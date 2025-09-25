@@ -1,21 +1,17 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import { SpellLink, SpellIcon, TooltipElement } from 'interface';
-import Analyzer from 'parser/core/Analyzer';
+import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import ArcaneMissiles from '../core/ArcaneMissiles';
 import { formatDurationMillisMinSec } from 'common/format';
-import { PerformanceMark, qualitativePerformanceToColor } from 'interface/guide';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from '../Guide';
-import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBreakdown';
+import { BaseMageGuide, PerformanceUtils, MageGuideComponents, createRuleset } from '../../shared/guide';
+
+import ArcaneMissiles from '../core/ArcaneMissiles';
 
 const MISSILE_LATE_CLIP_DELAY = 500;
 const MISSILE_EARLY_CLIP_DELAY = 200;
 
-class ArcaneMissilesGuide extends Analyzer {
+class ArcaneMissilesGuide extends BaseMageGuide {
   static dependencies = {
     arcaneMissiles: ArcaneMissiles,
   };
@@ -25,123 +21,110 @@ class ArcaneMissilesGuide extends Analyzer {
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
   hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.AETHER_ATTUNEMENT_TALENT);
 
-  generateGuideTooltip(
-    performance: QualitativePerformance,
-    tooltipItems: { perf: QualitativePerformance; detail: string }[],
-    timestamp: number,
-  ) {
-    const tooltip = (
-      <>
-        <div>
-          <b>@ {this.owner.formatTimestamp(timestamp)}</b>
-        </div>
-        <div>
-          <PerformanceMark perf={performance} /> {performance}
-        </div>
-        <div>
-          {tooltipItems.map((t, i) => (
-            <div key={i}>
-              <PerformanceMark perf={t.perf} /> {t.detail}
-              <br />
-            </div>
-          ))}
-        </div>
-      </>
-    );
-    return tooltip;
-  }
-
   channelDelayUtil(delay: number) {
-    const thresholds = this.arcaneMissiles.channelDelayThresholds.isGreaterThan;
-    let performance = QualitativePerformance.Fail;
-    if (delay < thresholds.minor) {
-      performance = QualitativePerformance.Perfect;
-    } else if (delay < thresholds.average) {
-      performance = QualitativePerformance.Good;
-    } else if (delay < thresholds.major) {
-      performance = QualitativePerformance.Ok;
-    }
-    return performance;
+    return PerformanceUtils.evaluatePerformance(
+      delay,
+      this.arcaneMissiles.channelDelayThresholds.isGreaterThan,
+      false // lower delay is better
+    );
   }
 
-  get arcaneMissilesData() {
-    const data: BoxRowEntry[] = [];
-    this.arcaneMissiles.missileCasts.forEach((am) => {
-      const clippedAtGCD =
-        am.channelEnd && am.gcdEnd && am.channelEnd - am.gcdEnd < MISSILE_LATE_CLIP_DELAY
-          ? true
-          : false;
-      const clippedBeforeGCD =
-        am.channelEnd && am.gcdEnd && am.gcdEnd - am.channelEnd > MISSILE_EARLY_CLIP_DELAY
-          ? true
-          : false;
-      const tooltipItems: { perf: QualitativePerformance; detail: string }[] = [];
-
-      if (am.clearcastingCapped) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Good,
-          detail: 'Capped on Clearcasting Charges',
-        });
-      }
-
+  get arcaneMissilesData(): BoxRowEntry[] {
+    return this.arcaneMissiles.missileCasts.map((am) => {
+      const clippedAtGCD = am.channelEnd && am.gcdEnd &&
+        am.channelEnd - am.gcdEnd < MISSILE_LATE_CLIP_DELAY;
+      const clippedBeforeGCD = am.channelEnd && am.gcdEnd &&
+        am.gcdEnd - am.channelEnd > MISSILE_EARLY_CLIP_DELAY;
       const hadBuffNP = this.hasNetherPrecision && am.netherPrecision;
-      if (hadBuffNP && !am.clearcastingCapped) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Fail,
-          detail: 'Nether Precision Buff Active',
-        });
-      }
-
       const badClip = am.clipped && clippedBeforeGCD;
-      if (badClip) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Fail,
-          detail: `Clipped Missiles Before GCD`,
-        });
-      }
-
       const noClip = !am.aetherAttunement && !am.clipped;
-      if (noClip) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Ok,
-          detail: `Full Channeled without Aether Attunement`,
-        });
-      }
-
       const goodClip = !am.aetherAttunement && am.clipped && clippedAtGCD;
-      if (goodClip) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Perfect,
-          detail: `Clipped at GCD With Aether Attunement`,
-        });
-      }
 
-      if (am.channelEndDelay !== undefined && am.nextCast) {
-        tooltipItems.push({
-          perf: this.channelDelayUtil(am.channelEndDelay),
-          detail: `${formatDurationMillisMinSec(am.channelEndDelay, 3)} Delay Until Next Cast (${am.nextCast.ability.name})`,
-        });
-      } else {
-        tooltipItems.push({ perf: QualitativePerformance.Fail, detail: 'Next Cast Not Found' });
-      }
+      return createRuleset(am, this)
 
-      let overallPerf = QualitativePerformance.Fail;
-      if (hadBuffNP && !am.clearcastingCapped) {
-        overallPerf = QualitativePerformance.Fail;
-      } else if (noClip) {
-        overallPerf = QualitativePerformance.Ok;
-      } else if (goodClip && (!hadBuffNP || am.clearcastingCapped)) {
-        overallPerf = QualitativePerformance.Perfect;
-      } else if (!hadBuffNP || (hadBuffNP && am.clearcastingCapped)) {
-        overallPerf = QualitativePerformance.Good;
-      }
+        // ===== INDIVIDUAL RULE DEFINITIONS =====
 
-      if (tooltipItems) {
-        const tooltip = this.generateGuideTooltip(overallPerf, tooltipItems, am.cast.timestamp);
-        data.push({ value: overallPerf, tooltip });
-      }
+        // Critical failure rules
+        .createRule({
+          id: 'netherPrecisionActive',
+          check: () => !(hadBuffNP && !am.clearcastingCapped),
+          failureText: 'Nether Precision Buff Active',
+          successText: hadBuffNP ? 'Had Nether Precision but was capped on Clearcasting' : 'No Nether Precision active',
+          failurePerformance: QualitativePerformance.Fail
+        })
+
+        .createRule({
+          id: 'clippedBeforeGCD',
+          check: () => !badClip,
+          failureText: 'Clipped Missiles Before GCD',
+          successText: badClip ? undefined : 'Did not clip before GCD',
+          failurePerformance: QualitativePerformance.Fail
+        })
+
+        .createRule({
+          id: 'nextCastFound',
+          check: () => am.channelEndDelay !== undefined && am.nextCast !== undefined,
+          failureText: 'Next Cast Not Found',
+          successText: am.nextCast ? `Next cast: ${am.nextCast.ability.name}` : undefined,
+          failurePerformance: QualitativePerformance.Fail
+        })
+
+        // Positive condition rules
+        .createRule({
+          id: 'clearcastingCapped',
+          check: () => am.clearcastingCapped,
+          failureText: 'Not capped on Clearcasting charges',
+          successText: 'Capped on Clearcasting Charges',
+          failurePerformance: QualitativePerformance.Ok
+        })
+
+        .createRule({
+          id: 'goodClip',
+          check: () => am.clipped,
+          failureText: 'Did not clip at GCD optimally',
+          successText: 'Clipped at GCD with Aether Attunement',
+          failurePerformance: QualitativePerformance.Ok
+        })
+
+        .createRule({
+          id: 'fullChannel',
+          check: () => noClip,
+          failureText: 'Did not fully channel',
+          successText: 'Full channeled without Aether Attunement',
+          failurePerformance: QualitativePerformance.Ok
+        })
+
+        .createRule({
+          id: 'channelDelay',
+          check: () => {
+            if (am.channelEndDelay === undefined) return false;
+            const delayPerf = this.channelDelayUtil(am.channelEndDelay);
+            return delayPerf === QualitativePerformance.Good || delayPerf === QualitativePerformance.Perfect;
+          },
+          failureText: am.channelEndDelay !== undefined ?
+            `${formatDurationMillisMinSec(am.channelEndDelay, 3)} Delay Until Next Cast (${am.nextCast?.ability.name || 'Unknown'})` :
+            'Channel delay unknown',
+          successText: am.channelEndDelay !== undefined ?
+            `Good timing: ${formatDurationMillisMinSec(am.channelEndDelay, 3)} delay` :
+            undefined,
+          failurePerformance: QualitativePerformance.Ok
+        })
+
+        // ===== PERFORMANCE CRITERIA =====
+
+        // Perfect: Good clipping with optimal conditions
+        .perfectIf(['netherPrecisionActive', 'clippedBeforeGCD', 'nextCastFound', 'goodClip'])
+
+        // Good: Meeting basic requirements
+        .goodIf(['netherPrecisionActive', 'clippedBeforeGCD', 'nextCastFound'])
+
+        // Ok: Full channel without clipping issues
+        .okIf(['netherPrecisionActive', 'clippedBeforeGCD', 'fullChannel'])
+
+        // Fail if critical rules not met
+
+        .evaluate(am.cast.timestamp);
     });
-    return data;
   }
 
   get guideSubsection(): JSX.Element {
@@ -149,68 +132,46 @@ class ArcaneMissilesGuide extends Analyzer {
     const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
     const netherPrecision = <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} />;
     const aetherAttunement = <SpellLink spell={TALENTS.AETHER_ATTUNEMENT_TALENT} />;
-    const highVoltage = <SpellLink spell={TALENTS.HIGH_VOLTAGE_TALENT} />;
-    const arcaneMissilesIcon = <SpellIcon spell={TALENTS.ARCANE_MISSILES_TALENT} />;
 
     const explanation = (
       <>
         <div>
-          <b>{arcaneMissiles}</b> is your {clearcasting} spender and increases damage via procs such
-          as {netherPrecision}, {aetherAttunement}, and {highVoltage}. The below guidelines take
-          advantage of these procs without conflicting with other procs and buffs.
+          Ensure you are spending your <b>{clearcasting}</b> procs effectively with {arcaneMissiles}.
+        </div>
+        <div>
           <ul>
-            <li>
-              Cast {arcaneMissiles} immediately if capped on {clearcasting} charges, ignoring any of
-              the below items, to avoid munching procs (gaining a charge while capped).
-            </li>
-            <li>
-              Do not cast {arcaneMissiles} if you have {netherPrecision}.
-            </li>
-            <li>
-              If you don't have {aetherAttunement}, you can optionally clip your {arcaneMissiles}{' '}
-              cast once the GCD ends for a small damage boost.
-            </li>
+            <li>Cast {arcaneMissiles} immediately if capped on {clearcasting} charges, ignoring any of the below items, to avoid munching procs (gaining a charge while capped).</li>
+            <li>Do not cast {arcaneMissiles} if you have {netherPrecision}.</li>
+            <li>If you don't have {aetherAttunement}, you can optionally clip your {arcaneMissiles} cast once the GCD ends for a small damage boost.</li>
           </ul>
         </div>
       </>
     );
+
     const averageDelayTooltip = (
       <>
         {formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3)} Average Delay from
         End Channel to Next Cast.
       </>
     );
-    const data = (
-      <div>
-        <RoundedPanel>
-          <div
-            style={{
-              color: qualitativePerformanceToColor(
-                this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay),
-              ),
-              fontSize: '20px',
-            }}
-          >
-            {arcaneMissilesIcon}{' '}
-            <TooltipElement content={averageDelayTooltip}>
-              {formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3)}{' '}
-              <small>Average Delay from Channel End to Next Cast</small>
-            </TooltipElement>
-          </div>
-          <div>
-            <CastSummaryAndBreakdown
-              spell={TALENTS.ARCANE_MISSILES_TALENT}
-              castEntries={this.arcaneMissilesData}
-            />
-          </div>
-        </RoundedPanel>
-      </div>
-    );
 
-    return explanationAndDataSubsection(
+    const dataComponents = [
+      MageGuideComponents.createStatistic(
+        TALENTS.ARCANE_MISSILES_TALENT,
+        formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
+        'Average Delay from Channel End to Next Cast',
+        this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay),
+        averageDelayTooltip
+      ),
+      MageGuideComponents.createPerCastSummary(
+        TALENTS.ARCANE_MISSILES_TALENT,
+        this.arcaneMissilesData,
+      ),
+    ];
+
+    return MageGuideComponents.createSubsection(
       explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
+      dataComponents,
       'Arcane Missiles',
     );
   }

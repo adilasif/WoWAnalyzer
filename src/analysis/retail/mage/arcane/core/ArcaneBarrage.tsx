@@ -14,7 +14,6 @@ import Events, {
 import ArcaneChargeTracker from './ArcaneChargeTracker';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
-import { TrackedBuffEvent } from 'parser/core/Entity';
 import { encodeTargetString } from 'parser/shared/modules/Enemies';
 
 const TEMPO_DURATION = 12000;
@@ -61,7 +60,7 @@ export default class ArcaneBarrage extends Analyzer {
 
   onBarrage(event: CastEvent) {
     const hasTempo = this.selectedCombatant.hasBuff(SPELLS.ARCANE_TEMPO_BUFF.id);
-    const blastPrecast: CastEvent | undefined = GetRelatedEvent(event, 'SpellPrecast');
+    const precast: CastEvent | undefined = GetRelatedEvent(event, 'SpellPrecast');
     const netherPrecision = this.selectedCombatant.getBuff(SPELLS.NETHER_PRECISION_BUFF.id);
     const charges = this.arcaneChargeTracker.current;
     const targetsHit = GetRelatedEvents(event, 'SpellDamage').length;
@@ -86,8 +85,8 @@ export default class ArcaneBarrage extends Analyzer {
 
     this.barrageCasts.push({
       cast: event,
-      netherPrecisionStacks: netherPrecision ? netherPrecision.stacks : undefined,
-      blastPrecast,
+      netherPrecisionStacks: netherPrecision ? netherPrecision.stacks : 0,
+      precast,
       touchCD: this.spellUsable.cooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
       tempoRemaining: hasTempo
         ? TEMPO_DURATION - (event.timestamp - this.lastTempoApply)
@@ -96,14 +95,13 @@ export default class ArcaneBarrage extends Analyzer {
         SPELLS.CLEARCASTING_ARCANE.id,
         event.timestamp - 10,
       ),
-      arcaneOrb: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
+      arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
       arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
       burdenOfPower: this.selectedCombatant.hasBuff(SPELLS.BURDEN_OF_POWER_BUFF.id),
       gloriousIncandescence: this.selectedCombatant.hasBuff(
         TALENTS.GLORIOUS_INCANDESCENCE_TALENT.id,
       ),
       intuition: this.selectedCombatant.hasBuff(SPELLS.INTUITION_BUFF.id),
-      aethervision: this.selectedCombatant.getBuff(SPELLS.AETHERVISION_BUFF.id),
       charges,
       targetsHit: targetsHit || 0,
       mana: manaPercent,
@@ -116,17 +114,16 @@ export default class ArcaneBarrage extends Analyzer {
 
 export interface ArcaneBarrageCast {
   cast: CastEvent;
-  netherPrecisionStacks?: number;
-  blastPrecast?: CastEvent;
+  netherPrecisionStacks: number;
+  precast?: CastEvent;
   touchCD: number;
   tempoRemaining?: number;
   clearcasting: boolean;
-  arcaneOrb: boolean;
+  arcaneOrbAvail: boolean;
   arcaneSoul: boolean;
   burdenOfPower: boolean;
   gloriousIncandescence: boolean;
   intuition: boolean;
-  aethervision?: TrackedBuffEvent;
   charges: number;
   targetsHit: number;
   mana?: number;

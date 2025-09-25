@@ -50,8 +50,7 @@ const config: Config = {
       frontmatterType: 'guide',
       notes: (
         <AlertWarning>
-          This is now updated for 11.0.5. If you notice any issues or if something is missing, ping
-          me in the Altered Time Mage Discord <code>@Sharrq</code>
+          This will be updated when Deam stops peeling grapes. Be sure to ping him repeatedly in the Alter Time Discord until he complies. <code>@deam</code>
         </AlertWarning>
       ),
     },

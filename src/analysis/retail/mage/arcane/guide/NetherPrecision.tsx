@@ -1,93 +1,63 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
-import Analyzer from 'parser/core/Analyzer';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { PerformanceMark } from 'interface/guide';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from 'analysis/retail/mage/arcane/Guide';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
 
 import NetherPrecision from '../talents/NetherPrecision';
-import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBreakdown';
 
-class NetherPrecisionGuide extends Analyzer {
+class NetherPrecisionGuide extends BaseMageGuide {
   static dependencies = {
     netherPrecision: NetherPrecision,
   };
 
   protected netherPrecision!: NetherPrecision;
 
-  generateGuideTooltip(
-    performance: QualitativePerformance,
-    tooltipItems: { perf: QualitativePerformance; detail: string }[],
-    timestamp: number,
-  ) {
-    const tooltip = (
-      <>
-        <div>
-          <b>@ {this.owner.formatTimestamp(timestamp)}</b>
-        </div>
-        <div>
-          <PerformanceMark perf={performance} /> {performance}
-        </div>
-        <div>
-          {tooltipItems.map((t, i) => (
-            <div key={i}>
-              <PerformanceMark perf={t.perf} /> {t.detail}
-              <br />
-            </div>
-          ))}
-        </div>
-      </>
-    );
-    return tooltip;
-  }
-
-  get netherPrecisionData() {
-    const data: BoxRowEntry[] = [];
-    this.netherPrecision.netherPrecisionBuffs.forEach((np) => {
-      const tooltipItems: { perf: QualitativePerformance; detail: string }[] = [];
-
-      if (np.overwritten) {
-        tooltipItems.push({ perf: QualitativePerformance.Fail, detail: `Buff Overwritten` });
-      }
-
+  get netherPrecisionData(): BoxRowEntry[] {
+    return this.netherPrecision.netherPrecisionBuffs.map((np) => {
       const oneStackLost = np.damageEvents?.length === 1;
       const bothStacksLost = !np.damageEvents;
-      if (oneStackLost || bothStacksLost) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Fail,
-          detail: `${oneStackLost ? 'One stack' : 'Both stacks'} lost`,
-        });
-      }
+      const fightEndOneLost = this.owner.fight.end_time === np.removed && oneStackLost;
+      const fightEndBothLost = this.owner.fight.end_time === np.removed && bothStacksLost;
 
-      const fightEndOneLost =
-        this.owner.fight.end_time === np.removed && np.damageEvents?.length === 1;
-      const fightEndBothLost = this.owner.fight.end_time === np.removed && !np.damageEvents;
-      if (fightEndOneLost || fightEndBothLost) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Ok,
-          detail: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost close to fight end`,
-        });
-      }
+      return createRuleset(np, this)
 
-      let overallPerf = QualitativePerformance.Fail;
-      if (np.overwritten || oneStackLost || bothStacksLost) {
-        overallPerf = QualitativePerformance.Fail;
-      } else if (fightEndBothLost || fightEndOneLost) {
-        overallPerf = QualitativePerformance.Ok;
-      } else {
-        overallPerf = QualitativePerformance.Good;
-      }
+        // ===== INDIVIDUAL RULE DEFINITIONS =====
 
-      if (tooltipItems) {
-        const tooltip = this.generateGuideTooltip(overallPerf, tooltipItems, np.applied);
-        data.push({ value: overallPerf, tooltip });
-      }
+        .createRule({
+          id: 'notOverwritten',
+          check: () => !np.overwritten,
+          failureText: 'Buff Overwritten',
+          successText: 'Buff not overwritten',
+          failurePerformance: QualitativePerformance.Fail
+        })
+
+        .createRule({
+          id: 'stacksUsed',
+          check: () => !(oneStackLost || bothStacksLost),
+          failureText: `${oneStackLost ? 'One stack' : 'Both stacks'} lost`,
+          successText: 'Both stacks used properly',
+          failurePerformance: QualitativePerformance.Fail
+        })
+
+        .createRule({
+          id: 'fightEndGrace',
+          check: () => fightEndOneLost || fightEndBothLost,
+          failureText: 'Stacks lost not near fight end',
+          successText: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost close to fight end`,
+          failurePerformance: QualitativePerformance.Ok
+        })
+
+        // ===== PERFORMANCE CRITERIA =====
+
+        .goodIf(['notOverwritten', 'stacksUsed'])              // Good if not overwritten and all stacks used
+        .okIf(['notOverwritten', 'fightEndGrace'])             // Ok if lost near fight end but not overwritten
+
+        // Fail if overwritten or stacks wasted
+
+        .evaluate(np.applied);
     });
-    return data;
   }
 
   get guideSubsection(): JSX.Element {
@@ -108,23 +78,17 @@ class NetherPrecisionGuide extends Analyzer {
         </div>
       </>
     );
-    const data = (
-      <div>
-        <RoundedPanel>
-          <div>
-            <CastSummaryAndBreakdown
-              spell={TALENTS.NETHER_PRECISION_TALENT}
-              castEntries={this.netherPrecisionData}
-            />
-          </div>
-        </RoundedPanel>
-      </div>
-    );
 
-    return explanationAndDataSubsection(
+    const dataComponents = [
+      MageGuideComponents.createPerCastSummary(
+        TALENTS.NETHER_PRECISION_TALENT,
+        this.netherPrecisionData,
+      ),
+    ];
+
+    return MageGuideComponents.createSubsection(
       explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
+      dataComponents,
       'Nether Precision',
     );
   }

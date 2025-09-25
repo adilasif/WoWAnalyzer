@@ -1,23 +1,19 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
-import Analyzer from 'parser/core/Analyzer';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
-import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { PassFailCheckmark } from 'interface/guide';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from 'analysis/retail/mage/arcane/Guide';
 import { SpellSeq } from 'parser/ui/SpellSeq';
+import {
+  BaseMageGuide,
+  MageGuideComponents,
+  createRuleset
+} from '../../shared/guide';
 
 import ArcaneSurge, { ArcaneSurgeCast } from '../core/ArcaneSurge';
-import CooldownExpandable, {
-  CooldownExpandableItem,
-} from 'interface/guide/components/CooldownExpandable';
 import { ARCANE_CHARGE_MAX_STACKS } from '../../shared';
 
 const OPENER_DURATION = 20000;
 
-class ArcaneSurgeGuide extends Analyzer {
+class ArcaneSurgeGuide extends BaseMageGuide {
   static dependencies = {
     arcaneSurge: ArcaneSurge,
   };
@@ -28,69 +24,56 @@ class ArcaneSurgeGuide extends Analyzer {
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
   private perCastBreakdown(cast: ArcaneSurgeCast): React.ReactNode {
-    const header = (
-      <>
-        @ {this.owner.formatTimestamp(cast.cast)} &mdash;{' '}
-        <SpellLink spell={TALENTS.ARCANE_SURGE_TALENT} />
-      </>
-    );
-
-    const checklistItems: CooldownExpandableItem[] = [];
-
-    const maxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS;
     const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
-    checklistItems.push({
-      label: (
-        <>
-          <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Surge
-        </>
-      ),
-      result: <PassFailCheckmark pass={maxCharges || (!maxCharges && opener)} />,
-      details: (
-        <>
-          {cast.charges} {opener ? '(Opener)' : ''}
-        </>
-      ),
-    });
 
-    if (this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT)) {
-      checklistItems.push({
-        label: (
-          <>
-            <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active
-          </>
-        ),
-        result: <PassFailCheckmark pass={cast.siphonStormBuff} />,
-        details: <>{cast.siphonStormBuff ? `Buff Active` : `Buff Missing`}</>,
-      });
-    }
+    // Create rules for evaluation
+    const ruleset = createRuleset(cast, this)
+      .createRule({
+        id: 'maxCharges',
+        check: () => cast.charges === ARCANE_CHARGE_MAX_STACKS || opener,
+        failureText: `Only ${cast.charges} charges`,
+        successText: cast.charges === ARCANE_CHARGE_MAX_STACKS
+          ? `${cast.charges} charges`
+          : `${cast.charges} charges (Opener)`,
+      })
 
-    if (this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT)) {
-      checklistItems.push({
-        label: (
-          <>
-            <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active
-          </>
-        ),
-        result: <PassFailCheckmark pass={cast.netherPrecision} />,
-        details: <>{cast.netherPrecision ? `Buff Active` : `Buff Missing`}</>,
-      });
-    }
+      .createRule({
+        id: 'siphonStorm',
+        active: this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT),
+        check: () => cast.siphonStormBuff,
+        failureText: 'Buff Missing',
+        successText: 'Buff Active',
+      })
 
-    const perf =
-      (maxCharges || (!maxCharges && opener)) &&
-      (!this.hasSiphonStorm || cast.siphonStormBuff) &&
-      (!this.hasNetherPrecision || cast.netherPrecision)
-        ? QualitativePerformance.Good
-        : QualitativePerformance.Fail;
+      .createRule({
+        id: 'netherPrecision',
+        active: this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT),
+        check: () => cast.netherPrecision,
+        failureText: 'Buff Missing',
+        successText: 'Buff Active',
+      })
 
-    return (
-      <CooldownExpandable
-        header={header}
-        checklistItems={checklistItems}
-        perf={perf}
-        key={cast.ordinal}
-      />
+      .goodIf(['maxCharges', 'siphonStorm', 'netherPrecision']);
+
+    // Get rule results and performance
+    const ruleResults = ruleset.getRuleResults();
+    const performance = ruleset.getPerformance();
+
+    // Define labels for checklist items
+    const ruleLabels = new Map<string, JSX.Element>([
+      ['maxCharges', <><SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Surge</>],
+      ['siphonStorm', <><SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active</>],
+      ['netherPrecision', <><SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active</>],
+    ]);
+
+    return MageGuideComponents.createExpandableCastItem(
+      TALENTS.ARCANE_SURGE_TALENT,
+      cast.cast,
+      this.owner,
+      ruleResults,
+      ruleLabels,
+      performance,
+      cast.ordinal
     );
   }
 
@@ -139,24 +122,15 @@ class ArcaneSurgeGuide extends Analyzer {
         </div>
       </>
     );
-    const data = (
-      <div>
-        <RoundedPanel>
-          <div>
-            <p>
-              <strong>Per-Cast Breakdown</strong>
-              <small> - click to expand</small>
-              {this.arcaneSurge.surgeCasts.map((cast) => this.perCastBreakdown(cast))}
-            </p>
-          </div>
-        </RoundedPanel>
-      </div>
-    );
+    const castBreakdowns = this.arcaneSurge.surgeCasts.map((cast) => this.perCastBreakdown(cast));
 
-    return explanationAndDataSubsection(
+    const dataComponents = [
+      MageGuideComponents.createExpandableCastBreakdown(castBreakdowns),
+    ];
+
+    return MageGuideComponents.createSubsection(
       explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
+      dataComponents,
       'Arcane Surge',
     );
   }

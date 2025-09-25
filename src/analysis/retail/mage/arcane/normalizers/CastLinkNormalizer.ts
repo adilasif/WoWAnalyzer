@@ -53,7 +53,7 @@ const EVENT_LINKS: EventLink[] = [
     linkingEventId: SPELLS.ARCANE_BARRAGE.id,
     linkingEventType: EventType.Cast,
     linkRelation: SPELL_PRECAST,
-    referencedEventId: SPELLS.ARCANE_BLAST.id,
+    referencedEventId: [SPELLS.ARCANE_BLAST.id, TALENTS.ARCANE_SURGE_TALENT.id],
     referencedEventType: EventType.Cast,
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
