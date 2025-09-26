@@ -1,7 +1,23 @@
-import { formatPercentage } from 'common/format';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { PerformanceUtils } from './PerformanceUtils';
+
+/**
+ * Basic type for cast objects used in rules
+ * This is intentionally minimal to allow different cast types
+ */
+export type CastLike = Record<string, unknown>;
+
+/**
+ * Basic interface for guide objects that can generate tooltips
+ */
+export interface GuideLike {
+  generateGuideTooltip: (
+    performance: QualitativePerformance,
+    tooltipItems: Array<{ perf: QualitativePerformance; detail: string }>,
+    timestamp: number,
+  ) => JSX.Element;
+}
 
 /**
  * Represents an individual rule that can be evaluated.
@@ -30,15 +46,22 @@ export interface PerformanceCriteria {
 /**
  * Simple template for creating individual rules in guide files.
  */
-export class SimpleRuleTemplate {
-  private cast: any;
-  private guide: any;
+export class SimpleRuleTemplate<T = CastLike> {
+  private guide: GuideLike;
   private rules: GuideRule[] = [];
   private performanceCriteria: PerformanceCriteria = {};
+  private cast: T;
 
-  constructor(cast: any, guide: any) {
+  constructor(cast: T, guide: GuideLike) {
     this.cast = cast;
     this.guide = guide;
+  }
+
+  /**
+   * Get the cast data associated with this ruleset
+   */
+  getCast(): T {
+    return this.cast;
   }
 
   // ===== INDIVIDUAL RULE DEFINITIONS =====
@@ -62,6 +85,7 @@ export class SimpleRuleTemplate {
     failurePerformance?: QualitativePerformance;
     successPerformance?: QualitativePerformance;
     active?: boolean | (() => boolean);
+    label?: JSX.Element;
   }): this {
     // Handle active as boolean or function
     let isActive = true;
@@ -84,7 +108,8 @@ export class SimpleRuleTemplate {
       successText: params.successText,
       failurePerformance: params.failurePerformance ?? QualitativePerformance.Fail,
       successPerformance: params.successPerformance ?? QualitativePerformance.Good,
-      active: params.active
+      active: isActive,
+      label: params.label,
     };
     return this.addRule(rule);
   }
@@ -146,8 +171,8 @@ export class SimpleRuleTemplate {
 
     // Helper to check if any combination of rules passes
     const checkCriteria = (criteriaGroups: string[][]): boolean => {
-      return criteriaGroups.some(ruleGroup =>
-        ruleGroup.every(ruleId => ruleResults.get(ruleId)?.passed === true)
+      return criteriaGroups.some((ruleGroup) =>
+        ruleGroup.every((ruleId) => ruleResults.get(ruleId)?.passed === true),
       );
     };
 
@@ -162,16 +187,22 @@ export class SimpleRuleTemplate {
     }
 
     // Check Good criteria (only if not already Perfect)
-    if (overallPerformance !== QualitativePerformance.Perfect &&
-        this.performanceCriteria.good && this.performanceCriteria.good.length > 0) {
+    if (
+      overallPerformance !== QualitativePerformance.Perfect &&
+      this.performanceCriteria.good &&
+      this.performanceCriteria.good.length > 0
+    ) {
       if (checkCriteria(this.performanceCriteria.good)) {
         overallPerformance = QualitativePerformance.Good;
       }
     }
 
     // Check Ok criteria (only if not already Perfect/Good)
-    if (overallPerformance === QualitativePerformance.Fail &&
-        this.performanceCriteria.ok && this.performanceCriteria.ok.length > 0) {
+    if (
+      overallPerformance === QualitativePerformance.Fail &&
+      this.performanceCriteria.ok &&
+      this.performanceCriteria.ok.length > 0
+    ) {
       if (checkCriteria(this.performanceCriteria.ok)) {
         overallPerformance = QualitativePerformance.Ok;
       }
@@ -180,20 +211,20 @@ export class SimpleRuleTemplate {
     // Build tooltip items
     const tooltipItems: Array<{ perf: QualitativePerformance; detail: string }> = [];
 
-    for (const [ruleId, result] of ruleResults) {
+    for (const [, result] of ruleResults) {
       const { rule, passed } = result;
 
       if (passed && rule.successText) {
         // Add success tooltip
         tooltipItems.push({
           perf: rule.successPerformance || QualitativePerformance.Good,
-          detail: rule.successText
+          detail: rule.successText,
         });
       } else if (!passed && rule.failureText) {
         // Add failure tooltip only if failureText is provided
         tooltipItems.push({
           perf: rule.failurePerformance || QualitativePerformance.Fail,
-          detail: rule.failureText
+          detail: rule.failureText,
         });
       }
     }
@@ -231,8 +262,8 @@ export class SimpleRuleTemplate {
 
     // Helper to check if any combination of rules passes
     const checkCriteria = (criteriaGroups: string[][]): boolean => {
-      return criteriaGroups.some(ruleGroup =>
-        ruleGroup.every(ruleId => ruleResults.get(ruleId)?.passed === true)
+      return criteriaGroups.some((ruleGroup) =>
+        ruleGroup.every((ruleId) => ruleResults.get(ruleId)?.passed === true),
       );
     };
 
@@ -247,16 +278,22 @@ export class SimpleRuleTemplate {
     }
 
     // Check Good criteria (only if not already Perfect)
-    if (overallPerformance !== QualitativePerformance.Perfect &&
-        this.performanceCriteria.good && this.performanceCriteria.good.length > 0) {
+    if (
+      overallPerformance !== QualitativePerformance.Perfect &&
+      this.performanceCriteria.good &&
+      this.performanceCriteria.good.length > 0
+    ) {
       if (checkCriteria(this.performanceCriteria.good)) {
         overallPerformance = QualitativePerformance.Good;
       }
     }
 
     // Check Ok criteria (only if not already Perfect/Good)
-    if (overallPerformance === QualitativePerformance.Fail &&
-        this.performanceCriteria.ok && this.performanceCriteria.ok.length > 0) {
+    if (
+      overallPerformance === QualitativePerformance.Fail &&
+      this.performanceCriteria.ok &&
+      this.performanceCriteria.ok.length > 0
+    ) {
       if (checkCriteria(this.performanceCriteria.ok)) {
         overallPerformance = QualitativePerformance.Ok;
       }
@@ -269,6 +306,6 @@ export class SimpleRuleTemplate {
 /**
  * Factory function to create a ruleset template.
  */
-export function createRuleset(cast: any, guide: any): SimpleRuleTemplate {
-  return new SimpleRuleTemplate(cast, guide);
+export function createRuleset<T = CastLike>(cast: T, guide: GuideLike): SimpleRuleTemplate<T> {
+  return new SimpleRuleTemplate<T>(cast, guide);
 }

@@ -1,23 +1,16 @@
 import TALENTS from 'common/TALENTS/mage';
-import { SpellLink, SpellIcon, TooltipElement } from 'interface';
-import Analyzer from 'parser/core/Analyzer';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
+import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { PassFailCheckmark, qualitativePerformanceToColor } from 'interface/guide';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from 'analysis/retail/mage/arcane/Guide';
-
-import CooldownExpandable, {
-  CooldownExpandableItem,
-} from 'interface/guide/components/CooldownExpandable';
+import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
 import Supernova, { SupernovaCast } from '../../shared/Supernova';
 
 const AOE_THRESHOLD = 4;
 const TOUCH_DURATION_THRESHOLD = 3000;
 
-class SupernovaGuide extends Analyzer {
+class SupernovaGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     supernova: Supernova,
   };
 
@@ -29,65 +22,64 @@ class SupernovaGuide extends Analyzer {
   );
 
   private perCastBreakdown(cast: SupernovaCast): React.ReactNode {
-    const header = (
-      <>
-        @ {this.owner.formatTimestamp(cast.timestamp)} &mdash;{' '}
-        <SpellLink spell={TALENTS.SUPERNOVA_TALENT} />
-      </>
-    );
+    const ST = cast.targetsHit < AOE_THRESHOLD;
+    const AOE = cast.targetsHit >= AOE_THRESHOLD;
 
-    const checklistItems: CooldownExpandableItem[] = [];
-
-    checklistItems.push({
-      label: <>Targets Hit</>,
-      details: <>{cast.targetsHit}</>,
-    });
-
-    if (this.hasTouchOfTheMagi) {
-      const touchRemaining =
-        cast.touchRemaining && cast.touchRemaining < TOUCH_DURATION_THRESHOLD ? true : false;
-      checklistItems.push({
+    // Create rules for evaluation
+    const ruleset = createRuleset(cast, this)
+      .createRule({
+        id: 'touchTiming',
+        check: () =>
+          !this.hasTouchOfTheMagi ||
+          (cast.touchRemaining != null && cast.touchRemaining < TOUCH_DURATION_THRESHOLD),
+        failureText: cast.touchRemaining
+          ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining`
+          : 'No Touch active',
+        successText: cast.touchRemaining
+          ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining`
+          : 'No Touch needed',
+        active: () => this.hasTouchOfTheMagi && ST,
         label: (
           <>
             <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} /> Duration Remaining
           </>
         ),
-        result: <PassFailCheckmark pass={touchRemaining} />,
-        details: <>{cast.unerringStacks ? cast.unerringStacks : `Buff Missing`}</>,
-      });
-    }
-
-    if (this.hasUnerringProficiency) {
-      const unerringStacks = cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS;
-      checklistItems.push({
+      })
+      .createRule({
+        id: 'unerringStacks',
+        check: () =>
+          !this.hasUnerringProficiency || cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS,
+        failureText: cast.unerringStacks ? `${cast.unerringStacks} stacks` : 'Buff Missing',
+        successText: `${UNERRING_PROFICIENCY_MAX_STACKS} stacks`,
+        active: () => this.hasUnerringProficiency && AOE,
         label: (
           <>
             <SpellLink spell={TALENTS.UNERRING_PROFICIENCY_TALENT} /> Stacks
           </>
         ),
-        result: <PassFailCheckmark pass={unerringStacks} />,
-        details: <>{cast.unerringStacks ? cast.unerringStacks : `Buff Missing`}</>,
-      });
-    }
+      })
+      .createRule({
+        id: 'targetsHit',
+        check: () => true, // Always show targets hit as informational
+        failureText: `${cast.targetsHit} targets`,
+        successText: `${cast.targetsHit} targets`,
+        failurePerformance: QualitativePerformance.Good, // Neutral display
+        successPerformance: QualitativePerformance.Good,
+        label: <>Targets Hit</>,
+      })
+      .goodIf(['touchTiming', 'unerringStacks', 'targetsHit']);
 
-    const ST = cast.targetsHit < AOE_THRESHOLD;
-    const AOE = cast.targetsHit >= AOE_THRESHOLD;
+    // Get rule results and performance
+    const ruleResults = ruleset.getRuleResults();
+    const performance = ruleset.getPerformance();
 
-    const overallPerf =
-      (ST && cast.touchRemaining && cast.touchRemaining < TOUCH_DURATION_THRESHOLD) ||
-      (this.hasUnerringProficiency &&
-        AOE &&
-        cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS)
-        ? QualitativePerformance.Good
-        : QualitativePerformance.Fail;
-
-    return (
-      <CooldownExpandable
-        header={header}
-        checklistItems={checklistItems}
-        perf={overallPerf}
-        key={cast.ordinal}
-      />
+    return MageGuideComponents.createExpandableCastItem(
+      TALENTS.SUPERNOVA_TALENT,
+      cast.timestamp,
+      this.owner,
+      ruleResults,
+      performance,
+      cast.ordinal,
     );
   }
 
@@ -95,7 +87,6 @@ class SupernovaGuide extends Analyzer {
     const supernova = <SpellLink spell={TALENTS.SUPERNOVA_TALENT} />;
     const touchOfTheMagi = <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />;
     const unerringProficiency = <SpellLink spell={TALENTS.UNERRING_PROFICIENCY_TALENT} />;
-    const supernovaIcon = <SpellIcon spell={TALENTS.SUPERNOVA_TALENT} />;
 
     const explanation = (
       <>
@@ -119,49 +110,28 @@ class SupernovaGuide extends Analyzer {
         </div>
       </>
     );
+
     const supernovaTooltip = (
       <>{this.supernova.averageTargetsHit.toFixed(2)} average targets hit per cast.</>
     );
-    const data =
-      this.supernova.casts.length > 0 ? (
-        <div>
-          <RoundedPanel>
-            <div
-              style={{
-                color: qualitativePerformanceToColor(QualitativePerformance.Good),
-                fontSize: '20px',
-              }}
-            >
-              {supernovaIcon}{' '}
-              <TooltipElement content={supernovaTooltip}>
-                {this.supernova.averageTargetsHit.toFixed(2)} <small>Average Targets Hit</small>
-              </TooltipElement>
-            </div>
-            <div>
-              <p>
-                <strong>Per-Cast Breakdown</strong>
-                <small> - click to expand</small>
-                {this.supernova.casts.map((cast) => this.perCastBreakdown(cast))}
-              </p>
-            </div>
-          </RoundedPanel>
-        </div>
-      ) : (
-        <RoundedPanel>
-          <div style={{ textAlign: 'center', fontSize: '20px' }}>
-            <p>
-              <strong>Player did not cast {supernova}</strong>
-            </p>
-          </div>
-        </RoundedPanel>
-      );
 
-    return explanationAndDataSubsection(
-      explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
-      'Supernova',
-    );
+    const castBreakdowns = this.supernova.casts.map((cast) => this.perCastBreakdown(cast));
+
+    const dataComponents =
+      this.supernova.casts.length > 0
+        ? [
+            MageGuideComponents.createStatisticPanel(
+              TALENTS.SUPERNOVA_TALENT,
+              this.supernova.averageTargetsHit.toFixed(2),
+              'Average Targets Hit',
+              QualitativePerformance.Good,
+              supernovaTooltip,
+            ),
+            MageGuideComponents.createExpandableCastBreakdown(castBreakdowns),
+          ]
+        : [MageGuideComponents.createNoUsageComponent(TALENTS.SUPERNOVA_TALENT)];
+
+    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Supernova');
   }
 }
 

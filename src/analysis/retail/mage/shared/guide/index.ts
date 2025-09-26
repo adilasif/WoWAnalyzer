@@ -1,4 +1,9 @@
 export { default as BaseMageGuide } from './BaseMageGuide';
 export { PerformanceUtils } from './PerformanceUtils';
-export { MageGuideComponents } from './MageGuideComponents';
-export { SimpleRuleTemplate, createRuleset } from './SimpleRuleTemplate';
+export { MageGuideComponents, type ModuleLike } from './MageGuideComponents';
+export {
+  SimpleRuleTemplate,
+  createRuleset,
+  type CastLike,
+  type GuideLike,
+} from './SimpleRuleTemplate';

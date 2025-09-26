@@ -9,6 +9,7 @@ import NetherPrecision from '../talents/NetherPrecision';
 
 class NetherPrecisionGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     netherPrecision: NetherPrecision,
   };
 
@@ -21,42 +22,43 @@ class NetherPrecisionGuide extends BaseMageGuide {
       const fightEndOneLost = this.owner.fight.end_time === np.removed && oneStackLost;
       const fightEndBothLost = this.owner.fight.end_time === np.removed && bothStacksLost;
 
-      return createRuleset(np, this)
+      return (
+        createRuleset(np, this)
+          // ===== INDIVIDUAL RULE DEFINITIONS =====
 
-        // ===== INDIVIDUAL RULE DEFINITIONS =====
+          .createRule({
+            id: 'notOverwritten',
+            check: () => !np.overwritten,
+            failureText: 'Buff Overwritten',
+            successText: 'Buff not overwritten',
+            failurePerformance: QualitativePerformance.Fail,
+          })
 
-        .createRule({
-          id: 'notOverwritten',
-          check: () => !np.overwritten,
-          failureText: 'Buff Overwritten',
-          successText: 'Buff not overwritten',
-          failurePerformance: QualitativePerformance.Fail
-        })
+          .createRule({
+            id: 'stacksUsed',
+            check: () => !(oneStackLost || bothStacksLost),
+            failureText: `${oneStackLost ? 'One stack' : 'Both stacks'} lost`,
+            successText: 'Both stacks used properly',
+            failurePerformance: QualitativePerformance.Fail,
+          })
 
-        .createRule({
-          id: 'stacksUsed',
-          check: () => !(oneStackLost || bothStacksLost),
-          failureText: `${oneStackLost ? 'One stack' : 'Both stacks'} lost`,
-          successText: 'Both stacks used properly',
-          failurePerformance: QualitativePerformance.Fail
-        })
+          .createRule({
+            id: 'fightEndGrace',
+            check: () => fightEndOneLost || fightEndBothLost,
+            failureText: 'Stacks lost not near fight end',
+            successText: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost close to fight end`,
+            failurePerformance: QualitativePerformance.Ok,
+          })
 
-        .createRule({
-          id: 'fightEndGrace',
-          check: () => fightEndOneLost || fightEndBothLost,
-          failureText: 'Stacks lost not near fight end',
-          successText: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost close to fight end`,
-          failurePerformance: QualitativePerformance.Ok
-        })
+          // ===== PERFORMANCE CRITERIA =====
 
-        // ===== PERFORMANCE CRITERIA =====
+          .goodIf(['notOverwritten', 'stacksUsed']) // Good if not overwritten and all stacks used
+          .okIf(['notOverwritten', 'fightEndGrace']) // Ok if lost near fight end but not overwritten
 
-        .goodIf(['notOverwritten', 'stacksUsed'])              // Good if not overwritten and all stacks used
-        .okIf(['notOverwritten', 'fightEndGrace'])             // Ok if lost near fight end but not overwritten
+          // Fail if overwritten or stacks wasted
 
-        // Fail if overwritten or stacks wasted
-
-        .evaluate(np.applied);
+          .evaluate(np.applied)
+      );
     });
   }
 
@@ -86,11 +88,7 @@ class NetherPrecisionGuide extends BaseMageGuide {
       ),
     ];
 
-    return MageGuideComponents.createSubsection(
-      explanation,
-      dataComponents,
-      'Nether Precision',
-    );
+    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Nether Precision');
   }
 }
 

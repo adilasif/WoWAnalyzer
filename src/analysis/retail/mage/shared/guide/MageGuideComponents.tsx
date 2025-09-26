@@ -5,15 +5,26 @@ import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBr
 import { PerformanceBoxRow, BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import {
   CastEfficiencyBarElement,
-  CastEfficiencyStatElement
+  CastEfficiencyStatElement,
 } from 'interface/guide/components/CastEfficiencyPanel';
 import { qualitativePerformanceToColor } from 'interface/guide';
 import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../arcane/Guide';
-import CooldownExpandable, { CooldownExpandableItem } from 'interface/guide/components/CooldownExpandable';
+import CooldownExpandable, {
+  CooldownExpandableItem,
+} from 'interface/guide/components/CooldownExpandable';
 import UptimeStackBar from 'parser/ui/UptimeStackBar';
 import { formatPercentage } from 'common/format';
 import { PassFailCheckmark } from 'interface/guide';
-import { SimpleRuleTemplate, GuideRule } from './SimpleRuleTemplate';
+import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import { GuideRule } from './SimpleRuleTemplate';
+import Spell from 'common/SPELLS/Spell';
+
+/**
+ * Interface for WoWAnalyzer module instances that can format timestamps
+ */
+export interface ModuleLike {
+  formatTimestamp: (timestamp: number) => string;
+}
 
 /**
  * Reusable UI components commonly used in mage guide implementations.
@@ -38,7 +49,10 @@ export class MageGuideComponents {
       <RoundedPanel>
         <div>
           {dataComponents.map((component, index) => (
-            <div key={index} style={{ marginBottom: index < dataComponents.length - 1 ? '15px' : '0' }}>
+            <div
+              key={index}
+              style={{ marginBottom: index < dataComponents.length - 1 ? '15px' : '0' }}
+            >
               {component}
             </div>
           ))}
@@ -46,12 +60,7 @@ export class MageGuideComponents {
       </RoundedPanel>
     );
 
-    return explanationAndDataSubsection(
-      explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
-      title,
-    );
+    return explanationAndDataSubsection(explanation, data, GUIDE_CORE_EXPLANATION_PERCENT, title);
   }
 
   // ===== DATA COMPONENTS =====
@@ -60,16 +69,10 @@ export class MageGuideComponents {
    * Per Cast Summary Component - Shows performance breakdown for each cast
    * Used by: Arcane Barrage, Arcane Missiles, etc.
    */
-  static createPerCastSummary(
-    spell: any,
-    castEntries: BoxRowEntry[],
-  ): JSX.Element {
+  static createPerCastSummary(spell: Spell, castEntries: BoxRowEntry[]): JSX.Element {
     return (
       <div>
-        <CastSummaryAndBreakdown
-          spell={spell}
-          castEntries={castEntries}
-        />
+        <CastSummaryAndBreakdown spell={spell} castEntries={castEntries} />
       </div>
     );
   }
@@ -79,40 +82,65 @@ export class MageGuideComponents {
    * Used by: Arcane Missiles (Average Delay), etc.
    */
   static createStatistic(
-    spell: any,
+    spell: Spell,
     value: string,
     label: string,
-    performance: any,
+    performance: QualitativePerformance,
     tooltip?: JSX.Element,
   ): JSX.Element {
     const spellIcon = <SpellIcon spell={spell} />;
     const content = (
       <span style={{ color: qualitativePerformanceToColor(performance), fontSize: '18px' }}>
-        {spellIcon}{' '}
-        {value} <small>{label}</small>
+        {spellIcon} {value} <small>{label}</small>
       </span>
     );
 
     const statContent = tooltip ? (
       <TooltipElement content={tooltip}>{content}</TooltipElement>
-    ) : content;
+    ) : (
+      content
+    );
 
-    return (
-      <div style={{ fontSize: '20px' }}>
-        {statContent}
+    return <div style={{ fontSize: '20px' }}>{statContent}</div>;
+  }
+
+  /**
+   * Statistic Panel Component - Shows a statistic in a rounded panel (like TouchOfTheMagi active time)
+   * Used by: Touch of the Magi (Active Time Summary), etc.
+   */
+  static createStatisticPanel(
+    spell: Spell,
+    value: string,
+    label: string,
+    performance: QualitativePerformance,
+    tooltip?: JSX.Element,
+  ): JSX.Element {
+    const spellIcon = <SpellIcon spell={spell} />;
+    const content = (
+      <div
+        style={{
+          color: qualitativePerformanceToColor(performance),
+          fontSize: '20px',
+        }}
+      >
+        {spellIcon} {value} <small>{label}</small>
       </div>
     );
+
+    const statContent = tooltip ? (
+      <TooltipElement content={tooltip}>{content}</TooltipElement>
+    ) : (
+      content
+    );
+
+    return <RoundedPanel>{statContent}</RoundedPanel>;
   }
 
   /**
    * Per Cast Breakdown Component - Shows detailed breakdown of each cast
    * Used by: Shifting Power, Touch of the Magi, Arcane Surge, etc.
    */
-  static createPerCastBreakdown(
-    spell: any,
-    castEntries: BoxRowEntry[],
-    title: string,
-  ): JSX.Element {
+  static createPerCastBreakdown(castEntries: BoxRowEntry[], title: string): JSX.Element {
     return (
       <div>
         <strong>{title}</strong>
@@ -127,7 +155,7 @@ export class MageGuideComponents {
    * Used by: Arcane Orb, etc.
    */
   static createCooldownTimeline(
-    spell: any,
+    spell: Spell,
     averageValue: string,
     averageLabel: string,
     missedCount: number,
@@ -164,20 +192,19 @@ export class MageGuideComponents {
    * Used by: Arcane Tempo, etc.
    */
   static createBuffUptimeGraph(
-    spell: any,
+    spell: Spell,
     uptimePercentage: number,
     uptimeGraph?: JSX.Element,
   ): JSX.Element {
     return (
       <div>
         <div>
-          <SpellIcon spell={spell} /> <strong>{spell.name} Uptime: {uptimePercentage.toFixed(1)}%</strong>
+          <SpellIcon spell={spell} />{' '}
+          <strong>
+            {spell.name} Uptime: {uptimePercentage.toFixed(1)}%
+          </strong>
         </div>
-        {uptimeGraph && (
-          <div>
-            {uptimeGraph}
-          </div>
-        )}
+        {uptimeGraph && <div>{uptimeGraph}</div>}
       </div>
     );
   }
@@ -186,7 +213,7 @@ export class MageGuideComponents {
    * No Usage Component - Shows when a player didn't use an ability
    * Used when there's no data to analyze
    */
-  static createNoUsageComponent(spell: any): JSX.Element {
+  static createNoUsageComponent(spell: Spell): JSX.Element {
     const spellLink = <SpellLink spell={spell} />;
 
     return (
@@ -202,9 +229,7 @@ export class MageGuideComponents {
    * Expandable Cast Breakdown Component - Shows detailed per-cast breakdown with expandable checklist
    * Used by: ArcaneSurge, TouchOfTheMagi, etc.
    */
-  static createExpandableCastBreakdown(
-    castBreakdowns: React.ReactNode[],
-  ): JSX.Element {
+  static createExpandableCastBreakdown(castBreakdowns: React.ReactNode[]): JSX.Element {
     return (
       <div>
         <p>
@@ -221,29 +246,69 @@ export class MageGuideComponents {
    * Used for individual cast breakdowns in ArcaneSurge, TouchOfTheMagi, etc.
    */
   static createExpandableCastItem(
-    spell: any,
+    spell: Spell,
     timestamp: number,
-    owner: any,
+    owner: ModuleLike,
     ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
     ruleLabels: Map<string, JSX.Element>,
     performance: QualitativePerformance,
     ordinal?: number,
+  ): React.ReactNode;
+
+  /**
+   * Create a single expandable cast item with header and checklist using labels from rules
+   * Used for individual cast breakdowns in ArcaneSurge, TouchOfTheMagi, etc.
+   */
+  static createExpandableCastItem(
+    spell: Spell,
+    timestamp: number,
+    owner: ModuleLike,
+    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
+    performance: QualitativePerformance,
+    ordinal?: number,
+  ): React.ReactNode;
+
+  static createExpandableCastItem(
+    spell: Spell,
+    timestamp: number,
+    owner: ModuleLike,
+    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
+    ruleLabelsOrPerformance: Map<string, JSX.Element> | QualitativePerformance,
+    performanceOrOrdinal?: QualitativePerformance | number,
+    ordinal?: number,
   ): React.ReactNode {
     const header = (
       <>
-        @ {owner.formatTimestamp(timestamp)} &mdash;{' '}
-        <SpellLink spell={spell} />
+        @ {owner.formatTimestamp(timestamp)} &mdash; <SpellLink spell={spell} />
       </>
     );
 
-    const checklistItems = MageGuideComponents.createChecklistFromRules(ruleResults, ruleLabels);
+    let checklistItems: CooldownExpandableItem[];
+    let performance: QualitativePerformance;
+    let finalOrdinal: number | undefined;
+
+    // Determine which overload was called
+    if (ruleLabelsOrPerformance instanceof Map) {
+      // First overload: with separate ruleLabels map
+      checklistItems = MageGuideComponents.createChecklistFromRules(
+        ruleResults,
+        ruleLabelsOrPerformance,
+      );
+      performance = performanceOrOrdinal as QualitativePerformance;
+      finalOrdinal = ordinal;
+    } else {
+      // Second overload: using labels from rules
+      checklistItems = MageGuideComponents.createChecklistFromRulesWithLabels(ruleResults);
+      performance = ruleLabelsOrPerformance;
+      finalOrdinal = performanceOrOrdinal as number | undefined;
+    }
 
     return (
       <CooldownExpandable
         header={header}
         checklistItems={checklistItems}
         perf={performance}
-        key={ordinal || timestamp}
+        key={finalOrdinal || timestamp}
       />
     );
   }
@@ -275,15 +340,39 @@ export class MageGuideComponents {
   }
 
   /**
+   * Create checklist items from rule evaluation results using labels from the rules themselves
+   * Maps rule results to CooldownExpandableItem format
+   */
+  static createChecklistFromRulesWithLabels(
+    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
+  ): CooldownExpandableItem[] {
+    const checklistItems: CooldownExpandableItem[] = [];
+
+    for (const [, result] of ruleResults) {
+      const { rule, passed } = result;
+
+      if (rule.label) {
+        checklistItems.push({
+          label: rule.label,
+          result: <PassFailCheckmark pass={passed} />,
+          details: <>{passed ? rule.successText || 'Passed' : rule.failureText || 'Failed'}</>,
+        });
+      }
+    }
+
+    return checklistItems;
+  }
+
+  /**
    * Buff Stack Uptime Component - Shows stacked buff uptime over time with statistics
    * Used by: ArcaneTempo, etc.
    */
   static createBuffStackUptime(
-    spell: any,
+    spell: Spell,
     uptimePercentage: number,
     averageStacks: number,
-    stackUptimes: any,
-    overallUptimes: any,
+    stackUptimes: Array<{ start: number; end: number; stacks: number }>,
+    overallUptimes: Array<{ start: number; end: number }>,
     fightStart: number,
     fightEnd: number,
     maxStacks: number,
@@ -303,7 +392,10 @@ export class MageGuideComponents {
               </span>
               <br />
               <TooltipElement
-                content={averageStacksTooltip || `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`}
+                content={
+                  averageStacksTooltip ||
+                  `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`
+                }
               >
                 <span style={{ color: barColor }}>
                   {averageStacks.toFixed(1)} <small>avg stacks</small>
@@ -327,5 +419,4 @@ export class MageGuideComponents {
       </div>
     );
   }
-
 }

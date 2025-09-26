@@ -1,25 +1,23 @@
 import { formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import { SpellLink, SpellIcon, TooltipElement } from 'interface';
-import Analyzer from 'parser/core/Analyzer';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
+import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { PassFailCheckmark, qualitativePerformanceToColor } from 'interface/guide';
-import { PerformanceMark } from 'interface/guide';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from 'analysis/retail/mage/arcane/Guide';
 import { SpellSeq } from 'parser/ui/SpellSeq';
+import {
+  BaseMageGuide,
+  MageGuideComponents,
+  createRuleset,
+  type GuideLike,
+} from '../../shared/guide';
 
 import TouchOfTheMagi, { TouchOfTheMagiCast } from '../talents/TouchOfTheMagi';
-import CooldownExpandable, {
-  CooldownExpandableItem,
-} from 'interface/guide/components/CooldownExpandable';
 
 const MAX_ARCANE_CHARGES = 4;
 
-class TouchOfTheMagiGuide extends Analyzer {
+class TouchOfTheMagiGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     touchOfTheMagi: TouchOfTheMagi,
   };
 
@@ -39,54 +37,53 @@ class TouchOfTheMagiGuide extends Analyzer {
   }
 
   private perCastBreakdown(cast: TouchOfTheMagiCast): React.ReactNode {
-    const header = (
-      <>
-        @ {this.owner.formatTimestamp(cast.applied)} &mdash;{' '}
-        <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
-      </>
-    );
-
-    const checklistItems: CooldownExpandableItem[] = [];
-
     const noCharges = cast.charges === 0;
     const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
-    checklistItems.push({
-      label: (
-        <>
-          <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Touch
-        </>
-      ),
-      result: <PassFailCheckmark pass={noCharges || (maxCharges && cast.refundBuff)} />,
-      details: (
-        <>
-          {cast.charges} {cast.refundBuff ? '(Refund)' : ''}
-        </>
-      ),
-    });
+    const activeTime = cast.activeTime || 0;
 
-    const activeTime = cast.activeTime;
-    checklistItems.push({
-      label: (
-        <>
-          Active Time Percent during <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
-        </>
-      ),
-      result: <PerformanceMark perf={this.activeTimeUtil(activeTime || 0)} />,
-      details: <>{formatPercentage(activeTime || 0, 2)}%</>,
-    });
+    // Create rules for evaluation
+    const ruleset = createRuleset<TouchOfTheMagiCast>(cast, this as GuideLike)
+      .createRule({
+        id: 'correctCharges',
+        check: () => noCharges || (maxCharges && cast.refundBuff),
+        failureText: `${cast.charges} charges ${cast.refundBuff ? '(Refund)' : ''}`,
+        successText: `${cast.charges} charges ${cast.refundBuff ? '(Refund)' : ''}`,
+        label: (
+          <>
+            <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Touch
+          </>
+        ),
+      })
 
-    const overallPerf =
-      (noCharges || (maxCharges && cast.refundBuff)) && activeTime
-        ? QualitativePerformance.Good
-        : QualitativePerformance.Fail;
+      .createRule({
+        id: 'activeTime',
+        check: () =>
+          this.activeTimeUtil(activeTime) === QualitativePerformance.Perfect ||
+          this.activeTimeUtil(activeTime) === QualitativePerformance.Good,
+        failureText: `${formatPercentage(activeTime, 2)}%`,
+        successText: `${formatPercentage(activeTime, 2)}%`,
+        failurePerformance: this.activeTimeUtil(activeTime),
+        successPerformance: this.activeTimeUtil(activeTime),
+        label: (
+          <>
+            Active Time Percent during <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
+          </>
+        ),
+      })
 
-    return (
-      <CooldownExpandable
-        header={header}
-        checklistItems={checklistItems}
-        perf={overallPerf}
-        key={cast.ordinal}
-      />
+      .goodIf(['correctCharges', 'activeTime']);
+
+    // Get rule results and performance
+    const ruleResults = ruleset.getRuleResults();
+    const performance = ruleset.getPerformance();
+
+    return MageGuideComponents.createExpandableCastItem(
+      TALENTS.TOUCH_OF_THE_MAGI_TALENT,
+      cast.applied,
+      this.owner,
+      ruleResults,
+      performance,
+      cast.ordinal,
     );
   }
 
@@ -104,7 +101,6 @@ class TouchOfTheMagiGuide extends Analyzer {
     const burdenOfPower = <SpellLink spell={TALENTS.BURDEN_OF_POWER_TALENT} />;
     const gloriousIncandescence = <SpellLink spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />;
     const intuition = <SpellLink spell={SPELLS.INTUITION_BUFF} />;
-    const touchOfTheMagiIcon = <SpellIcon spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />;
 
     const explanation = (
       <>
@@ -159,40 +155,23 @@ class TouchOfTheMagiGuide extends Analyzer {
         the Magi cast.
       </>
     );
-    const data = (
-      <div>
-        <RoundedPanel>
-          <div
-            style={{
-              color: qualitativePerformanceToColor(
-                this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime),
-              ),
-              fontSize: '20px',
-            }}
-          >
-            {touchOfTheMagiIcon}{' '}
-            <TooltipElement content={activeTimeTooltip}>
-              {formatPercentage(this.touchOfTheMagi.averageActiveTime)}%{' '}
-              <small>Average Active Time</small>
-            </TooltipElement>
-          </div>
-          <div>
-            <p>
-              <strong>Per-Cast Breakdown</strong>
-              <small> - click to expand</small>
-              {this.touchOfTheMagi.touchCasts.map((cast) => this.perCastBreakdown(cast))}
-            </p>
-          </div>
-        </RoundedPanel>
-      </div>
+
+    const castBreakdowns = this.touchOfTheMagi.touchCasts.map((cast) =>
+      this.perCastBreakdown(cast),
     );
 
-    return explanationAndDataSubsection(
-      explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
-      'Touch of the Magi',
-    );
+    const dataComponents = [
+      MageGuideComponents.createStatisticPanel(
+        TALENTS.TOUCH_OF_THE_MAGI_TALENT,
+        `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,
+        'Average Active Time',
+        this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime),
+        activeTimeTooltip,
+      ),
+      MageGuideComponents.createExpandableCastBreakdown(castBreakdowns),
+    ];
+
+    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Touch of the Magi');
   }
 }
 

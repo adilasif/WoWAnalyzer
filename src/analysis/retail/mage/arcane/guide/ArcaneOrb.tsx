@@ -10,41 +10,42 @@ const ORB_CHARGE_THRESHOLD = 2;
 
 class ArcaneOrbGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     arcaneOrb: ArcaneOrb,
   };
 
   protected arcaneOrb!: ArcaneOrb;
 
-
   get arcaneOrbData(): BoxRowEntry[] {
     return this.arcaneOrb.orbCasts.map((cast) => {
-      return createRuleset(cast, this)
+      return (
+        createRuleset(cast, this)
+          // ===== INDIVIDUAL RULE DEFINITIONS =====
 
-        // ===== INDIVIDUAL RULE DEFINITIONS =====
+          .createRule({
+            id: 'targetsHit',
+            check: () => cast.targetsHit > 0,
+            failureText: 'No targets hit',
+            successText: `Targets Hit: ${cast.targetsHit}`,
+            failurePerformance: QualitativePerformance.Fail,
+          })
 
-        .createRule({
-          id: 'targetsHit',
-          check: () => cast.targetsHit > 0,
-          failureText: 'No targets hit',
-          successText: `Targets Hit: ${cast.targetsHit}`,
-          failurePerformance: QualitativePerformance.Fail
-        })
+          .createRule({
+            id: 'efficientCharges',
+            check: () => cast.chargesBefore <= ORB_CHARGE_THRESHOLD,
+            failureText: `Too many charges (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
+            successText: `Efficient charge usage (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
+            failurePerformance: QualitativePerformance.Fail,
+          })
 
-        .createRule({
-          id: 'efficientCharges',
-          check: () => cast.chargesBefore <= ORB_CHARGE_THRESHOLD,
-          failureText: `Too many charges (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
-          successText: `Efficient charge usage (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
-          failurePerformance: QualitativePerformance.Fail
-        })
+          // ===== PERFORMANCE CRITERIA =====
 
-        // ===== PERFORMANCE CRITERIA =====
+          .goodIf(['targetsHit', 'efficientCharges']) // Good if both conditions met
 
-        .goodIf(['targetsHit', 'efficientCharges'])  // Good if both conditions met
+          // Fail if either condition not met
 
-        // Fail if either condition not met
-
-        .evaluate(cast.timestamp);
+          .evaluate(cast.timestamp)
+      );
     });
   }
 
@@ -55,7 +56,8 @@ class ArcaneOrbGuide extends BaseMageGuide {
     const explanation = (
       <>
         <div>
-          <b>{arcaneOrb}</b> primary purpose is to quickly generate {arcaneCharge}s, as it is an instant that generates at least 2 charges.
+          <b>{arcaneOrb}</b> primary purpose is to quickly generate {arcaneCharge}s, as it is an
+          instant that generates at least 2 charges.
         </div>
         <div>
           <ul>
@@ -65,22 +67,21 @@ class ArcaneOrbGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents = this.arcaneOrb.orbCasts.length > 0
-      ? [MageGuideComponents.createCooldownTimeline(
-          SPELLS.ARCANE_ORB,
-          this.arcaneOrb.averageHitsPerCast.toFixed(2),
-          'avg targets hit',
-          this.arcaneOrb.missedOrbs,
-          this.arcaneOrbData,
-          'Arcane Orb Usage'
-        )]
-      : [MageGuideComponents.createNoUsageComponent(SPELLS.ARCANE_ORB)];
+    const dataComponents =
+      this.arcaneOrb.orbCasts.length > 0
+        ? [
+            MageGuideComponents.createCooldownTimeline(
+              SPELLS.ARCANE_ORB,
+              this.arcaneOrb.averageHitsPerCast.toFixed(2),
+              'avg targets hit',
+              this.arcaneOrb.missedOrbs,
+              this.arcaneOrbData,
+              'Arcane Orb Usage',
+            ),
+          ]
+        : [MageGuideComponents.createNoUsageComponent(SPELLS.ARCANE_ORB)];
 
-    return MageGuideComponents.createSubsection(
-      explanation,
-      dataComponents,
-      'Arcane Orb'
-    );
+    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Arcane Orb');
   }
 }
 

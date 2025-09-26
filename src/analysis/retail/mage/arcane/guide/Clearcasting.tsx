@@ -8,6 +8,7 @@ import Clearcasting from '../core/Clearcasting';
 
 class ClearcastingGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     clearcasting: Clearcasting,
   };
 
@@ -15,25 +16,26 @@ class ClearcastingGuide extends BaseMageGuide {
 
   get clearcastingData(): BoxRowEntry[] {
     return this.clearcasting.clearcastingProcs.map((cc) => {
-      return createRuleset(cc, this)
+      return (
+        createRuleset(cc, this)
+          // ===== INDIVIDUAL RULE DEFINITIONS =====
 
-        // ===== INDIVIDUAL RULE DEFINITIONS =====
+          .createRule({
+            id: 'notExpired',
+            check: () => !cc.expired,
+            failureText: 'Clearcasting Expired',
+            successText: 'Clearcasting Used Before Expiring',
+            failurePerformance: QualitativePerformance.Fail,
+          })
 
-        .createRule({
-          id: 'notExpired',
-          check: () => !cc.expired,
-          failureText: 'Clearcasting Expired',
-          successText: 'Clearcasting Used Before Expiring',
-          failurePerformance: QualitativePerformance.Fail
-        })
+          // ===== PERFORMANCE CRITERIA =====
 
-        // ===== PERFORMANCE CRITERIA =====
+          .perfectIf(['notExpired']) // Perfect if used before expiring
 
-        .perfectIf(['notExpired'])  // Perfect if used before expiring
+          // If expired, automatic Fail
 
-        // If expired, automatic Fail
-
-        .evaluate(cc.applied);
+          .evaluate(cc.applied)
+      );
     });
   }
 
@@ -47,7 +49,10 @@ class ClearcastingGuide extends BaseMageGuide {
         </div>
         <div>
           <ul>
-            <li>Never let procs expire without getting used, unless you have no choice because of forced downtime.</li>
+            <li>
+              Never let procs expire without getting used, unless you have no choice because of
+              forced downtime.
+            </li>
             <li>Avoid overcapping on procs.</li>
           </ul>
         </div>
@@ -55,17 +60,10 @@ class ClearcastingGuide extends BaseMageGuide {
     );
 
     const dataComponents = [
-      MageGuideComponents.createPerCastSummary(
-        SPELLS.CLEARCASTING_ARCANE,
-        this.clearcastingData,
-      ),
+      MageGuideComponents.createPerCastSummary(SPELLS.CLEARCASTING_ARCANE, this.clearcastingData),
     ];
 
-    return MageGuideComponents.createSubsection(
-      explanation,
-      dataComponents,
-      'Clearcasting',
-    );
+    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Clearcasting');
   }
 }
 

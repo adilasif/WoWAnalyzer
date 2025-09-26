@@ -18,7 +18,7 @@ export class PerformanceUtils {
   static evaluatePerformance(
     actual: number,
     thresholds: { minor: number; average: number; major: number },
-    isGreaterThan: boolean = true,
+    isGreaterThan = true,
   ): QualitativePerformance {
     if (isGreaterThan) {
       if (actual >= thresholds.minor) {
@@ -48,10 +48,7 @@ export class PerformanceUtils {
    * @param tooltip - Tooltip content to display
    * @returns BoxRowEntry for use in PerformanceBoxRow
    */
-  static createBoxRowEntry(
-    performance: QualitativePerformance,
-    tooltip: JSX.Element,
-  ): BoxRowEntry {
+  static createBoxRowEntry(performance: QualitativePerformance, tooltip: JSX.Element): BoxRowEntry {
     return {
       value: performance,
       tooltip,
@@ -103,10 +100,7 @@ export class PerformanceUtils {
    * @param threshold - Maximum charges/stacks considered efficient
    * @returns Performance level
    */
-  static evaluateCastEfficiency(
-    chargesBefore: number,
-    threshold: number,
-  ): QualitativePerformance {
+  static evaluateCastEfficiency(chargesBefore: number, threshold: number): QualitativePerformance {
     return chargesBefore <= threshold ? QualitativePerformance.Good : QualitativePerformance.Fail;
   }
 }

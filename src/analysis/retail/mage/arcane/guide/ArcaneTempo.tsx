@@ -4,7 +4,9 @@ import { SpellLink } from 'interface';
 import {
   BaseMageGuide,
   MageGuideComponents,
-  createRuleset
+  createRuleset,
+  type GuideLike,
+  type ModuleLike,
 } from '../../shared/guide';
 
 import ArcaneTempo from '../talents/ArcaneTempo';
@@ -17,11 +19,11 @@ const TEMPO_BG_COLOR = '#7e5da8';
 
 class ArcaneTempoGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     arcaneTempo: ArcaneTempo,
   };
 
   protected arcaneTempo!: ArcaneTempo;
-
 
   get guideSubsection(): JSX.Element {
     const arcaneTempo = <SpellLink spell={TALENTS.ARCANE_TEMPO_TALENT} />;
@@ -43,11 +45,12 @@ class ArcaneTempoGuide extends BaseMageGuide {
     // Create rules to evaluate Arcane Tempo performance
     const tempoData = {
       uptime: this.arcaneTempo.buffUptimePercent,
-      averageStacks: this.arcaneTempo.averageStacks
+      averageStacks: this.arcaneTempo.averageStacks,
+      timestamp: this.owner.fight.start_time,
     };
     const thresholds = this.arcaneTempo.arcaneTempoUptimeThresholds.isLessThan;
 
-    const tempoRuleset = createRuleset(tempoData, this)
+    const tempoRuleset = createRuleset(tempoData, this as GuideLike)
       .createRule({
         id: 'excellentUptime',
         check: () => tempoData.uptime >= thresholds.minor,
@@ -73,9 +76,6 @@ class ArcaneTempoGuide extends BaseMageGuide {
       .goodIf(['goodUptime'])
       .okIf(['minimumUptime']);
 
-    // Get performance for potential use in statistics
-    const uptimePerformance = tempoRuleset.getPerformance();
-
     const dataComponents = [
       MageGuideComponents.createBuffStackUptime(
         TALENTS.ARCANE_TEMPO_TALENT,
@@ -88,13 +88,21 @@ class ArcaneTempoGuide extends BaseMageGuide {
         ARCANE_TEMPO_MAX_STACKS,
         TEMPO_COLOR,
         TEMPO_BG_COLOR,
-        `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`
+        `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`,
+      ),
+      MageGuideComponents.createExpandableCastItem(
+        TALENTS.ARCANE_TEMPO_TALENT,
+        this.owner.fight.start_time,
+        this.owner as ModuleLike,
+        tempoRuleset.getRuleResults(),
+        tempoRuleset.getPerformance(),
+        undefined,
       ),
     ];
 
     return MageGuideComponents.createSubsection(
       explanation,
-      dataComponents,
+      dataComponents as JSX.Element[],
       'Arcane Tempo',
     );
   }

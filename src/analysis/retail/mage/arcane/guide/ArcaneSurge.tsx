@@ -5,7 +5,8 @@ import { SpellSeq } from 'parser/ui/SpellSeq';
 import {
   BaseMageGuide,
   MageGuideComponents,
-  createRuleset
+  createRuleset,
+  type GuideLike,
 } from '../../shared/guide';
 
 import ArcaneSurge, { ArcaneSurgeCast } from '../core/ArcaneSurge';
@@ -15,6 +16,7 @@ const OPENER_DURATION = 20000;
 
 class ArcaneSurgeGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     arcaneSurge: ArcaneSurge,
   };
 
@@ -27,14 +29,20 @@ class ArcaneSurgeGuide extends BaseMageGuide {
     const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
 
     // Create rules for evaluation
-    const ruleset = createRuleset(cast, this)
+    const ruleset = createRuleset<ArcaneSurgeCast>(cast, this as GuideLike)
       .createRule({
         id: 'maxCharges',
         check: () => cast.charges === ARCANE_CHARGE_MAX_STACKS || opener,
         failureText: `Only ${cast.charges} charges`,
-        successText: cast.charges === ARCANE_CHARGE_MAX_STACKS
-          ? `${cast.charges} charges`
-          : `${cast.charges} charges (Opener)`,
+        successText:
+          cast.charges === ARCANE_CHARGE_MAX_STACKS
+            ? `${cast.charges} charges`
+            : `${cast.charges} charges (Opener)`,
+        label: (
+          <>
+            <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Surge
+          </>
+        ),
       })
 
       .createRule({
@@ -43,6 +51,11 @@ class ArcaneSurgeGuide extends BaseMageGuide {
         check: () => cast.siphonStormBuff,
         failureText: 'Buff Missing',
         successText: 'Buff Active',
+        label: (
+          <>
+            <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active
+          </>
+        ),
       })
 
       .createRule({
@@ -51,6 +64,11 @@ class ArcaneSurgeGuide extends BaseMageGuide {
         check: () => cast.netherPrecision,
         failureText: 'Buff Missing',
         successText: 'Buff Active',
+        label: (
+          <>
+            <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active
+          </>
+        ),
       })
 
       .goodIf(['maxCharges', 'siphonStorm', 'netherPrecision']);
@@ -59,21 +77,13 @@ class ArcaneSurgeGuide extends BaseMageGuide {
     const ruleResults = ruleset.getRuleResults();
     const performance = ruleset.getPerformance();
 
-    // Define labels for checklist items
-    const ruleLabels = new Map<string, JSX.Element>([
-      ['maxCharges', <><SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Surge</>],
-      ['siphonStorm', <><SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active</>],
-      ['netherPrecision', <><SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active</>],
-    ]);
-
     return MageGuideComponents.createExpandableCastItem(
       TALENTS.ARCANE_SURGE_TALENT,
       cast.cast,
       this.owner,
       ruleResults,
-      ruleLabels,
       performance,
-      cast.ordinal
+      cast.ordinal,
     );
   }
 
@@ -124,15 +134,9 @@ class ArcaneSurgeGuide extends BaseMageGuide {
     );
     const castBreakdowns = this.arcaneSurge.surgeCasts.map((cast) => this.perCastBreakdown(cast));
 
-    const dataComponents = [
-      MageGuideComponents.createExpandableCastBreakdown(castBreakdowns),
-    ];
+    const dataComponents = [MageGuideComponents.createExpandableCastBreakdown(castBreakdowns)];
 
-    return MageGuideComponents.createSubsection(
-      explanation,
-      dataComponents,
-      'Arcane Surge',
-    );
+    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Arcane Surge');
   }
 }
 

@@ -1,98 +1,103 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
-import Analyzer from 'parser/core/Analyzer';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { PassFailCheckmark } from 'interface/guide';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from 'analysis/retail/mage/arcane/Guide';
-
-import CooldownExpandable, {
-  CooldownExpandableItem,
-} from 'interface/guide/components/CooldownExpandable';
+import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
 import PresenceOfMind, { PresenceOfMindCast } from '../talents/PresenceOfMind';
 
 const TOUCH_DELAY_THRESHOLD = 500;
 const AOE_THRESHOLD = 4;
 
-class PresenceOfMindGuide extends Analyzer {
+class PresenceOfMindGuide extends BaseMageGuide {
   static dependencies = {
+    ...BaseMageGuide.dependencies,
     presenceOfMind: PresenceOfMind,
   };
 
   protected presenceOfMind!: PresenceOfMind;
 
   private perCastBreakdown(cast: PresenceOfMindCast): React.ReactNode {
-    const header = (
-      <>
-        @ {this.owner.formatTimestamp(cast.cast.timestamp)} &mdash;{' '}
-        <SpellLink spell={TALENTS.PRESENCE_OF_MIND_TALENT} />
-      </>
-    );
+    const ST = cast.targets && cast.targets < AOE_THRESHOLD;
+    const AOE = cast.targets && cast.targets >= AOE_THRESHOLD;
+    const touchAtEnd = cast.usedTouchEnd;
+    const aoeCharges = cast.charges === 2 || cast.charges === 3;
 
-    const checklistItems: CooldownExpandableItem[] = [];
-
-    checklistItems.push({
-      label: (
-        <>
-          <SpellLink spell={SPELLS.ARCANE_CHARGE} />s
-        </>
-      ),
-      details: <>{cast.charges}</>,
-    });
-
-    checklistItems.push({
-      label: <>Targets Hit (Next Barrage)</>,
-      details: <>{cast.targets ? cast.targets : `Unknown`}</>,
-    });
-
-    checklistItems.push({
-      label: <>Stacks Used</>,
-      details: <>{cast.stacksUsed}</>,
-    });
-
-    if (cast.targets && cast.targets < AOE_THRESHOLD) {
-      const touchAtEnd = cast.usedTouchEnd ? true : false;
-      checklistItems.push({
+    // Create rules for evaluation
+    const ruleset = createRuleset(cast, this)
+      .createRule({
+        id: 'charges',
+        check: () => true, // Always show charges as informational
+        failureText: `${cast.charges} charges`,
+        successText: `${cast.charges} charges`,
+        failurePerformance: QualitativePerformance.Good,
+        successPerformance: QualitativePerformance.Good,
+        label: (
+          <>
+            <SpellLink spell={SPELLS.ARCANE_CHARGE} />s
+          </>
+        ),
+      })
+      .createRule({
+        id: 'stacksUsed',
+        check: () => true, // Always show stacks used as informational
+        failureText: `${cast.stacksUsed} stacks used`,
+        successText: `${cast.stacksUsed} stacks used`,
+        failurePerformance: QualitativePerformance.Good,
+        successPerformance: QualitativePerformance.Good,
+        label: <>Stacks Used</>,
+      })
+      .createRule({
+        id: 'targets',
+        check: () => true, // Always show targets as informational
+        failureText: cast.targets ? `${cast.targets} targets` : 'Unknown targets',
+        successText: cast.targets ? `${cast.targets} targets` : 'Unknown targets',
+        failurePerformance: QualitativePerformance.Good,
+        successPerformance: QualitativePerformance.Good,
+        label: <>Targets Hit (Next Barrage)</>,
+      })
+      .createRule({
+        id: 'touchTiming',
+        check: () => !ST || Boolean(touchAtEnd),
+        failureText: 'Not used at Touch end',
+        successText: 'Used at Touch end',
+        active: () => Boolean(ST),
         label: (
           <>
             Used at end of <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
           </>
         ),
-        result: <PassFailCheckmark pass={touchAtEnd} />,
-        details: <>{touchAtEnd ? `Yes` : `No`}</>,
-      });
-    }
-
-    if (cast.touchCancelDelay) {
-      checklistItems.push({
+      })
+      .createRule({
+        id: 'touchDelay',
+        check: () => !cast.touchCancelDelay || cast.touchCancelDelay <= TOUCH_DELAY_THRESHOLD,
+        failureText: cast.touchCancelDelay ? `${cast.touchCancelDelay.toFixed(2)}ms delay` : '',
+        successText: cast.touchCancelDelay
+          ? `${cast.touchCancelDelay.toFixed(2)}ms delay`
+          : 'No delay',
+        active: () => cast.touchCancelDelay != null,
         label: <>Channel Clipped Before/After GCD</>,
-        result: <PassFailCheckmark pass={cast.touchCancelDelay > TOUCH_DELAY_THRESHOLD} />,
-        details: <>`{cast.touchCancelDelay.toFixed(2)}ms</>,
-      });
-    }
+      })
+      .createRule({
+        id: 'aoeCharges',
+        check: () => !AOE || aoeCharges,
+        failureText: `${cast.charges} charges (should be 2-3)`,
+        successText: `${cast.charges} charges`,
+        active: () => Boolean(AOE),
+        label: <>Good charge count for AoE</>,
+      })
+      .goodIf(['charges', 'stacksUsed', 'targets', 'touchTiming', 'touchDelay', 'aoeCharges']);
 
-    const ST = cast.targets && cast.targets < AOE_THRESHOLD;
-    const AOE = cast.targets && cast.targets >= AOE_THRESHOLD;
-    const touchDelay = cast.touchCancelDelay;
-    const touchAtEnd = cast.usedTouchEnd;
-    const aoeCharges = cast.charges === 2 || cast.charges === 3;
+    // Get rule results and performance
+    const ruleResults = ruleset.getRuleResults();
+    const performance = ruleset.getPerformance();
 
-    const overallPerf =
-      (ST && touchAtEnd && !touchDelay) ||
-      (ST && touchAtEnd && touchDelay && touchDelay < TOUCH_DELAY_THRESHOLD) ||
-      (AOE && aoeCharges)
-        ? QualitativePerformance.Good
-        : QualitativePerformance.Fail;
-
-    return (
-      <CooldownExpandable
-        header={header}
-        checklistItems={checklistItems}
-        perf={overallPerf}
-        key={cast.ordinal}
-      />
+    return MageGuideComponents.createExpandableCastItem(
+      TALENTS.PRESENCE_OF_MIND_TALENT,
+      cast.cast.timestamp,
+      this.owner,
+      ruleResults,
+      performance,
+      cast.ordinal,
     );
   }
 
@@ -127,26 +132,15 @@ class PresenceOfMindGuide extends Analyzer {
         </div>
       </>
     );
-    const data = (
-      <div>
-        <RoundedPanel>
-          <div>
-            <p>
-              <strong>Per-Cast Breakdown</strong>
-              <small> - click to expand</small>
-              {this.presenceOfMind.pomCasts.map((cast) => this.perCastBreakdown(cast))}
-            </p>
-          </div>
-        </RoundedPanel>
-      </div>
-    );
 
-    return explanationAndDataSubsection(
-      explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
-      'Presence of Mind',
-    );
+    const castBreakdowns = this.presenceOfMind.pomCasts.map((cast) => this.perCastBreakdown(cast));
+
+    const dataComponents =
+      this.presenceOfMind.pomCasts.length > 0
+        ? [MageGuideComponents.createExpandableCastBreakdown(castBreakdowns)]
+        : [MageGuideComponents.createNoUsageComponent(TALENTS.PRESENCE_OF_MIND_TALENT)];
+
+    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Presence of Mind');
   }
 }
 
