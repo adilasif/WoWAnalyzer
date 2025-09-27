@@ -2,15 +2,11 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvent, evaluatePerformance } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
 import ArcaneTempo from '../talents/ArcaneTempo';
-import { getUptimesFromBuffHistory } from 'parser/ui/UptimeBar';
 import { getStackUptimesFromBuffHistory } from 'parser/ui/UptimeStackBar';
-import { ARCANE_TEMPO_MAX_STACKS } from '../../shared';
-
-const TEMPO_COLOR = '#cd1bdf';
-const TEMPO_BG_COLOR = '#7e5da8';
 
 class ArcaneTempoGuide extends BaseMageGuide {
   static dependencies = {
@@ -34,7 +30,6 @@ class ArcaneTempoGuide extends BaseMageGuide {
       </>
     );
     const buffHistory = this.selectedCombatant.getBuffHistory(SPELLS.ARCANE_TEMPO_BUFF.id);
-    const overallUptimes = getUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
     const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
 
     // Evaluate Arcane Tempo performance using universal template
@@ -46,7 +41,7 @@ class ArcaneTempoGuide extends BaseMageGuide {
     const thresholds = this.arcaneTempo.arcaneTempoUptimeThresholds.isLessThan;
     const uptimePercent = (tempoData.uptime * 100).toFixed(1);
 
-    const tempoEntry = evaluateGuide(tempoData.timestamp, tempoData, this, {
+    const tempoEntry = evaluateEvent(tempoData.timestamp, tempoData, this, {
       actionName: 'Arcane Tempo',
 
       // PERFECT: Excellent uptime
@@ -81,28 +76,19 @@ class ArcaneTempoGuide extends BaseMageGuide {
       defaultMessage: `Very low uptime (${uptimePercent}%) - need to maintain Arcane Tempo better`,
     });
 
-    const dataComponents = [
-      GuideComponents.createBuffStackUptime(
-        TALENTS.ARCANE_TEMPO_TALENT,
-        this.arcaneTempo.buffUptimePercent,
-        this.arcaneTempo.averageStacks,
-        stackUptimes,
-        overallUptimes,
-        this.owner.fight.start_time,
-        this.owner.fight.end_time,
-        ARCANE_TEMPO_MAX_STACKS,
-        TEMPO_COLOR,
-        TEMPO_BG_COLOR,
-        `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`,
-      ),
-      GuideComponents.createPerCastSummary(TALENTS.ARCANE_TEMPO_TALENT, [tempoEntry]),
-    ];
-
-    return GuideComponents.createSubsection(
-      explanation,
-      dataComponents as JSX.Element[],
-      'Arcane Tempo',
-    );
+    return new GuideBuilder(TALENTS.ARCANE_TEMPO_TALENT)
+      .explanation(explanation)
+      .addBuffStackUptime({
+        stackData: stackUptimes,
+        averageStacks: this.arcaneTempo.averageStacks,
+        castData: [tempoEntry],
+      })
+      .addStatistic({
+        value: `${uptimePercent}%`,
+        label: 'Uptime',
+        performance: evaluatePerformance(tempoData.uptime, thresholds, true),
+      })
+      .build();
   }
 }
 

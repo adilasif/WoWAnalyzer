@@ -5,9 +5,11 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
-import TouchOfTheMagi from '../talents/TouchOfTheMagi';
+import { BaseMageGuide, evaluateEvents, evaluatePerformance } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+
+import TouchOfTheMagi, { TouchOfTheMagiCast } from '../talents/TouchOfTheMagi';
 
 const MAX_ARCANE_CHARGES = 4;
 
@@ -21,73 +23,88 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
 
   activeTimeUtil(activePercent: number) {
     const thresholds = this.touchOfTheMagi.touchMagiActiveTimeThresholds.isLessThan;
-    let performance = QualitativePerformance.Good;
-    if (activePercent >= thresholds.minor) {
-      performance = QualitativePerformance.Perfect;
-    } else if (activePercent >= thresholds.average) {
-      performance = QualitativePerformance.Good;
-    } else if (activePercent >= thresholds.major) {
-      performance = QualitativePerformance.Ok;
-    }
-    return performance;
+    return evaluatePerformance(activePercent, thresholds, true);
   }
 
   get touchOfTheMagiData(): BoxRowEntry[] {
-    return this.touchOfTheMagi.touchCasts.map((cast) => {
-      const noCharges = cast.charges === 0;
-      const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
-      const activeTime = cast.activeTime || 0;
-      const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
-      const correctCharges = noCharges || (maxCharges && cast.refundBuff);
+    return evaluateEvents(
+      this.touchOfTheMagi.touchCasts,
+      (cast: TouchOfTheMagiCast) => {
+        const noCharges = cast.charges === 0;
+        const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
+        const activeTime = cast.activeTime || 0;
+        const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
+        const correctCharges = noCharges || (maxCharges && cast.refundBuff);
 
-      return evaluateGuide(cast.applied, cast, this, {
-        actionName: 'Touch of the Magi',
+        return {
+          actionName: 'Touch of the Magi',
 
-        // FAIL: Critical mistakes
-        failConditions: [
-          {
-            name: 'wrongCharges',
-            check: !correctCharges,
-            description: `Wrong charge count (${cast.charges}) - should have 0 or 4 charges with refund buff`,
-          },
-          {
-            name: 'veryLowActiveTime',
-            check: activeTimePerf === QualitativePerformance.Fail,
-            description: `Very low active time (${formatPercentage(activeTime, 1)}%) - need to cast more during Touch window`,
-          },
-        ],
+          // FAIL: Critical mistakes with expandable configs
+          failConditions: [
+            {
+              name: 'wrongCharges',
+              check: !correctCharges,
+              description: `Wrong charge count (${cast.charges}) - should have 0 or 4 charges with refund buff`,
+              expandableConfig: {
+                label: (
+                  <>
+                    <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Touch
+                  </>
+                ),
+                getDetails: (cast: TouchOfTheMagiCast) =>
+                  `${cast.charges} charges ${cast.refundBuff ? '(Refund)' : ''}`,
+              },
+            },
+            {
+              name: 'veryLowActiveTime',
+              check: activeTimePerf === QualitativePerformance.Fail,
+              description: `Very low active time (${formatPercentage(activeTime, 1)}%) - need to cast more during Touch window`,
+            },
+          ],
 
-        // PERFECT: Optimal usage
-        perfectConditions: [
-          {
-            name: 'perfectActiveTime',
-            check: correctCharges && activeTimePerf === QualitativePerformance.Perfect,
-            description: `Perfect usage: correct charges (${cast.charges}) + excellent active time (${formatPercentage(activeTime, 1)}%)`,
-          },
-        ],
+          // PERFECT: Optimal usage
+          perfectConditions: [
+            {
+              name: 'perfectActiveTime',
+              check: correctCharges && activeTimePerf === QualitativePerformance.Perfect,
+              description: `Perfect usage: correct charges (${cast.charges}) + excellent active time (${formatPercentage(activeTime, 1)}%)`,
+            },
+          ],
 
-        // GOOD: Acceptable usage
-        goodConditions: [
-          {
-            name: 'goodActiveTime',
-            check: correctCharges && activeTimePerf === QualitativePerformance.Good,
-            description: `Good usage: correct charges (${cast.charges}) + good active time (${formatPercentage(activeTime, 1)}%)`,
-          },
-        ],
+          // GOOD: Acceptable usage
+          goodConditions: [
+            {
+              name: 'goodActiveTime',
+              check: correctCharges && activeTimePerf === QualitativePerformance.Good,
+              description: `Good usage: correct charges (${cast.charges}) + good active time (${formatPercentage(activeTime, 1)}%)`,
+              expandableConfig: {
+                label: (
+                  <>
+                    Active Time Percent during{' '}
+                    <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
+                  </>
+                ),
+                getDetails: (cast: TouchOfTheMagiCast) =>
+                  `${formatPercentage(cast.activeTime || 0, 2)}%`,
+              },
+            },
+          ],
 
-        // OK: Basic acceptable usage
-        okConditions: [
-          {
-            name: 'correctChargesOk',
-            check: correctCharges && activeTimePerf === QualitativePerformance.Ok,
-            description: `Acceptable: correct charges (${cast.charges}) but could improve active time (${formatPercentage(activeTime, 1)}%)`,
-          },
-        ],
+          // OK: Basic acceptable usage
+          okConditions: [
+            {
+              name: 'correctChargesOk',
+              check: correctCharges && activeTimePerf === QualitativePerformance.Ok,
+              description: `Acceptable: correct charges (${cast.charges}) but could improve active time (${formatPercentage(activeTime, 1)}%)`,
+            },
+          ],
 
-        defaultPerformance: QualitativePerformance.Fail,
-        defaultMessage: `Suboptimal Touch usage: ${cast.charges} charges, ${formatPercentage(activeTime, 1)}% active time`,
-      });
-    });
+          defaultPerformance: QualitativePerformance.Fail,
+          defaultMessage: `Suboptimal Touch usage: ${cast.charges} charges, ${formatPercentage(activeTime, 1)}% active time`,
+        };
+      },
+      this,
+    );
   }
 
   get guideSubsection(): JSX.Element {
@@ -159,21 +176,17 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents = [
-      GuideComponents.createStatisticPanel(
-        TALENTS.TOUCH_OF_THE_MAGI_TALENT,
-        `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,
-        'Average Active Time',
-        this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime),
-        activeTimeTooltip,
-      ),
-      GuideComponents.createPerCastSummary(
-        TALENTS.TOUCH_OF_THE_MAGI_TALENT,
-        this.touchOfTheMagiData,
-      ),
-    ];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Touch of the Magi');
+    // Use the unified evaluation approach - no more duplication!
+    return new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT, 'Touch of the Magi')
+      .explanation(explanation)
+      .addStatistic({
+        value: `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,
+        label: 'Average Active Time',
+        performance: this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime),
+        tooltip: activeTimeTooltip,
+      })
+      .addCastSummary({ castData: this.touchOfTheMagiData })
+      .build();
   }
 }
 

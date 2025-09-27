@@ -1,5 +1,6 @@
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import Spell from 'common/SPELLS/Spell';
 
 export type GuideData = Record<string, unknown>;
 /**
@@ -59,76 +60,86 @@ export interface GuideEvaluationConfig {
  * @param config - Evaluation configuration specifying conditions
  * @returns BoxRowEntry for use in PerformanceBoxRow
  */
-export function evaluateGuide<T = GuideData>(
+export function evaluateEvent<T = GuideData>(
   timestamp: number,
   data: T,
   guide: TooltipProvider,
   config: GuideEvaluationConfig,
 ): BoxRowEntry {
+  let finalEvaluation: BoxRowEntry | null = null;
+
   // Step 1: Check fail conditions - any condition that makes the cast a failure
   // This includes prerequisites not met, mistakes made, etc.
   if (config.failConditions) {
     for (const condition of config.failConditions) {
       if (condition.check) {
-        return createTooltipEntry(
+        finalEvaluation = createTooltipEntry(
           guide,
           QualitativePerformance.Fail,
           condition.description,
           timestamp,
         );
+        break;
       }
     }
   }
 
   // Step 2: Check perfect conditions (any match = perfect)
-  if (config.perfectConditions) {
+  if (!finalEvaluation && config.perfectConditions) {
     for (const condition of config.perfectConditions) {
       if (condition.check) {
-        return createTooltipEntry(
+        finalEvaluation = createTooltipEntry(
           guide,
           QualitativePerformance.Perfect,
           condition.description,
           timestamp,
         );
+        break;
       }
     }
   }
 
   // Step 3: Check good conditions (any match = good)
-  if (config.goodConditions) {
+  if (!finalEvaluation && config.goodConditions) {
     for (const condition of config.goodConditions) {
       if (condition.check) {
-        return createTooltipEntry(
+        finalEvaluation = createTooltipEntry(
           guide,
           QualitativePerformance.Good,
           condition.description,
           timestamp,
         );
+        break;
       }
     }
   }
 
   // Step 4: Check ok conditions (any match = ok)
-  if (config.okConditions) {
+  if (!finalEvaluation && config.okConditions) {
     for (const condition of config.okConditions) {
       if (condition.check) {
-        return createTooltipEntry(
+        finalEvaluation = createTooltipEntry(
           guide,
           QualitativePerformance.Ok,
           condition.description,
           timestamp,
         );
+        break;
       }
     }
   }
 
   // Step 5: Default fallback
-  return createTooltipEntry(
-    guide,
-    config.defaultPerformance || QualitativePerformance.Ok,
-    config.defaultMessage || `${config.actionName} without specific conditions`,
-    timestamp,
-  );
+  if (!finalEvaluation) {
+    finalEvaluation = createTooltipEntry(
+      guide,
+      config.defaultPerformance || QualitativePerformance.Ok,
+      config.defaultMessage || `${config.actionName} without specific conditions`,
+      timestamp,
+    );
+  }
+
+  return finalEvaluation;
 }
 
 /**
@@ -146,99 +157,214 @@ function createTooltipEntry(
 }
 
 /**
- * Utility functions for creating common guide conditions
+ * Configuration for auto-generating expandable breakdown components from evaluateEvent data
  */
-export class GuideConditions {
-  /**
-   * Creates a condition for checking resource requirements (charges, mana, etc.)
-   * Note: Returns a condition that fails when resources are insufficient
-   */
-  static hasResource(
-    name: string,
-    current: number,
-    required: number,
-    resourceName: string,
-  ): GuideCondition {
-    return {
-      name,
-      check: current < required, // true = insufficient resources = fail condition
-      description: `Insufficient ${resourceName} (${current}/${required})`,
-    };
-  }
+export interface ExpandableConfig {
+  /** The spell/ability to show in the header */
+  spell: Spell;
+  /** Function to format the timestamp for the header */
+  formatTimestamp: (timestamp: number) => string;
+  /** Function to extract the timestamp from cast data */
+  getTimestamp: (data: unknown) => number;
+  /** Array of checklist item configurations */
+  checklistItems: ExpandableChecklistItem[];
+}
 
-  /**
-   * Creates a condition for checking if a buff/proc is active
-   */
-  static hasProc(name: string, active: boolean, procName: string): GuideCondition {
-    return {
-      name,
-      check: active,
-      description: `${procName} proc active`,
-    };
-  }
+/**
+ * Configuration for individual checklist items in expandable components
+ */
+export interface ExpandableChecklistItem {
+  /** Label to display for this checklist item */
+  label: JSX.Element;
+  /** Function to extract the pass/fail result from cast data */
+  getResult: (data: unknown, evaluatedData: BoxRowEntry) => boolean;
+  /** Function to get descriptive details from cast data */
+  getDetails: (data: unknown) => string;
+}
 
-  /**
-   * Creates a condition for checking if a buff/proc is missing when required
-   */
-  static missingRequiredProc(name: string, active: boolean, procName: string): GuideCondition {
-    return {
-      name,
-      check: !active,
-      description: `Missing required ${procName} proc`,
-    };
-  }
+/**
+ * Helper function to create an ExpandableConfig with clean, simple parameters.
+ * Reduces boilerplate when setting up expandable breakdowns.
+ */
+export function createExpandableConfig(config: {
+  spell: Spell;
+  formatTimestamp: (timestamp: number) => string;
+  getTimestamp: (cast: unknown) => number;
+  checklistItems: Array<{
+    label: JSX.Element;
+    getResult: (cast: unknown, evaluatedData: BoxRowEntry) => boolean;
+    getDetails: (cast: unknown) => string;
+  }>;
+}): ExpandableConfig {
+  return {
+    spell: config.spell,
+    formatTimestamp: config.formatTimestamp,
+    getTimestamp: config.getTimestamp,
+    checklistItems: config.checklistItems.map((item) => ({
+      label: item.label,
+      getResult: item.getResult,
+      getDetails: item.getDetails,
+    })),
+  };
+}
 
-  /**
-   * Creates a condition for checking target count (AOE scenarios)
-   */
-  static targetsHit(name: string, targets: number, threshold: number): GuideCondition {
-    return {
-      name,
-      check: targets >= threshold,
-      description: `Hit ${targets} targets (${threshold}+ ideal)`,
-    };
-  }
+// =============================================================================
+// PERFORMANCE UTILITIES
+// Previously in PerformanceUtils.tsx, now consolidated here
+// =============================================================================
 
-  /**
-   * Creates a condition for emergency situations (low health/mana)
-   */
-  static emergency(
-    name: string,
-    value: number,
-    threshold: number,
-    resourceName: string,
-  ): GuideCondition {
-    return {
-      name,
-      check: value <= threshold,
-      description: `Emergency ${resourceName} situation (${Math.round(value * 100)}%)`,
-    };
+/**
+ * Universal performance evaluation method that handles all threshold-based scenarios.
+ * Consolidates all performance evaluation patterns into a single flexible method.
+ *
+ * @param actual - The actual measured value
+ * @param thresholds - Threshold object with minor/average/major properties
+ * @param isGreaterThan - True if higher values are better, false if lower values are better
+ * @returns QualitativePerformance level (Perfect/Good/Ok/Fail)
+ *
+ * @example
+ * // Active time (higher is better): 85% with thresholds 80%/60%/40%
+ * evaluatePerformance(0.85, {minor: 0.8, average: 0.6, major: 0.4}, true) // => Perfect
+ *
+ * // Cast delay (lower is better): 500ms with thresholds 200ms/500ms/1000ms
+ * evaluatePerformance(500, {minor: 200, average: 500, major: 1000}, false) // => Good
+ *
+ * // Charge efficiency (lower is better): 2 charges with thresholds 2/3/4
+ * evaluatePerformance(2, {minor: 2, average: 3, major: 4}, false) // => Perfect
+ */
+export function evaluatePerformance(
+  actual: number,
+  thresholds: { minor: number; average: number; major: number },
+  isGreaterThan = true,
+): QualitativePerformance {
+  if (isGreaterThan) {
+    if (actual >= thresholds.minor) {
+      return QualitativePerformance.Perfect;
+    } else if (actual >= thresholds.average) {
+      return QualitativePerformance.Good;
+    } else if (actual >= thresholds.major) {
+      return QualitativePerformance.Ok;
+    }
+  } else {
+    if (actual < thresholds.minor) {
+      return QualitativePerformance.Perfect;
+    } else if (actual < thresholds.average) {
+      return QualitativePerformance.Good;
+    } else if (actual < thresholds.major) {
+      return QualitativePerformance.Ok;
+    }
   }
+  return QualitativePerformance.Fail;
+}
 
-  /**
-   * Creates a condition for timing-based checks (buff about to expire, etc.)
-   */
-  static timeRemaining(
-    name: string,
-    remaining: number,
-    threshold: number,
-    description: string,
-  ): GuideCondition {
-    return {
-      name,
-      check: remaining <= threshold,
-      description,
-    };
-  }
+/**
+ * Creates a performance-based BoxRowEntry with tooltip.
+ * Commonly used pattern for cast analysis displays.
+ *
+ * @param performance - Performance level for this entry
+ * @param tooltip - Tooltip content to display
+ * @returns BoxRowEntry for use in PerformanceBoxRow
+ */
+export function createBoxRowEntry(
+  performance: QualitativePerformance,
+  tooltip: JSX.Element,
+): BoxRowEntry {
+  return {
+    value: performance,
+    tooltip,
+  };
+}
 
-  /**
-   * Creates a condition for combo/synergy checks
-   */
-  static combo(name: string, condition: boolean, description: string): GuideCondition {
-    return {
-      name,
-      check: condition,
-      description,
-    };
-  }
+/**
+ * Creates a simple performance entry for boolean conditions.
+ * Useful for simple pass/fail evaluations.
+ *
+ * @param passed - Whether the condition was met
+ * @param tooltip - Tooltip content to display
+ * @returns BoxRowEntry with Good/Fail performance
+ */
+export function createSimpleEntry(passed: boolean, tooltip: JSX.Element): BoxRowEntry {
+  return {
+    value: passed ? QualitativePerformance.Good : QualitativePerformance.Fail,
+    tooltip,
+  };
+}
+
+/**
+ * Convenience method for boolean evaluations.
+ *
+ * @param condition - The boolean condition to evaluate
+ * @param invertLogic - If true, false condition = Good, true condition = Fail (for negative conditions like "expired" or "overcapped")
+ * @returns Performance level
+ *
+ * @example
+ * // For positive conditions (higher is better)
+ * evaluateBoolean(hasCorrectBuff, false); // true = Good, false = Fail
+ *
+ * // For negative conditions (lower is better)
+ * evaluateBoolean(wasOvercapped, true); // false = Good, true = Fail
+ */
+export function evaluateBoolean(condition: boolean, invertLogic = false): QualitativePerformance {
+  const result = invertLogic ? !condition : condition;
+  return result ? QualitativePerformance.Good : QualitativePerformance.Fail;
+}
+
+/**
+ * Standardized evaluation helper for event data that reduces boilerplate.
+ * Common pattern: map over events and evaluate each one with similar structure.
+ *
+ * @param events - Array of event data to evaluate
+ * @param evaluationLogic - Function that takes an event and returns evaluation config
+ * @param guide - Guide instance for tooltip generation
+ * @returns Array of BoxRowEntry evaluations
+ *
+ * @example
+ * get arcaneOrbData(): BoxRowEntry[] {
+ *   return evaluateEvents(
+ *     this.arcaneOrb.orbCasts,
+ *     (cast) => ({
+ *       actionName: 'Arcane Orb',
+ *       failConditions: [
+ *         { name: 'missed', check: !cast.hitTargets, description: 'Failed to hit targets' }
+ *       ],
+ *       perfectConditions: [
+ *         { name: 'optimal', check: cast.hitTargets && cast.chargesBefore <= 2, description: 'Perfect usage' }
+ *       ],
+ *     }),
+ *     this
+ *   );
+ * }
+ */
+export function evaluateEvents<
+  T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
+>(
+  events: T[],
+  evaluationLogic: (event: T) => GuideEvaluationConfig,
+  guide: TooltipProvider,
+): BoxRowEntry[] {
+  return events.map((event: T) => {
+    const timestamp = event.timestamp || event.applied || event.cast?.timestamp || 0;
+    return evaluateEvent(timestamp, event, guide, evaluationLogic(event));
+  });
+}
+
+/**
+ * Helper for common fight duration checks to reduce duplication.
+ */
+export function getFightContext(
+  guide: TooltipProvider & { owner: { fight: { start_time: number; end_time: number } } },
+  timestamp: number,
+) {
+  const fightStart = guide.owner.fight.start_time;
+  const fightEnd = guide.owner.fight.end_time;
+  const timeSinceStart = timestamp - fightStart;
+  const timeUntilEnd = fightEnd - timestamp;
+
+  return {
+    isOpener: timeSinceStart < 20000, // 20 seconds
+    isShortFight: timeUntilEnd < 60000, // 1 minute
+    isFightEnd: timeUntilEnd < 5000, // 5 seconds
+    timeSinceStart,
+    timeUntilEnd,
+  };
 }

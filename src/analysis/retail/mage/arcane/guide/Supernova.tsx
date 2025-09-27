@@ -2,12 +2,13 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+
+const AOE_TARGET_THRESHOLD = 4;
+const TOUCH_DURATION_THRESHOLD = 3000; // 3 seconds
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
 import Supernova from '../../shared/Supernova';
-
-const AOE_THRESHOLD = 4;
-const TOUCH_DURATION_THRESHOLD = 3000;
 
 class SupernovaGuide extends BaseMageGuide {
   static dependencies = {
@@ -24,8 +25,8 @@ class SupernovaGuide extends BaseMageGuide {
 
   get supernovaData(): BoxRowEntry[] {
     return this.supernova.casts.map((cast) => {
-      const ST = cast.targetsHit < AOE_THRESHOLD;
-      const AOE = cast.targetsHit >= AOE_THRESHOLD;
+      const ST = cast.targetsHit < AOE_TARGET_THRESHOLD;
+      const AOE = cast.targetsHit >= AOE_TARGET_THRESHOLD;
       const goodTouchTiming =
         this.hasTouchOfTheMagi &&
         cast.touchRemaining != null &&
@@ -33,7 +34,7 @@ class SupernovaGuide extends BaseMageGuide {
       const maxUnerringStacks =
         this.hasUnerringProficiency && cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS;
 
-      return evaluateGuide(cast.timestamp, cast, this, {
+      return evaluateEvent(cast.timestamp, cast, this, {
         actionName: 'Supernova',
 
         // FAIL: Critical issues
@@ -72,7 +73,7 @@ class SupernovaGuide extends BaseMageGuide {
           },
           {
             name: 'perfectAoe',
-            check: AOE && maxUnerringStacks && cast.targetsHit >= AOE_THRESHOLD,
+            check: AOE && maxUnerringStacks && cast.targetsHit >= AOE_TARGET_THRESHOLD,
             description: `Perfect AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} Unerring stacks, ${cast.targetsHit} targets hit`,
           },
         ],
@@ -136,8 +137,8 @@ class SupernovaGuide extends BaseMageGuide {
             </li>
             <li>
               For Spellslingers, use {supernova} when you have {UNERRING_PROFICIENCY_MAX_STACKS}{' '}
-              stacks of {unerringProficiency} and {supernova} will hit {AOE_THRESHOLD} or more
-              targets.
+              stacks of {unerringProficiency} and {supernova} will hit {AOE_TARGET_THRESHOLD} or
+              more targets.
             </li>
           </ul>
         </div>
@@ -148,21 +149,22 @@ class SupernovaGuide extends BaseMageGuide {
       <>{this.supernova.averageTargetsHit.toFixed(2)} average targets hit per cast.</>
     );
 
-    const dataComponents =
-      this.supernova.casts.length > 0
-        ? [
-            GuideComponents.createStatisticPanel(
-              TALENTS.SUPERNOVA_TALENT,
-              this.supernova.averageTargetsHit.toFixed(2),
-              'Average Targets Hit',
-              QualitativePerformance.Good,
-              supernovaTooltip,
-            ),
-            GuideComponents.createPerCastSummary(TALENTS.SUPERNOVA_TALENT, this.supernovaData),
-          ]
-        : [GuideComponents.createNoUsageComponent(TALENTS.SUPERNOVA_TALENT)];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Supernova');
+    return new GuideBuilder(TALENTS.SUPERNOVA_TALENT, 'Supernova')
+      .explanation(explanation)
+      .when(this.supernova.casts.length > 0, (builder: GuideBuilder) =>
+        builder
+          .addStatistic({
+            value: this.supernova.averageTargetsHit.toFixed(2),
+            label: 'Average Targets Hit',
+            performance: QualitativePerformance.Good,
+            tooltip: supernovaTooltip,
+          })
+          .addCastSummary({
+            castData: this.supernovaData,
+          }),
+      )
+      .when(this.supernova.casts.length === 0, (builder: GuideBuilder) => builder.addNoUsage())
+      .build();
   }
 }
 

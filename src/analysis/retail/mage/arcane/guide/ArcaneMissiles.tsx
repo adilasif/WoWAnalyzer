@@ -4,12 +4,8 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { formatDurationMillisMinSec } from 'common/format';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import {
-  BaseMageGuide,
-  PerformanceUtils,
-  GuideComponents,
-  evaluateGuide,
-} from '../../shared/guide';
+import { BaseMageGuide, evaluateEvent, evaluatePerformance } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
 import ArcaneMissiles from '../core/ArcaneMissiles';
 
@@ -27,7 +23,7 @@ class ArcaneMissilesGuide extends BaseMageGuide {
   hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.AETHER_ATTUNEMENT_TALENT);
 
   channelDelayUtil(delay: number) {
-    return PerformanceUtils.evaluatePerformance(
+    return evaluatePerformance(
       delay,
       this.arcaneMissiles.channelDelayThresholds.isGreaterThan,
       false, // lower delay is better
@@ -47,7 +43,7 @@ class ArcaneMissilesGuide extends BaseMageGuide {
         (this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Good ||
           this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Perfect);
 
-      return evaluateGuide(am.cast.timestamp, am, this, {
+      return evaluateEvent(am.cast.timestamp, am, this, {
         actionName: 'Arcane Missiles',
 
         // FAIL: Critical issues that make the cast bad
@@ -157,18 +153,18 @@ class ArcaneMissilesGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents = [
-      GuideComponents.createStatistic(
-        TALENTS.ARCANE_MISSILES_TALENT,
-        formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
-        'Average Delay from Channel End to Next Cast',
-        this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay),
-        averageDelayTooltip,
-      ),
-      GuideComponents.createPerCastSummary(TALENTS.ARCANE_MISSILES_TALENT, this.arcaneMissilesData),
-    ];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Missiles');
+    return new GuideBuilder(TALENTS.ARCANE_MISSILES_TALENT, 'Arcane Missiles')
+      .explanation(explanation)
+      .addStatistic({
+        value: formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
+        label: 'Average Delay from Channel End to Next Cast',
+        performance: this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay),
+        tooltip: averageDelayTooltip,
+      })
+      .addCastSummary({
+        castData: this.arcaneMissilesData,
+      })
+      .build();
   }
 }
 

@@ -2,7 +2,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 import ShiftingPowerArcane, { MAX_TICKS } from '../talents/ShiftingPower';
 
 class ShiftingPowerGuide extends BaseMageGuide {
@@ -25,7 +26,7 @@ class ShiftingPowerGuide extends BaseMageGuide {
         cast.spellsReduced.touchOfTheMagi &&
         cast.spellsReduced.evocation;
 
-      return evaluateGuide(cast.timestamp, cast, this, {
+      return evaluateEvent(cast.timestamp, cast, this, {
         actionName: 'Shifting Power',
 
         // FAIL: Critical issues that make the cast bad
@@ -127,17 +128,15 @@ class ShiftingPowerGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents =
-      this.shiftingPower.casts.length > 0
-        ? [
-            GuideComponents.createPerCastSummary(
-              TALENTS.SHIFTING_POWER_TALENT,
-              this.shiftingPowerData,
-            ),
-          ]
-        : [GuideComponents.createNoUsageComponent(TALENTS.SHIFTING_POWER_TALENT)];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Shifting Power');
+    return new GuideBuilder(TALENTS.SHIFTING_POWER_TALENT, 'Shifting Power')
+      .explanation(explanation)
+      .when(this.shiftingPower.casts.length > 0, (builder: GuideBuilder) =>
+        builder.addCastSummary({
+          castData: this.shiftingPowerData,
+        }),
+      )
+      .when(this.shiftingPower.casts.length === 0, (builder: GuideBuilder) => builder.addNoUsage())
+      .build();
   }
 }
 

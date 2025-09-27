@@ -1,10 +1,18 @@
 export { default as BaseMageGuide } from './BaseMageGuide';
-export { PerformanceUtils } from './PerformanceUtils';
-export { GuideComponents, type TimestampFormatter } from './GuideComponents';
 export {
-  evaluateGuide,
-  GuideConditions,
+  evaluateEvent,
+  evaluateEvents,
+  evaluatePerformance,
+  evaluateBoolean,
+  createBoxRowEntry,
+  createSimpleEntry,
+  getFightContext,
+  createExpandableConfig,
   type GuideEvaluationConfig,
   type GuideCondition,
   type TooltipProvider,
+  type ExpandableConfig,
+  type ExpandableChecklistItem,
 } from './GuideEvaluation';
+
+export { generateExpandableBreakdown } from './GuideBuilder';

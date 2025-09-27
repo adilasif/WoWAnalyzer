@@ -3,11 +3,12 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
-import PresenceOfMind from '../talents/PresenceOfMind';
+import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
 
-const TOUCH_DELAY_THRESHOLD = 500;
-const AOE_THRESHOLD = 4;
+const AOE_TARGET_THRESHOLD = 4;
+const CAST_DELAY_THRESHOLD = 500; // 500ms
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+import PresenceOfMind from '../talents/PresenceOfMind';
 
 class PresenceOfMindGuide extends BaseMageGuide {
   static dependencies = {
@@ -19,13 +20,13 @@ class PresenceOfMindGuide extends BaseMageGuide {
 
   get presenceOfMindData(): BoxRowEntry[] {
     return this.presenceOfMind.pomCasts.map((cast) => {
-      const ST = cast.targets && cast.targets < AOE_THRESHOLD;
-      const AOE = cast.targets && cast.targets >= AOE_THRESHOLD;
+      const ST = cast.targets && cast.targets < AOE_TARGET_THRESHOLD;
+      const AOE = cast.targets && cast.targets >= AOE_TARGET_THRESHOLD;
       const touchAtEnd = cast.usedTouchEnd;
       const aoeCharges = cast.charges === 2 || cast.charges === 3;
-      const hasDelayIssue = cast.touchCancelDelay && cast.touchCancelDelay > TOUCH_DELAY_THRESHOLD;
+      const hasDelayIssue = cast.touchCancelDelay && cast.touchCancelDelay > CAST_DELAY_THRESHOLD;
 
-      return evaluateGuide(cast.cast.timestamp, cast, this, {
+      return evaluateEvent(cast.cast.timestamp, cast, this, {
         actionName: 'Presence of Mind',
 
         // FAIL: Critical issues
@@ -57,7 +58,7 @@ class PresenceOfMindGuide extends BaseMageGuide {
             check:
               Boolean(ST) &&
               Boolean(touchAtEnd) &&
-              (!cast.touchCancelDelay || cast.touchCancelDelay <= TOUCH_DELAY_THRESHOLD),
+              (!cast.touchCancelDelay || cast.touchCancelDelay <= CAST_DELAY_THRESHOLD),
             description: 'Perfect - used at Touch end with proper timing',
           },
           {
@@ -81,7 +82,7 @@ class PresenceOfMindGuide extends BaseMageGuide {
           },
           {
             name: 'goodTiming',
-            check: !cast.touchCancelDelay || cast.touchCancelDelay <= TOUCH_DELAY_THRESHOLD,
+            check: !cast.touchCancelDelay || cast.touchCancelDelay <= CAST_DELAY_THRESHOLD,
             description: cast.touchCancelDelay
               ? `${cast.touchCancelDelay.toFixed(2)}ms delay - acceptable timing`
               : 'Good timing',
@@ -135,17 +136,17 @@ class PresenceOfMindGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents =
-      this.presenceOfMind.pomCasts.length > 0
-        ? [
-            GuideComponents.createPerCastSummary(
-              TALENTS.PRESENCE_OF_MIND_TALENT,
-              this.presenceOfMindData,
-            ),
-          ]
-        : [GuideComponents.createNoUsageComponent(TALENTS.PRESENCE_OF_MIND_TALENT)];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Presence of Mind');
+    return new GuideBuilder(TALENTS.PRESENCE_OF_MIND_TALENT, 'Presence of Mind')
+      .explanation(explanation)
+      .when(this.presenceOfMind.pomCasts.length > 0, (builder: GuideBuilder) =>
+        builder.addCastSummary({
+          castData: this.presenceOfMindData,
+        }),
+      )
+      .when(this.presenceOfMind.pomCasts.length === 0, (builder: GuideBuilder) =>
+        builder.addNoUsage(),
+      )
+      .build();
   }
 }
 

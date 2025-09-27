@@ -116,6 +116,7 @@ export class GuideComponents {
         style={{
           color: qualitativePerformanceToColor(performance),
           fontSize: '20px',
+          textAlign: 'left',
         }}
       >
         {spellIcon} {value} <small>{label}</small>
@@ -141,6 +142,29 @@ export class GuideComponents {
         <strong>{title}</strong>
         <PerformanceBoxRow values={castEntries} />
         <small>green (good) / red (fail) mouseover the rectangles to see more details</small>
+      </div>
+    );
+  }
+
+  /**
+   * Expandable Cast Breakdown Component - Shows detailed per-cast breakdown with expandable checklist
+   * Used by: ArcaneSurge, TouchOfTheMagi, etc.
+   */
+  static createExpandableCastBreakdown(castBreakdowns: React.ReactNode[]): JSX.Element {
+    return (
+      <div style={{ margin: '-0.5em 0 0.25em 0' }}>
+        <div style={{ marginBottom: '0.5em' }}>
+          <strong>Per-Cast Breakdown</strong>
+          <small> - click to expand</small>
+        </div>
+        {castBreakdowns.map((breakdown, index) => (
+          <div
+            key={index}
+            style={{ marginBottom: index < castBreakdowns.length - 1 ? '0.5em' : '0' }}
+          >
+            {breakdown}
+          </div>
+        ))}
       </div>
     );
   }
@@ -215,22 +239,6 @@ export class GuideComponents {
       <div style={{ textAlign: 'center', fontSize: '20px' }}>
         <p>
           <strong>Player did not cast {spellLink}</strong>
-        </p>
-      </div>
-    );
-  }
-
-  /**
-   * Expandable Cast Breakdown Component - Shows detailed per-cast breakdown with expandable checklist
-   * Used by: ArcaneSurge, TouchOfTheMagi, etc.
-   */
-  static createExpandableCastBreakdown(castBreakdowns: React.ReactNode[]): JSX.Element {
-    return (
-      <div>
-        <p>
-          <strong>Per-Cast Breakdown</strong>
-          <small> - click to expand</small>
-          {castBreakdowns.map((breakdown) => breakdown)}
         </p>
       </div>
     );

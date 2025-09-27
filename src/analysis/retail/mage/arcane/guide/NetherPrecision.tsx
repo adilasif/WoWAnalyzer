@@ -3,7 +3,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
 import NetherPrecision from '../talents/NetherPrecision';
 
@@ -22,7 +23,7 @@ class NetherPrecisionGuide extends BaseMageGuide {
       const fightEndOneLost = this.owner.fight.end_time === np.removed && oneStackLost;
       const fightEndBothLost = this.owner.fight.end_time === np.removed && bothStacksLost;
 
-      return evaluateGuide(np.applied, np, this, {
+      return evaluateEvent(np.applied, np, this, {
         actionName: 'Nether Precision',
 
         // FAIL: Critical mistakes
@@ -83,14 +84,12 @@ class NetherPrecisionGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents = [
-      GuideComponents.createPerCastSummary(
-        TALENTS.NETHER_PRECISION_TALENT,
-        this.netherPrecisionData,
-      ),
-    ];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Nether Precision');
+    return new GuideBuilder(TALENTS.NETHER_PRECISION_TALENT, 'Nether Precision')
+      .explanation(explanation)
+      .addCastSummary({
+        castData: this.netherPrecisionData,
+      })
+      .build();
   }
 }
 

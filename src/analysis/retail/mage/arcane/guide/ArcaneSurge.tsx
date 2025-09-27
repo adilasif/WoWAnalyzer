@@ -3,12 +3,20 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import {
+  BaseMageGuide,
+  evaluateEvent,
+  generateExpandableBreakdown,
+  createExpandableConfig,
+  ExpandableConfig,
+} from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
-import ArcaneSurge from '../core/ArcaneSurge';
-import { ARCANE_CHARGE_MAX_STACKS } from '../../shared';
+import ArcaneSurge, { ArcaneSurgeCast } from '../core/ArcaneSurge';
 
-const OPENER_DURATION = 20000;
+const ARCANE_CHARGE_MAX_STACKS = 4;
+const OPENER_DURATION = 20000; // 20 seconds
+const SHORT_FIGHT_DURATION = 60000; // 1 minute
 
 class ArcaneSurgeGuide extends BaseMageGuide {
   static dependencies = {
@@ -26,9 +34,9 @@ class ArcaneSurgeGuide extends BaseMageGuide {
       const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
       const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
       const fightTimeRemaining = this.owner.fight.end_time - cast.cast;
-      const shortFight = fightTimeRemaining < 60000; // Less than 1 minute remaining
+      const shortFight = fightTimeRemaining < SHORT_FIGHT_DURATION;
 
-      return evaluateGuide(cast.cast, cast, this, {
+      return evaluateEvent(cast.cast, cast, this, {
         actionName: 'Arcane Surge',
 
         // FAIL: Critical requirements not met
@@ -94,6 +102,55 @@ class ArcaneSurgeGuide extends BaseMageGuide {
     });
   }
 
+  private get expandableConfig(): ExpandableConfig {
+    return createExpandableConfig({
+      spell: TALENTS.ARCANE_SURGE_TALENT,
+      formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
+      getTimestamp: (cast: unknown) => (cast as ArcaneSurgeCast).cast,
+      checklistItems: [
+        {
+          label: (
+            <>
+              <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Surge
+            </>
+          ),
+          getResult: (cast: unknown) => {
+            const surgeCast = cast as ArcaneSurgeCast;
+            const opener = surgeCast.cast - this.owner.fight.start_time < OPENER_DURATION;
+            return surgeCast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
+          },
+          getDetails: (cast: unknown) => {
+            const surgeCast = cast as ArcaneSurgeCast;
+            const opener = surgeCast.cast - this.owner.fight.start_time < OPENER_DURATION;
+            return opener
+              ? `${surgeCast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges (opener)`
+              : `${surgeCast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`;
+          },
+        },
+        {
+          label: (
+            <>
+              <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active
+            </>
+          ),
+          getResult: (cast: unknown) => (cast as ArcaneSurgeCast).siphonStormBuff,
+          getDetails: (cast: unknown) =>
+            (cast as ArcaneSurgeCast).siphonStormBuff ? 'Active' : 'Not active',
+        },
+        {
+          label: (
+            <>
+              <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active
+            </>
+          ),
+          getResult: (cast: unknown) => (cast as ArcaneSurgeCast).netherPrecision,
+          getDetails: (cast: unknown) =>
+            (cast as ArcaneSurgeCast).netherPrecision ? 'Active' : 'Not active',
+        },
+      ],
+    });
+  }
+
   get guideSubsection(): JSX.Element {
     const arcaneOrb = <SpellLink spell={SPELLS.ARCANE_ORB} />;
     const arcaneCharge = <SpellLink spell={SPELLS.ARCANE_CHARGE} />;
@@ -139,11 +196,18 @@ class ArcaneSurgeGuide extends BaseMageGuide {
         </div>
       </>
     );
-    const dataComponents = [
-      GuideComponents.createPerCastSummary(TALENTS.ARCANE_SURGE_TALENT, this.arcaneSurgeData),
-    ];
 
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Surge');
+    // Use the unified approach - no more duplication!
+    return new GuideBuilder(TALENTS.ARCANE_SURGE_TALENT, 'Arcane Surge')
+      .explanation(explanation)
+      .addExpandableBreakdown({
+        castBreakdowns: generateExpandableBreakdown({
+          castData: this.arcaneSurge.surgeCasts,
+          evaluatedData: this.arcaneSurgeData,
+          expandableConfig: this.expandableConfig,
+        }),
+      })
+      .build();
   }
 }
 

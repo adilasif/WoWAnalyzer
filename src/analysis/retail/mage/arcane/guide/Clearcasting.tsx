@@ -2,9 +2,10 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvents } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
-import Clearcasting from '../core/Clearcasting';
+import Clearcasting, { ClearcastingProc } from '../core/Clearcasting';
 
 class ClearcastingGuide extends BaseMageGuide {
   static dependencies = {
@@ -15,8 +16,9 @@ class ClearcastingGuide extends BaseMageGuide {
   protected clearcasting!: Clearcasting;
 
   get clearcastingData(): BoxRowEntry[] {
-    return this.clearcasting.clearcastingProcs.map((cc) => {
-      return evaluateGuide(cc.applied, cc, this, {
+    return evaluateEvents(
+      this.clearcasting.clearcastingProcs,
+      (cc: ClearcastingProc) => ({
         actionName: 'Clearcasting',
 
         // FAIL: Letting procs expire
@@ -24,7 +26,7 @@ class ClearcastingGuide extends BaseMageGuide {
           {
             name: 'expired',
             check: cc.expired,
-            description: 'Clearcasting proc expired unused - significant DPS loss',
+            description: 'Expired unused - significant DPS loss',
           },
         ],
 
@@ -39,8 +41,9 @@ class ClearcastingGuide extends BaseMageGuide {
 
         defaultPerformance: QualitativePerformance.Fail,
         defaultMessage: 'Clearcasting proc not handled properly',
-      });
-    });
+      }),
+      this,
+    );
   }
 
   get guideSubsection(): JSX.Element {
@@ -63,11 +66,12 @@ class ClearcastingGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents = [
-      GuideComponents.createPerCastSummary(SPELLS.CLEARCASTING_ARCANE, this.clearcastingData),
-    ];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Clearcasting');
+    return new GuideBuilder(SPELLS.CLEARCASTING_ARCANE, 'Clearcasting')
+      .explanation(explanation)
+      .addCastSummary({
+        castData: this.clearcastingData,
+      })
+      .build();
   }
 }
 

@@ -2,11 +2,18 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvents, evaluatePerformance } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
 import ArcaneOrb from '../core/ArcaneOrb';
 
-const ORB_CHARGE_THRESHOLD = 2;
+interface ArcaneOrbCast {
+  timestamp: number;
+  targetsHit: number;
+  chargesBefore: number;
+}
+
+const ORB_EFFICIENT_CHARGE_THRESHOLD = 2;
 
 class ArcaneOrbGuide extends BaseMageGuide {
   static dependencies = {
@@ -17,49 +24,53 @@ class ArcaneOrbGuide extends BaseMageGuide {
   protected arcaneOrb!: ArcaneOrb;
 
   get arcaneOrbData(): BoxRowEntry[] {
-    return this.arcaneOrb.orbCasts.map((cast) => {
-      const hitTargets = cast.targetsHit > 0;
-      const efficientCharges = cast.chargesBefore <= ORB_CHARGE_THRESHOLD;
+    return evaluateEvents(
+      this.arcaneOrb.orbCasts,
+      (cast: ArcaneOrbCast) => {
+        const hitTargets = cast.targetsHit > 0;
+        const efficientCharges = cast.chargesBefore <= ORB_EFFICIENT_CHARGE_THRESHOLD;
 
-      return evaluateGuide(cast.timestamp, cast, this, {
-        actionName: 'Arcane Orb',
+        return {
+          actionName: 'Arcane Orb',
 
-        // FAIL: Critical mistakes
-        failConditions: [
-          {
-            name: 'missedTargets',
-            check: !hitTargets,
-            description: 'Failed to hit any targets - wasted cooldown',
-          },
-          {
-            name: 'wastedCharges',
-            check: !efficientCharges,
-            description: `Inefficient usage - already had ${cast.chargesBefore} charges (use at ≤${ORB_CHARGE_THRESHOLD} charges)`,
-          },
-        ],
+          // FAIL: Critical mistakes
+          failConditions: [
+            {
+              name: 'missedTargets',
+              check: !hitTargets,
+              description: 'Failed to hit any targets',
+            },
+            {
+              name: 'wastedCharges',
+              check: !efficientCharges,
+              description: `Inefficient usage - already had ${cast.chargesBefore} charges (use at ≤${ORB_EFFICIENT_CHARGE_THRESHOLD} charges)`,
+            },
+          ],
 
-        // PERFECT: Optimal usage
-        perfectConditions: [
-          {
-            name: 'optimalUsage',
-            check: hitTargets && efficientCharges && cast.targetsHit >= 2,
-            description: `Perfect usage - ${cast.targetsHit} targets hit with efficient charge usage (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
-          },
-        ],
+          // PERFECT: Optimal usage
+          perfectConditions: [
+            {
+              name: 'optimalUsage',
+              check: hitTargets && efficientCharges && cast.targetsHit >= 2,
+              description: `Perfect usage - ${cast.targetsHit} targets hit with efficient charge usage (${cast.chargesBefore}/${ORB_EFFICIENT_CHARGE_THRESHOLD})`,
+            },
+          ],
 
-        // GOOD: Standard usage
-        goodConditions: [
-          {
-            name: 'standardUsage',
-            check: hitTargets && efficientCharges,
-            description: `Good usage - ${cast.targetsHit} target(s) hit with efficient charge usage (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
-          },
-        ],
+          // GOOD: Decent usage
+          goodConditions: [
+            {
+              name: 'goodUsage',
+              check: hitTargets && efficientCharges,
+              description: `Good usage - ${cast.targetsHit} target(s) hit with efficient charge usage (${cast.chargesBefore}/${ORB_EFFICIENT_CHARGE_THRESHOLD})`,
+            },
+          ],
 
-        defaultPerformance: QualitativePerformance.Fail,
-        defaultMessage: 'Suboptimal Arcane Orb usage',
-      });
-    });
+          defaultPerformance: QualitativePerformance.Fail,
+          defaultMessage: 'Arcane Orb usage needs improvement',
+        };
+      },
+      this,
+    );
   }
 
   get guideSubsection(): JSX.Element {
@@ -80,21 +91,28 @@ class ArcaneOrbGuide extends BaseMageGuide {
       </>
     );
 
-    const dataComponents =
-      this.arcaneOrb.orbCasts.length > 0
-        ? [
-            GuideComponents.createCooldownTimeline(
-              SPELLS.ARCANE_ORB,
-              this.arcaneOrb.averageHitsPerCast.toFixed(2),
-              'avg targets hit',
-              this.arcaneOrb.missedOrbs,
-              this.arcaneOrbData,
-              'Arcane Orb Usage',
+    return new GuideBuilder(SPELLS.ARCANE_ORB)
+      .explanation(explanation)
+      .when(this.arcaneOrb.orbCasts.length > 0, (builder: GuideBuilder) =>
+        builder
+          .addStatistic({
+            value: this.arcaneOrb.averageHitsPerCast.toFixed(2),
+            label: 'avg targets hit',
+            performance: evaluatePerformance(
+              this.arcaneOrb.averageHitsPerCast,
+              { minor: 2.0, average: 1.5, major: 1.0 },
+              true,
             ),
-          ]
-        : [GuideComponents.createNoUsageComponent(SPELLS.ARCANE_ORB)];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Orb');
+          })
+          .addCastEfficiency()
+          .addCastSummary({
+            castData: this.arcaneOrbData,
+            title: 'Arcane Orb Usage',
+          })
+          .addCooldownTimeline(),
+      )
+      .when(this.arcaneOrb.orbCasts.length === 0, (builder: GuideBuilder) => builder.addNoUsage())
+      .build();
   }
 }
 

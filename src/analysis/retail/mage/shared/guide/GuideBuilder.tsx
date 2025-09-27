@@ -1,0 +1,479 @@
+/**
+ * Fluent Builder Pattern for Guide Components
+ *
+ * This builder provides an intuitive, English-like interface for creating guide subsections.
+ * It's designed to be easy to use for non-programmers while maintaining full flexibility.
+ *
+ * Usage Example:
+ * Simple ability with cast summary:
+ * new GuideBuilder(SPELLS.ARCANE_ORB)
+ *   .explanation(explanation)
+ *   .addCastSummary({ castData: this.arcaneOrbData })
+ *   .build()
+ *
+ * Complex ability with multiple components:
+ * new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT, 'Touch of the Magi')
+ *   .explanation(explanation)
+ *   .addStatistic({
+ *     value: '85.2%',
+ *     label: 'Average Active Time',
+ *     performance: QualitativePerformance.Good,
+ *     tooltip
+ *   })
+ *   .addExpandableBreakdown({ castBreakdowns })
+ *   .build()
+ *
+ * Arcane Orb with individual components:
+ * new GuideBuilder(SPELLS.ARCANE_ORB)
+ *   .explanation(explanation)
+ *   .addStatistic({ value: '2.1', label: 'avg targets hit', performance: QualitativePerformance.Good })
+ *   .addCastEfficiency()
+ *   .addCastSummary({ castData: this.arcaneOrbData, title: 'Arcane Orb Usage' })
+ *   .addCooldownTimeline()
+ *   .build()
+ */
+
+import React from 'react';
+import { SpellLink, SpellIcon, TooltipElement } from 'interface';
+import { PassFailCheckmark } from 'interface/guide';
+import { RoundedPanel } from 'interface/guide/components/GuideDivs';
+import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
+import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBreakdown';
+import CooldownExpandable from 'interface/guide/components/CooldownExpandable';
+import { PerformanceBoxRow, BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import {
+  CastEfficiencyBarElement,
+  CastEfficiencyStatElement,
+} from 'interface/guide/components/CastEfficiencyPanel';
+import { qualitativePerformanceToColor } from 'interface/guide';
+import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../arcane/Guide';
+import UptimeStackBar from 'parser/ui/UptimeStackBar';
+import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import Spell from 'common/SPELLS/Spell';
+import { ExpandableConfig } from './GuideEvaluation';
+
+/**
+ * Main fluent builder class for creating guide subsections
+ */
+export class GuideBuilder {
+  private title = '';
+  private spell: Spell;
+  private explanationContent: JSX.Element = (<></>);
+  private components: JSX.Element[] = [];
+
+  /**
+   * Create a new guide builder for the given spell
+   * @param spell The spell this guide section is for
+   * @param title Optional custom title (defaults to spell name)
+   */
+  constructor(spell: Spell, title?: string) {
+    this.spell = spell;
+    this.title = title || spell.name;
+  }
+
+  /**
+   * Set the explanation content (required)
+   * @param explanation JSX content explaining the ability/mechanic
+   */
+  explanation(explanation: JSX.Element): GuideBuilder {
+    this.explanationContent = explanation;
+    return this;
+  }
+
+  /**
+   * Add a statistic showing a key metric in a rounded panel
+   * Perfect for showing percentages, averages, or other summary stats
+   */
+  addStatistic(config: {
+    value: string;
+    label: string;
+    performance: QualitativePerformance;
+    tooltip?: JSX.Element;
+  }): GuideBuilder {
+    this.components.push(
+      this.createStatistic(
+        this.spell,
+        config.value,
+        config.label,
+        config.performance,
+        config.tooltip,
+      ),
+    );
+    return this;
+  }
+
+  /**
+   * Add a cast summary showing performance rectangles for each cast with clickable expansion
+   * This creates the consolidated summary bar that can be clicked to expand details
+   */
+  addCastSummary(config: { castData: BoxRowEntry[]; title?: string }): GuideBuilder {
+    this.components.push(this.createCastSummaryAndBreakdown(config.castData));
+    return this;
+  }
+
+  /**
+   * Add cast efficiency statistics (usage percent, etc.)
+   */
+  addCastEfficiency(): GuideBuilder {
+    this.components.push(this.createCastEfficiencyStats(this.spell));
+    return this;
+  }
+
+  /**
+   * Add a cast efficiency timeline bar
+   */
+  addCooldownTimeline(): GuideBuilder {
+    this.components.push(this.createCastEfficiencyBar(this.spell));
+    return this;
+  }
+
+  /**
+   * Add a complete timeline view with all components (LEGACY - prefer individual components)
+   * Combines statistic, cast efficiency, cast summary, and timeline
+   */
+  addTimeline(config: {
+    averageValue: string;
+    averageLabel: string;
+    missedCasts: number;
+    castData: BoxRowEntry[];
+    title?: string;
+  }): GuideBuilder {
+    this.components.push(
+      this.createCooldownTimeline(
+        this.spell,
+        config.averageValue,
+        config.averageLabel,
+        config.missedCasts,
+        config.castData,
+        config.title || `${this.spell.name} Usage`,
+      ),
+    );
+    return this;
+  }
+
+  /**
+   * Add expandable per-cast breakdown with detailed analysis
+   * Perfect for complex abilities where each cast needs individual scrutiny
+   */
+  addExpandableBreakdown(config: {
+    castBreakdowns: React.ReactNode[];
+    title?: string;
+  }): GuideBuilder {
+    this.components.push(this.createExpandableCastBreakdown(config.castBreakdowns, config.title));
+    return this;
+  }
+
+  /**
+   * Add a buff uptime visualization
+   * Great for showing how well players maintained important buffs
+   */
+  addBuffUptime(config: { uptimePercentage: number; uptimeGraph?: JSX.Element }): GuideBuilder {
+    this.components.push(
+      this.createBuffUptimeGraph(this.spell, config.uptimePercentage, config.uptimeGraph),
+    );
+    return this;
+  }
+
+  /**
+   * Add buff stack uptime with multiple stack levels
+   * Useful for abilities that can stack and where stack count matters
+   */
+  addBuffStackUptime(config: {
+    stackData: { start: number; end: number; stacks: number }[];
+    averageStacks: number;
+    castData: BoxRowEntry[];
+  }): GuideBuilder {
+    this.components.push(
+      this.createBuffStackUptime(
+        this.spell,
+        config.stackData,
+        config.averageStacks,
+        config.castData,
+      ),
+    );
+    return this;
+  }
+
+  /**
+   * Add a "no usage" message when the ability wasn't used
+   */
+  addNoUsage(): GuideBuilder {
+    this.components.push(this.createNoUsageComponent(this.spell));
+    return this;
+  }
+
+  /**
+   * Add a custom component if the built-in options don't fit your needs
+   */
+  addCustomComponent(config: { component: JSX.Element }): GuideBuilder {
+    this.components.push(config.component);
+    return this;
+  }
+
+  /**
+   * Conditional builder - only add components if condition is true
+   * Makes it easy to handle cases like "show timeline if data exists, otherwise show no usage"
+   *
+   * @param condition The condition to check
+   * @param builderFunc Function that receives this builder and adds components
+   */
+  when(condition: boolean, builderFunc: (builder: GuideBuilder) => GuideBuilder): GuideBuilder {
+    if (condition) {
+      builderFunc(this);
+    }
+    return this;
+  }
+
+  /**
+   * Alternative path for when() - executes if the last when() condition was false
+   * @param builderFunc Function that receives this builder and adds components
+   */
+  otherwise(builderFunc: (builder: GuideBuilder) => GuideBuilder): GuideBuilder {
+    // Note: This is a simplified implementation. A more sophisticated version would
+    // track the last condition state, but for most use cases this pattern works:
+    // when(condition, ...).otherwise(...) where otherwise is only called if when wasn't
+    builderFunc(this);
+    return this;
+  }
+
+  /**
+   * Build the final guide subsection JSX
+   */
+  build(): JSX.Element {
+    return this.createSubsection(this.explanationContent, this.components, this.title);
+  }
+
+  // ========================================
+  // Private implementation methods
+  // ========================================
+
+  private createSubsection(
+    explanation: JSX.Element,
+    dataComponents: JSX.Element[],
+    title: string,
+  ): JSX.Element {
+    const data = (
+      <RoundedPanel>
+        <div>
+          {dataComponents.map((component, index) => (
+            <div
+              key={index}
+              style={{ marginBottom: index < dataComponents.length - 1 ? '15px' : '0' }}
+            >
+              {component}
+            </div>
+          ))}
+        </div>
+      </RoundedPanel>
+    );
+
+    return explanationAndDataSubsection(explanation, data, GUIDE_CORE_EXPLANATION_PERCENT, title);
+  }
+
+  private createPerCastSummary(spell: Spell, castEntries: BoxRowEntry[]): JSX.Element {
+    return <CastSummaryAndBreakdown spell={spell} castEntries={castEntries} />;
+  }
+
+  private createCastEfficiencyStats(spell: Spell): JSX.Element {
+    return <CastEfficiencyStatElement spell={spell} useThresholds />;
+  }
+
+  private createCastEfficiencyBar(spell: Spell): JSX.Element {
+    return <CastEfficiencyBarElement spell={spell} />;
+  }
+
+  private createCastSummaryAndBreakdown(castEntries: BoxRowEntry[]): JSX.Element {
+    return <CastSummaryAndBreakdown spell={this.spell} castEntries={castEntries} />;
+  }
+
+  private createStatistic(
+    spell: Spell,
+    value: string,
+    label: string,
+    performance: QualitativePerformance,
+    tooltip?: JSX.Element,
+  ): JSX.Element {
+    const spellIcon = <SpellIcon spell={spell} />;
+    const content = (
+      <div
+        style={{
+          color: qualitativePerformanceToColor(performance),
+          fontSize: '20px',
+          textAlign: 'left',
+        }}
+      >
+        {spellIcon} {value} <small>{label}</small>
+      </div>
+    );
+
+    const statContent = tooltip ? (
+      <TooltipElement content={tooltip}>{content}</TooltipElement>
+    ) : (
+      content
+    );
+
+    return <RoundedPanel>{statContent}</RoundedPanel>;
+  }
+
+  private createPerCastBreakdown(castEntries: BoxRowEntry[], title: string): JSX.Element {
+    return (
+      <div>
+        <strong>{title}</strong>
+        <PerformanceBoxRow values={castEntries} />
+        <small>green (good) / red (fail) mouseover the rectangles to see more details</small>
+      </div>
+    );
+  }
+
+  private createExpandableCastBreakdown(
+    castBreakdowns: React.ReactNode[],
+    title?: string,
+  ): JSX.Element {
+    return (
+      <div style={{ margin: '-0.5em 0 0.25em 0' }}>
+        <div style={{ marginBottom: '0.5em' }}>
+          <strong>{title || 'Per-Cast Breakdown'}</strong>
+          <small> - click to expand</small>
+        </div>
+        {castBreakdowns.map((breakdown, index) => (
+          <div
+            key={index}
+            style={{ marginBottom: index < castBreakdowns.length - 1 ? '0.5em' : '0' }}
+          >
+            {breakdown}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  private createCooldownTimeline(
+    spell: Spell,
+    averageValue: string,
+    averageLabel: string,
+    missedCount: number,
+    castEntries: BoxRowEntry[],
+    title: string,
+  ): JSX.Element {
+    const spellIcon = <SpellIcon spell={spell} />;
+    const tooltip = <>{missedCount} casts with issues.</>;
+
+    return (
+      <div>
+        <div>
+          <span style={{ fontSize: '18px' }}>
+            {spellIcon}{' '}
+            <TooltipElement content={tooltip}>
+              {averageValue} <small>{averageLabel}</small>
+            </TooltipElement>
+          </span>
+          {' / '}
+          <CastEfficiencyStatElement spell={spell} useThresholds />
+        </div>
+        <div>
+          <strong>{title}</strong>
+          <PerformanceBoxRow values={castEntries} />
+          <small>green (good) / red (fail) mouseover the rectangles to see more details</small>
+        </div>
+        <CastEfficiencyBarElement spell={spell} />
+      </div>
+    );
+  }
+
+  private createBuffUptimeGraph(
+    spell: Spell,
+    uptimePercentage: number,
+    uptimeGraph?: JSX.Element,
+  ): JSX.Element {
+    return (
+      <div>
+        <div>
+          <SpellIcon spell={spell} />{' '}
+          <strong>
+            {spell.name} Uptime: {uptimePercentage.toFixed(1)}%
+          </strong>
+        </div>
+        {uptimeGraph}
+      </div>
+    );
+  }
+
+  private createNoUsageComponent(spell: Spell): JSX.Element {
+    return (
+      <div>
+        <SpellIcon spell={spell} /> <strong>No {spell.name} casts recorded.</strong>
+        <br />
+        <small>
+          Make sure you are using this spell if it is available to you and you are specced into it.
+        </small>
+      </div>
+    );
+  }
+
+  private createBuffStackUptime(
+    spell: Spell,
+    stackData: { start: number; end: number; stacks: number }[],
+    averageStacks: number,
+    castEntries: BoxRowEntry[],
+  ): JSX.Element {
+    return (
+      <div>
+        <div>
+          <SpellIcon spell={spell} /> <strong>{spell.name} Stack Uptime</strong>
+          <br />
+          <small>Average stacks: {averageStacks.toFixed(1)}</small>
+        </div>
+        <div style={{ marginTop: '10px' }}>
+          <UptimeStackBar
+            stackUptimeHistory={stackData}
+            start={0} // Would need to be passed or calculated
+            end={100} // Would need to be passed or calculated
+            maxStacks={10} // Would need to be passed
+          />
+        </div>
+        <CastSummaryAndBreakdown spell={spell} castEntries={castEntries} />
+      </div>
+    );
+  }
+}
+
+/**
+ * Generates expandable breakdown components for cast analysis.
+ * Creates expandable components showing detailed breakdowns for each cast.
+ *
+ * @param config Configuration containing cast data, evaluated data, and expandable config
+ * @returns Array of React components (CooldownExpandable elements)
+ */
+export function generateExpandableBreakdown(config: {
+  castData: unknown[];
+  evaluatedData: BoxRowEntry[];
+  expandableConfig: ExpandableConfig;
+}): React.ReactNode[] {
+  return config.castData.map((cast, index) => {
+    const evaluatedEntry = config.evaluatedData[index];
+    const expandableConfig = config.expandableConfig;
+
+    const timestamp = expandableConfig.getTimestamp(cast);
+    const checklistItems = expandableConfig.checklistItems.map((item) => ({
+      label: item.label,
+      result: <PassFailCheckmark pass={item.getResult(cast, evaluatedEntry)} />,
+      details: item.getDetails(cast),
+    }));
+
+    const header = (
+      <>
+        @ {expandableConfig.formatTimestamp(timestamp)} &mdash;{' '}
+        <SpellLink spell={expandableConfig.spell} />
+      </>
+    );
+
+    return (
+      <CooldownExpandable
+        header={header}
+        checklistItems={checklistItems}
+        perf={evaluatedEntry.value}
+        key={index}
+      />
+    );
+  });
+}

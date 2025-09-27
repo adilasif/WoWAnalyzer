@@ -3,7 +3,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
-import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
 import ArcaneBarrage from '../core/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
@@ -48,7 +49,7 @@ class ArcaneBarrageGuide extends BaseMageGuide {
       // Spellslinger procs: Intuition or Arcane Orb available
       const hasSpellslingerProc = this.isSpellslinger && (cast.intuition || cast.arcaneOrbAvail);
 
-      return evaluateGuide(cast.cast.timestamp, cast, this, {
+      return evaluateEvent(cast.cast.timestamp, cast, this, {
         actionName: 'Arcane Barrage',
 
         // FAIL: Critical requirements not met
@@ -164,11 +165,12 @@ class ArcaneBarrageGuide extends BaseMageGuide {
         </div>
       </>
     );
-    const dataComponents = [
-      GuideComponents.createPerCastSummary(SPELLS.ARCANE_BARRAGE, this.arcaneBarrageData),
-    ];
-
-    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Barrage');
+    return new GuideBuilder(SPELLS.ARCANE_BARRAGE, 'Arcane Barrage')
+      .explanation(explanation)
+      .addCastSummary({
+        castData: this.arcaneBarrageData,
+      })
+      .build();
   }
 }
 
