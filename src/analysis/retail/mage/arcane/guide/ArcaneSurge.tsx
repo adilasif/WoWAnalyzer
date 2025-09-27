@@ -2,10 +2,9 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
-import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import {
   BaseMageGuide,
-  evaluateEvent,
+  evaluateEvents,
   generateExpandableBreakdown,
   createExpandableConfig,
   ExpandableConfig,
@@ -29,77 +28,98 @@ class ArcaneSurgeGuide extends BaseMageGuide {
   hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
-  get arcaneSurgeData(): BoxRowEntry[] {
-    return this.arcaneSurge.surgeCasts.map((cast) => {
-      const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
-      const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
-      const fightTimeRemaining = this.owner.fight.end_time - cast.cast;
-      const shortFight = fightTimeRemaining < SHORT_FIGHT_DURATION;
+  get arcaneSurgeData() {
+    // Transform ArcaneSurgeCast to match evaluateEvents expected format
+    const transformedCasts = this.arcaneSurge.surgeCasts.map((cast) => ({
+      ordinal: cast.ordinal,
+      timestamp: cast.cast,
+      mana: cast.mana,
+      charges: cast.charges,
+      siphonStormBuff: cast.siphonStormBuff,
+      netherPrecision: cast.netherPrecision,
+    }));
 
-      return evaluateEvent(cast.cast, cast, this, {
-        actionName: 'Arcane Surge',
+    return evaluateEvents(
+      transformedCasts,
+      (cast: {
+        ordinal: number;
+        timestamp: number;
+        mana?: number;
+        charges: number;
+        siphonStormBuff: boolean;
+        netherPrecision: boolean;
+      }) => {
+        const opener = cast.timestamp - this.owner.fight.start_time < OPENER_DURATION;
+        const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
+        const fightTimeRemaining = this.owner.fight.end_time - cast.timestamp;
+        const shortFight = fightTimeRemaining < SHORT_FIGHT_DURATION;
 
-        // FAIL: Critical requirements not met
-        failConditions: [
-          {
-            name: 'insufficientCharges',
-            check: !hasMaxCharges,
-            description: opener
-              ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
-              : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
-          },
-        ],
+        return {
+          actionName: 'Arcane Surge',
 
-        // PERFECT: Optimal cooldown usage with all buffs
-        perfectConditions: [
-          {
-            name: 'allBuffsCombo',
-            check:
-              hasMaxCharges &&
-              (!this.hasSiphonStorm || cast.siphonStormBuff) &&
-              (!this.hasNetherPrecision || cast.netherPrecision),
-            description:
-              'Perfect combo: max charges + all available buffs (Siphon Storm + Nether Precision)',
-          },
-          {
-            name: 'openerPerfect',
-            check:
-              opener &&
-              (!this.hasSiphonStorm || cast.siphonStormBuff) &&
-              (!this.hasNetherPrecision || cast.netherPrecision),
-            description: 'Perfect opener with available buffs',
-          },
-        ],
+          // FAIL: Critical requirements not met
+          failConditions: [
+            {
+              name: 'insufficientCharges',
+              check: !hasMaxCharges,
+              description: opener
+                ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
+                : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
+            },
+          ],
 
-        // GOOD: Acceptable usage patterns
-        goodConditions: [
-          {
-            name: 'maxChargesGood',
-            check: hasMaxCharges && (cast.siphonStormBuff || cast.netherPrecision),
-            description: `Good usage: ${cast.charges} charges + ${cast.siphonStormBuff ? 'Siphon Storm' : ''}${cast.siphonStormBuff && cast.netherPrecision ? ' + ' : ''}${cast.netherPrecision ? 'Nether Precision' : ''}`,
-          },
-          {
-            name: 'emergencyUsage',
-            check: hasMaxCharges && shortFight,
-            description: 'Good emergency usage - short fight/encounter ending',
-          },
-        ],
+          // PERFECT: Optimal cooldown usage with all buffs
+          perfectConditions: [
+            {
+              name: 'allBuffsCombo',
+              check:
+                hasMaxCharges &&
+                (!this.hasSiphonStorm || cast.siphonStormBuff) &&
+                (!this.hasNetherPrecision || cast.netherPrecision),
+              description:
+                'Perfect combo: max charges + all available buffs (Siphon Storm + Nether Precision)',
+            },
+            {
+              name: 'openerPerfect',
+              check:
+                opener &&
+                (!this.hasSiphonStorm || cast.siphonStormBuff) &&
+                (!this.hasNetherPrecision || cast.netherPrecision),
+              description: 'Perfect opener with available buffs',
+            },
+          ],
 
-        // OK: Basic usage without optimization
-        okConditions: [
-          {
-            name: 'basicUsage',
-            check: hasMaxCharges,
-            description: opener
-              ? `Opener usage with ${cast.charges} charges`
-              : `Basic usage with ${cast.charges} charges - could optimize with buffs`,
-          },
-        ],
+          // GOOD: Acceptable usage patterns
+          goodConditions: [
+            {
+              name: 'maxChargesGood',
+              check: hasMaxCharges && (cast.siphonStormBuff || cast.netherPrecision),
+              description: `Good usage: ${cast.charges} charges + ${cast.siphonStormBuff ? 'Siphon Storm' : ''}${cast.siphonStormBuff && cast.netherPrecision ? ' + ' : ''}${cast.netherPrecision ? 'Nether Precision' : ''}`,
+            },
+            {
+              name: 'emergencyUsage',
+              check: hasMaxCharges && shortFight,
+              description: 'Good emergency usage - short fight/encounter ending',
+            },
+          ],
 
-        defaultPerformance: undefined, // Let it fall through to Fail if requirements not met
-        defaultMessage: 'Suboptimal Arcane Surge usage',
-      });
-    });
+          // OK: Basic usage without optimization
+          okConditions: [
+            {
+              name: 'basicUsage',
+              check: hasMaxCharges,
+              description: opener
+                ? `Opener usage with ${cast.charges} charges`
+                : `Basic usage with ${cast.charges} charges - could optimize with buffs`,
+            },
+          ],
+
+          defaultPerformance: undefined, // Let it fall through to Fail if requirements not met
+          defaultMessage: 'Suboptimal Arcane Surge usage',
+        };
+      },
+      this,
+    );
   }
 
   private get expandableConfig(): ExpandableConfig {

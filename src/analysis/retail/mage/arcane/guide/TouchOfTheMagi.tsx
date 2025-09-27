@@ -6,7 +6,14 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 
-import { BaseMageGuide, evaluateEvents, evaluatePerformance } from '../../shared/guide';
+import {
+  BaseMageGuide,
+  evaluateEvents,
+  evaluatePerformance,
+  createExpandableConfig,
+  generateExpandableBreakdown,
+  ExpandableConfig,
+} from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
 import TouchOfTheMagi, { TouchOfTheMagiCast } from '../talents/TouchOfTheMagi';
@@ -26,6 +33,50 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
     return evaluatePerformance(activePercent, thresholds, true);
   }
 
+  get expandableConfig(): ExpandableConfig {
+    return createExpandableConfig({
+      spell: TALENTS.TOUCH_OF_THE_MAGI_TALENT,
+      formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
+      getTimestamp: (cast: unknown) => (cast as TouchOfTheMagiCast).applied,
+      checklistItems: [
+        {
+          label: (
+            <>
+              <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Touch
+            </>
+          ),
+          getResult: (cast: unknown) => {
+            const touchCast = cast as TouchOfTheMagiCast;
+            const noCharges = touchCast.charges === 0;
+            const maxCharges = touchCast.charges === MAX_ARCANE_CHARGES;
+            return noCharges || (maxCharges && touchCast.refundBuff);
+          },
+          getDetails: (cast: unknown) => {
+            const touchCast = cast as TouchOfTheMagiCast;
+            return `${touchCast.charges} charges ${touchCast.refundBuff ? '(Refund)' : ''}`;
+          },
+        },
+        {
+          label: (
+            <>
+              Active Time during <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
+            </>
+          ),
+          getResult: (cast: unknown) => {
+            const touchCast = cast as TouchOfTheMagiCast;
+            const activeTime = touchCast.activeTime || 0;
+            const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
+            return activeTimePerf !== QualitativePerformance.Fail;
+          },
+          getDetails: (cast: unknown) => {
+            const touchCast = cast as TouchOfTheMagiCast;
+            return `${formatPercentage(touchCast.activeTime || 0, 1)}% active time`;
+          },
+        },
+      ],
+    });
+  }
+
   get touchOfTheMagiData(): BoxRowEntry[] {
     return evaluateEvents(
       this.touchOfTheMagi.touchCasts,
@@ -39,21 +90,12 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
         return {
           actionName: 'Touch of the Magi',
 
-          // FAIL: Critical mistakes with expandable configs
+          // FAIL: Critical mistakes
           failConditions: [
             {
               name: 'wrongCharges',
               check: !correctCharges,
               description: `Wrong charge count (${cast.charges}) - should have 0 or 4 charges with refund buff`,
-              expandableConfig: {
-                label: (
-                  <>
-                    <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Touch
-                  </>
-                ),
-                getDetails: (cast: TouchOfTheMagiCast) =>
-                  `${cast.charges} charges ${cast.refundBuff ? '(Refund)' : ''}`,
-              },
             },
             {
               name: 'veryLowActiveTime',
@@ -77,16 +119,6 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
               name: 'goodActiveTime',
               check: correctCharges && activeTimePerf === QualitativePerformance.Good,
               description: `Good usage: correct charges (${cast.charges}) + good active time (${formatPercentage(activeTime, 1)}%)`,
-              expandableConfig: {
-                label: (
-                  <>
-                    Active Time Percent during{' '}
-                    <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
-                  </>
-                ),
-                getDetails: (cast: TouchOfTheMagiCast) =>
-                  `${formatPercentage(cast.activeTime || 0, 2)}%`,
-              },
             },
           ],
 
@@ -176,7 +208,7 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
       </>
     );
 
-    // Use the unified evaluation approach - no more duplication!
+    // Use the unified evaluation approach with expandable breakdown
     return new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT, 'Touch of the Magi')
       .explanation(explanation)
       .addStatistic({
@@ -185,7 +217,13 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
         performance: this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime),
         tooltip: activeTimeTooltip,
       })
-      .addCastSummary({ castData: this.touchOfTheMagiData })
+      .addExpandableBreakdown({
+        castBreakdowns: generateExpandableBreakdown({
+          castData: this.touchOfTheMagi.touchCasts,
+          evaluatedData: this.touchOfTheMagiData,
+          expandableConfig: this.expandableConfig,
+        }),
+      })
       .build();
   }
 }
