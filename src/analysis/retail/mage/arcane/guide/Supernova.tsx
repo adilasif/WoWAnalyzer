@@ -1,9 +1,10 @@
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
-import Supernova, { SupernovaCast } from '../../shared/Supernova';
+import Supernova from '../../shared/Supernova';
 
 const AOE_THRESHOLD = 4;
 const TOUCH_DURATION_THRESHOLD = 3000;
@@ -21,95 +22,97 @@ class SupernovaGuide extends BaseMageGuide {
     TALENTS.UNERRING_PROFICIENCY_TALENT,
   );
 
-  private perCastBreakdown(cast: SupernovaCast): React.ReactNode {
-    const ST = cast.targetsHit < AOE_THRESHOLD;
-    const AOE = cast.targetsHit >= AOE_THRESHOLD;
-    const goodTouchTiming =
-      this.hasTouchOfTheMagi &&
-      cast.touchRemaining != null &&
-      cast.touchRemaining < TOUCH_DURATION_THRESHOLD;
-    const maxUnerringStacks =
-      this.hasUnerringProficiency && cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS;
+  get supernovaData(): BoxRowEntry[] {
+    return this.supernova.casts.map((cast) => {
+      const ST = cast.targetsHit < AOE_THRESHOLD;
+      const AOE = cast.targetsHit >= AOE_THRESHOLD;
+      const goodTouchTiming =
+        this.hasTouchOfTheMagi &&
+        cast.touchRemaining != null &&
+        cast.touchRemaining < TOUCH_DURATION_THRESHOLD;
+      const maxUnerringStacks =
+        this.hasUnerringProficiency && cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS;
 
-    return evaluateGuide(cast.timestamp, cast, this, {
-      actionName: 'Supernova',
+      return evaluateGuide(cast.timestamp, cast, this, {
+        actionName: 'Supernova',
 
-      // FAIL: Critical issues
-      failConditions: [
-        {
-          name: 'touchTimingFail',
-          check:
-            this.hasTouchOfTheMagi &&
-            ST &&
-            cast.touchRemaining != null &&
-            cast.touchRemaining >= TOUCH_DURATION_THRESHOLD,
-          description: cast.touchRemaining
-            ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining - should wait until Touch is almost expired`
-            : '',
-        },
-        {
-          name: 'unerringStacksFail',
-          check:
-            this.hasUnerringProficiency &&
-            AOE &&
-            cast.unerringStacks !== UNERRING_PROFICIENCY_MAX_STACKS,
-          description: cast.unerringStacks
-            ? `${cast.unerringStacks} stacks (need ${UNERRING_PROFICIENCY_MAX_STACKS}) - wait for max stacks for AoE`
-            : 'Missing Unerring Proficiency buff for AoE',
-        },
-      ],
+        // FAIL: Critical issues
+        failConditions: [
+          {
+            name: 'touchTimingFail',
+            check:
+              this.hasTouchOfTheMagi &&
+              ST &&
+              cast.touchRemaining != null &&
+              cast.touchRemaining >= TOUCH_DURATION_THRESHOLD,
+            description: cast.touchRemaining
+              ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining - should wait until Touch is almost expired`
+              : '',
+          },
+          {
+            name: 'unerringStacksFail',
+            check:
+              this.hasUnerringProficiency &&
+              AOE &&
+              cast.unerringStacks !== UNERRING_PROFICIENCY_MAX_STACKS,
+            description: cast.unerringStacks
+              ? `${cast.unerringStacks} stacks (need ${UNERRING_PROFICIENCY_MAX_STACKS}) - wait for max stacks for AoE`
+              : 'Missing Unerring Proficiency buff for AoE',
+          },
+        ],
 
-      // PERFECT: Optimal usage
-      perfectConditions: [
-        {
-          name: 'perfectSingleTarget',
-          check: ST && goodTouchTiming,
-          description: cast.touchRemaining
-            ? `Perfect timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
-            : 'Perfect - used at Touch end',
-        },
-        {
-          name: 'perfectAoe',
-          check: AOE && maxUnerringStacks && cast.targetsHit >= AOE_THRESHOLD,
-          description: `Perfect AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} Unerring stacks, ${cast.targetsHit} targets hit`,
-        },
-      ],
+        // PERFECT: Optimal usage
+        perfectConditions: [
+          {
+            name: 'perfectSingleTarget',
+            check: ST && goodTouchTiming,
+            description: cast.touchRemaining
+              ? `Perfect timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
+              : 'Perfect - used at Touch end',
+          },
+          {
+            name: 'perfectAoe',
+            check: AOE && maxUnerringStacks && cast.targetsHit >= AOE_THRESHOLD,
+            description: `Perfect AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} Unerring stacks, ${cast.targetsHit} targets hit`,
+          },
+        ],
 
-      // GOOD: Acceptable usage patterns
-      goodConditions: [
-        {
-          name: 'goodSingleTarget',
-          check: ST && (!this.hasTouchOfTheMagi || goodTouchTiming),
-          description:
-            this.hasTouchOfTheMagi && cast.touchRemaining
-              ? `Good timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
-              : 'Good single target usage',
-        },
-        {
-          name: 'goodAoe',
-          check: AOE && (!this.hasUnerringProficiency || maxUnerringStacks),
-          description: this.hasUnerringProficiency
-            ? `Good AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} stacks, ${cast.targetsHit} targets`
-            : `Good AoE - ${cast.targetsHit} targets hit`,
-        },
-        {
-          name: 'interruptUtility',
-          check: cast.targetsHit >= 1,
-          description: `Utility usage - ${cast.targetsHit} targets (can interrupt non-boss enemies)`,
-        },
-      ],
+        // GOOD: Acceptable usage patterns
+        goodConditions: [
+          {
+            name: 'goodSingleTarget',
+            check: ST && (!this.hasTouchOfTheMagi || goodTouchTiming),
+            description:
+              this.hasTouchOfTheMagi && cast.touchRemaining
+                ? `Good timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
+                : 'Good single target usage',
+          },
+          {
+            name: 'goodAoe',
+            check: AOE && (!this.hasUnerringProficiency || maxUnerringStacks),
+            description: this.hasUnerringProficiency
+              ? `Good AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} stacks, ${cast.targetsHit} targets`
+              : `Good AoE - ${cast.targetsHit} targets hit`,
+          },
+          {
+            name: 'interruptUtility',
+            check: cast.targetsHit >= 1,
+            description: `Utility usage - ${cast.targetsHit} targets (can interrupt non-boss enemies)`,
+          },
+        ],
 
-      // OK: Understandable but suboptimal
-      okConditions: [
-        {
-          name: 'standardUsage',
-          check: true,
-          description: `Standard usage - ${cast.targetsHit} targets hit`,
-        },
-      ],
+        // OK: Understandable but suboptimal
+        okConditions: [
+          {
+            name: 'standardUsage',
+            check: true,
+            description: `Standard usage - ${cast.targetsHit} targets hit`,
+          },
+        ],
 
-      defaultPerformance: QualitativePerformance.Ok,
-      defaultMessage: `Used on ${cast.targetsHit} targets - check timing for optimization`,
+        defaultPerformance: QualitativePerformance.Ok,
+        defaultMessage: `Used on ${cast.targetsHit} targets - check timing for optimization`,
+      });
     });
   }
 
@@ -145,8 +148,6 @@ class SupernovaGuide extends BaseMageGuide {
       <>{this.supernova.averageTargetsHit.toFixed(2)} average targets hit per cast.</>
     );
 
-    const castBreakdowns = this.supernova.casts.map((cast) => this.perCastBreakdown(cast));
-
     const dataComponents =
       this.supernova.casts.length > 0
         ? [
@@ -157,7 +158,7 @@ class SupernovaGuide extends BaseMageGuide {
               QualitativePerformance.Good,
               supernovaTooltip,
             ),
-            GuideComponents.createExpandableCastBreakdown(castBreakdowns),
+            GuideComponents.createPerCastSummary(TALENTS.SUPERNOVA_TALENT, this.supernovaData),
           ]
         : [GuideComponents.createNoUsageComponent(TALENTS.SUPERNOVA_TALENT)];
 
