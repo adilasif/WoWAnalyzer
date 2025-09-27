@@ -6,6 +6,5 @@ export {
   GuideConditions,
   type GuideEvaluationConfig,
   type GuideCondition,
-  type GuideRequirement,
   type TooltipProvider,
 } from './GuideEvaluation';

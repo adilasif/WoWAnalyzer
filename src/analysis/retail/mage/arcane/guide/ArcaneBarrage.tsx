@@ -51,12 +51,12 @@ class ArcaneBarrageGuide extends BaseMageGuide {
       return evaluateGuide(cast.cast.timestamp, cast, this, {
         actionName: 'Arcane Barrage',
 
-        // REQUIREMENTS: Must have max charges (unless special circumstances)
-        requirements: [
+        // FAIL: Critical requirements not met
+        failConditions: [
           {
-            name: 'maxCharges',
-            check: hasMaxCharges,
-            failureMessage: `Insufficient Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES})`,
+            name: 'insufficientCharges',
+            check: !hasMaxCharges,
+            description: `Insufficient Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES})`,
           },
         ],
 

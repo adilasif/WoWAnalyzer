@@ -31,23 +31,14 @@ class ArcaneSurgeGuide extends BaseMageGuide {
       return evaluateGuide(cast.cast, cast, this, {
         actionName: 'Arcane Surge',
 
-        // REQUIREMENTS: Must have charges (unless opener)
-        requirements: [
-          {
-            name: 'charges',
-            check: hasMaxCharges,
-            failureMessage: opener
-              ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
-              : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
-          },
-        ],
-
-        // FAIL: Things that waste the cooldown
+        // FAIL: Critical requirements not met
         failConditions: [
           {
-            name: 'aboutToDie',
-            check: !shortFight && fightTimeRemaining < 30000,
-            description: 'Wasted cooldown - fight ending soon and not short encounter',
+            name: 'insufficientCharges',
+            check: !hasMaxCharges,
+            description: opener
+              ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
+              : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
           },
         ],
 

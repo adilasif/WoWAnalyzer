@@ -14,21 +14,13 @@ export interface TooltipProvider {
 }
 
 /**
- * Represents a condition that can be evaluated for guide performance
+ * Represents a condition that can result in performance evaluation.
+ * Used for fail/perfect/good/ok conditions.
  */
 export interface GuideCondition {
   name: string;
-  check: boolean;
-  description: string;
-}
-
-/**
- * Represents a requirement that must be met for a guide evaluation to be valid
- */
-export interface GuideRequirement {
-  name: string;
-  check: boolean;
-  failureMessage: string;
+  check: boolean; // true means this condition is met
+  description: string; // what to show in tooltip when this condition triggers
 }
 
 /**
@@ -37,10 +29,7 @@ export interface GuideRequirement {
 export interface GuideEvaluationConfig {
   actionName: string;
 
-  // Optional requirements (checked first)
-  requirements?: GuideRequirement[];
-
-  // Performance conditions (checked in priority order)
+  // Conditions that result in failure (prerequisites not met, mistakes made, etc.)
   failConditions?: GuideCondition[];
   perfectConditions?: GuideCondition[];
   goodConditions?: GuideCondition[];
@@ -54,12 +43,18 @@ export interface GuideEvaluationConfig {
 /**
  * Universal guide evaluation function that handles ALL action types.
  *
- * This function implements the "Any One Good Reason" philosophy:
- * - If you have ANY valid reason for an action, the action is good
- * - Evaluation stops at the first matching condition
- * - No complex rule combinations to understand
+ * Evaluation Order:
+ * 1. failConditions - Any condition that results in failure (auto-fail if true)
+ * 2. perfectConditions - Check for perfect execution
+ * 3. goodConditions - Check for good execution
+ * 4. okConditions - Check for acceptable execution
+ * 5. Default fallback performance
  *
- * @param data - The action data (must have timestamp property)
+ * Philosophy: "Any One Good Reason" - if you have ANY valid reason for an action, it's good.
+ * But critical mistakes override everything.
+ *
+ * @param timestamp - When the action occurred
+ * @param data - The action data
  * @param guide - Guide instance that can generate tooltips
  * @param config - Evaluation configuration specifying conditions
  * @returns BoxRowEntry for use in PerformanceBoxRow
@@ -70,21 +65,8 @@ export function evaluateGuide<T = GuideData>(
   guide: TooltipProvider,
   config: GuideEvaluationConfig,
 ): BoxRowEntry {
-  // Step 1: Check requirements (any failure = auto-fail)
-  if (config.requirements) {
-    for (const req of config.requirements) {
-      if (!req.check) {
-        return createTooltipEntry(
-          guide,
-          QualitativePerformance.Fail,
-          req.failureMessage,
-          timestamp,
-        );
-      }
-    }
-  }
-
-  // Step 2: Check fail conditions (any match = fail)
+  // Step 1: Check fail conditions - any condition that makes the cast a failure
+  // This includes prerequisites not met, mistakes made, etc.
   if (config.failConditions) {
     for (const condition of config.failConditions) {
       if (condition.check) {
@@ -98,7 +80,7 @@ export function evaluateGuide<T = GuideData>(
     }
   }
 
-  // Step 3: Check perfect conditions (any match = perfect)
+  // Step 2: Check perfect conditions (any match = perfect)
   if (config.perfectConditions) {
     for (const condition of config.perfectConditions) {
       if (condition.check) {
@@ -112,7 +94,7 @@ export function evaluateGuide<T = GuideData>(
     }
   }
 
-  // Step 4: Check good conditions (any match = good)
+  // Step 3: Check good conditions (any match = good)
   if (config.goodConditions) {
     for (const condition of config.goodConditions) {
       if (condition.check) {
@@ -126,7 +108,7 @@ export function evaluateGuide<T = GuideData>(
     }
   }
 
-  // Step 5: Check ok conditions (any match = ok)
+  // Step 4: Check ok conditions (any match = ok)
   if (config.okConditions) {
     for (const condition of config.okConditions) {
       if (condition.check) {
@@ -140,7 +122,7 @@ export function evaluateGuide<T = GuideData>(
     }
   }
 
-  // Step 6: Default fallback
+  // Step 5: Default fallback
   return createTooltipEntry(
     guide,
     config.defaultPerformance || QualitativePerformance.Ok,
@@ -169,17 +151,18 @@ function createTooltipEntry(
 export class GuideConditions {
   /**
    * Creates a condition for checking resource requirements (charges, mana, etc.)
+   * Note: Returns a condition that fails when resources are insufficient
    */
   static hasResource(
     name: string,
     current: number,
     required: number,
     resourceName: string,
-  ): GuideRequirement {
+  ): GuideCondition {
     return {
       name,
-      check: current >= required,
-      failureMessage: `Insufficient ${resourceName} (${current}/${required})`,
+      check: current < required, // true = insufficient resources = fail condition
+      description: `Insufficient ${resourceName} (${current}/${required})`,
     };
   }
 
