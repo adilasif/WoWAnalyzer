@@ -1,7 +1,7 @@
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
 import Supernova, { SupernovaCast } from '../../shared/Supernova';
 
@@ -24,63 +24,93 @@ class SupernovaGuide extends BaseMageGuide {
   private perCastBreakdown(cast: SupernovaCast): React.ReactNode {
     const ST = cast.targetsHit < AOE_THRESHOLD;
     const AOE = cast.targetsHit >= AOE_THRESHOLD;
+    const goodTouchTiming =
+      this.hasTouchOfTheMagi &&
+      cast.touchRemaining != null &&
+      cast.touchRemaining < TOUCH_DURATION_THRESHOLD;
+    const maxUnerringStacks =
+      this.hasUnerringProficiency && cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS;
 
-    // Create rules for evaluation
-    const ruleset = createRuleset(cast, this)
-      .createRule({
-        id: 'touchTiming',
-        check: () =>
-          !this.hasTouchOfTheMagi ||
-          (cast.touchRemaining != null && cast.touchRemaining < TOUCH_DURATION_THRESHOLD),
-        failureText: cast.touchRemaining
-          ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining`
-          : 'No Touch active',
-        successText: cast.touchRemaining
-          ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining`
-          : 'No Touch needed',
-        active: () => this.hasTouchOfTheMagi && ST,
-        label: (
-          <>
-            <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} /> Duration Remaining
-          </>
-        ),
-      })
-      .createRule({
-        id: 'unerringStacks',
-        check: () =>
-          !this.hasUnerringProficiency || cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS,
-        failureText: cast.unerringStacks ? `${cast.unerringStacks} stacks` : 'Buff Missing',
-        successText: `${UNERRING_PROFICIENCY_MAX_STACKS} stacks`,
-        active: () => this.hasUnerringProficiency && AOE,
-        label: (
-          <>
-            <SpellLink spell={TALENTS.UNERRING_PROFICIENCY_TALENT} /> Stacks
-          </>
-        ),
-      })
-      .createRule({
-        id: 'targetsHit',
-        check: () => true, // Always show targets hit as informational
-        failureText: `${cast.targetsHit} targets`,
-        successText: `${cast.targetsHit} targets`,
-        failurePerformance: QualitativePerformance.Good, // Neutral display
-        successPerformance: QualitativePerformance.Good,
-        label: <>Targets Hit</>,
-      })
-      .goodIf(['touchTiming', 'unerringStacks', 'targetsHit']);
+    return evaluateGuide(cast.timestamp, cast, this, {
+      actionName: 'Supernova',
 
-    // Get rule results and performance
-    const ruleResults = ruleset.getRuleResults();
-    const performance = ruleset.getPerformance();
+      // FAIL: Critical issues
+      failConditions: [
+        {
+          name: 'touchTimingFail',
+          check:
+            this.hasTouchOfTheMagi &&
+            ST &&
+            cast.touchRemaining != null &&
+            cast.touchRemaining >= TOUCH_DURATION_THRESHOLD,
+          description: cast.touchRemaining
+            ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining - should wait until Touch is almost expired`
+            : '',
+        },
+        {
+          name: 'unerringStacksFail',
+          check:
+            this.hasUnerringProficiency &&
+            AOE &&
+            cast.unerringStacks !== UNERRING_PROFICIENCY_MAX_STACKS,
+          description: cast.unerringStacks
+            ? `${cast.unerringStacks} stacks (need ${UNERRING_PROFICIENCY_MAX_STACKS}) - wait for max stacks for AoE`
+            : 'Missing Unerring Proficiency buff for AoE',
+        },
+      ],
 
-    return MageGuideComponents.createExpandableCastItem(
-      TALENTS.SUPERNOVA_TALENT,
-      cast.timestamp,
-      this.owner,
-      ruleResults,
-      performance,
-      cast.ordinal,
-    );
+      // PERFECT: Optimal usage
+      perfectConditions: [
+        {
+          name: 'perfectSingleTarget',
+          check: ST && goodTouchTiming,
+          description: cast.touchRemaining
+            ? `Perfect timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
+            : 'Perfect - used at Touch end',
+        },
+        {
+          name: 'perfectAoe',
+          check: AOE && maxUnerringStacks && cast.targetsHit >= AOE_THRESHOLD,
+          description: `Perfect AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} Unerring stacks, ${cast.targetsHit} targets hit`,
+        },
+      ],
+
+      // GOOD: Acceptable usage patterns
+      goodConditions: [
+        {
+          name: 'goodSingleTarget',
+          check: ST && (!this.hasTouchOfTheMagi || goodTouchTiming),
+          description:
+            this.hasTouchOfTheMagi && cast.touchRemaining
+              ? `Good timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
+              : 'Good single target usage',
+        },
+        {
+          name: 'goodAoe',
+          check: AOE && (!this.hasUnerringProficiency || maxUnerringStacks),
+          description: this.hasUnerringProficiency
+            ? `Good AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} stacks, ${cast.targetsHit} targets`
+            : `Good AoE - ${cast.targetsHit} targets hit`,
+        },
+        {
+          name: 'interruptUtility',
+          check: cast.targetsHit >= 1,
+          description: `Utility usage - ${cast.targetsHit} targets (can interrupt non-boss enemies)`,
+        },
+      ],
+
+      // OK: Understandable but suboptimal
+      okConditions: [
+        {
+          name: 'standardUsage',
+          check: true,
+          description: `Standard usage - ${cast.targetsHit} targets hit`,
+        },
+      ],
+
+      defaultPerformance: QualitativePerformance.Ok,
+      defaultMessage: `Used on ${cast.targetsHit} targets - check timing for optimization`,
+    });
   }
 
   get guideSubsection(): JSX.Element {
@@ -120,18 +150,18 @@ class SupernovaGuide extends BaseMageGuide {
     const dataComponents =
       this.supernova.casts.length > 0
         ? [
-            MageGuideComponents.createStatisticPanel(
+            GuideComponents.createStatisticPanel(
               TALENTS.SUPERNOVA_TALENT,
               this.supernova.averageTargetsHit.toFixed(2),
               'Average Targets Hit',
               QualitativePerformance.Good,
               supernovaTooltip,
             ),
-            MageGuideComponents.createExpandableCastBreakdown(castBreakdowns),
+            GuideComponents.createExpandableCastBreakdown(castBreakdowns),
           ]
-        : [MageGuideComponents.createNoUsageComponent(TALENTS.SUPERNOVA_TALENT)];
+        : [GuideComponents.createNoUsageComponent(TALENTS.SUPERNOVA_TALENT)];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Supernova');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Supernova');
   }
 }
 

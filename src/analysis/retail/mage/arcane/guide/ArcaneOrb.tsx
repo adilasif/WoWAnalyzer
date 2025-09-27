@@ -2,7 +2,7 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
 import ArcaneOrb from '../core/ArcaneOrb';
 
@@ -18,34 +18,47 @@ class ArcaneOrbGuide extends BaseMageGuide {
 
   get arcaneOrbData(): BoxRowEntry[] {
     return this.arcaneOrb.orbCasts.map((cast) => {
-      return (
-        createRuleset(cast, this)
-          // ===== INDIVIDUAL RULE DEFINITIONS =====
+      const hitTargets = cast.targetsHit > 0;
+      const efficientCharges = cast.chargesBefore <= ORB_CHARGE_THRESHOLD;
 
-          .createRule({
-            id: 'targetsHit',
-            check: () => cast.targetsHit > 0,
-            failureText: 'No targets hit',
-            successText: `Targets Hit: ${cast.targetsHit}`,
-            failurePerformance: QualitativePerformance.Fail,
-          })
+      return evaluateGuide(cast.timestamp, cast, this, {
+        actionName: 'Arcane Orb',
 
-          .createRule({
-            id: 'efficientCharges',
-            check: () => cast.chargesBefore <= ORB_CHARGE_THRESHOLD,
-            failureText: `Too many charges (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
-            successText: `Efficient charge usage (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // FAIL: Critical mistakes
+        failConditions: [
+          {
+            name: 'missedTargets',
+            check: !hitTargets,
+            description: 'Failed to hit any targets - wasted cooldown',
+          },
+          {
+            name: 'wastedCharges',
+            check: !efficientCharges,
+            description: `Inefficient usage - already had ${cast.chargesBefore} charges (use at ≤${ORB_CHARGE_THRESHOLD} charges)`,
+          },
+        ],
 
-          // ===== PERFORMANCE CRITERIA =====
+        // PERFECT: Optimal usage
+        perfectConditions: [
+          {
+            name: 'optimalUsage',
+            check: hitTargets && efficientCharges && cast.targetsHit >= 2,
+            description: `Perfect usage - ${cast.targetsHit} targets hit with efficient charge usage (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
+          },
+        ],
 
-          .goodIf(['targetsHit', 'efficientCharges']) // Good if both conditions met
+        // GOOD: Standard usage
+        goodConditions: [
+          {
+            name: 'standardUsage',
+            check: hitTargets && efficientCharges,
+            description: `Good usage - ${cast.targetsHit} target(s) hit with efficient charge usage (${cast.chargesBefore}/${ORB_CHARGE_THRESHOLD})`,
+          },
+        ],
 
-          // Fail if either condition not met
-
-          .evaluate(cast.timestamp)
-      );
+        defaultPerformance: QualitativePerformance.Fail,
+        defaultMessage: 'Suboptimal Arcane Orb usage',
+      });
     });
   }
 
@@ -70,7 +83,7 @@ class ArcaneOrbGuide extends BaseMageGuide {
     const dataComponents =
       this.arcaneOrb.orbCasts.length > 0
         ? [
-            MageGuideComponents.createCooldownTimeline(
+            GuideComponents.createCooldownTimeline(
               SPELLS.ARCANE_ORB,
               this.arcaneOrb.averageHitsPerCast.toFixed(2),
               'avg targets hit',
@@ -79,9 +92,9 @@ class ArcaneOrbGuide extends BaseMageGuide {
               'Arcane Orb Usage',
             ),
           ]
-        : [MageGuideComponents.createNoUsageComponent(SPELLS.ARCANE_ORB)];
+        : [GuideComponents.createNoUsageComponent(SPELLS.ARCANE_ORB)];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Arcane Orb');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Orb');
   }
 }
 

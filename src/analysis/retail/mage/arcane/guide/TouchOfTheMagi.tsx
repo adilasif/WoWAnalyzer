@@ -4,14 +4,10 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
-import {
-  BaseMageGuide,
-  MageGuideComponents,
-  createRuleset,
-  type GuideLike,
-} from '../../shared/guide';
+import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
-import TouchOfTheMagi, { TouchOfTheMagiCast } from '../talents/TouchOfTheMagi';
+import TouchOfTheMagi from '../talents/TouchOfTheMagi';
 
 const MAX_ARCANE_CHARGES = 4;
 
@@ -36,55 +32,62 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
     return performance;
   }
 
-  private perCastBreakdown(cast: TouchOfTheMagiCast): React.ReactNode {
-    const noCharges = cast.charges === 0;
-    const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
-    const activeTime = cast.activeTime || 0;
+  get touchOfTheMagiData(): BoxRowEntry[] {
+    return this.touchOfTheMagi.touchCasts.map((cast) => {
+      const noCharges = cast.charges === 0;
+      const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
+      const activeTime = cast.activeTime || 0;
+      const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
+      const correctCharges = noCharges || (maxCharges && cast.refundBuff);
 
-    // Create rules for evaluation
-    const ruleset = createRuleset<TouchOfTheMagiCast>(cast, this as GuideLike)
-      .createRule({
-        id: 'correctCharges',
-        check: () => noCharges || (maxCharges && cast.refundBuff),
-        failureText: `${cast.charges} charges ${cast.refundBuff ? '(Refund)' : ''}`,
-        successText: `${cast.charges} charges ${cast.refundBuff ? '(Refund)' : ''}`,
-        label: (
-          <>
-            <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Touch
-          </>
-        ),
-      })
+      return evaluateGuide(cast.applied, cast, this, {
+        actionName: 'Touch of the Magi',
 
-      .createRule({
-        id: 'activeTime',
-        check: () =>
-          this.activeTimeUtil(activeTime) === QualitativePerformance.Perfect ||
-          this.activeTimeUtil(activeTime) === QualitativePerformance.Good,
-        failureText: `${formatPercentage(activeTime, 2)}%`,
-        successText: `${formatPercentage(activeTime, 2)}%`,
-        failurePerformance: this.activeTimeUtil(activeTime),
-        successPerformance: this.activeTimeUtil(activeTime),
-        label: (
-          <>
-            Active Time Percent during <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
-          </>
-        ),
-      })
+        // FAIL: Critical mistakes
+        failConditions: [
+          {
+            name: 'wrongCharges',
+            check: !correctCharges,
+            description: `Wrong charge count (${cast.charges}) - should have 0 or 4 charges with refund buff`,
+          },
+          {
+            name: 'veryLowActiveTime',
+            check: activeTimePerf === QualitativePerformance.Fail,
+            description: `Very low active time (${formatPercentage(activeTime, 1)}%) - need to cast more during Touch window`,
+          },
+        ],
 
-      .goodIf(['correctCharges', 'activeTime']);
+        // PERFECT: Optimal usage
+        perfectConditions: [
+          {
+            name: 'perfectActiveTime',
+            check: correctCharges && activeTimePerf === QualitativePerformance.Perfect,
+            description: `Perfect usage: correct charges (${cast.charges}) + excellent active time (${formatPercentage(activeTime, 1)}%)`,
+          },
+        ],
 
-    // Get rule results and performance
-    const ruleResults = ruleset.getRuleResults();
-    const performance = ruleset.getPerformance();
+        // GOOD: Acceptable usage
+        goodConditions: [
+          {
+            name: 'goodActiveTime',
+            check: correctCharges && activeTimePerf === QualitativePerformance.Good,
+            description: `Good usage: correct charges (${cast.charges}) + good active time (${formatPercentage(activeTime, 1)}%)`,
+          },
+        ],
 
-    return MageGuideComponents.createExpandableCastItem(
-      TALENTS.TOUCH_OF_THE_MAGI_TALENT,
-      cast.applied,
-      this.owner,
-      ruleResults,
-      performance,
-      cast.ordinal,
-    );
+        // OK: Basic acceptable usage
+        okConditions: [
+          {
+            name: 'correctChargesOk',
+            check: correctCharges && activeTimePerf === QualitativePerformance.Ok,
+            description: `Acceptable: correct charges (${cast.charges}) but could improve active time (${formatPercentage(activeTime, 1)}%)`,
+          },
+        ],
+
+        defaultPerformance: QualitativePerformance.Fail,
+        defaultMessage: `Suboptimal Touch usage: ${cast.charges} charges, ${formatPercentage(activeTime, 1)}% active time`,
+      });
+    });
   }
 
   get guideSubsection(): JSX.Element {
@@ -156,22 +159,21 @@ class TouchOfTheMagiGuide extends BaseMageGuide {
       </>
     );
 
-    const castBreakdowns = this.touchOfTheMagi.touchCasts.map((cast) =>
-      this.perCastBreakdown(cast),
-    );
-
     const dataComponents = [
-      MageGuideComponents.createStatisticPanel(
+      GuideComponents.createStatisticPanel(
         TALENTS.TOUCH_OF_THE_MAGI_TALENT,
         `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,
         'Average Active Time',
         this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime),
         activeTimeTooltip,
       ),
-      MageGuideComponents.createExpandableCastBreakdown(castBreakdowns),
+      GuideComponents.createPerCastSummary(
+        TALENTS.TOUCH_OF_THE_MAGI_TALENT,
+        this.touchOfTheMagiData,
+      ),
     ];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Touch of the Magi');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Touch of the Magi');
   }
 }
 

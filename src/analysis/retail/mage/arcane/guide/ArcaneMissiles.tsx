@@ -7,12 +7,11 @@ import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import {
   BaseMageGuide,
   PerformanceUtils,
-  MageGuideComponents,
-  createRuleset,
-  type GuideLike,
+  GuideComponents,
+  evaluateGuide,
 } from '../../shared/guide';
 
-import ArcaneMissiles, { ArcaneMissilesCast } from '../core/ArcaneMissiles';
+import ArcaneMissiles from '../core/ArcaneMissiles';
 
 const MISSILE_EARLY_CLIP_DELAY = 200;
 
@@ -42,99 +41,82 @@ class ArcaneMissilesGuide extends BaseMageGuide {
       const hadBuffNP = this.hasNetherPrecision && am.netherPrecision;
       const badClip = am.clipped && clippedBeforeGCD;
       const noClip = !am.aetherAttunement && !am.clipped;
+      const hasValidTiming = am.channelEndDelay !== undefined && am.nextCast !== undefined;
+      const goodChannelDelay =
+        hasValidTiming &&
+        (this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Good ||
+          this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Perfect);
 
-      return (
-        createRuleset<ArcaneMissilesCast>(am, this as GuideLike)
-          // ===== INDIVIDUAL RULE DEFINITIONS =====
+      return evaluateGuide(am.cast.timestamp, am, this, {
+        actionName: 'Arcane Missiles',
 
-          // Critical failure rules
-          .createRule({
-            id: 'netherPrecisionActive',
-            check: () => !(hadBuffNP && !am.clearcastingCapped),
-            failureText: 'Nether Precision Buff Active',
-            successText: hadBuffNP
-              ? 'Had Nether Precision but was capped on Clearcasting'
-              : 'No Nether Precision active',
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // FAIL: Critical issues that make the cast bad
+        failConditions: [
+          {
+            name: 'netherPrecisionWaste',
+            check: hadBuffNP && !am.clearcastingCapped,
+            description: 'Wasted Nether Precision buff - should not cast Missiles with this buff',
+          },
+          {
+            name: 'clippedEarly',
+            check: Boolean(badClip),
+            description: 'Clipped Missiles before GCD ended - significant DPS loss',
+          },
+          {
+            name: 'invalidTiming',
+            check: !hasValidTiming,
+            description: 'Cannot determine channel timing - likely data issue',
+          },
+        ],
 
-          .createRule({
-            id: 'clippedBeforeGCD',
-            check: () => !badClip,
-            failureText: 'Clipped Missiles Before GCD',
-            successText: badClip ? undefined : 'Did not clip before GCD',
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // PERFECT: Optimal channel usage
+        perfectConditions: [
+          {
+            name: 'cappedClearcasting',
+            check: am.clearcastingCapped,
+            description: 'Perfect - avoided munching Clearcasting charges by using when capped',
+          },
+          {
+            name: 'optimalClip',
+            check: am.clipped && am.aetherAttunement && goodChannelDelay,
+            description: 'Perfect clip timing with Aether Attunement and good delay',
+          },
+        ],
 
-          .createRule({
-            id: 'nextCastFound',
-            check: () => am.channelEndDelay !== undefined && am.nextCast !== undefined,
-            failureText: 'Next Cast Not Found',
-            successText: am.nextCast ? `Next cast: ${am.nextCast.ability.name}` : undefined,
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // GOOD: Acceptable usage patterns
+        goodConditions: [
+          {
+            name: 'goodClipTiming',
+            check: am.clipped && am.aetherAttunement,
+            description: 'Good clip timing with Aether Attunement',
+          },
+          {
+            name: 'fullChannelNoAether',
+            check: noClip && !this.hasAetherAttunement,
+            description: 'Good - full channel without Aether Attunement (optimal without talent)',
+          },
+          {
+            name: 'goodDelay',
+            check: goodChannelDelay,
+            description: `Good timing - ${am.channelEndDelay ? formatDurationMillisMinSec(am.channelEndDelay, 3) : '???'} delay to next cast`,
+          },
+        ],
 
-          // Positive condition rules
-          .createRule({
-            id: 'clearcastingCapped',
-            check: () => am.clearcastingCapped,
-            failureText: 'Not capped on Clearcasting charges',
-            successText: 'Capped on Clearcasting Charges',
-            failurePerformance: QualitativePerformance.Ok,
-          })
+        // OK: Understandable but suboptimal
+        okConditions: [
+          {
+            name: 'fullChannel',
+            check: noClip,
+            description: 'Full channel - not clipped but could be optimized with Aether Attunement',
+          },
+        ],
 
-          .createRule({
-            id: 'goodClip',
-            check: () => am.clipped,
-            failureText: 'Did not clip at GCD optimally',
-            successText: 'Clipped at GCD with Aether Attunement',
-            failurePerformance: QualitativePerformance.Ok,
-          })
-
-          .createRule({
-            id: 'fullChannel',
-            check: () => noClip,
-            failureText: 'Did not fully channel',
-            successText: 'Full channeled without Aether Attunement',
-            failurePerformance: QualitativePerformance.Ok,
-          })
-
-          .createRule({
-            id: 'channelDelay',
-            check: () => {
-              if (am.channelEndDelay === undefined) return false;
-              const delayPerf = this.channelDelayUtil(am.channelEndDelay);
-              return (
-                delayPerf === QualitativePerformance.Good ||
-                delayPerf === QualitativePerformance.Perfect
-              );
-            },
-            failureText:
-              am.channelEndDelay !== undefined
-                ? `${formatDurationMillisMinSec(am.channelEndDelay, 3)} Delay Until Next Cast (${am.nextCast?.ability.name || 'Unknown'})`
-                : 'Channel delay unknown',
-            successText:
-              am.channelEndDelay !== undefined
-                ? `Good timing: ${formatDurationMillisMinSec(am.channelEndDelay, 3)} delay`
-                : undefined,
-            failurePerformance: QualitativePerformance.Ok,
-          })
-
-          // ===== PERFORMANCE CRITERIA =====
-
-          // Perfect: Good clipping with optimal conditions
-          .perfectIf(['netherPrecisionActive', 'clippedBeforeGCD', 'nextCastFound', 'goodClip'])
-
-          // Good: Meeting basic requirements
-          .goodIf(['netherPrecisionActive', 'clippedBeforeGCD', 'nextCastFound'])
-
-          // Ok: Full channel without clipping issues
-          .okIf(['netherPrecisionActive', 'clippedBeforeGCD', 'fullChannel'])
-
-          // Fail if critical rules not met
-
-          .evaluate(am.cast.timestamp)
-      );
+        // Default if no specific conditions match
+        defaultPerformance: QualitativePerformance.Ok,
+        defaultMessage: am.channelEndDelay
+          ? `Standard usage - ${formatDurationMillisMinSec(am.channelEndDelay, 3)} delay to next cast`
+          : 'Standard Arcane Missiles usage',
+      });
     });
   }
 
@@ -176,20 +158,17 @@ class ArcaneMissilesGuide extends BaseMageGuide {
     );
 
     const dataComponents = [
-      MageGuideComponents.createStatistic(
+      GuideComponents.createStatistic(
         TALENTS.ARCANE_MISSILES_TALENT,
         formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
         'Average Delay from Channel End to Next Cast',
         this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay),
         averageDelayTooltip,
       ),
-      MageGuideComponents.createPerCastSummary(
-        TALENTS.ARCANE_MISSILES_TALENT,
-        this.arcaneMissilesData,
-      ),
+      GuideComponents.createPerCastSummary(TALENTS.ARCANE_MISSILES_TALENT, this.arcaneMissilesData),
     ];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Arcane Missiles');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Missiles');
   }
 }
 

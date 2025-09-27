@@ -1,13 +1,8 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
-import {
-  BaseMageGuide,
-  MageGuideComponents,
-  createRuleset,
-  type GuideLike,
-  type ModuleLike,
-} from '../../shared/guide';
+import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
 import ArcaneTempo from '../talents/ArcaneTempo';
 import { getUptimesFromBuffHistory } from 'parser/ui/UptimeBar';
@@ -42,42 +37,52 @@ class ArcaneTempoGuide extends BaseMageGuide {
     const overallUptimes = getUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
     const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
 
-    // Create rules to evaluate Arcane Tempo performance
+    // Evaluate Arcane Tempo performance using universal template
     const tempoData = {
       uptime: this.arcaneTempo.buffUptimePercent,
       averageStacks: this.arcaneTempo.averageStacks,
       timestamp: this.owner.fight.start_time,
     };
     const thresholds = this.arcaneTempo.arcaneTempoUptimeThresholds.isLessThan;
+    const uptimePercent = (tempoData.uptime * 100).toFixed(1);
 
-    const tempoRuleset = createRuleset(tempoData, this as GuideLike)
-      .createRule({
-        id: 'excellentUptime',
-        check: () => tempoData.uptime >= thresholds.minor,
-        failureText: `Uptime could be higher (${(tempoData.uptime * 100).toFixed(1)}%)`,
-        successText: `Excellent uptime (${(tempoData.uptime * 100).toFixed(1)}%)`,
-      })
+    const tempoEntry = evaluateGuide(tempoData.timestamp, tempoData, this, {
+      actionName: 'Arcane Tempo',
 
-      .createRule({
-        id: 'goodUptime',
-        check: () => tempoData.uptime >= thresholds.average,
-        failureText: `Uptime needs improvement (${(tempoData.uptime * 100).toFixed(1)}%)`,
-        successText: `Good uptime (${(tempoData.uptime * 100).toFixed(1)}%)`,
-      })
+      // PERFECT: Excellent uptime
+      perfectConditions: [
+        {
+          name: 'excellentUptime',
+          check: tempoData.uptime >= thresholds.minor,
+          description: `Excellent uptime (${uptimePercent}%) - maximizing Arcane Tempo benefits`,
+        },
+      ],
 
-      .createRule({
-        id: 'minimumUptime',
-        check: () => tempoData.uptime >= thresholds.major,
-        failureText: `Very low uptime (${(tempoData.uptime * 100).toFixed(1)}%)`,
-        successText: `Minimum acceptable uptime (${(tempoData.uptime * 100).toFixed(1)}%)`,
-      })
+      // GOOD: Acceptable uptime
+      goodConditions: [
+        {
+          name: 'goodUptime',
+          check: tempoData.uptime >= thresholds.average,
+          description: `Good uptime (${uptimePercent}%) - maintaining most Arcane Tempo benefits`,
+        },
+      ],
 
-      .perfectIf(['excellentUptime'])
-      .goodIf(['goodUptime'])
-      .okIf(['minimumUptime']);
+      // OK: Minimum acceptable uptime
+      okConditions: [
+        {
+          name: 'minimumUptime',
+          check: tempoData.uptime >= thresholds.major,
+          description: `Minimum acceptable uptime (${uptimePercent}%) - could be improved`,
+        },
+      ],
+
+      // Default if below minimum
+      defaultPerformance: QualitativePerformance.Fail,
+      defaultMessage: `Very low uptime (${uptimePercent}%) - need to maintain Arcane Tempo better`,
+    });
 
     const dataComponents = [
-      MageGuideComponents.createBuffStackUptime(
+      GuideComponents.createBuffStackUptime(
         TALENTS.ARCANE_TEMPO_TALENT,
         this.arcaneTempo.buffUptimePercent,
         this.arcaneTempo.averageStacks,
@@ -90,17 +95,10 @@ class ArcaneTempoGuide extends BaseMageGuide {
         TEMPO_BG_COLOR,
         `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`,
       ),
-      MageGuideComponents.createExpandableCastItem(
-        TALENTS.ARCANE_TEMPO_TALENT,
-        this.owner.fight.start_time,
-        this.owner as ModuleLike,
-        tempoRuleset.getRuleResults(),
-        tempoRuleset.getPerformance(),
-        undefined,
-      ),
+      GuideComponents.createPerCastSummary(TALENTS.ARCANE_TEMPO_TALENT, [tempoEntry]),
     ];
 
-    return MageGuideComponents.createSubsection(
+    return GuideComponents.createSubsection(
       explanation,
       dataComponents as JSX.Element[],
       'Arcane Tempo',

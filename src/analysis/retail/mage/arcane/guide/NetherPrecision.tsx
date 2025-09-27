@@ -3,7 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
 import NetherPrecision from '../talents/NetherPrecision';
 
@@ -22,43 +22,45 @@ class NetherPrecisionGuide extends BaseMageGuide {
       const fightEndOneLost = this.owner.fight.end_time === np.removed && oneStackLost;
       const fightEndBothLost = this.owner.fight.end_time === np.removed && bothStacksLost;
 
-      return (
-        createRuleset(np, this)
-          // ===== INDIVIDUAL RULE DEFINITIONS =====
+      return evaluateGuide(np.applied, np, this, {
+        actionName: 'Nether Precision',
 
-          .createRule({
-            id: 'notOverwritten',
-            check: () => !np.overwritten,
-            failureText: 'Buff Overwritten',
-            successText: 'Buff not overwritten',
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // FAIL: Critical mistakes
+        failConditions: [
+          {
+            name: 'overwritten',
+            check: Boolean(np.overwritten),
+            description:
+              'Nether Precision buff overwritten - wasted proc by casting Arcane Missiles again',
+          },
+          {
+            name: 'stacksWasted',
+            check: (oneStackLost || bothStacksLost) && !(fightEndOneLost || fightEndBothLost),
+            description: `${oneStackLost ? 'One stack' : 'Both stacks'} lost - should have used before expiry`,
+          },
+        ],
 
-          .createRule({
-            id: 'stacksUsed',
-            check: () => !(oneStackLost || bothStacksLost),
-            failureText: `${oneStackLost ? 'One stack' : 'Both stacks'} lost`,
-            successText: 'Both stacks used properly',
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // PERFECT: Used all stacks without overwriting
+        perfectConditions: [
+          {
+            name: 'perfectUsage',
+            check: !np.overwritten && !(oneStackLost || bothStacksLost),
+            description: 'Perfect - used both Nether Precision stacks without overwriting',
+          },
+        ],
 
-          .createRule({
-            id: 'fightEndGrace',
-            check: () => fightEndOneLost || fightEndBothLost,
-            failureText: 'Stacks lost not near fight end',
-            successText: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost close to fight end`,
-            failurePerformance: QualitativePerformance.Ok,
-          })
+        // OK: Lost stacks at fight end (understandable)
+        okConditions: [
+          {
+            name: 'fightEndLoss',
+            check: !np.overwritten && (fightEndOneLost || fightEndBothLost),
+            description: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost at fight end - acceptable`,
+          },
+        ],
 
-          // ===== PERFORMANCE CRITERIA =====
-
-          .goodIf(['notOverwritten', 'stacksUsed']) // Good if not overwritten and all stacks used
-          .okIf(['notOverwritten', 'fightEndGrace']) // Ok if lost near fight end but not overwritten
-
-          // Fail if overwritten or stacks wasted
-
-          .evaluate(np.applied)
-      );
+        defaultPerformance: QualitativePerformance.Fail,
+        defaultMessage: 'Nether Precision not used optimally',
+      });
     });
   }
 
@@ -82,13 +84,13 @@ class NetherPrecisionGuide extends BaseMageGuide {
     );
 
     const dataComponents = [
-      MageGuideComponents.createPerCastSummary(
+      GuideComponents.createPerCastSummary(
         TALENTS.NETHER_PRECISION_TALENT,
         this.netherPrecisionData,
       ),
     ];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Nether Precision');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Nether Precision');
   }
 }
 

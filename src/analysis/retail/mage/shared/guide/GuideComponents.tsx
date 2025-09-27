@@ -9,28 +9,23 @@ import {
 } from 'interface/guide/components/CastEfficiencyPanel';
 import { qualitativePerformanceToColor } from 'interface/guide';
 import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../arcane/Guide';
-import CooldownExpandable, {
-  CooldownExpandableItem,
-} from 'interface/guide/components/CooldownExpandable';
 import UptimeStackBar from 'parser/ui/UptimeStackBar';
 import { formatPercentage } from 'common/format';
-import { PassFailCheckmark } from 'interface/guide';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { GuideRule } from './SimpleRuleTemplate';
 import Spell from 'common/SPELLS/Spell';
 
 /**
  * Interface for WoWAnalyzer module instances that can format timestamps
  */
-export interface ModuleLike {
+export interface TimestampFormatter {
   formatTimestamp: (timestamp: number) => string;
 }
 
 /**
- * Reusable UI components commonly used in mage guide implementations.
+ * Reusable UI components commonly used in guide implementations.
  * These components encapsulate common patterns to reduce code duplication.
  */
-export class MageGuideComponents {
+export class GuideComponents {
   /**
    * Creates a standardized guide subsection with flexible data components.
    * Use this for all guide subsections to maintain consistency.
@@ -239,128 +234,6 @@ export class MageGuideComponents {
         </p>
       </div>
     );
-  }
-
-  /**
-   * Create a single expandable cast item with header and checklist
-   * Used for individual cast breakdowns in ArcaneSurge, TouchOfTheMagi, etc.
-   */
-  static createExpandableCastItem(
-    spell: Spell,
-    timestamp: number,
-    owner: ModuleLike,
-    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
-    ruleLabels: Map<string, JSX.Element>,
-    performance: QualitativePerformance,
-    ordinal?: number,
-  ): React.ReactNode;
-
-  /**
-   * Create a single expandable cast item with header and checklist using labels from rules
-   * Used for individual cast breakdowns in ArcaneSurge, TouchOfTheMagi, etc.
-   */
-  static createExpandableCastItem(
-    spell: Spell,
-    timestamp: number,
-    owner: ModuleLike,
-    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
-    performance: QualitativePerformance,
-    ordinal?: number,
-  ): React.ReactNode;
-
-  static createExpandableCastItem(
-    spell: Spell,
-    timestamp: number,
-    owner: ModuleLike,
-    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
-    ruleLabelsOrPerformance: Map<string, JSX.Element> | QualitativePerformance,
-    performanceOrOrdinal?: QualitativePerformance | number,
-    ordinal?: number,
-  ): React.ReactNode {
-    const header = (
-      <>
-        @ {owner.formatTimestamp(timestamp)} &mdash; <SpellLink spell={spell} />
-      </>
-    );
-
-    let checklistItems: CooldownExpandableItem[];
-    let performance: QualitativePerformance;
-    let finalOrdinal: number | undefined;
-
-    // Determine which overload was called
-    if (ruleLabelsOrPerformance instanceof Map) {
-      // First overload: with separate ruleLabels map
-      checklistItems = MageGuideComponents.createChecklistFromRules(
-        ruleResults,
-        ruleLabelsOrPerformance,
-      );
-      performance = performanceOrOrdinal as QualitativePerformance;
-      finalOrdinal = ordinal;
-    } else {
-      // Second overload: using labels from rules
-      checklistItems = MageGuideComponents.createChecklistFromRulesWithLabels(ruleResults);
-      performance = ruleLabelsOrPerformance;
-      finalOrdinal = performanceOrOrdinal as number | undefined;
-    }
-
-    return (
-      <CooldownExpandable
-        header={header}
-        checklistItems={checklistItems}
-        perf={performance}
-        key={finalOrdinal || timestamp}
-      />
-    );
-  }
-
-  /**
-   * Create checklist items from rule evaluation results
-   * Maps rule results to CooldownExpandableItem format
-   */
-  static createChecklistFromRules(
-    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
-    ruleLabels: Map<string, JSX.Element>,
-  ): CooldownExpandableItem[] {
-    const checklistItems: CooldownExpandableItem[] = [];
-
-    for (const [ruleId, result] of ruleResults) {
-      const { rule, passed } = result;
-      const label = ruleLabels.get(ruleId);
-
-      if (label) {
-        checklistItems.push({
-          label,
-          result: <PassFailCheckmark pass={passed} />,
-          details: <>{passed ? rule.successText || 'Passed' : rule.failureText || 'Failed'}</>,
-        });
-      }
-    }
-
-    return checklistItems;
-  }
-
-  /**
-   * Create checklist items from rule evaluation results using labels from the rules themselves
-   * Maps rule results to CooldownExpandableItem format
-   */
-  static createChecklistFromRulesWithLabels(
-    ruleResults: Map<string, { rule: GuideRule; passed: boolean }>,
-  ): CooldownExpandableItem[] {
-    const checklistItems: CooldownExpandableItem[] = [];
-
-    for (const [, result] of ruleResults) {
-      const { rule, passed } = result;
-
-      if (rule.label) {
-        checklistItems.push({
-          label: rule.label,
-          result: <PassFailCheckmark pass={passed} />,
-          details: <>{passed ? rule.successText || 'Passed' : rule.failureText || 'Failed'}</>,
-        });
-      }
-    }
-
-    return checklistItems;
   }
 
   /**

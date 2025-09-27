@@ -2,7 +2,7 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
 import Clearcasting from '../core/Clearcasting';
 
@@ -16,26 +16,30 @@ class ClearcastingGuide extends BaseMageGuide {
 
   get clearcastingData(): BoxRowEntry[] {
     return this.clearcasting.clearcastingProcs.map((cc) => {
-      return (
-        createRuleset(cc, this)
-          // ===== INDIVIDUAL RULE DEFINITIONS =====
+      return evaluateGuide(cc.applied, cc, this, {
+        actionName: 'Clearcasting',
 
-          .createRule({
-            id: 'notExpired',
-            check: () => !cc.expired,
-            failureText: 'Clearcasting Expired',
-            successText: 'Clearcasting Used Before Expiring',
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // FAIL: Letting procs expire
+        failConditions: [
+          {
+            name: 'expired',
+            check: cc.expired,
+            description: 'Clearcasting proc expired unused - significant DPS loss',
+          },
+        ],
 
-          // ===== PERFORMANCE CRITERIA =====
+        // PERFECT: Used before expiring
+        perfectConditions: [
+          {
+            name: 'usedBeforeExpiry',
+            check: !cc.expired,
+            description: 'Perfect - used Clearcasting proc before it expired',
+          },
+        ],
 
-          .perfectIf(['notExpired']) // Perfect if used before expiring
-
-          // If expired, automatic Fail
-
-          .evaluate(cc.applied)
-      );
+        defaultPerformance: QualitativePerformance.Fail,
+        defaultMessage: 'Clearcasting proc not handled properly',
+      });
     });
   }
 
@@ -60,10 +64,10 @@ class ClearcastingGuide extends BaseMageGuide {
     );
 
     const dataComponents = [
-      MageGuideComponents.createPerCastSummary(SPELLS.CLEARCASTING_ARCANE, this.clearcastingData),
+      GuideComponents.createPerCastSummary(SPELLS.CLEARCASTING_ARCANE, this.clearcastingData),
     ];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Clearcasting');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Clearcasting');
   }
 }
 

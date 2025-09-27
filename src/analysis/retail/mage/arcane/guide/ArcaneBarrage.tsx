@@ -3,7 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
-import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
 import ArcaneBarrage from '../core/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
@@ -28,94 +28,99 @@ class ArcaneBarrageGuide extends BaseMageGuide {
 
   get arcaneBarrageData(): BoxRowEntry[] {
     return this.arcaneBarrage.barrageCasts.map((cast) => {
-      return (
-        createRuleset(cast, this)
-          // Check if AOE or ST
-          .createRule({
-            id: 'AOE',
-            check: () => cast.targetsHit >= this.AOE_THRESHOLD,
-          })
-          .createRule({
-            id: 'ST',
-            check: () => cast.targetsHit < this.AOE_THRESHOLD,
-          })
+      const hasMaxCharges = cast.charges >= this.MAX_ARCANE_CHARGES;
+      const isAOE = cast.targetsHit >= this.AOE_THRESHOLD;
+      const hasLowMana = cast.mana !== undefined && cast.mana <= this.LOW_MANA_THRESHOLD;
+      const hasLowHealth = cast.health !== undefined && cast.health < this.LOW_HEALTH_THRESHOLD;
+      const hasPrecastSurge = cast.precast?.ability.guid === TALENTS.ARCANE_SURGE_TALENT.id;
+      const tempoExpiring =
+        this.isSpellslinger &&
+        cast.tempoRemaining !== undefined &&
+        cast.tempoRemaining < this.TEMPO_THRESHOLD;
 
-          // Check if they had Max Arcane Charges
-          .createRule({
-            id: 'maxedCharges',
-            check: () => cast.charges >= this.MAX_ARCANE_CHARGES,
-            failureText: `Low Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES})`,
-            failurePerformance: QualitativePerformance.Fail,
-          })
+      // Sunfury procs: Intuition, Glorious Incandescence, or Arcane Soul (with conditions)
+      const hasSunfuryProc =
+        this.isSunfury &&
+        (cast.intuition ||
+          cast.gloriousIncandescence ||
+          (cast.arcaneSoul && (cast.netherPrecisionStacks > 0 || !cast.clearcasting)));
 
-          // Check if they were low on mana
-          .createRule({
-            id: 'lowMana',
-            active: () => cast.mana !== undefined,
-            check: () => cast.mana! <= this.LOW_MANA_THRESHOLD,
-            failureText: `High Mana (${formatPercentage(cast.mana!, 1)}%)`,
-            failurePerformance: QualitativePerformance.Ok,
-          })
+      // Spellslinger procs: Intuition or Arcane Orb available
+      const hasSpellslingerProc = this.isSpellslinger && (cast.intuition || cast.arcaneOrbAvail);
 
-          // Check to see if the target was about to die
-          .createRule({
-            id: 'lowHealth',
-            active: cast.health !== undefined,
-            check: () => cast.health! < this.LOW_HEALTH_THRESHOLD,
-            failureText: `Target health not low (${formatPercentage(cast.health!, 1)}%)`,
-            failurePerformance: QualitativePerformance.Ok,
-          })
+      return evaluateGuide(cast.cast.timestamp, cast, this, {
+        actionName: 'Arcane Barrage',
 
-          //Check if they had a Supporting Proc (Intuition, Glorious Incandescence, or Arcane Soul) if Sunfury
-          .createRule({
-            id: 'barrageProcSunfury',
-            active: this.isSunfury,
-            check: () =>
-              cast.intuition ||
-              cast.gloriousIncandescence ||
-              (cast.arcaneSoul && (cast.netherPrecisionStacks > 0 || !cast.clearcasting)),
-            failureText: `Did not have Intuition, Glorious Incandescence, or Arcane Soul`,
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // REQUIREMENTS: Must have max charges (unless special circumstances)
+        requirements: [
+          {
+            name: 'maxCharges',
+            check: hasMaxCharges,
+            failureMessage: `Insufficient Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES})`,
+          },
+        ],
 
-          // Check if they had a Supporting Proc (Intuition) or Arcane Orb was available if Spellslinger
-          .createRule({
-            id: 'barrageProcSpellslinger',
-            active: this.isSpellslinger,
-            check: () => cast.intuition || cast.arcaneOrbAvail,
-            failureText: `Did not have Intuition or Arcane Orb`,
-            failurePerformance: QualitativePerformance.Fail,
-          })
+        // PERFECT: Optimal usage patterns
+        perfectConditions: [
+          {
+            name: 'precastSurge',
+            check: hasMaxCharges && hasPrecastSurge,
+            description: 'Perfect combo - Arcane Surge + 4 charges for maximum damage!',
+          },
+          {
+            name: 'sunfuryProc',
+            check: hasMaxCharges && hasSunfuryProc,
+            description: 'Perfect Sunfury proc usage with max charges',
+          },
+          {
+            name: 'spellslingerProc',
+            check: hasMaxCharges && hasSpellslingerProc,
+            description: 'Perfect Spellslinger proc usage with max charges',
+          },
+          {
+            name: 'aoeOpportunity',
+            check: isAOE && hasMaxCharges,
+            description: `Excellent AOE usage - hit ${cast.targetsHit} targets with max charges`,
+          },
+          {
+            name: 'aoeWithTempo',
+            check: isAOE && tempoExpiring,
+            description: `Perfect AOE + Tempo management - hit ${cast.targetsHit} targets before Tempo expires`,
+          },
+        ],
 
-          // Check if Arcane Tempo was about to expire
-          .createRule({
-            id: 'tempoExpiring',
-            active: this.isSpellslinger && cast.tempoRemaining !== undefined,
-            check: () => cast.tempoRemaining! < this.TEMPO_THRESHOLD,
-          })
+        // GOOD: Acceptable usage patterns
+        goodConditions: [
+          {
+            name: 'lowMana',
+            check: hasMaxCharges && hasLowMana,
+            description: `Good emergency usage - low mana (${cast.mana ? formatPercentage(cast.mana, 1) : '???'}%)`,
+          },
+          {
+            name: 'tempoExpiring',
+            check: hasMaxCharges && tempoExpiring,
+            description: 'Good timing - avoiding Arcane Tempo expiration',
+          },
+        ],
 
-          // Check if they cast Arcane Surge immediately beforehand
-          .createRule({
-            id: 'precastSurge',
-            active: cast.precast !== undefined,
-            check: () => cast.precast!.ability.guid === TALENTS.ARCANE_SURGE_TALENT.id,
-            failureText: `No Arcane Surge Beforehand`,
-            failurePerformance: QualitativePerformance.Ok,
-          })
+        // OK: Understandable but suboptimal
+        okConditions: [
+          {
+            name: 'lowHealth',
+            check: hasMaxCharges && hasLowHealth,
+            description: `Target execute - ${cast.health ? formatPercentage(cast.health, 1) : '???'}% health remaining`,
+          },
+          {
+            name: 'basicAOE',
+            check: isAOE,
+            description: `AOE usage - hit ${cast.targetsHit} targets (could optimize with procs/buffs)`,
+          },
+        ],
 
-          // Evaluate Overall Performance
-          .perfectIf(['maxedCharges', 'precastSurge'])
-          .perfectIf(['barrageProcSpellslinger'])
-          .perfectIf(['barrageProcSunfury'])
-          .perfectIf(['AOE', 'tempoExpiring'])
-          .perfectIf(['AOE', 'maxedCharges'])
-          .perfectIf(['noMana'])
-          .goodIf(['lowMana'])
-          .goodIf(['lowHealth'])
-          .okIf(['sufficientCharges'])
-
-          .evaluate(cast.cast.timestamp)
-      );
+        // Default if requirements met but no good reasons
+        defaultPerformance: QualitativePerformance.Fail,
+        defaultMessage: 'Wasted Arcane Charges - no clear benefit to casting Barrage',
+      });
     });
   }
 
@@ -160,10 +165,10 @@ class ArcaneBarrageGuide extends BaseMageGuide {
       </>
     );
     const dataComponents = [
-      MageGuideComponents.createPerCastSummary(SPELLS.ARCANE_BARRAGE, this.arcaneBarrageData),
+      GuideComponents.createPerCastSummary(SPELLS.ARCANE_BARRAGE, this.arcaneBarrageData),
     ];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Arcane Barrage');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Barrage');
   }
 }
 

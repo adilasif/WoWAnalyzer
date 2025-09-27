@@ -2,14 +2,10 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
-import {
-  BaseMageGuide,
-  MageGuideComponents,
-  createRuleset,
-  type GuideLike,
-} from '../../shared/guide';
+import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 
-import ArcaneSurge, { ArcaneSurgeCast } from '../core/ArcaneSurge';
+import ArcaneSurge from '../core/ArcaneSurge';
 import { ARCANE_CHARGE_MAX_STACKS } from '../../shared';
 
 const OPENER_DURATION = 20000;
@@ -25,66 +21,86 @@ class ArcaneSurgeGuide extends BaseMageGuide {
   hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
-  private perCastBreakdown(cast: ArcaneSurgeCast): React.ReactNode {
-    const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
+  get arcaneSurgeData(): BoxRowEntry[] {
+    return this.arcaneSurge.surgeCasts.map((cast) => {
+      const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
+      const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
+      const fightTimeRemaining = this.owner.fight.end_time - cast.cast;
+      const shortFight = fightTimeRemaining < 60000; // Less than 1 minute remaining
 
-    // Create rules for evaluation
-    const ruleset = createRuleset<ArcaneSurgeCast>(cast, this as GuideLike)
-      .createRule({
-        id: 'maxCharges',
-        check: () => cast.charges === ARCANE_CHARGE_MAX_STACKS || opener,
-        failureText: `Only ${cast.charges} charges`,
-        successText:
-          cast.charges === ARCANE_CHARGE_MAX_STACKS
-            ? `${cast.charges} charges`
-            : `${cast.charges} charges (Opener)`,
-        label: (
-          <>
-            <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Surge
-          </>
-        ),
-      })
+      return evaluateGuide(cast.cast, cast, this, {
+        actionName: 'Arcane Surge',
 
-      .createRule({
-        id: 'siphonStorm',
-        active: this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT),
-        check: () => cast.siphonStormBuff,
-        failureText: 'Buff Missing',
-        successText: 'Buff Active',
-        label: (
-          <>
-            <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active
-          </>
-        ),
-      })
+        // REQUIREMENTS: Must have charges (unless opener)
+        requirements: [
+          {
+            name: 'charges',
+            check: hasMaxCharges,
+            failureMessage: opener
+              ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
+              : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
+          },
+        ],
 
-      .createRule({
-        id: 'netherPrecision',
-        active: this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT),
-        check: () => cast.netherPrecision,
-        failureText: 'Buff Missing',
-        successText: 'Buff Active',
-        label: (
-          <>
-            <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active
-          </>
-        ),
-      })
+        // FAIL: Things that waste the cooldown
+        failConditions: [
+          {
+            name: 'aboutToDie',
+            check: !shortFight && fightTimeRemaining < 30000,
+            description: 'Wasted cooldown - fight ending soon and not short encounter',
+          },
+        ],
 
-      .goodIf(['maxCharges', 'siphonStorm', 'netherPrecision']);
+        // PERFECT: Optimal cooldown usage with all buffs
+        perfectConditions: [
+          {
+            name: 'allBuffsCombo',
+            check:
+              hasMaxCharges &&
+              (!this.hasSiphonStorm || cast.siphonStormBuff) &&
+              (!this.hasNetherPrecision || cast.netherPrecision),
+            description:
+              'Perfect combo: max charges + all available buffs (Siphon Storm + Nether Precision)',
+          },
+          {
+            name: 'openerPerfect',
+            check:
+              opener &&
+              (!this.hasSiphonStorm || cast.siphonStormBuff) &&
+              (!this.hasNetherPrecision || cast.netherPrecision),
+            description: 'Perfect opener with available buffs',
+          },
+        ],
 
-    // Get rule results and performance
-    const ruleResults = ruleset.getRuleResults();
-    const performance = ruleset.getPerformance();
+        // GOOD: Acceptable usage patterns
+        goodConditions: [
+          {
+            name: 'maxChargesGood',
+            check: hasMaxCharges && (cast.siphonStormBuff || cast.netherPrecision),
+            description: `Good usage: ${cast.charges} charges + ${cast.siphonStormBuff ? 'Siphon Storm' : ''}${cast.siphonStormBuff && cast.netherPrecision ? ' + ' : ''}${cast.netherPrecision ? 'Nether Precision' : ''}`,
+          },
+          {
+            name: 'emergencyUsage',
+            check: hasMaxCharges && shortFight,
+            description: 'Good emergency usage - short fight/encounter ending',
+          },
+        ],
 
-    return MageGuideComponents.createExpandableCastItem(
-      TALENTS.ARCANE_SURGE_TALENT,
-      cast.cast,
-      this.owner,
-      ruleResults,
-      performance,
-      cast.ordinal,
-    );
+        // OK: Basic usage without optimization
+        okConditions: [
+          {
+            name: 'basicUsage',
+            check: hasMaxCharges,
+            description: opener
+              ? `Opener usage with ${cast.charges} charges`
+              : `Basic usage with ${cast.charges} charges - could optimize with buffs`,
+          },
+        ],
+
+        defaultPerformance: undefined, // Let it fall through to Fail if requirements not met
+        defaultMessage: 'Suboptimal Arcane Surge usage',
+      });
+    });
   }
 
   get guideSubsection(): JSX.Element {
@@ -132,11 +148,11 @@ class ArcaneSurgeGuide extends BaseMageGuide {
         </div>
       </>
     );
-    const castBreakdowns = this.arcaneSurge.surgeCasts.map((cast) => this.perCastBreakdown(cast));
+    const dataComponents = [
+      GuideComponents.createPerCastSummary(TALENTS.ARCANE_SURGE_TALENT, this.arcaneSurgeData),
+    ];
 
-    const dataComponents = [MageGuideComponents.createExpandableCastBreakdown(castBreakdowns)];
-
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Arcane Surge');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Arcane Surge');
   }
 }
 

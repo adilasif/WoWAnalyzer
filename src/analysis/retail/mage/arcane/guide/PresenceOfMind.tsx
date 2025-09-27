@@ -2,7 +2,7 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { BaseMageGuide, MageGuideComponents, createRuleset } from '../../shared/guide';
+import { BaseMageGuide, GuideComponents, evaluateGuide } from '../../shared/guide';
 import PresenceOfMind, { PresenceOfMindCast } from '../talents/PresenceOfMind';
 
 const TOUCH_DELAY_THRESHOLD = 500;
@@ -21,84 +21,83 @@ class PresenceOfMindGuide extends BaseMageGuide {
     const AOE = cast.targets && cast.targets >= AOE_THRESHOLD;
     const touchAtEnd = cast.usedTouchEnd;
     const aoeCharges = cast.charges === 2 || cast.charges === 3;
+    const hasDelayIssue = cast.touchCancelDelay && cast.touchCancelDelay > TOUCH_DELAY_THRESHOLD;
 
-    // Create rules for evaluation
-    const ruleset = createRuleset(cast, this)
-      .createRule({
-        id: 'charges',
-        check: () => true, // Always show charges as informational
-        failureText: `${cast.charges} charges`,
-        successText: `${cast.charges} charges`,
-        failurePerformance: QualitativePerformance.Good,
-        successPerformance: QualitativePerformance.Good,
-        label: (
-          <>
-            <SpellLink spell={SPELLS.ARCANE_CHARGE} />s
-          </>
-        ),
-      })
-      .createRule({
-        id: 'stacksUsed',
-        check: () => true, // Always show stacks used as informational
-        failureText: `${cast.stacksUsed} stacks used`,
-        successText: `${cast.stacksUsed} stacks used`,
-        failurePerformance: QualitativePerformance.Good,
-        successPerformance: QualitativePerformance.Good,
-        label: <>Stacks Used</>,
-      })
-      .createRule({
-        id: 'targets',
-        check: () => true, // Always show targets as informational
-        failureText: cast.targets ? `${cast.targets} targets` : 'Unknown targets',
-        successText: cast.targets ? `${cast.targets} targets` : 'Unknown targets',
-        failurePerformance: QualitativePerformance.Good,
-        successPerformance: QualitativePerformance.Good,
-        label: <>Targets Hit (Next Barrage)</>,
-      })
-      .createRule({
-        id: 'touchTiming',
-        check: () => !ST || Boolean(touchAtEnd),
-        failureText: 'Not used at Touch end',
-        successText: 'Used at Touch end',
-        active: () => Boolean(ST),
-        label: (
-          <>
-            Used at end of <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
-          </>
-        ),
-      })
-      .createRule({
-        id: 'touchDelay',
-        check: () => !cast.touchCancelDelay || cast.touchCancelDelay <= TOUCH_DELAY_THRESHOLD,
-        failureText: cast.touchCancelDelay ? `${cast.touchCancelDelay.toFixed(2)}ms delay` : '',
-        successText: cast.touchCancelDelay
-          ? `${cast.touchCancelDelay.toFixed(2)}ms delay`
-          : 'No delay',
-        active: () => cast.touchCancelDelay != null,
-        label: <>Channel Clipped Before/After GCD</>,
-      })
-      .createRule({
-        id: 'aoeCharges',
-        check: () => !AOE || aoeCharges,
-        failureText: `${cast.charges} charges (should be 2-3)`,
-        successText: `${cast.charges} charges`,
-        active: () => Boolean(AOE),
-        label: <>Good charge count for AoE</>,
-      })
-      .goodIf(['charges', 'stacksUsed', 'targets', 'touchTiming', 'touchDelay', 'aoeCharges']);
+    return evaluateGuide(cast.cast.timestamp, cast, this, {
+      actionName: 'Presence of Mind',
 
-    // Get rule results and performance
-    const ruleResults = ruleset.getRuleResults();
-    const performance = ruleset.getPerformance();
+      // FAIL: Critical issues
+      failConditions: [
+        {
+          name: 'touchTimingFail',
+          check: Boolean(ST) && !touchAtEnd,
+          description:
+            'Not used at Touch end - should squeeze extra casts into Touch of the Magi window',
+        },
+        {
+          name: 'aoeChargesFail',
+          check: Boolean(AOE) && !aoeCharges,
+          description: `${cast.charges} charges (should be 2-3 for AoE) - use at proper charge count for faster Barrage"`,
+        },
+        {
+          name: 'touchDelayFail',
+          check: Boolean(hasDelayIssue),
+          description: cast.touchCancelDelay
+            ? `${cast.touchCancelDelay.toFixed(2)}ms delay - significant clipping issue`
+            : '',
+        },
+      ],
 
-    return MageGuideComponents.createExpandableCastItem(
-      TALENTS.PRESENCE_OF_MIND_TALENT,
-      cast.cast.timestamp,
-      this.owner,
-      ruleResults,
-      performance,
-      cast.ordinal,
-    );
+      // PERFECT: Optimal usage
+      perfectConditions: [
+        {
+          name: 'perfectSingleTarget',
+          check:
+            Boolean(ST) &&
+            Boolean(touchAtEnd) &&
+            (!cast.touchCancelDelay || cast.touchCancelDelay <= TOUCH_DELAY_THRESHOLD),
+          description: 'Perfect - used at Touch end with proper timing',
+        },
+        {
+          name: 'perfectAoe',
+          check: Boolean(AOE) && aoeCharges,
+          description: `Perfect - ${cast.charges} charges for AoE (optimal for faster Barrage)"`,
+        },
+      ],
+
+      // GOOD: Acceptable usage
+      goodConditions: [
+        {
+          name: 'goodSingleTarget',
+          check: Boolean(ST) && Boolean(touchAtEnd),
+          description: 'Good - used at Touch end to squeeze extra casts',
+        },
+        {
+          name: 'goodAoe',
+          check: Boolean(AOE) && aoeCharges,
+          description: `Good - ${cast.charges} charges for AoE usage"`,
+        },
+        {
+          name: 'goodTiming',
+          check: !cast.touchCancelDelay || cast.touchCancelDelay <= TOUCH_DELAY_THRESHOLD,
+          description: cast.touchCancelDelay
+            ? `${cast.touchCancelDelay.toFixed(2)}ms delay - acceptable timing`
+            : 'Good timing',
+        },
+      ],
+
+      // OK: Understandable but suboptimal
+      okConditions: [
+        {
+          name: 'informationalUsage',
+          check: true,
+          description: `Used with ${cast.charges} charges, ${cast.stacksUsed} stacks, ${cast.targets ? cast.targets : 'unknown'} targets hit by next Barrage`,
+        },
+      ],
+
+      defaultPerformance: QualitativePerformance.Ok,
+      defaultMessage: `Standard usage - ${cast.charges} charges, ${cast.stacksUsed} stacks used`,
+    });
   }
 
   get guideSubsection(): JSX.Element {
@@ -137,10 +136,10 @@ class PresenceOfMindGuide extends BaseMageGuide {
 
     const dataComponents =
       this.presenceOfMind.pomCasts.length > 0
-        ? [MageGuideComponents.createExpandableCastBreakdown(castBreakdowns)]
-        : [MageGuideComponents.createNoUsageComponent(TALENTS.PRESENCE_OF_MIND_TALENT)];
+        ? [GuideComponents.createExpandableCastBreakdown(castBreakdowns)]
+        : [GuideComponents.createNoUsageComponent(TALENTS.PRESENCE_OF_MIND_TALENT)];
 
-    return MageGuideComponents.createSubsection(explanation, dataComponents, 'Presence of Mind');
+    return GuideComponents.createSubsection(explanation, dataComponents, 'Presence of Mind');
   }
 }
 
