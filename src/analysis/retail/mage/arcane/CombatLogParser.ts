@@ -43,9 +43,8 @@ import ArcaneTempoGuide from './guide/ArcaneTempo';
 
 //Items
 
-//Mana Chart
-import Mana from './ManaChart/Mana';
-import ManaValues from './ManaChart/ManaValues';
+// Mana Chart - replaced with simplified guide
+import ManaChart from './guide/ManaChart';
 import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
 
 //Talents
@@ -80,8 +79,6 @@ class CombatLogParser extends CoreCombatLogParser {
     cooldownThroughputTracker: CooldownThroughputTracker,
     arcaneChargeTracker: ArcaneChargeTracker,
     channeling: Channeling,
-    mana: Mana,
-    manaValues: ManaValues,
     manaLevelChart: ManaLevelChart,
     cancelledCasts: CancelledCasts,
     arcaneSurge: ArcaneSurge,
@@ -102,6 +99,7 @@ class CombatLogParser extends CoreCombatLogParser {
     clearcastingGuide: ClearcastingGuide,
     netherPrecisionGuide: NetherPrecisionGuide,
     arcaneTempoGuide: ArcaneTempoGuide,
+    manaChart: ManaChart,
 
     //Talents - Shared
     divertedEnergy: DivertedEnergy,
