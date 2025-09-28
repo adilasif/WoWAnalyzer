@@ -2,9 +2,15 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+import {
+  BaseMageGuide,
+  evaluateEvents,
+  createExpandableConfig,
+  generateExpandableBreakdown,
+  ExpandableConfig,
+} from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
-import ShiftingPowerArcane, { MAX_TICKS } from '../talents/ShiftingPower';
+import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerCast } from '../talents/ShiftingPower';
 
 class ShiftingPowerGuide extends BaseMageGuide {
   static dependencies = {
@@ -14,102 +20,191 @@ class ShiftingPowerGuide extends BaseMageGuide {
 
   protected shiftingPower!: ShiftingPowerArcane;
 
-  get shiftingPowerData(): BoxRowEntry[] {
-    return this.shiftingPower.casts.map((cast) => {
-      const inConservePhase =
-        !cast.cdsActive.arcaneSurge &&
-        !cast.cdsActive.touchOfTheMagi &&
-        !cast.cdsActive.siphonStorm;
-      const fullDuration = cast.ticks >= MAX_TICKS;
-      const allMajorCdsOnCooldown =
-        cast.spellsReduced.arcaneSurge &&
-        cast.spellsReduced.touchOfTheMagi &&
-        cast.spellsReduced.evocation;
-
-      return evaluateEvent(cast.timestamp, cast, this, {
-        actionName: 'Shifting Power',
-
-        // FAIL: Critical issues that make the cast bad
-        failConditions: [
-          {
-            name: 'burnPhaseUsage',
-            check: !inConservePhase,
-            description:
-              'Used during burn phase - should only be used in conserve phase when major CDs are down',
+  get expandableConfig(): ExpandableConfig {
+    return createExpandableConfig({
+      spell: TALENTS.SHIFTING_POWER_TALENT,
+      formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
+      getTimestamp: (cast: unknown) => (cast as ShiftingPowerCast).timestamp,
+      checklistItems: [
+        {
+          label: <>Channeled full duration</>,
+          getResult: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return spCast.ticks >= MAX_TICKS;
           },
-          {
-            name: 'arcaneSurgeActive',
-            check: cast.cdsActive.arcaneSurge,
-            description: 'Arcane Surge active - wasting burn phase potential',
+          getDetails: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return `${spCast.ticks}/${MAX_TICKS} ticks`;
           },
-          {
-            name: 'touchActive',
-            check: cast.cdsActive.touchOfTheMagi,
-            description: 'Touch of the Magi active - wasting burn phase potential',
+        },
+        {
+          label: (
+            <>
+              <SpellLink spell={TALENTS.ARCANE_SURGE_TALENT} /> on cooldown
+            </>
+          ),
+          getResult: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return spCast.spellsReduced.arcaneSurge;
           },
-          {
-            name: 'siphonActive',
-            check: cast.cdsActive.siphonStorm,
-            description: 'Siphon Storm active - wasting burn phase potential',
+          getDetails: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return spCast.spellsReduced.arcaneSurge ? 'Being reduced' : 'Not on cooldown';
           },
-          {
-            name: 'clippedChannel',
-            check: cast.ticks < MAX_TICKS,
-            description: `${cast.ticks}/${MAX_TICKS} ticks - clipped channel reduces cooldown reduction effectiveness`,
+        },
+        {
+          label: (
+            <>
+              <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} /> on cooldown
+            </>
+          ),
+          getResult: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return spCast.spellsReduced.touchOfTheMagi;
           },
-        ],
-
-        // PERFECT: Optimal usage
-        perfectConditions: [
-          {
-            name: 'perfectTiming',
-            check: inConservePhase && fullDuration && allMajorCdsOnCooldown,
-            description:
-              'Perfect - used in conserve phase with full duration and all major CDs on cooldown',
+          getDetails: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return spCast.spellsReduced.touchOfTheMagi ? 'Being reduced' : 'Not on cooldown';
           },
-        ],
-
-        // GOOD: Acceptable usage patterns
-        goodConditions: [
-          {
-            name: 'goodConserveUsage',
-            check: inConservePhase && fullDuration,
-            description: 'Good - used in conserve phase with full duration',
+        },
+        {
+          label: (
+            <>
+              <SpellLink spell={TALENTS.EVOCATION_TALENT} /> on cooldown
+            </>
+          ),
+          getResult: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return spCast.spellsReduced.evocation;
           },
-          {
-            name: 'goodCooldownTiming',
-            check: allMajorCdsOnCooldown,
-            description:
-              'Good - all major cooldowns being reduced (Arcane Surge, Touch, Evocation)',
+          getDetails: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return spCast.spellsReduced.evocation ? 'Being reduced' : 'Not on cooldown';
           },
-          {
-            name: 'fullDuration',
-            check: fullDuration,
-            description: `${cast.ticks}/${MAX_TICKS} ticks - full channel duration`,
+        },
+        {
+          label: <>In conserve phase</>,
+          getResult: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            return (
+              !spCast.cdsActive.arcaneSurge &&
+              !spCast.cdsActive.touchOfTheMagi &&
+              !spCast.cdsActive.siphonStorm
+            );
           },
-        ],
-
-        // OK: Understandable but suboptimal
-        okConditions: [
-          {
-            name: 'conservePhase',
-            check: inConservePhase,
-            description: 'Used in conserve phase - correct timing',
+          getDetails: (cast: unknown) => {
+            const spCast = cast as ShiftingPowerCast;
+            const activeCds = [];
+            if (spCast.cdsActive.arcaneSurge) activeCds.push('Arcane Surge');
+            if (spCast.cdsActive.touchOfTheMagi) activeCds.push('Touch of the Magi');
+            if (spCast.cdsActive.siphonStorm) activeCds.push('Siphon Storm');
+            return activeCds.length > 0 ? `Active: ${activeCds.join(', ')}` : 'Conserve phase';
           },
-          {
-            name: 'someCooldownReduction',
-            check:
-              cast.spellsReduced.arcaneSurge ||
-              cast.spellsReduced.touchOfTheMagi ||
-              cast.spellsReduced.evocation,
-            description: 'Reducing some major cooldowns',
-          },
-        ],
-
-        defaultPerformance: QualitativePerformance.Fail,
-        defaultMessage: `${cast.ticks}/${MAX_TICKS} ticks - check timing and duration`,
-      });
+        },
+      ],
     });
+  }
+
+  get shiftingPowerData(): BoxRowEntry[] {
+    return evaluateEvents(
+      this.shiftingPower.casts,
+      (cast: ShiftingPowerCast) => {
+        const inConservePhase =
+          !cast.cdsActive.arcaneSurge &&
+          !cast.cdsActive.touchOfTheMagi &&
+          !cast.cdsActive.siphonStorm;
+        const fullDuration = cast.ticks >= MAX_TICKS;
+        const allMajorCdsOnCooldown =
+          cast.spellsReduced.arcaneSurge &&
+          cast.spellsReduced.touchOfTheMagi &&
+          cast.spellsReduced.evocation;
+
+        return {
+          actionName: 'Shifting Power',
+
+          // FAIL: Critical issues that make the cast bad
+          failConditions: [
+            {
+              name: 'burnPhaseUsage',
+              check: !inConservePhase,
+              description:
+                'Used during burn phase - should only be used in conserve phase when major CDs are down',
+            },
+            {
+              name: 'arcaneSurgeActive',
+              check: cast.cdsActive.arcaneSurge,
+              description: 'Arcane Surge active - wasting burn phase potential',
+            },
+            {
+              name: 'touchActive',
+              check: cast.cdsActive.touchOfTheMagi,
+              description: 'Touch of the Magi active - wasting burn phase potential',
+            },
+            {
+              name: 'siphonActive',
+              check: cast.cdsActive.siphonStorm,
+              description: 'Siphon Storm active - wasting burn phase potential',
+            },
+            {
+              name: 'clippedChannel',
+              check: cast.ticks < MAX_TICKS,
+              description: `${cast.ticks}/${MAX_TICKS} ticks - clipped channel reduces cooldown reduction effectiveness`,
+            },
+          ],
+
+          // PERFECT: Optimal usage
+          perfectConditions: [
+            {
+              name: 'perfectTiming',
+              check: inConservePhase && fullDuration && allMajorCdsOnCooldown,
+              description:
+                'Perfect - used in conserve phase with full duration and all major CDs on cooldown',
+            },
+          ],
+
+          // GOOD: Acceptable usage patterns
+          goodConditions: [
+            {
+              name: 'goodConserveUsage',
+              check: inConservePhase && fullDuration,
+              description: 'Good - used in conserve phase with full duration',
+            },
+            {
+              name: 'goodCooldownTiming',
+              check: allMajorCdsOnCooldown,
+              description:
+                'Good - all major cooldowns being reduced (Arcane Surge, Touch, Evocation)',
+            },
+            {
+              name: 'fullDuration',
+              check: fullDuration,
+              description: `${cast.ticks}/${MAX_TICKS} ticks - full channel duration`,
+            },
+          ],
+
+          // OK: Understandable but suboptimal
+          okConditions: [
+            {
+              name: 'conservePhase',
+              check: inConservePhase,
+              description: 'Used in conserve phase - correct timing',
+            },
+            {
+              name: 'someCooldownReduction',
+              check:
+                cast.spellsReduced.arcaneSurge ||
+                cast.spellsReduced.touchOfTheMagi ||
+                cast.spellsReduced.evocation,
+              description: 'Reducing some major cooldowns',
+            },
+          ],
+
+          defaultPerformance: QualitativePerformance.Fail,
+          defaultMessage: `${cast.ticks}/${MAX_TICKS} ticks - check timing and duration`,
+        };
+      },
+      this,
+    );
   }
 
   get guideSubsection(): JSX.Element {
@@ -131,8 +226,12 @@ class ShiftingPowerGuide extends BaseMageGuide {
     return new GuideBuilder(TALENTS.SHIFTING_POWER_TALENT, 'Shifting Power')
       .explanation(explanation)
       .when(this.shiftingPower.casts.length > 0, (builder: GuideBuilder) =>
-        builder.addCastSummary({
-          castData: this.shiftingPowerData,
+        builder.addExpandableBreakdown({
+          castBreakdowns: generateExpandableBreakdown({
+            castData: this.shiftingPower.casts,
+            evaluatedData: this.shiftingPowerData,
+            expandableConfig: this.expandableConfig,
+          }),
         }),
       )
       .when(this.shiftingPower.casts.length === 0, (builder: GuideBuilder) => builder.addNoUsage())

@@ -2,11 +2,16 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { BaseMageGuide, evaluateEvent, evaluatePerformance } from '../../shared/guide';
+import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+import { ARCANE_TEMPO_MAX_STACKS } from '../../shared/constants';
 
 import ArcaneTempo from '../talents/ArcaneTempo';
+import { getUptimesFromBuffHistory } from 'parser/ui/UptimeBar';
 import { getStackUptimesFromBuffHistory } from 'parser/ui/UptimeStackBar';
+
+const TEMPO_COLOR = '#cd1bdf';
+const TEMPO_BG_COLOR = '#7e5da8';
 
 class ArcaneTempoGuide extends BaseMageGuide {
   static dependencies = {
@@ -30,6 +35,7 @@ class ArcaneTempoGuide extends BaseMageGuide {
       </>
     );
     const buffHistory = this.selectedCombatant.getBuffHistory(SPELLS.ARCANE_TEMPO_BUFF.id);
+    const overallUptimes = getUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
     const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
 
     // Evaluate Arcane Tempo performance using universal template
@@ -82,11 +88,14 @@ class ArcaneTempoGuide extends BaseMageGuide {
         stackData: stackUptimes,
         averageStacks: this.arcaneTempo.averageStacks,
         castData: [tempoEntry],
-      })
-      .addStatistic({
-        value: `${uptimePercent}%`,
-        label: 'Uptime',
-        performance: evaluatePerformance(tempoData.uptime, thresholds, true),
+        uptimePercentage: this.arcaneTempo.buffUptimePercent,
+        backgroundUptimes: overallUptimes,
+        startTime: this.owner.fight.start_time,
+        endTime: this.owner.fight.end_time,
+        maxStacks: ARCANE_TEMPO_MAX_STACKS,
+        barColor: TEMPO_COLOR,
+        backgroundBarColor: TEMPO_BG_COLOR,
+        tooltip: `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`,
       })
       .build();
   }

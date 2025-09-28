@@ -34,6 +34,7 @@
  */
 
 import React from 'react';
+import { formatPercentage } from 'common/format';
 import { SpellLink, SpellIcon, TooltipElement } from 'interface';
 import { PassFailCheckmark } from 'interface/guide';
 import { RoundedPanel } from 'interface/guide/components/GuideDivs';
@@ -182,6 +183,14 @@ export class GuideBuilder {
     stackData: { start: number; end: number; stacks: number }[];
     averageStacks: number;
     castData: BoxRowEntry[];
+    uptimePercentage: number;
+    backgroundUptimes: { start: number; end: number }[];
+    startTime: number;
+    endTime: number;
+    maxStacks: number;
+    barColor: string;
+    backgroundBarColor: string;
+    tooltip?: string;
   }): GuideBuilder {
     this.components.push(
       this.createBuffStackUptime(
@@ -189,6 +198,14 @@ export class GuideBuilder {
         config.stackData,
         config.averageStacks,
         config.castData,
+        config.uptimePercentage,
+        config.backgroundUptimes,
+        config.startTime,
+        config.endTime,
+        config.maxStacks,
+        config.barColor,
+        config.backgroundBarColor,
+        config.tooltip,
       ),
     );
     return this;
@@ -253,12 +270,12 @@ export class GuideBuilder {
     title: string,
   ): JSX.Element {
     const data = (
-      <RoundedPanel>
+      <RoundedPanel style={{ padding: '8px 8px 8px 16px' }}>
         <div>
           {dataComponents.map((component, index) => (
             <div
               key={index}
-              style={{ marginBottom: index < dataComponents.length - 1 ? '15px' : '0' }}
+              style={{ marginBottom: index < dataComponents.length - 1 ? '8px' : '0' }}
             >
               {component}
             </div>
@@ -294,7 +311,23 @@ export class GuideBuilder {
     tooltip?: JSX.Element,
   ): JSX.Element {
     const spellIcon = <SpellIcon spell={spell} />;
-    const content = (
+
+    const content = tooltip ? (
+      <div
+        style={{
+          color: qualitativePerformanceToColor(performance),
+          fontSize: '20px',
+          textAlign: 'left',
+        }}
+      >
+        {spellIcon}{' '}
+        <TooltipElement content={tooltip}>
+          <span style={{ display: 'inline-block' }}>
+            {value} <small>{label}</small>
+          </span>
+        </TooltipElement>
+      </div>
+    ) : (
       <div
         style={{
           color: qualitativePerformanceToColor(performance),
@@ -306,13 +339,9 @@ export class GuideBuilder {
       </div>
     );
 
-    const statContent = tooltip ? (
-      <TooltipElement content={tooltip}>{content}</TooltipElement>
-    ) : (
-      content
+    return (
+      <RoundedPanel style={{ textAlign: 'left', padding: '8px 8px 8px 0' }}>{content}</RoundedPanel>
     );
-
-    return <RoundedPanel>{statContent}</RoundedPanel>;
   }
 
   private createPerCastBreakdown(castEntries: BoxRowEntry[], title: string): JSX.Element {
@@ -330,15 +359,15 @@ export class GuideBuilder {
     title?: string,
   ): JSX.Element {
     return (
-      <div style={{ margin: '-0.5em 0 0.25em 0' }}>
-        <div style={{ marginBottom: '0.5em' }}>
+      <div style={{ margin: '0' }}>
+        <div style={{ marginBottom: '8px' }}>
           <strong>{title || 'Per-Cast Breakdown'}</strong>
           <small> - click to expand</small>
         </div>
         {castBreakdowns.map((breakdown, index) => (
           <div
             key={index}
-            style={{ marginBottom: index < castBreakdowns.length - 1 ? '0.5em' : '0' }}
+            style={{ marginBottom: index < castBreakdowns.length - 1 ? '8px' : '0' }}
           >
             {breakdown}
           </div>
@@ -415,24 +444,52 @@ export class GuideBuilder {
     stackData: { start: number; end: number; stacks: number }[],
     averageStacks: number,
     castEntries: BoxRowEntry[],
+    uptimePercentage: number,
+    backgroundUptimes: { start: number; end: number }[],
+    startTime: number,
+    endTime: number,
+    maxStacks: number,
+    barColor: string,
+    backgroundBarColor: string,
+    tooltip?: string,
   ): JSX.Element {
     return (
-      <div>
-        <div>
-          <SpellIcon spell={spell} /> <strong>{spell.name} Stack Uptime</strong>
-          <br />
-          <small>Average stacks: {averageStacks.toFixed(1)}</small>
+      <RoundedPanel style={{ padding: '8px 8px 8px 16px' }}>
+        <strong>{spell.name} Uptime</strong>
+        <div className="flex-main multi-uptime-bar">
+          <div className="flex main-bar-big">
+            <div className="flex-sub bar-label">
+              <SpellIcon spell={spell} />{' '}
+              <span style={{ color: backgroundBarColor }}>
+                {formatPercentage(uptimePercentage, 0)}% <small>active</small>
+              </span>
+              <br />
+              <TooltipElement
+                content={
+                  tooltip ||
+                  `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`
+                }
+              >
+                <span style={{ color: barColor }}>
+                  {averageStacks.toFixed(1)} <small>avg stacks</small>
+                </span>
+              </TooltipElement>
+            </div>
+            <div className="flex-main chart">
+              <UptimeStackBar
+                stackUptimeHistory={stackData}
+                start={startTime}
+                end={endTime}
+                maxStacks={maxStacks}
+                barColor={barColor}
+                backgroundHistory={backgroundUptimes}
+                backgroundBarColor={backgroundBarColor}
+                timeTooltip
+              />
+            </div>
+          </div>
         </div>
-        <div style={{ marginTop: '10px' }}>
-          <UptimeStackBar
-            stackUptimeHistory={stackData}
-            start={0} // Would need to be passed or calculated
-            end={100} // Would need to be passed or calculated
-            maxStacks={10} // Would need to be passed
-          />
-        </div>
-        <CastSummaryAndBreakdown spell={spell} castEntries={castEntries} />
-      </div>
+      </RoundedPanel>
     );
   }
 }
