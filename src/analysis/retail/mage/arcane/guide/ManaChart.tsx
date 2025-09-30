@@ -72,13 +72,12 @@ class ManaChart extends BaseMageGuide {
       });
     }
 
-    // TODO: Track Evocation casts here when ready
-    // if (event.ability.guid === TALENTS.EVOCATION_TALENT.id) {
-    //   this.evocationCasts.push({
-    //     timestamp: event.timestamp,
-    //     spell: TALENTS.EVOCATION_TALENT,
-    //   });
-    // }
+    if (event.ability.guid === TALENTS.EVOCATION_TALENT.id) {
+      this.evocationCasts.push({
+        timestamp: event.timestamp,
+        spell: TALENTS.EVOCATION_TALENT,
+      });
+    }
   }
 
   get guideSubsection(): JSX.Element {
