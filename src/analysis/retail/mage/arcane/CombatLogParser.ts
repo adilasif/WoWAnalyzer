@@ -15,12 +15,12 @@ import {
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import Channeling from 'parser/shared/normalizers/Channeling';
 
-//Analyzers
-import Abilities from './analyzers/Abilities';
-import AlwaysBeCasting from './analyzers/AlwaysBeCasting';
-import Buffs from './analyzers/Buffs';
-import CooldownThroughputTracker from './analyzers/CooldownThroughputTracker';
-import ArcaneChargeTracker from './analyzers/ArcaneChargeTracker';
+// Core Analyzers
+import Abilities from './core/Abilities';
+import AlwaysBeCasting from './core/AlwaysBeCasting';
+import Buffs from './core/Buffs';
+import CooldownThroughputTracker from './core/CooldownThroughputTracker';
+import ArcaneChargeTracker from './core/ArcaneChargeTracker';
 import Clearcasting from './analyzers/Clearcasting';
 import ArcaneMissiles from './analyzers/ArcaneMissiles';
 import ArcaneBarrage from './analyzers/ArcaneBarrage';

@@ -25,7 +25,7 @@ import Events, {
 } from 'parser/core/Events';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import ArcaneChargeTracker from './ArcaneChargeTracker';
+import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import {
   getManaPercentage,

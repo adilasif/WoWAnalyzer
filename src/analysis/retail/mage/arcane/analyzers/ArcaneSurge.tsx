@@ -4,7 +4,7 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import { ThresholdStyle } from 'parser/core/ParseResults';
-import ArcaneChargeTracker from './ArcaneChargeTracker';
+import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { getManaPercentage } from '../../shared/helpers';
 
 export default class ArcaneSurge extends Analyzer {
