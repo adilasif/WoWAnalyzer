@@ -300,6 +300,12 @@ export class ChartBuilder {
 
   /**
    * Get boss health data for the current fight
+   *
+   * ⚠️ **ASYNC METHOD**: This method fetches data from the WarcraftLogs API and must be awaited.
+   * Consider using `buildWithBossHealth()` instead if you want automatic async handling.
+   *
+   * @param reportCode - The WarcraftLogs report code
+   * @returns Promise that resolves to boss health data points, or null if fetch fails
    */
   async fetchBossHealth(
     reportCode: string,
@@ -387,7 +393,47 @@ export class ChartBuilder {
 
   /**
    * Build chart with boss health data fetched automatically
-   * Returns a React component that handles async loading
+   *
+   * ⚠️ **ASYNC WARNING**: This method returns a React component that performs asynchronous
+   * data fetching on mount. The chart will show a "Loading chart data..." message while
+   * fetching boss health data from the WCL API.
+   *
+   * **How it works:**
+   * 1. Returns a wrapper component that fetches boss health data on mount
+   * 2. Shows loading state while fetching
+   * 3. Rebuilds the chart with boss health data once loaded
+   * 4. If fetch fails or returns no data, builds chart without boss health
+   *
+   * **Usage example:**
+   * ```tsx
+   * // In a guide component
+   * const chart = new ChartBuilder(info.fightStart, info.fightEnd)
+   *   .addManaTracking(manaUpdates)
+   *   .addCastAnnotations(casts)
+   *   .asManaChart()
+   *   .buildWithBossHealth(info.report.code);
+   *
+   * return <div>{chart}</div>;
+   * ```
+   *
+   * **Alternative (synchronous):**
+   * If you need synchronous rendering or want to handle boss health fetching yourself,
+   * use `build()` instead and manage the async data externally:
+   * ```tsx
+   * const [bossHealth, setBossHealth] = useState<Array<{timestamp: number, value: number}>>();
+   *
+   * useEffect(() => {
+   *   builder.fetchBossHealth(reportCode).then(setBossHealth);
+   * }, []);
+   *
+   * const chart = builder
+   *   .addManaTracking(manaUpdates)
+   *   .addBossHealth(bossHealth || [])
+   *   .build();
+   * ```
+   *
+   * @param reportCode - The WarcraftLogs report code to fetch boss health data from
+   * @returns A React component that handles async boss health loading and renders the chart
    */
   buildWithBossHealth(reportCode: string): JSX.Element {
     const ChartWithAsyncBossHealth: React.FC = () => {

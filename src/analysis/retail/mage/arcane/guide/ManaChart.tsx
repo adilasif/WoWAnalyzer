@@ -1,13 +1,12 @@
 import React from 'react';
 import { SubSection } from 'interface/guide';
 import TALENTS from 'common/TALENTS/mage';
-import { BaseMageGuide } from '../../shared/guide';
+import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import { createChart, ArcaneManaExplanation } from '../../shared/components';
 import ManaValues from 'parser/shared/modules/ManaValues';
-import ArcaneSurge from '../core/ArcaneSurge';
-import TouchOfTheMagi from '../talents/TouchOfTheMagi';
+import ArcaneSurge from '../analyzers/ArcaneSurge';
+import TouchOfTheMagi from '../analyzers/TouchOfTheMagi';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
-import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent } from 'parser/core/Events';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import Spell from 'common/SPELLS/Spell';
@@ -30,9 +29,8 @@ const SPELL_COLORS = {
  * - Add spells: Add tracking in onCast and to chartBuilder
  * - Change explanation: Modify ArcaneManaExplanation component
  */
-class ManaChart extends BaseMageGuide {
+class ManaChart extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     manaValues: ManaValues,
     arcaneSurge: ArcaneSurge,
     touchOfTheMagi: TouchOfTheMagi,

@@ -5,9 +5,9 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import Analyzer from 'parser/core/Analyzer';
 
 import {
-  BaseMageGuide,
   evaluateEvents,
   evaluatePerformance,
   createExpandableConfig,
@@ -16,13 +16,12 @@ import {
 } from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
-import TouchOfTheMagi, { TouchOfTheMagiCast } from '../talents/TouchOfTheMagi';
+import TouchOfTheMagi, { TouchOfTheMagiCast } from '../analyzers/TouchOfTheMagi';
 
 const MAX_ARCANE_CHARGES = 4;
 
-class TouchOfTheMagiGuide extends BaseMageGuide {
+class TouchOfTheMagiGuide extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     touchOfTheMagi: TouchOfTheMagi,
   };
 

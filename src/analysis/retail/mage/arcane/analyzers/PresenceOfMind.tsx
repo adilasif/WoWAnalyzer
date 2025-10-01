@@ -8,7 +8,7 @@ import Events, {
   RemoveBuffEvent,
   RemoveDebuffEvent,
 } from 'parser/core/Events';
-import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
+import ArcaneChargeTracker from './ArcaneChargeTracker';
 
 export default class PresenceOfMind extends Analyzer {
   static dependencies = {

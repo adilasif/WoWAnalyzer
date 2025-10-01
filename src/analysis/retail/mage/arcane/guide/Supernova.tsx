@@ -2,7 +2,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+import Analyzer from 'parser/core/Analyzer';
+import { evaluateEvent } from '../../shared/guide';
 
 const AOE_TARGET_THRESHOLD = 4;
 const TOUCH_DURATION_THRESHOLD = 3000; // 3 seconds
@@ -10,9 +11,8 @@ import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
 import Supernova from '../../shared/Supernova';
 
-class SupernovaGuide extends BaseMageGuide {
+class SupernovaGuide extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     supernova: Supernova,
   };
 

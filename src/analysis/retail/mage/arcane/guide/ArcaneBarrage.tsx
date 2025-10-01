@@ -3,15 +3,15 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
-import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+import { evaluateEvent } from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+import Analyzer from 'parser/core/Analyzer';
 
-import ArcaneBarrage from '../core/ArcaneBarrage';
+import ArcaneBarrage from '../analyzers/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 
-class ArcaneBarrageGuide extends BaseMageGuide {
+class ArcaneBarrageGuide extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     arcaneBarrage: ArcaneBarrage,
   };
 

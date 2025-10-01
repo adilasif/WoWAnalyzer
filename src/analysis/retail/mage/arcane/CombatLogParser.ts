@@ -15,17 +15,17 @@ import {
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import Channeling from 'parser/shared/normalizers/Channeling';
 
-//Core
-import Abilities from './core/Abilities';
-import AlwaysBeCasting from './core/AlwaysBeCasting';
-import Buffs from './core/Buffs';
-import CooldownThroughputTracker from './core/CooldownThroughputTracker';
-import ArcaneChargeTracker from './core/ArcaneChargeTracker';
-import Clearcasting from './core/Clearcasting';
-import ArcaneMissiles from './core/ArcaneMissiles';
-import ArcaneBarrage from './core/ArcaneBarrage';
-import ArcaneOrb from './core/ArcaneOrb';
-import ArcaneSurge from './core/ArcaneSurge';
+//Analyzers
+import Abilities from './analyzers/Abilities';
+import AlwaysBeCasting from './analyzers/AlwaysBeCasting';
+import Buffs from './analyzers/Buffs';
+import CooldownThroughputTracker from './analyzers/CooldownThroughputTracker';
+import ArcaneChargeTracker from './analyzers/ArcaneChargeTracker';
+import Clearcasting from './analyzers/Clearcasting';
+import ArcaneMissiles from './analyzers/ArcaneMissiles';
+import ArcaneBarrage from './analyzers/ArcaneBarrage';
+import ArcaneOrb from './analyzers/ArcaneOrb';
+import ArcaneSurge from './analyzers/ArcaneSurge';
 
 //Guide
 import Guide from './Guide';
@@ -47,16 +47,15 @@ import ArcaneTempoGuide from './guide/ArcaneTempo';
 import ManaChart from './guide/ManaChart';
 import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
 
-//Talents
-import ArcaneBombardment from './talents/ArcaneBombardment';
-import ArcaneEcho from './talents/ArcaneEcho';
-import ArcaneHarmony from './talents/ArcaneHarmony';
-import TouchOfTheMagi from './talents/TouchOfTheMagi';
-import PresenceOfMind from './talents/PresenceOfMind';
-import ShiftingPowerArcane from './talents/ShiftingPower';
+import ArcaneBombardment from './analyzers/ArcaneBombardment';
+import ArcaneEcho from './analyzers/ArcaneEcho';
+import ArcaneHarmony from './analyzers/ArcaneHarmony';
+import TouchOfTheMagi from './analyzers/TouchOfTheMagi';
+import PresenceOfMind from './analyzers/PresenceOfMind';
+import ShiftingPowerArcane from './analyzers/ShiftingPower';
 import Supernova from '../shared/Supernova';
-import NetherPrecision from './talents/NetherPrecision';
-import ArcaneTempo from './talents/ArcaneTempo';
+import NetherPrecision from './analyzers/NetherPrecision';
+import ArcaneTempo from './analyzers/ArcaneTempo';
 
 //Normalizers
 import ArcaneChargesNormalizer from './normalizers/ArcaneCharges';
@@ -72,7 +71,7 @@ class CombatLogParser extends CoreCombatLogParser {
     arcaneSurgeNormalizer: ArcaneSurgeNormalizer,
     castLinkNormalizer: CastLinkNormalizer,
 
-    //Core
+    //Analyzers
     buffs: Buffs,
     alwaysBeCasting: AlwaysBeCasting,
     abilities: Abilities,

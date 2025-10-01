@@ -129,30 +129,6 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a complete timeline view with all components (LEGACY - prefer individual components)
-   * Combines statistic, cast efficiency, cast summary, and timeline
-   */
-  addTimeline(config: {
-    averageValue: string;
-    averageLabel: string;
-    missedCasts: number;
-    castData: BoxRowEntry[];
-    title?: string;
-  }): GuideBuilder {
-    this.components.push(
-      this.createCooldownTimeline(
-        this.spell,
-        config.averageValue,
-        config.averageLabel,
-        config.missedCasts,
-        config.castData,
-        config.title || `${this.spell.name} Usage`,
-      ),
-    );
-    return this;
-  }
-
-  /**
    * Add expandable per-cast breakdown with detailed analysis
    * Perfect for complex abilities where each cast needs individual scrutiny
    */

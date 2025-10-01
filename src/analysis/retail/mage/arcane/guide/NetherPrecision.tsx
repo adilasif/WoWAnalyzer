@@ -3,14 +3,14 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BaseMageGuide, evaluateEvent } from '../../shared/guide';
+import Analyzer from 'parser/core/Analyzer';
+import { evaluateEvent } from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
-import NetherPrecision from '../talents/NetherPrecision';
+import NetherPrecision from '../analyzers/NetherPrecision';
 
-class NetherPrecisionGuide extends BaseMageGuide {
+class NetherPrecisionGuide extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     netherPrecision: NetherPrecision,
   };
 

@@ -2,14 +2,14 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { BaseMageGuide, evaluateEvents } from '../../shared/guide';
+import Analyzer from 'parser/core/Analyzer';
+import { evaluateEvents } from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
-import Clearcasting, { ClearcastingProc } from '../core/Clearcasting';
+import Clearcasting, { ClearcastingProc } from '../analyzers/Clearcasting';
 
-class ClearcastingGuide extends BaseMageGuide {
+class ClearcastingGuide extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     clearcasting: Clearcasting,
   };
 

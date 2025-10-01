@@ -12,7 +12,7 @@ import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
+import ArcaneChargeTracker from './ArcaneChargeTracker';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 
 class ArcaneOrb extends Analyzer {

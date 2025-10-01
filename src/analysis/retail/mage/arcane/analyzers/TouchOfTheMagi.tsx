@@ -10,10 +10,10 @@ import Events, {
   RemoveBuffEvent,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
-import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
+import ArcaneChargeTracker from './ArcaneChargeTracker';
 import Enemies from 'parser/shared/modules/Enemies';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import AlwaysBeCasting from '../core/AlwaysBeCasting';
+import AlwaysBeCasting from './AlwaysBeCasting';
 
 export default class TouchOfTheMagi extends Analyzer {
   static dependencies = {

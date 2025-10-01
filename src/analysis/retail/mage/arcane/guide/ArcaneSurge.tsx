@@ -2,8 +2,8 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
+import Analyzer from 'parser/core/Analyzer';
 import {
-  BaseMageGuide,
   evaluateEvents,
   generateExpandableBreakdown,
   createExpandableConfig,
@@ -11,15 +11,14 @@ import {
 } from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 
-import ArcaneSurge, { ArcaneSurgeCast } from '../core/ArcaneSurge';
+import ArcaneSurge, { ArcaneSurgeCast } from '../analyzers/ArcaneSurge';
 
 const ARCANE_CHARGE_MAX_STACKS = 4;
 const OPENER_DURATION = 20000; // 20 seconds
 const SHORT_FIGHT_DURATION = 60000; // 1 minute
 
-class ArcaneSurgeGuide extends BaseMageGuide {
+class ArcaneSurgeGuide extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     arcaneSurge: ArcaneSurge,
   };
 

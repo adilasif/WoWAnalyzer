@@ -2,19 +2,18 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import Analyzer from 'parser/core/Analyzer';
 import {
-  BaseMageGuide,
   evaluateEvents,
   createExpandableConfig,
   generateExpandableBreakdown,
   ExpandableConfig,
 } from '../../shared/guide';
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
-import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerCast } from '../talents/ShiftingPower';
+import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerCast } from '../analyzers/ShiftingPower';
 
-class ShiftingPowerGuide extends BaseMageGuide {
+class ShiftingPowerGuide extends Analyzer {
   static dependencies = {
-    ...BaseMageGuide.dependencies,
     shiftingPower: ShiftingPowerArcane,
   };
 

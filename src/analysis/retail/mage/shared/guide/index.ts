@@ -1,5 +1,5 @@
-export { default as BaseMageGuide } from './BaseMageGuide';
 export {
+  generateGuideTooltip,
   evaluateEvent,
   evaluateEvents,
   evaluatePerformance,
@@ -10,7 +10,6 @@ export {
   createExpandableConfig,
   type GuideEvaluationConfig,
   type GuideCondition,
-  type TooltipProvider,
   type ExpandableConfig,
   type ExpandableChecklistItem,
 } from './GuideEvaluation';
