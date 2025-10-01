@@ -1,7 +1,8 @@
 import React from 'react';
+import { SubSection } from 'interface/guide';
 import TALENTS from 'common/TALENTS/mage';
 import { BaseMageGuide } from '../../shared/guide';
-import { createChart, ChartWithBossHealth, ArcaneManaExplanation } from '../../shared/components';
+import { createChart, ArcaneManaExplanation } from '../../shared/components';
 import ManaValues from 'parser/shared/modules/ManaValues';
 import ArcaneSurge from '../core/ArcaneSurge';
 import TouchOfTheMagi from '../talents/TouchOfTheMagi';
@@ -87,22 +88,20 @@ class ManaChart extends BaseMageGuide {
       spell: TALENTS.ARCANE_SURGE_TALENT,
     }));
 
-    // Build chart using ultra-clean builder pattern
-    const chartBuilder = createChart(this.owner.fight.start_time, this.owner.fight.end_time)
+    // Build chart using ultra-clean builder pattern with boss health built-in!
+    const chart = createChart(this.owner.fight.start_time, this.owner.fight.end_time)
       .asManaChart() // Apply mana chart defaults
       .addManaTracking(this.manaUpdates)
       .addCastAnnotations(arcaneSurgeCasts, SPELL_COLORS.ARCANE_SURGE)
       .addCastAnnotations(this.evocationCasts, SPELL_COLORS.EVOCATION)
-      .addLowResourceWarnings(this.manaUpdates, 0.1, 'Low Mana');
+      .addLowResourceWarnings(this.manaUpdates, 0.1, 'Low Mana')
+      .buildWithBossHealth(this.owner.report.code); // Automatically handles boss health fetching!
 
-    // Return ultra-simple component that handles everything else
     return (
-      <ChartWithBossHealth
-        chartBuilder={chartBuilder}
-        reportCode={this.owner.report.code}
-        title="Mana Management"
-        explanation={<ArcaneManaExplanation />}
-      />
+      <SubSection title="Mana Management">
+        <ArcaneManaExplanation />
+        <div style={{ marginTop: '16px' }}>{chart}</div>
+      </SubSection>
     );
   }
 }

@@ -38,16 +38,30 @@ class ArcaneOrb extends Analyzer {
     const damageEvents: DamageEvent[] = GetRelatedEvents(event, 'SpellDamage');
     const energize: ResourceChangeEvent[] = GetRelatedEvents(event, 'Energize');
 
-    const targetsHit = new Set(damageEvents.map((d) => encodeEventTargetString(d))).size;
-    const chargesBefore =
-      this.arcaneChargeTracker.current -
-      (energize && energize.filter((e) => e.timestamp < event.timestamp).length > 0 ? 1 : 0);
-
     this.orbCasts.push({
       timestamp: event.timestamp,
-      targetsHit,
-      chargesBefore,
+      // Complex values from helpers
+      targetsHit: this.getTargetsHit(damageEvents),
+      chargesBefore: this.getChargesBefore(energize, event),
     });
+  }
+
+  /**
+   * Get unique targets hit by Arcane Orb.
+   * HELPER REASON: Needs Set operations and mapping.
+   */
+  private getTargetsHit(damageEvents: DamageEvent[]): number {
+    return new Set(damageEvents.map((d) => encodeEventTargetString(d))).size;
+  }
+
+  /**
+   * Get Arcane Charges before the Orb charge gain.
+   * HELPER REASON: Complex calculation with filtering and conditional logic.
+   */
+  private getChargesBefore(energize: ResourceChangeEvent[], event: CastEvent): number {
+    const chargeGained =
+      energize && energize.filter((e) => e.timestamp < event.timestamp).length > 0 ? 1 : 0;
+    return this.arcaneChargeTracker.current - chargeGained;
   }
 
   get missedOrbs() {

@@ -30,21 +30,25 @@ export default class ArcaneSurge extends Analyzer {
   }
 
   onSurgeCast(event: CastEvent) {
-    const resource = event.classResources?.find(
-      (resource) => resource.type === RESOURCE_TYPES.MANA.id,
-    );
-    const manaPercent = resource && resource.amount / resource.max;
-    const siphonStorm = this.selectedCombatant.hasBuff(SPELLS.SIPHON_STORM_BUFF.id);
-    const netherPrecision = this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id);
-
     this.surgeCasts.push({
       ordinal: this.surgeCasts.length + 1,
       cast: event.timestamp,
-      mana: manaPercent,
+      // Simple inline values
       charges: this.chargeTracker.current,
-      siphonStormBuff: siphonStorm,
-      netherPrecision: netherPrecision,
+      siphonStormBuff: this.selectedCombatant.hasBuff(SPELLS.SIPHON_STORM_BUFF.id),
+      netherPrecision: this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id),
+      // Complex values from helpers
+      mana: this.getMana(event),
     });
+  }
+
+  /**
+   * Get current mana percentage.
+   * HELPER REASON: Needs to find resource in array and do calculation.
+   */
+  private getMana(event: CastEvent): number | undefined {
+    const resource = event.classResources?.find((r) => r.type === RESOURCE_TYPES.MANA.id);
+    return resource ? resource.amount / resource.max : undefined;
   }
 
   get averageManaPercent() {

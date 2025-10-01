@@ -1,19 +1,35 @@
-import SPELLS from 'common/SPELLS';
-import TALENTS from 'common/TALENTS/mage';
+/**
+ * Arcane Barrage Analyzer
+ *
+ * Tracks Arcane Barrage casts with comprehensive context data for
+ * performance evaluation in guides.
+ *
+ * Events tracked:
+ * - Arcane Barrage casts (main data collection)
+ * - Arcane Tempo buff applications (for timing calculations)
+ *
+ * Data collected:
+ * - Mana percentage, Arcane Charges, buff states
+ * - Cooldown status, target information, damage events
+ * - Tempo timing, Nether Precision stacks
+ */
+
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
   CastEvent,
-  GetRelatedEvents,
-  GetRelatedEvent,
   ApplyBuffEvent,
   ApplyBuffStackEvent,
   RefreshBuffEvent,
+  GetRelatedEvents,
+  GetRelatedEvent,
   HasTarget,
   HasHitpoints,
 } from 'parser/core/Events';
+import SPELLS from 'common/SPELLS';
+import TALENTS from 'common/TALENTS/mage';
+import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import ArcaneChargeTracker from './ArcaneChargeTracker';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
-import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import { encodeTargetString } from 'parser/shared/modules/Enemies';
 
 const TEMPO_DURATION = 12000;
@@ -27,12 +43,8 @@ export default class ArcaneBarrage extends Analyzer {
   protected arcaneChargeTracker!: ArcaneChargeTracker;
   protected spellUsable!: SpellUsable;
 
-  hasArcaneTempo: boolean = this.selectedCombatant.hasTalent(TALENTS.ARCANE_TEMPO_TALENT);
-  hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
-  hasArcaneSoul: boolean = this.selectedCombatant.hasTalent(TALENTS.MEMORY_OF_ALAR_TALENT);
-
   barrageCasts: ArcaneBarrageCast[] = [];
-  lastTempoApply = 0;
+  private lastTempoApply = 0;
 
   constructor(options: Options) {
     super(options);
@@ -59,15 +71,78 @@ export default class ArcaneBarrage extends Analyzer {
   }
 
   onBarrage(event: CastEvent) {
+    const netherData = this.getNetherPrecisionData();
+    const tempoData = this.getTempoData(event);
+    const targetData = this.getTargetData(event);
+
+    this.barrageCasts.push({
+      cast: event,
+      // Simple inline values
+      mana: this.getMana(event),
+      charges: this.arcaneChargeTracker.current,
+      precast: GetRelatedEvent(event, 'SpellPrecast'),
+      targetsHit: GetRelatedEvents(event, 'SpellDamage').length || 0,
+      clearcasting: this.selectedCombatant.hasBuff(
+        SPELLS.CLEARCASTING_ARCANE.id,
+        event.timestamp - 10,
+      ),
+      arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
+      burdenOfPower: this.selectedCombatant.hasBuff(SPELLS.BURDEN_OF_POWER_BUFF.id),
+      gloriousIncandescence: this.selectedCombatant.hasBuff(
+        TALENTS.GLORIOUS_INCANDESCENCE_TALENT.id,
+      ),
+      intuition: this.selectedCombatant.hasBuff(SPELLS.INTUITION_BUFF.id),
+      arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
+      // Complex values from helpers
+      netherPrecisionStacks: netherData.stacks,
+      touchCD: this.getTouchCooldown(),
+      tempoRemaining: tempoData.remaining,
+      health: targetData.health,
+    });
+
+    this.arcaneChargeTracker.clearCharges(event);
+  }
+
+  // =================================================================
+  // HELPER METHODS (Only for complex logic)
+  // =================================================================
+
+  /**
+   * Get current mana percentage.
+   * HELPER REASON: Needs to find resource in array and do calculation.
+   */
+  private getMana(event: CastEvent): number | undefined {
+    const resource = event.classResources?.find((r) => r.type === RESOURCE_TYPES.MANA.id);
+    return resource ? resource.amount / resource.max : undefined;
+  }
+
+  /**
+   * Get Nether Precision buff stacks.
+   * HELPER REASON: Needs to check buff existence and get stacks.
+   */
+  private getNetherPrecisionData(): { stacks: number } {
+    const buff = this.selectedCombatant.getBuff(SPELLS.NETHER_PRECISION_BUFF.id);
+    return {
+      stacks: buff ? buff.stacks || 0 : 0,
+    };
+  }
+
+  /**
+   * Get Arcane Tempo remaining duration.
+   * HELPER REASON: Needs buff check and time calculation.
+   */
+  private getTempoData(event: CastEvent): { remaining: number | undefined } {
     const hasTempo = this.selectedCombatant.hasBuff(SPELLS.ARCANE_TEMPO_BUFF.id);
-    const precast: CastEvent | undefined = GetRelatedEvent(event, 'SpellPrecast');
-    const netherPrecision = this.selectedCombatant.getBuff(SPELLS.NETHER_PRECISION_BUFF.id);
-    const charges = this.arcaneChargeTracker.current;
-    const targetsHit = GetRelatedEvents(event, 'SpellDamage').length;
-    const resource = event.classResources?.find(
-      (resource) => resource.type === RESOURCE_TYPES.MANA.id,
-    );
-    const manaPercent = resource && resource.amount / resource.max;
+    return {
+      remaining: hasTempo ? TEMPO_DURATION - (event.timestamp - this.lastTempoApply) : undefined,
+    };
+  }
+
+  /**
+   * Get target health percentage.
+   * HELPER REASON: Complex logic with multiple null checks and target matching.
+   */
+  private getTargetData(event: CastEvent): { health: number | undefined } {
     const castTarget = HasTarget(event) && encodeTargetString(event.targetID, event.targetInstance);
     const damage = GetRelatedEvents(event, 'SpellDamage');
     const targetHit = damage.find(
@@ -83,49 +158,38 @@ export default class ArcaneBarrage extends Analyzer {
       HasHitpoints(targetHit) &&
       targetHit.hitPoints / targetHit.maxHitPoints;
 
-    this.barrageCasts.push({
-      cast: event,
-      netherPrecisionStacks: netherPrecision ? netherPrecision.stacks : 0,
-      precast,
-      touchCD: this.spellUsable.cooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
-      tempoRemaining: hasTempo
-        ? TEMPO_DURATION - (event.timestamp - this.lastTempoApply)
-        : undefined,
-      clearcasting: this.selectedCombatant.hasBuff(
-        SPELLS.CLEARCASTING_ARCANE.id,
-        event.timestamp - 10,
-      ),
-      arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
-      arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
-      burdenOfPower: this.selectedCombatant.hasBuff(SPELLS.BURDEN_OF_POWER_BUFF.id),
-      gloriousIncandescence: this.selectedCombatant.hasBuff(
-        TALENTS.GLORIOUS_INCANDESCENCE_TALENT.id,
-      ),
-      intuition: this.selectedCombatant.hasBuff(SPELLS.INTUITION_BUFF.id),
-      charges,
-      targetsHit: targetsHit || 0,
-      mana: manaPercent,
+    return {
       health: healthPercent || undefined,
-    });
+    };
+  }
 
-    this.arcaneChargeTracker.clearCharges(event);
+  /**
+   * Get remaining cooldown for Touch of the Magi.
+   * HELPER REASON: Uses SpellUsable API.
+   */
+  private getTouchCooldown(): number {
+    return this.spellUsable.cooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id);
+  }
+
+  get data() {
+    return this.barrageCasts;
   }
 }
 
 export interface ArcaneBarrageCast {
   cast: CastEvent;
-  netherPrecisionStacks: number;
+  mana?: number;
+  charges: number;
   precast?: CastEvent;
-  touchCD: number;
-  tempoRemaining?: number;
+  targetsHit: number;
   clearcasting: boolean;
-  arcaneOrbAvail: boolean;
   arcaneSoul: boolean;
   burdenOfPower: boolean;
   gloriousIncandescence: boolean;
   intuition: boolean;
-  charges: number;
-  targetsHit: number;
-  mana?: number;
+  arcaneOrbAvail: boolean;
+  netherPrecisionStacks: number;
+  touchCD: number;
+  tempoRemaining?: number;
   health?: number;
 }

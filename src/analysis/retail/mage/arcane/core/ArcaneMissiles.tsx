@@ -31,19 +31,35 @@ export default class ArcaneMissiles extends Analyzer {
       event,
       'SpellDamage',
     );
-    const clearcasting = this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id);
+    const clearcastingData = this.getClearcastingData();
 
     this.missileCasts.push({
       cast: event,
+      // Simple inline values
       ticks: damageTicks.length,
       aetherAttunement: this.selectedCombatant.hasBuff(SPELLS.AETHER_ATTUNEMENT_PROC_BUFF.id),
       netherPrecision: this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id),
       arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
-      clearcastingCapped:
-        clearcasting && clearcasting?.stacks === CLEARCASTING_MAX_STACKS ? true : false,
-      clearcastingProcs: clearcasting?.stacks || 0,
       clipped: damageTicks && damageTicks.length < ARCANE_MISSILES_MAX_TICKS,
+      // Complex values from helpers
+      clearcastingCapped: clearcastingData.capped,
+      clearcastingProcs: clearcastingData.stacks,
     });
+  }
+
+  /**
+   * Get Clearcasting buff data.
+   * HELPER REASON: Needs buff check and stack comparison logic.
+   */
+  private getClearcastingData(): { capped: boolean; stacks: number } {
+    const buff = this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id);
+    if (!buff) {
+      return { capped: false, stacks: 0 };
+    }
+    return {
+      capped: buff.stacks === CLEARCASTING_MAX_STACKS,
+      stacks: buff.stacks || 0,
+    };
   }
 
   onFightEnd() {

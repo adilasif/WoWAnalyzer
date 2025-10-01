@@ -384,6 +384,47 @@ export class ChartBuilder {
       />
     );
   }
+
+  /**
+   * Build chart with boss health data fetched automatically
+   * Returns a React component that handles async loading
+   */
+  buildWithBossHealth(reportCode: string): JSX.Element {
+    const ChartWithAsyncBossHealth: React.FC = () => {
+      const [bossHealthData, setBossHealthData] = React.useState<Array<{
+        timestamp: number;
+        value: number;
+      }> | null>(null);
+      const [loading, setLoading] = React.useState(true);
+
+      React.useEffect(() => {
+        const loadBossHealth = async () => {
+          const data = await this.fetchBossHealth(reportCode);
+          setBossHealthData(data);
+          setLoading(false);
+        };
+        loadBossHealth();
+      }, []);
+
+      if (loading) {
+        return <div>Loading chart data...</div>;
+      }
+
+      // Clone builder and add boss health if available
+      const finalBuilder = new ChartBuilder(this.startTime, this.endTime);
+      finalBuilder.series = [...this.series];
+      finalBuilder.annotations = [...this.annotations];
+      finalBuilder.config = { ...this.config };
+
+      if (bossHealthData) {
+        finalBuilder.addBossHealth(bossHealthData);
+      }
+
+      return finalBuilder.build();
+    };
+
+    return <ChartWithAsyncBossHealth />;
+  }
 }
 
 /**
