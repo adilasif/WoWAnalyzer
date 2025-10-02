@@ -5,6 +5,7 @@ import Events, { CastEvent, GetRelatedEvents, DamageEvent, EventType } from 'par
 import { ARCANE_MISSILES_MAX_TICKS, CLEARCASTING_MAX_STACKS } from '../../shared';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import EventHistory from 'parser/shared/modules/EventHistory';
+import { EventRelations } from '../../shared/helpers';
 
 export default class ArcaneMissiles extends Analyzer {
   static dependencies = {
@@ -29,7 +30,7 @@ export default class ArcaneMissiles extends Analyzer {
   onMissiles(event: CastEvent) {
     const damageTicks: DamageEvent | DamageEvent[] | undefined = GetRelatedEvents(
       event,
-      'SpellDamage',
+      EventRelations.DAMAGE,
     );
     const clearcastingData = this.getClearcastingData();
 

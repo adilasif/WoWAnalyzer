@@ -43,6 +43,8 @@ export const EventRelations = {
   PRECAST: 'precast',
   CONSUME: 'consume',
   TICK: 'tick',
+  BARRAGE_CAST: 'BarrageCast',
+  REFUND_BUFF: 'RefundBuff',
 } as const;
 
 /** Configuration for a single event link */

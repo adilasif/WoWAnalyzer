@@ -4,10 +4,7 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { DamageEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
-import ItemDamageDone from 'parser/ui/ItemDamageDone';
-import Statistic from 'parser/ui/Statistic';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
+import { StatisticBuilder } from '../../shared/helpers';
 
 const HEALTH_THRESHOLD = 0.35;
 const DAMAGE_BONUS = 1;
@@ -40,14 +37,10 @@ class ArcaneBombardment extends Analyzer {
   }
 
   statistic() {
-    return (
-      <Statistic category={STATISTIC_CATEGORY.TALENTS} size="flexible">
-        <BoringSpellValueText spell={TALENTS.ARCANE_BOMBARDMENT_TALENT}>
-          <ItemDamageDone amount={this.bonusDamage} />
-          <br />
-        </BoringSpellValueText>
-      </Statistic>
-    );
+    return new StatisticBuilder()
+      .spell(TALENTS.ARCANE_BOMBARDMENT_TALENT)
+      .damage(this.bonusDamage)
+      .build();
   }
 }
 

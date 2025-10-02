@@ -4,10 +4,7 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { CastEvent, DamageEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
-import Statistic from 'parser/ui/Statistic';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import { formatNumber } from 'common/format';
+import { StatisticBuilder } from '../../shared/helpers';
 
 const DAMAGE_BONUS_PER_STACK = 0.05;
 
@@ -61,21 +58,12 @@ class ArcaneHarmony extends Analyzer {
   }
 
   statistic() {
-    return (
-      <Statistic
-        category={STATISTIC_CATEGORY.TALENTS}
-        size="flexible"
-        tooltip="Arcane Harmony makes Arcane Barrage do extra damage with more stacks. Try to hold Arcane Barrage until you reach 20 stacks of Arcane Harmony. You can spam Arcane Missiles to build stacks during Hero/Bloodlust/Timewarp while standing in your Rune of Power before starting the Radiant Spark Ramp."
-      >
-        <BoringSpellValueText spell={SPELLS.ARCANE_HARMONY_BUFF}>
-          {formatNumber(this.bonusDamage)} <small>Bonus Damage</small>
-          <br />
-          {formatNumber(this.dpsIncrease)} <small>DPS</small>
-          <br />
-          {formatNumber(this.averageStacks)} <small>Avg. stacks per Barrage</small>
-        </BoringSpellValueText>
-      </Statistic>
-    );
+    return new StatisticBuilder()
+      .spell(SPELLS.ARCANE_HARMONY_BUFF)
+      .value(this.bonusDamage, 'Bonus Damage', 'number')
+      .value(this.dpsIncrease, 'DPS', 'number')
+      .value(this.averageStacks, 'Avg. stacks per Barrage', 'number')
+      .build();
   }
 }
 

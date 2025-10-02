@@ -53,3 +53,6 @@ export {
   type LinkConfig,
   type SpellLinkSpec,
 } from './castLinkHelpers';
+
+// Statistic helpers
+export { StatisticBuilder } from './statisticHelpers';

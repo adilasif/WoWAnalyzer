@@ -30,7 +30,7 @@ export default class PresenceOfMind extends Analyzer {
 
   onPresenceMind(event: CastEvent) {
     const blasts: CastEvent[] | undefined = GetRelatedEvents(event, EventRelations.CAST);
-    const barrage: CastEvent | undefined = GetRelatedEvent(event, 'BarrageCast');
+    const barrage: CastEvent | undefined = GetRelatedEvent(event, EventRelations.BARRAGE_CAST);
     const barrageHits: DamageEvent[] | undefined =
       barrage && GetRelatedEvents(barrage, EventRelations.DAMAGE);
     const buffedCasts = blasts.filter((b) =>

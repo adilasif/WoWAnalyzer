@@ -50,7 +50,10 @@ export default class TouchOfTheMagi extends Analyzer {
       EventRelations.REMOVE_DEBUFF,
     );
     const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
-    const refundBuff: RemoveBuffEvent | undefined = GetRelatedEvent(event, 'RefundBuff');
+    const refundBuff: RemoveBuffEvent | undefined = GetRelatedEvent(
+      event,
+      EventRelations.REFUND_BUFF,
+    );
     let damage = 0;
     damageEvents.forEach((d) => (damage += d.amount + (d.absorb || 0)));
 

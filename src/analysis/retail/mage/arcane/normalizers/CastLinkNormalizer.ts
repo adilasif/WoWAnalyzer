@@ -131,7 +131,7 @@ const EVENT_LINKS = createEventLinks(
       LinkPatterns.energize({ id: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id, anyTarget: true }),
       {
         // Charge refund when TotM is applied
-        relation: 'RefundBuff',
+        relation: EventRelations.REFUND_BUFF,
         type: EventType.RemoveBuff,
         id: [
           SPELLS.BURDEN_OF_POWER_BUFF.id,
@@ -238,7 +238,7 @@ const EVENT_LINKS = createEventLinks(
       LinkPatterns.removeBuff({ forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
       {
         // Next Barrage after PoM (for checking PoM → Barrage efficiency)
-        relation: 'BarrageCast',
+        relation: EventRelations.BARRAGE_CAST,
         type: EventType.Cast,
         id: SPELLS.ARCANE_BARRAGE.id,
         maxLinks: 1,

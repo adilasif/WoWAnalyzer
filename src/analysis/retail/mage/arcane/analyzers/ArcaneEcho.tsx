@@ -4,10 +4,7 @@ import { SpellIcon } from 'interface';
 import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import Events, { CastEvent, DamageEvent, GetRelatedEvents } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
-import Statistic from 'parser/ui/Statistic';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import { EventRelations } from '../../shared/helpers';
+import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 
 class ArcaneEcho extends Analyzer {
   static dependencies = {
@@ -45,25 +42,21 @@ class ArcaneEcho extends Analyzer {
   }
 
   statistic() {
-    return (
-      <Statistic
-        size="flexible"
-        category={STATISTIC_CATEGORY.TALENTS}
-        tooltip={
-          <>
-            On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the
-            Magi cast.
-          </>
-        }
-      >
-        <BoringSpellValueText spell={TALENTS.ARCANE_ECHO_TALENT}>
-          <>
-            <SpellIcon spell={TALENTS.ARCANE_ECHO_TALENT} />{' '}
-            {formatNumber(this.averageDamagePerTouch)} <small>Average Damage</small>
-          </>
-        </BoringSpellValueText>
-      </Statistic>
-    );
+    return new StatisticBuilder()
+      .spell(TALENTS.ARCANE_ECHO_TALENT)
+      .content(
+        <>
+          <SpellIcon spell={TALENTS.ARCANE_ECHO_TALENT} />{' '}
+          {formatNumber(this.averageDamagePerTouch)} <small>Average Damage</small>
+        </>,
+      )
+      .tooltip(
+        <>
+          On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the Magi
+          cast.
+        </>,
+      )
+      .build();
   }
 }
 
