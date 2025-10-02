@@ -3,8 +3,8 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import Analyzer from 'parser/core/Analyzer';
-import { evaluateEvents, evaluatePerformance } from '../../shared/guide';
-import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+import { evaluateEvents, evaluatePerformance } from '../../shared/components';
+import { GuideBuilder } from '../../shared/components';
 
 import ArcaneOrb from '../analyzers/ArcaneOrb';
 

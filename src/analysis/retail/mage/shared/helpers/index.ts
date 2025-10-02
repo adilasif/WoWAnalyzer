@@ -55,4 +55,4 @@ export {
 } from './castLinkHelpers';
 
 // Statistic helpers
-export { StatisticBuilder } from './statisticHelpers';
+export { StatisticBuilder, DropdownTableBuilder } from '../builders/StatisticBuilder';

@@ -4,6 +4,7 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { DamageEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { StatisticBuilder } from '../../shared/helpers';
 
 const HEALTH_THRESHOLD = 0.35;
@@ -37,9 +38,9 @@ class ArcaneBombardment extends Analyzer {
   }
 
   statistic() {
-    return new StatisticBuilder()
-      .spell(TALENTS.ARCANE_BOMBARDMENT_TALENT)
-      .damage(this.bonusDamage)
+    return new StatisticBuilder(TALENTS.ARCANE_BOMBARDMENT_TALENT)
+      .category(STATISTIC_CATEGORY.TALENTS)
+      .damage({ amount: this.bonusDamage })
       .build();
   }
 }

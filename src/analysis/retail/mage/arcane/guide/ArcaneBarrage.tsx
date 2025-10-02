@@ -3,8 +3,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
-import { evaluateEvent } from '../../shared/guide';
-import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+import { evaluateEvent } from '../../shared/components';
+import { GuideBuilder } from '../../shared/components';
 import Analyzer from 'parser/core/Analyzer';
 
 import ArcaneBarrage from '../analyzers/ArcaneBarrage';

@@ -9,12 +9,10 @@ import Events, {
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
-import Statistic from 'parser/ui/Statistic';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
-import { EventRelations } from '../../shared/helpers';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
+import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 
 class ArcaneOrb extends Analyzer {
   static dependencies = {
@@ -86,27 +84,20 @@ class ArcaneOrb extends Analyzer {
   }
 
   statistic() {
-    return (
-      <Statistic
-        size="flexible"
-        category={STATISTIC_CATEGORY.TALENTS}
-        tooltip={`You averaged ${formatNumber(
-          this.averageHitsPerCast,
-        )} hits per cast of Arcane Orb. ${
-          this.missedOrbs > 0
-            ? `Additionally, you cast Arcane Orb ${this.missedOrbs} times without hitting anything.`
-            : ''
-        } Casting Arcane Orb when it will only hit one target is still beneficial and acceptable, but if you can aim it so that it hits multiple enemies then you should.`}
-      >
-        <BoringSpellValueText spell={SPELLS.ARCANE_ORB}>
-          <>
-            {this.averageHitsPerCast.toFixed(2)} <small>Average hits per cast</small>
-            <br />
-            {this.missedOrbs} <small>Orbs cast with no targets hit.</small>
-          </>
-        </BoringSpellValueText>
-      </Statistic>
-    );
+    const tooltipText = `You averaged ${formatNumber(
+      this.averageHitsPerCast,
+    )} hits per cast of Arcane Orb. ${
+      this.missedOrbs > 0
+        ? `Additionally, you cast Arcane Orb ${this.missedOrbs} times without hitting anything.`
+        : ''
+    } Casting Arcane Orb when it will only hit one target is still beneficial and acceptable, but if you can aim it so that it hits multiple enemies then you should.`;
+
+    return new StatisticBuilder(SPELLS.ARCANE_ORB)
+      .category(STATISTIC_CATEGORY.TALENTS)
+      .value({ value: this.averageHitsPerCast.toFixed(2), label: 'Average hits per cast' })
+      .value({ value: this.missedOrbs, label: 'Orbs cast with no targets hit' })
+      .tooltip(tooltipText)
+      .build();
   }
 }
 

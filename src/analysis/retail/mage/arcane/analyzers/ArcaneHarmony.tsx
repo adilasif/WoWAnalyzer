@@ -4,6 +4,7 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { CastEvent, DamageEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { StatisticBuilder } from '../../shared/helpers';
 
 const DAMAGE_BONUS_PER_STACK = 0.05;
@@ -58,11 +59,11 @@ class ArcaneHarmony extends Analyzer {
   }
 
   statistic() {
-    return new StatisticBuilder()
-      .spell(SPELLS.ARCANE_HARMONY_BUFF)
-      .value(this.bonusDamage, 'Bonus Damage', 'number')
-      .value(this.dpsIncrease, 'DPS', 'number')
-      .value(this.averageStacks, 'Avg. stacks per Barrage', 'number')
+    return new StatisticBuilder(SPELLS.ARCANE_HARMONY_BUFF)
+      .category(STATISTIC_CATEGORY.TALENTS)
+      .value({ value: this.bonusDamage, label: 'Bonus Damage', format: 'number' })
+      .value({ value: this.dpsIncrease, label: 'DPS', format: 'number' })
+      .value({ value: this.averageStacks, label: 'Avg. stacks per Barrage', format: 'number' })
       .build();
   }
 }

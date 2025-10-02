@@ -4,6 +4,7 @@ import { SpellIcon } from 'interface';
 import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import Events, { CastEvent, DamageEvent, GetRelatedEvents } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 
 class ArcaneEcho extends Analyzer {
@@ -42,20 +43,22 @@ class ArcaneEcho extends Analyzer {
   }
 
   statistic() {
-    return new StatisticBuilder()
-      .spell(TALENTS.ARCANE_ECHO_TALENT)
-      .content(
-        <>
-          <SpellIcon spell={TALENTS.ARCANE_ECHO_TALENT} />{' '}
-          {formatNumber(this.averageDamagePerTouch)} <small>Average Damage</small>
-        </>,
-      )
-      .tooltip(
-        <>
-          On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the Magi
-          cast.
-        </>,
-      )
+    return new StatisticBuilder(TALENTS.ARCANE_ECHO_TALENT)
+      .category(STATISTIC_CATEGORY.TALENTS)
+      .content({
+        content: (
+          <>
+            <SpellIcon spell={TALENTS.ARCANE_ECHO_TALENT} />{' '}
+            {formatNumber(this.averageDamagePerTouch)} <small>Average Damage</small>
+          </>
+        ),
+        tooltip: (
+          <>
+            On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the
+            Magi cast.
+          </>
+        ),
+      })
       .build();
   }
 }

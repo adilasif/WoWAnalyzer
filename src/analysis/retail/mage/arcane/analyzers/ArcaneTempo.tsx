@@ -12,11 +12,10 @@ import Events, {
   RemoveBuffStackEvent,
 } from 'parser/core/Events';
 import { currentStacks } from 'parser/shared/modules/helpers/Stacks';
-import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import { formatDuration, formatPercentage } from 'common/format';
-import TalentSpellText from 'parser/ui/TalentSpellText';
 import HasteIcon from 'interface/icons/Haste';
+import { DropdownTableBuilder, StatisticBuilder } from '../../shared/helpers';
 
 class ArcaneTempo extends Analyzer {
   /** Time spent at each stack count (index = stack count) */
@@ -95,41 +94,31 @@ class ArcaneTempo extends Analyzer {
   }
 
   statistic() {
-    return (
-      <Statistic
-        position={STATISTIC_ORDER.CORE(7)}
-        size="flexible"
-        dropdown={
-          <>
-            <table className="table table-condensed">
-              <thead>
-                <tr>
-                  <th>Haste-Bonus</th>
-                  <th>Time (s)</th>
-                  <th>Time (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.timeAtStackCount.map((e, i) => (
-                  <tr key={i}>
-                    <th>{formatPercentage(i * ARCANE_TEMPO_HASTE_PER_STACK, 0)}%</th>
-                    <td>{formatDuration(e)}</td>
-                    <td>{formatPercentage(e / this.owner.fightDuration)}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        }
-      >
-        <TalentSpellText talent={TALENTS.ARCANE_TEMPO_TALENT}>
-          <>
-            <HasteIcon /> {formatPercentage(this.averageHaste)} %{' '}
-            <small>average haste gained</small>
-          </>
-        </TalentSpellText>
-      </Statistic>
-    );
+    const dropdown = new DropdownTableBuilder()
+      .column(
+        'Haste-Bonus',
+        (data) => `${formatPercentage(data.stacks * ARCANE_TEMPO_HASTE_PER_STACK, 0)}%`,
+        true,
+      )
+      .column('Time (s)', (data) => formatDuration(data.time))
+      .column('Time (%)', (data) => `${formatPercentage(data.time / this.owner.fightDuration)}%`)
+      .data(
+        this.timeAtStackCount.map((time, stacks) => ({
+          time,
+          stacks,
+        })),
+      );
+
+    return new StatisticBuilder(TALENTS.ARCANE_TEMPO_TALENT)
+      .position(STATISTIC_ORDER.CORE(7))
+      .value({
+        value: this.averageHaste,
+        label: 'average haste gained',
+        format: 'percentage',
+        icon: <HasteIcon />,
+      })
+      .dropdown(dropdown)
+      .build();
   }
 }
 

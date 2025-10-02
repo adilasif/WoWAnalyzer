@@ -5,8 +5,8 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { formatDurationMillisMinSec } from 'common/format';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import Analyzer from 'parser/core/Analyzer';
-import { evaluateEvent, evaluatePerformance } from '../../shared/guide';
-import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+import { evaluateEvent, evaluatePerformance } from '../../shared/components';
+import { GuideBuilder } from '../../shared/components';
 
 import ArcaneMissiles from '../analyzers/ArcaneMissiles';
 

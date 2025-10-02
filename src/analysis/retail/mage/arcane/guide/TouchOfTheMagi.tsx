@@ -13,8 +13,8 @@ import {
   createExpandableConfig,
   generateExpandableBreakdown,
   ExpandableConfig,
-} from '../../shared/guide';
-import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+} from '../../shared/components';
+import { GuideBuilder } from '../../shared/components';
 
 import TouchOfTheMagi, { TouchOfTheMagiCast } from '../analyzers/TouchOfTheMagi';
 

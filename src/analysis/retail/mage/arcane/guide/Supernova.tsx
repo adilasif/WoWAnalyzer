@@ -3,11 +3,11 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import Analyzer from 'parser/core/Analyzer';
-import { evaluateEvent } from '../../shared/guide';
+import { evaluateEvent } from '../../shared/components';
 
 const AOE_TARGET_THRESHOLD = 4;
 const TOUCH_DURATION_THRESHOLD = 3000;
-import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+import { GuideBuilder } from '../../shared/components';
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
 import Supernova from '../../shared/Supernova';
 

@@ -8,8 +8,8 @@ import {
   createExpandableConfig,
   generateExpandableBreakdown,
   ExpandableConfig,
-} from '../../shared/guide';
-import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+} from '../../shared/components';
+import { GuideBuilder } from '../../shared/components';
 import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerCast } from '../analyzers/ShiftingPower';
 
 class ShiftingPowerGuide extends Analyzer {

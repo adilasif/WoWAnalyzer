@@ -8,8 +8,8 @@ import {
   generateExpandableBreakdown,
   createExpandableConfig,
   ExpandableConfig,
-} from '../../shared/guide';
-import { GuideBuilder } from '../../shared/guide/GuideBuilder';
+} from '../../shared/components';
+import { GuideBuilder } from '../../shared/components';
 
 import ArcaneSurge, { ArcaneSurgeCast } from '../analyzers/ArcaneSurge';
 
