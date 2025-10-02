@@ -23,7 +23,6 @@ import Events, {
   GetRelatedEvents,
   GetRelatedEvent,
 } from 'parser/core/Events';
-import { EventRelations } from '../normalizers/castLinkHelpers';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
@@ -33,6 +32,7 @@ import {
   getBuffStacks,
   getCooldownRemaining,
   getTargetHealthPercentage,
+  EventRelations,
 } from '../../shared/helpers';
 
 const TEMPO_DURATION = 12000;

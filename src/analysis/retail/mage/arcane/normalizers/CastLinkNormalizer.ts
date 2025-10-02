@@ -9,7 +9,11 @@ import {
   HasRelatedEvent,
 } from 'parser/core/Events';
 import { Options } from 'parser/core/Module';
-import { createEventLinks, LinkPatterns, EventRelations } from './castLinkHelpers';
+import {
+  createEventLinks,
+  LinkPatterns,
+  EventRelations,
+} from 'analysis/retail/mage/shared/helpers/castLinkHelpers';
 
 const EVENT_LINKS = createEventLinks(
   // ============================================================================

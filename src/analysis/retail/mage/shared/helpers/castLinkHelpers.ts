@@ -51,7 +51,7 @@ export const EventRelations = {
 /**
  * Configuration for a single event link
  */
-interface LinkConfig {
+export interface LinkConfig {
   /** The relation name for this link */
   relation: string;
   /**
@@ -87,7 +87,7 @@ interface LinkConfig {
 /**
  * Complete specification for a spell's event links
  */
-interface SpellLinkSpec {
+export interface SpellLinkSpec {
   /** The source spell/buff ID */
   id: number;
   /** The source event type */

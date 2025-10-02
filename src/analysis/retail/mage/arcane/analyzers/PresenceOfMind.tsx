@@ -8,7 +8,7 @@ import Events, {
   RemoveBuffEvent,
   RemoveDebuffEvent,
 } from 'parser/core/Events';
-import { EventRelations } from '../normalizers/castLinkHelpers';
+import { EventRelations } from '../../shared/helpers';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 
 export default class PresenceOfMind extends Analyzer {

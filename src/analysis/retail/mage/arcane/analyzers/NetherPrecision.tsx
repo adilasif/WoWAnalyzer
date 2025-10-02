@@ -10,7 +10,7 @@ import Events, {
   GetRelatedEvents,
   RefreshBuffEvent,
 } from 'parser/core/Events';
-import { EventRelations } from '../normalizers/castLinkHelpers';
+import { EventRelations } from '../../shared/helpers';
 
 export default class NetherPrecision extends Analyzer {
   netherPrecisionBuffs: NetherPrecisionProc[] = [];

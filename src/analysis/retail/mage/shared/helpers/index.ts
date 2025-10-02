@@ -43,3 +43,13 @@ export {
   isShortFight,
   type FightContext,
 } from './fightHelpers';
+
+// Cast Link helpers
+export {
+  EventRelations,
+  LinkPatterns,
+  createEventLinks,
+  defineSpellLinks,
+  type LinkConfig,
+  type SpellLinkSpec,
+} from './castLinkHelpers';

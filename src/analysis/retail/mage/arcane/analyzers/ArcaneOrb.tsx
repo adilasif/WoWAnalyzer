@@ -7,7 +7,6 @@ import Events, {
   GetRelatedEvents,
   ResourceChangeEvent,
 } from 'parser/core/Events';
-import { EventRelations } from '../normalizers/castLinkHelpers';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
@@ -15,6 +14,7 @@ import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
+import { EventRelations } from '../../shared/helpers';
 
 class ArcaneOrb extends Analyzer {
   static dependencies = {

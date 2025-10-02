@@ -1,10 +1,10 @@
 import TALENTS from 'common/TALENTS/mage';
 import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import Events, { CastEvent, GetRelatedEvents } from 'parser/core/Events';
-import { EventRelations } from '../normalizers/castLinkHelpers';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import Enemies from 'parser/shared/modules/Enemies';
 import SPELLS from 'common/SPELLS';
+import { EventRelations } from '../../shared/helpers';
 
 export const MAX_TICKS = 4;
 

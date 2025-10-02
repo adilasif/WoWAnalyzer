@@ -3,11 +3,11 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellIcon } from 'interface';
 import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import Events, { CastEvent, DamageEvent, GetRelatedEvents } from 'parser/core/Events';
-import { EventRelations } from '../normalizers/castLinkHelpers';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
+import { EventRelations } from '../../shared/helpers';
 
 class ArcaneEcho extends Analyzer {
   static dependencies = {
