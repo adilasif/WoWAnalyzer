@@ -3,6 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellIcon } from 'interface';
 import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import Events, { CastEvent, DamageEvent, GetRelatedEvents } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
@@ -26,7 +27,7 @@ class ArcaneEcho extends Analyzer {
   }
 
   onTouchMagiCast(event: CastEvent) {
-    const damageEvents: DamageEvent[] = GetRelatedEvents(event, 'SpellDamage');
+    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
     let damage = 0;
     damageEvents.forEach((a) => (damage += a.amount + (a.absorbed || 0)));
 

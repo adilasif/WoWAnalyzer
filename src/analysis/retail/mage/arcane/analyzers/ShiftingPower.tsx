@@ -1,6 +1,7 @@
 import TALENTS from 'common/TALENTS/mage';
 import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import Events, { CastEvent, GetRelatedEvents } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import Enemies from 'parser/shared/modules/Enemies';
 import SPELLS from 'common/SPELLS';
@@ -34,7 +35,7 @@ export default class ShiftingPowerArcane extends Analyzer {
   onShiftingPower(event: CastEvent) {
     const ordinal = this.casts.length + 1;
     const timestamp = event.timestamp;
-    const ticks = GetRelatedEvents(event, 'SpellTick').length;
+    const ticks = GetRelatedEvents(event, EventRelations.TICK).length;
     const spellsReduced = {
       arcaneSurge: this.spellUsable.isOnCooldown(TALENTS.ARCANE_SURGE_TALENT.id),
       touchOfTheMagi: this.spellUsable.isOnCooldown(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),

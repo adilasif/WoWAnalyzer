@@ -23,6 +23,7 @@ import Events, {
   GetRelatedEvents,
   GetRelatedEvent,
 } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
@@ -80,8 +81,8 @@ export default class ArcaneBarrage extends Analyzer {
       // Simple inline values
       mana: getManaPercentage(event), // ✅ Shared helper
       charges: this.arcaneChargeTracker.current,
-      precast: GetRelatedEvent(event, 'SpellPrecast'),
-      targetsHit: GetRelatedEvents(event, 'SpellDamage').length || 0,
+      precast: GetRelatedEvent(event, EventRelations.PRECAST),
+      targetsHit: GetRelatedEvents(event, EventRelations.DAMAGE).length || 0,
       clearcasting: this.selectedCombatant.hasBuff(
         SPELLS.CLEARCASTING_ARCANE.id,
         event.timestamp - 10,

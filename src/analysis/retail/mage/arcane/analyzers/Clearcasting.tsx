@@ -8,6 +8,7 @@ import Events, {
   RemoveBuffStackEvent,
   GetRelatedEvent,
 } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 
 export default class Clearcasting extends Analyzer {
   clearcastingProcs: ClearcastingProc[] = [];
@@ -29,7 +30,7 @@ export default class Clearcasting extends Analyzer {
       event,
       'BuffRemomve',
     );
-    const missiles: CastEvent | undefined = GetRelatedEvent(event, 'SpellCast');
+    const missiles: CastEvent | undefined = GetRelatedEvent(event, EventRelations.CAST);
 
     this.clearcastingProcs.push({
       applied: event.timestamp,

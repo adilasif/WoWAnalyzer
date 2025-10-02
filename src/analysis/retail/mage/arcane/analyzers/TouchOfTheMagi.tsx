@@ -9,6 +9,7 @@ import Events, {
   GetRelatedEvents,
   RemoveBuffEvent,
 } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import Enemies from 'parser/shared/modules/Enemies';
@@ -44,8 +45,11 @@ export default class TouchOfTheMagi extends Analyzer {
 
   onTouch(event: ApplyDebuffEvent) {
     const ordinal = this.touchCasts.length + 1;
-    const removeDebuff: RemoveDebuffEvent | undefined = GetRelatedEvent(event, 'DebuffRemove');
-    const damageEvents: DamageEvent[] = GetRelatedEvents(event, 'SpellDamage');
+    const removeDebuff: RemoveDebuffEvent | undefined = GetRelatedEvent(
+      event,
+      EventRelations.REMOVE_DEBUFF,
+    );
+    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
     const refundBuff: RemoveBuffEvent | undefined = GetRelatedEvent(event, 'RefundBuff');
     let damage = 0;
     damageEvents.forEach((d) => (damage += d.amount + (d.absorb || 0)));

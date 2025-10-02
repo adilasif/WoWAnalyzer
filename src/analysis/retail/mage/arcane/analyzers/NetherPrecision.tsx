@@ -10,6 +10,7 @@ import Events, {
   GetRelatedEvents,
   RefreshBuffEvent,
 } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 
 export default class NetherPrecision extends Analyzer {
   netherPrecisionBuffs: NetherPrecisionProc[] = [];
@@ -32,7 +33,7 @@ export default class NetherPrecision extends Analyzer {
       event,
       'BuffRemove',
     );
-    const damage: DamageEvent[] = GetRelatedEvents(event, 'SpellDamage');
+    const damage: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
     const overwritten = removeBuff?.type === EventType.RefreshBuff;
 
     this.netherPrecisionBuffs.push({

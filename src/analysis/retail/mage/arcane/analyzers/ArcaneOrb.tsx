@@ -7,6 +7,7 @@ import Events, {
   GetRelatedEvents,
   ResourceChangeEvent,
 } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
@@ -35,8 +36,8 @@ class ArcaneOrb extends Analyzer {
   }
 
   onOrbCast(event: CastEvent) {
-    const damageEvents: DamageEvent[] = GetRelatedEvents(event, 'SpellDamage');
-    const energize: ResourceChangeEvent[] = GetRelatedEvents(event, 'Energize');
+    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
+    const energize: ResourceChangeEvent[] = GetRelatedEvents(event, EventRelations.RESOURCE_CHANGE);
 
     this.orbCasts.push({
       timestamp: event.timestamp,

@@ -8,6 +8,7 @@ import Events, {
   RemoveBuffEvent,
   RemoveDebuffEvent,
 } from 'parser/core/Events';
+import { EventRelations } from '../normalizers/castLinkHelpers';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 
 export default class PresenceOfMind extends Analyzer {
@@ -28,15 +29,21 @@ export default class PresenceOfMind extends Analyzer {
   }
 
   onPresenceMind(event: CastEvent) {
-    const blasts: CastEvent[] | undefined = GetRelatedEvents(event, 'SpellCast');
+    const blasts: CastEvent[] | undefined = GetRelatedEvents(event, EventRelations.CAST);
     const barrage: CastEvent | undefined = GetRelatedEvent(event, 'BarrageCast');
     const barrageHits: DamageEvent[] | undefined =
-      barrage && GetRelatedEvents(barrage, 'SpellDamage');
+      barrage && GetRelatedEvents(barrage, EventRelations.DAMAGE);
     const buffedCasts = blasts.filter((b) =>
       this.selectedCombatant.hasBuff(TALENTS.PRESENCE_OF_MIND_TALENT.id, b.timestamp),
     );
-    const buffRemove: RemoveBuffEvent | undefined = GetRelatedEvent(event, 'BuffRemove');
-    const touchRemove: RemoveDebuffEvent | undefined = GetRelatedEvent(event, 'DebuffRemove');
+    const buffRemove: RemoveBuffEvent | undefined = GetRelatedEvent(
+      event,
+      EventRelations.REMOVE_BUFF,
+    );
+    const touchRemove: RemoveDebuffEvent | undefined = GetRelatedEvent(
+      event,
+      EventRelations.REMOVE_DEBUFF,
+    );
     const touchCancelDelay =
       touchRemove && buffRemove && buffRemove.timestamp > touchRemove.timestamp
         ? buffRemove.timestamp - touchRemove.timestamp
