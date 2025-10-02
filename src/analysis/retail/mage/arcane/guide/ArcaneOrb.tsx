@@ -33,7 +33,6 @@ class ArcaneOrbGuide extends Analyzer {
         return {
           actionName: 'Arcane Orb',
 
-          // FAIL: Critical mistakes
           failConditions: [
             {
               name: 'missedTargets',
@@ -47,7 +46,6 @@ class ArcaneOrbGuide extends Analyzer {
             },
           ],
 
-          // PERFECT: Optimal usage
           perfectConditions: [
             {
               name: 'optimalUsage',
@@ -56,7 +54,6 @@ class ArcaneOrbGuide extends Analyzer {
             },
           ],
 
-          // GOOD: Decent usage
           goodConditions: [
             {
               name: 'goodUsage',

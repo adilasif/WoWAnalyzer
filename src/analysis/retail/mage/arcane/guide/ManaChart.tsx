@@ -11,24 +11,12 @@ import Events, { CastEvent } from 'parser/core/Events';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import Spell from 'common/SPELLS/Spell';
 
-// Spell colors for consistency
 const SPELL_COLORS = {
   ARCANE_SURGE: '#db35acff', // Pinkish purple
   EVOCATION: '#10B981', // Green
   TOUCH_OF_THE_MAGI: '#F59E0B', // Orange
 } as const;
 
-/**
- * ULTRA-SIMPLIFIED ManaChart
- *
- * This is now incredibly simple and easy to maintain!
- * All complexity has been moved to reusable ChartBuilder helpers.
- *
- * To modify:
- * - Change colors: Update SPELL_COLORS
- * - Add spells: Add tracking in onCast and to chartBuilder
- * - Change explanation: Modify ArcaneManaExplanation component
- */
 class ManaChart extends Analyzer {
   static dependencies = {
     manaValues: ManaValues,
@@ -56,7 +44,6 @@ class ManaChart extends Analyzer {
       return;
     }
 
-    // Track mana changes
     const manaResource = event.classResources.find(
       (resource) => resource.type === RESOURCE_TYPES.MANA.id,
     );
@@ -80,20 +67,18 @@ class ManaChart extends Analyzer {
   }
 
   get guideSubsection(): JSX.Element {
-    // Transform ArcaneSurge data to simple format
     const arcaneSurgeCasts = this.arcaneSurge.surgeCasts.map((cast) => ({
       timestamp: cast.cast,
       spell: TALENTS.ARCANE_SURGE_TALENT,
     }));
 
-    // Build chart using ultra-clean builder pattern with boss health built-in!
     const chart = createChart(this.owner.fight.start_time, this.owner.fight.end_time)
-      .asManaChart() // Apply mana chart defaults
+      .asManaChart()
       .addManaTracking(this.manaUpdates)
       .addCastAnnotations(arcaneSurgeCasts, SPELL_COLORS.ARCANE_SURGE)
       .addCastAnnotations(this.evocationCasts, SPELL_COLORS.EVOCATION)
       .addLowResourceWarnings(this.manaUpdates, 0.1, 'Low Mana')
-      .buildWithBossHealth(this.owner.report.code); // Automatically handles boss health fetching!
+      .buildWithBossHealth(this.owner.report.code);
 
     return (
       <SubSection title="Mana Management">

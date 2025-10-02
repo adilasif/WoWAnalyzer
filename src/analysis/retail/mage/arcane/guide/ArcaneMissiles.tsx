@@ -26,7 +26,7 @@ class ArcaneMissilesGuide extends Analyzer {
     return evaluatePerformance(
       delay,
       this.arcaneMissiles.channelDelayThresholds.isGreaterThan,
-      false, // lower delay is better
+      false,
     );
   }
 
@@ -46,7 +46,6 @@ class ArcaneMissilesGuide extends Analyzer {
       return evaluateEvent(am.cast.timestamp, am, this, {
         actionName: 'Arcane Missiles',
 
-        // FAIL: Critical issues that make the cast bad
         failConditions: [
           {
             name: 'netherPrecisionWaste',
@@ -65,7 +64,6 @@ class ArcaneMissilesGuide extends Analyzer {
           },
         ],
 
-        // PERFECT: Optimal channel usage
         perfectConditions: [
           {
             name: 'cappedClearcasting',
@@ -79,7 +77,6 @@ class ArcaneMissilesGuide extends Analyzer {
           },
         ],
 
-        // GOOD: Acceptable usage patterns
         goodConditions: [
           {
             name: 'goodClipTiming',
@@ -98,7 +95,6 @@ class ArcaneMissilesGuide extends Analyzer {
           },
         ],
 
-        // OK: Understandable but suboptimal
         okConditions: [
           {
             name: 'fullChannel',
@@ -107,7 +103,6 @@ class ArcaneMissilesGuide extends Analyzer {
           },
         ],
 
-        // Default if no specific conditions match
         defaultPerformance: QualitativePerformance.Ok,
         defaultMessage: am.channelEndDelay
           ? `Standard usage - ${formatDurationMillisMinSec(am.channelEndDelay, 3)} delay to next cast`

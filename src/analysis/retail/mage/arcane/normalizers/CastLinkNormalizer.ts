@@ -20,14 +20,14 @@ const EVENT_LINKS = createEventLinks(
   // CORE DAMAGE SPELLS
   // ============================================================================
   {
-    id: SPELLS.ARCANE_EXPLOSION.id,
-    type: EventType.Cast,
+    spell: SPELLS.ARCANE_EXPLOSION.id,
+    parentType: EventType.Cast,
     links: [LinkPatterns.damage({ anyTarget: true })],
   },
 
   {
-    id: SPELLS.ARCANE_BARRAGE.id,
-    type: EventType.Cast,
+    spell: SPELLS.ARCANE_BARRAGE.id,
+    parentType: EventType.Cast,
     links: [
       LinkPatterns.damage({ forwardBuffer: 2000, anyTarget: true }), // Barrage projectile travel time
       LinkPatterns.preCast({
@@ -38,8 +38,8 @@ const EVENT_LINKS = createEventLinks(
   },
 
   {
-    id: TALENTS.SUPERNOVA_TALENT.id,
-    type: EventType.Cast,
+    spell: TALENTS.SUPERNOVA_TALENT.id,
+    parentType: EventType.Cast,
     links: [LinkPatterns.damage({ forwardBuffer: 2000, anyTarget: true })],
   },
 
@@ -47,8 +47,8 @@ const EVENT_LINKS = createEventLinks(
   // CHANNELED SPELLS
   // ============================================================================
   {
-    id: TALENTS.ARCANE_MISSILES_TALENT.id,
-    type: EventType.Cast,
+    spell: TALENTS.ARCANE_MISSILES_TALENT.id,
+    parentType: EventType.Cast,
     links: [
       LinkPatterns.damage({
         id: SPELLS.ARCANE_MISSILES_DAMAGE.id,
@@ -60,8 +60,8 @@ const EVENT_LINKS = createEventLinks(
   },
 
   {
-    id: TALENTS.SHIFTING_POWER_TALENT.id,
-    type: EventType.Cast,
+    spell: TALENTS.SHIFTING_POWER_TALENT.id,
+    parentType: EventType.Cast,
     links: [
       LinkPatterns.cast({
         id: SPELLS.SHIFTING_POWER_TICK.id,
@@ -75,8 +75,8 @@ const EVENT_LINKS = createEventLinks(
   // ARCANE ORB
   // ============================================================================
   {
-    id: SPELLS.ARCANE_ORB.id,
-    type: EventType.Cast,
+    spell: SPELLS.ARCANE_ORB.id,
+    parentType: EventType.Cast,
     links: [
       LinkPatterns.damage({
         id: SPELLS.ARCANE_ORB_DAMAGE.id,
@@ -92,8 +92,8 @@ const EVENT_LINKS = createEventLinks(
   // MAJOR COOLDOWNS - ARCANE SURGE
   // ============================================================================
   {
-    id: TALENTS.ARCANE_SURGE_TALENT.id,
-    type: EventType.Cast,
+    spell: TALENTS.ARCANE_SURGE_TALENT.id,
+    parentType: EventType.Cast,
     links: [LinkPatterns.damage({ maxLinks: 1, anyTarget: true })],
   },
 
@@ -101,8 +101,8 @@ const EVENT_LINKS = createEventLinks(
   // MAJOR COOLDOWNS - TOUCH OF THE MAGI
   // ============================================================================
   {
-    id: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id,
-    type: EventType.Cast,
+    spell: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id,
+    parentType: EventType.Cast,
     links: [
       LinkPatterns.applyDebuff({
         id: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
@@ -124,8 +124,8 @@ const EVENT_LINKS = createEventLinks(
   },
 
   {
-    id: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
-    type: EventType.ApplyDebuff,
+    spell: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
+    parentType: EventType.ApplyDebuff,
     links: [
       LinkPatterns.removeDebuff({ forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
       LinkPatterns.energize({ id: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id, anyTarget: true }),
@@ -166,8 +166,8 @@ const EVENT_LINKS = createEventLinks(
   // PROC BUFFS - CLEARCASTING
   // ============================================================================
   {
-    id: SPELLS.CLEARCASTING_ARCANE.id,
-    type: [EventType.ApplyBuff, EventType.ApplyBuffStack],
+    spell: SPELLS.CLEARCASTING_ARCANE.id,
+    parentType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
     reverseRelation: EventRelations.APPLY_BUFF,
     links: [
       LinkPatterns.removeBuff({
@@ -190,8 +190,8 @@ const EVENT_LINKS = createEventLinks(
   // PROC BUFFS - NETHER PRECISION
   // ============================================================================
   {
-    id: SPELLS.NETHER_PRECISION_BUFF.id,
-    type: EventType.ApplyBuff,
+    spell: SPELLS.NETHER_PRECISION_BUFF.id,
+    parentType: EventType.ApplyBuff,
     links: [
       LinkPatterns.removeBuff({
         type: [EventType.RemoveBuff, EventType.RefreshBuff],
@@ -216,8 +216,8 @@ const EVENT_LINKS = createEventLinks(
   },
 
   {
-    id: SPELLS.NETHER_PRECISION_BUFF.id,
-    type: EventType.RefreshBuff,
+    spell: SPELLS.NETHER_PRECISION_BUFF.id,
+    parentType: EventType.RefreshBuff,
     links: [LinkPatterns.removeBuff({ forwardBuffer: 11000, maxLinks: 1, anyTarget: true })],
   },
 
@@ -225,8 +225,8 @@ const EVENT_LINKS = createEventLinks(
   // COOLDOWNS - PRESENCE OF MIND
   // ============================================================================
   {
-    id: TALENTS.PRESENCE_OF_MIND_TALENT.id,
-    type: EventType.Cast,
+    spell: TALENTS.PRESENCE_OF_MIND_TALENT.id,
+    parentType: EventType.Cast,
     links: [
       LinkPatterns.applyBuff(),
       LinkPatterns.consumed({
@@ -249,8 +249,8 @@ const EVENT_LINKS = createEventLinks(
   },
 
   {
-    id: TALENTS.PRESENCE_OF_MIND_TALENT.id,
-    type: EventType.RemoveBuff,
+    spell: TALENTS.PRESENCE_OF_MIND_TALENT.id,
+    parentType: EventType.RemoveBuff,
     links: [
       LinkPatterns.removeDebuff({
         id: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
@@ -266,8 +266,8 @@ const EVENT_LINKS = createEventLinks(
   // TALENT BUFFS
   // ============================================================================
   {
-    id: SPELLS.BURDEN_OF_POWER_BUFF.id,
-    type: EventType.RemoveBuff,
+    spell: SPELLS.BURDEN_OF_POWER_BUFF.id,
+    parentType: EventType.RemoveBuff,
     links: [
       LinkPatterns.consumed({
         id: [SPELLS.ARCANE_BLAST.id, SPELLS.ARCANE_BARRAGE.id],
@@ -278,8 +278,8 @@ const EVENT_LINKS = createEventLinks(
   },
 
   {
-    id: SPELLS.SIPHON_STORM_BUFF.id,
-    type: EventType.ApplyBuff,
+    spell: SPELLS.SIPHON_STORM_BUFF.id,
+    parentType: EventType.ApplyBuff,
     links: [
       LinkPatterns.removeBuff({ forwardBuffer: 25000, maxLinks: 1, anyTarget: true }),
       LinkPatterns.damage({

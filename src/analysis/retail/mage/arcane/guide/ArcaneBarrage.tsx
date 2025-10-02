@@ -20,7 +20,6 @@ class ArcaneBarrageGuide extends Analyzer {
   isSunfury: boolean = this.selectedCombatant.hasTalent(TALENTS.MEMORY_OF_ALAR_TALENT);
   isSpellslinger: boolean = this.selectedCombatant.hasTalent(TALENTS.SPLINTERSTORM_TALENT);
 
-  // Thresholds and Settings
   private readonly MAX_ARCANE_CHARGES = 4;
   private readonly LOW_MANA_THRESHOLD = 0.3;
   private readonly LOW_HEALTH_THRESHOLD = 0.35;
@@ -52,7 +51,6 @@ class ArcaneBarrageGuide extends Analyzer {
       return evaluateEvent(cast.cast.timestamp, cast, this, {
         actionName: 'Arcane Barrage',
 
-        // FAIL: Critical requirements not met
         failConditions: [
           {
             name: 'insufficientCharges',
@@ -61,7 +59,6 @@ class ArcaneBarrageGuide extends Analyzer {
           },
         ],
 
-        // PERFECT: Optimal usage patterns
         perfectConditions: [
           {
             name: 'precastSurge',
@@ -90,7 +87,6 @@ class ArcaneBarrageGuide extends Analyzer {
           },
         ],
 
-        // GOOD: Acceptable usage patterns
         goodConditions: [
           {
             name: 'lowMana',
@@ -104,7 +100,6 @@ class ArcaneBarrageGuide extends Analyzer {
           },
         ],
 
-        // OK: Understandable but suboptimal
         okConditions: [
           {
             name: 'lowHealth',
@@ -118,7 +113,6 @@ class ArcaneBarrageGuide extends Analyzer {
           },
         ],
 
-        // Default if requirements met but no good reasons
         defaultPerformance: QualitativePerformance.Fail,
         defaultMessage: 'Wasted Arcane Charges - no clear benefit to casting Barrage',
       });

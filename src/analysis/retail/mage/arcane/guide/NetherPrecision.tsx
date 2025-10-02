@@ -26,7 +26,6 @@ class NetherPrecisionGuide extends Analyzer {
       return evaluateEvent(np.applied, np, this, {
         actionName: 'Nether Precision',
 
-        // FAIL: Critical mistakes
         failConditions: [
           {
             name: 'overwritten',
@@ -41,7 +40,6 @@ class NetherPrecisionGuide extends Analyzer {
           },
         ],
 
-        // PERFECT: Used all stacks without overwriting
         perfectConditions: [
           {
             name: 'perfectUsage',
@@ -50,7 +48,6 @@ class NetherPrecisionGuide extends Analyzer {
           },
         ],
 
-        // OK: Lost stacks at fight end (understandable)
         okConditions: [
           {
             name: 'fightEndLoss',

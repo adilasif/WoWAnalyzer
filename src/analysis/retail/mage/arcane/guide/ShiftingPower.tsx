@@ -121,7 +121,6 @@ class ShiftingPowerGuide extends Analyzer {
         return {
           actionName: 'Shifting Power',
 
-          // FAIL: Critical issues that make the cast bad
           failConditions: [
             {
               name: 'burnPhaseUsage',
@@ -151,7 +150,6 @@ class ShiftingPowerGuide extends Analyzer {
             },
           ],
 
-          // PERFECT: Optimal usage
           perfectConditions: [
             {
               name: 'perfectTiming',
@@ -161,7 +159,6 @@ class ShiftingPowerGuide extends Analyzer {
             },
           ],
 
-          // GOOD: Acceptable usage patterns
           goodConditions: [
             {
               name: 'goodConserveUsage',
@@ -181,7 +178,6 @@ class ShiftingPowerGuide extends Analyzer {
             },
           ],
 
-          // OK: Understandable but suboptimal
           okConditions: [
             {
               name: 'conservePhase',

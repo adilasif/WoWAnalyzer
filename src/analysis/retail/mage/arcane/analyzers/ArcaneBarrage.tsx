@@ -1,19 +1,3 @@
-/**
- * Arcane Barrage Analyzer
- *
- * Tracks Arcane Barrage casts with comprehensive context data for
- * performance evaluation in guides.
- *
- * Events tracked:
- * - Arcane Barrage casts (main data collection)
- * - Arcane Tempo buff applications (for timing calculations)
- *
- * Data collected:
- * - Mana percentage, Arcane Charges, buff states
- * - Cooldown status, target information, damage events
- * - Tempo timing, Nether Precision stacks
- */
-
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
   CastEvent,
@@ -104,14 +88,6 @@ export default class ArcaneBarrage extends Analyzer {
     this.arcaneChargeTracker.clearCharges(event);
   }
 
-  // =================================================================
-  // HELPER METHODS
-  // =================================================================
-
-  /**
-   * Get Arcane Tempo remaining duration.
-   * This is specific to ArcaneBarrage because it tracks lastTempoApply internally.
-   */
   private getTempoData(event: CastEvent): { remaining: number | undefined } {
     const hasTempo = this.selectedCombatant.hasBuff(SPELLS.ARCANE_TEMPO_BUFF.id);
     return {

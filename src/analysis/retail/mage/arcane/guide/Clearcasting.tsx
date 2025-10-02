@@ -21,7 +21,6 @@ class ClearcastingGuide extends Analyzer {
       (cc: ClearcastingProc) => ({
         actionName: 'Clearcasting',
 
-        // FAIL: Letting procs expire
         failConditions: [
           {
             name: 'expired',
@@ -30,7 +29,6 @@ class ClearcastingGuide extends Analyzer {
           },
         ],
 
-        // PERFECT: Used before expiring
         perfectConditions: [
           {
             name: 'usedBeforeExpiry',

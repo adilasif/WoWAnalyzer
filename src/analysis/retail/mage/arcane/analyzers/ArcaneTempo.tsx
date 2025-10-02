@@ -18,15 +18,8 @@ import { formatDuration, formatPercentage } from 'common/format';
 import TalentSpellText from 'parser/ui/TalentSpellText';
 import HasteIcon from 'interface/icons/Haste';
 
-/**
- * **Arcane Tempo**
- * Spec Talent
- *
- * Consuming Arcane Charges increases your Haste by 2% for 12 sec, stacks up to 5 times.
- */
 class ArcaneTempo extends Analyzer {
-  /** Array keeps track of how much time was spent at each Arcane Tempo stack count.
-   *  Index is stack count, value is accumulated time at that stack count */
+  /** Time spent at each stack count (index = stack count) */
   timeAtStackCount: number[];
   lastStackChangeTime: number = this.owner.fight.start_time;
   lastStackCount = 0;

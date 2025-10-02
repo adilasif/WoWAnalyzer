@@ -14,8 +14,8 @@ import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 import ArcaneSurge, { ArcaneSurgeCast } from '../analyzers/ArcaneSurge';
 
 const ARCANE_CHARGE_MAX_STACKS = 4;
-const OPENER_DURATION = 20000; // 20 seconds
-const SHORT_FIGHT_DURATION = 60000; // 1 minute
+const OPENER_DURATION = 20000;
+const SHORT_FIGHT_DURATION = 60000;
 
 class ArcaneSurgeGuide extends Analyzer {
   static dependencies = {
@@ -28,7 +28,6 @@ class ArcaneSurgeGuide extends Analyzer {
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
   get arcaneSurgeData() {
-    // Transform ArcaneSurgeCast to match evaluateEvents expected format
     const transformedCasts = this.arcaneSurge.surgeCasts.map((cast) => ({
       ordinal: cast.ordinal,
       timestamp: cast.cast,
@@ -56,7 +55,6 @@ class ArcaneSurgeGuide extends Analyzer {
         return {
           actionName: 'Arcane Surge',
 
-          // FAIL: Critical requirements not met
           failConditions: [
             {
               name: 'insufficientCharges',
@@ -67,7 +65,6 @@ class ArcaneSurgeGuide extends Analyzer {
             },
           ],
 
-          // PERFECT: Optimal cooldown usage with all buffs
           perfectConditions: [
             {
               name: 'allBuffsCombo',
@@ -88,7 +85,6 @@ class ArcaneSurgeGuide extends Analyzer {
             },
           ],
 
-          // GOOD: Acceptable usage patterns
           goodConditions: [
             {
               name: 'maxChargesGood',
@@ -102,7 +98,6 @@ class ArcaneSurgeGuide extends Analyzer {
             },
           ],
 
-          // OK: Basic usage without optimization
           okConditions: [
             {
               name: 'basicUsage',
@@ -216,7 +211,6 @@ class ArcaneSurgeGuide extends Analyzer {
       </>
     );
 
-    // Use the unified approach - no more duplication!
     return new GuideBuilder(TALENTS.ARCANE_SURGE_TALENT, 'Arcane Surge')
       .explanation(explanation)
       .addExpandableBreakdown({

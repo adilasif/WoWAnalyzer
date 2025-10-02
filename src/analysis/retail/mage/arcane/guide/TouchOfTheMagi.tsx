@@ -89,7 +89,6 @@ class TouchOfTheMagiGuide extends Analyzer {
         return {
           actionName: 'Touch of the Magi',
 
-          // FAIL: Critical mistakes
           failConditions: [
             {
               name: 'wrongCharges',
@@ -103,7 +102,6 @@ class TouchOfTheMagiGuide extends Analyzer {
             },
           ],
 
-          // PERFECT: Optimal usage
           perfectConditions: [
             {
               name: 'perfectActiveTime',
@@ -112,7 +110,6 @@ class TouchOfTheMagiGuide extends Analyzer {
             },
           ],
 
-          // GOOD: Acceptable usage
           goodConditions: [
             {
               name: 'goodActiveTime',
@@ -121,7 +118,6 @@ class TouchOfTheMagiGuide extends Analyzer {
             },
           ],
 
-          // OK: Basic acceptable usage
           okConditions: [
             {
               name: 'correctChargesOk',
@@ -207,7 +203,6 @@ class TouchOfTheMagiGuide extends Analyzer {
       </>
     );
 
-    // Use the unified evaluation approach with expandable breakdown
     return new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT, 'Touch of the Magi')
       .explanation(explanation)
       .addStatistic({

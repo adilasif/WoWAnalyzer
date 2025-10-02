@@ -6,7 +6,7 @@ import Analyzer from 'parser/core/Analyzer';
 import { evaluateEvent } from '../../shared/guide';
 
 const AOE_TARGET_THRESHOLD = 4;
-const TOUCH_DURATION_THRESHOLD = 3000; // 3 seconds
+const TOUCH_DURATION_THRESHOLD = 3000;
 import { GuideBuilder } from '../../shared/guide/GuideBuilder';
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
 import Supernova from '../../shared/Supernova';
@@ -37,7 +37,6 @@ class SupernovaGuide extends Analyzer {
       return evaluateEvent(cast.timestamp, cast, this, {
         actionName: 'Supernova',
 
-        // FAIL: Critical issues
         failConditions: [
           {
             name: 'touchTimingFail',
@@ -62,7 +61,6 @@ class SupernovaGuide extends Analyzer {
           },
         ],
 
-        // PERFECT: Optimal usage
         perfectConditions: [
           {
             name: 'perfectSingleTarget',
@@ -78,7 +76,6 @@ class SupernovaGuide extends Analyzer {
           },
         ],
 
-        // GOOD: Acceptable usage patterns
         goodConditions: [
           {
             name: 'goodSingleTarget',
@@ -102,7 +99,6 @@ class SupernovaGuide extends Analyzer {
           },
         ],
 
-        // OK: Understandable but suboptimal
         okConditions: [
           {
             name: 'standardUsage',

@@ -55,10 +55,6 @@ class ArcaneOrb extends Analyzer {
     return new Set(damageEvents.map((d) => encodeEventTargetString(d))).size;
   }
 
-  /**
-   * Get Arcane Charges before the Orb charge gain.
-   * HELPER REASON: Complex calculation with filtering and conditional logic.
-   */
   private getChargesBefore(energize: ResourceChangeEvent[], event: CastEvent): number {
     const chargeGained =
       energize && energize.filter((e) => e.timestamp < event.timestamp).length > 0 ? 1 : 0;

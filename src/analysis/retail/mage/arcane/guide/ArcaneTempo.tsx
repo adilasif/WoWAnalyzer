@@ -37,8 +37,6 @@ class ArcaneTempoGuide extends Analyzer {
     const buffHistory = this.selectedCombatant.getBuffHistory(SPELLS.ARCANE_TEMPO_BUFF.id);
     const overallUptimes = getUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
     const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
-
-    // Evaluate Arcane Tempo performance using universal template
     const tempoData = {
       uptime: this.arcaneTempo.buffUptimePercent,
       averageStacks: this.arcaneTempo.averageStacks,
@@ -50,7 +48,6 @@ class ArcaneTempoGuide extends Analyzer {
     const tempoEntry = evaluateEvent(tempoData.timestamp, tempoData, this, {
       actionName: 'Arcane Tempo',
 
-      // PERFECT: Excellent uptime
       perfectConditions: [
         {
           name: 'excellentUptime',
@@ -59,7 +56,6 @@ class ArcaneTempoGuide extends Analyzer {
         },
       ],
 
-      // GOOD: Acceptable uptime
       goodConditions: [
         {
           name: 'goodUptime',
@@ -68,7 +64,6 @@ class ArcaneTempoGuide extends Analyzer {
         },
       ],
 
-      // OK: Minimum acceptable uptime
       okConditions: [
         {
           name: 'minimumUptime',
@@ -77,7 +72,6 @@ class ArcaneTempoGuide extends Analyzer {
         },
       ],
 
-      // Default if below minimum
       defaultPerformance: QualitativePerformance.Fail,
       defaultMessage: `Very low uptime (${uptimePercent}%) - need to maintain Arcane Tempo better`,
     });

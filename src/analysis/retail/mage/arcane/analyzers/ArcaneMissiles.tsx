@@ -47,10 +47,6 @@ export default class ArcaneMissiles extends Analyzer {
     });
   }
 
-  /**
-   * Get Clearcasting buff data.
-   * HELPER REASON: Needs buff check and stack comparison logic.
-   */
   private getClearcastingData(): { capped: boolean; stacks: number } {
     const buff = this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id);
     if (!buff) {

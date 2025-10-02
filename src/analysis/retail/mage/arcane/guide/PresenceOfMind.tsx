@@ -29,7 +29,6 @@ class PresenceOfMindGuide extends Analyzer {
       return evaluateEvent(cast.cast.timestamp, cast, this, {
         actionName: 'Presence of Mind',
 
-        // FAIL: Critical issues
         failConditions: [
           {
             name: 'touchTimingFail',
@@ -51,7 +50,6 @@ class PresenceOfMindGuide extends Analyzer {
           },
         ],
 
-        // PERFECT: Optimal usage
         perfectConditions: [
           {
             name: 'perfectSingleTarget',
@@ -68,7 +66,6 @@ class PresenceOfMindGuide extends Analyzer {
           },
         ],
 
-        // GOOD: Acceptable usage
         goodConditions: [
           {
             name: 'goodSingleTarget',
@@ -89,7 +86,6 @@ class PresenceOfMindGuide extends Analyzer {
           },
         ],
 
-        // OK: Understandable but suboptimal
         okConditions: [
           {
             name: 'informationalUsage',
