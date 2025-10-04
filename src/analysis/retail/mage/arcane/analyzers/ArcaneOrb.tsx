@@ -9,7 +9,6 @@ import Events, {
   ResourceChangeEvent,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
@@ -18,10 +17,8 @@ import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 class ArcaneOrb extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    abilityTracker: AbilityTracker,
     arcaneChargeTracker: ArcaneChargeTracker,
   };
-  protected abilityTracker!: AbilityTracker;
   protected arcaneChargeTracker!: ArcaneChargeTracker;
 
   orbCasts: {

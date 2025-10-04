@@ -12,8 +12,6 @@ import Events, {
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
-import Enemies from 'parser/shared/modules/Enemies';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import AlwaysBeCasting from '../core/AlwaysBeCasting';
 import { EventRelations } from '../../shared/helpers';
 
@@ -22,13 +20,9 @@ export default class TouchOfTheMagi extends MageAnalyzer {
     ...MageAnalyzer.dependencies,
     chargeTracker: ArcaneChargeTracker,
     alwaysBeCasting: AlwaysBeCasting,
-    abilityTracker: AbilityTracker,
-    enemies: Enemies,
   };
   protected chargeTracker!: ArcaneChargeTracker;
   protected alwaysBeCasting!: AlwaysBeCasting;
-  protected abilityTracker!: AbilityTracker;
-  protected enemies!: Enemies;
 
   hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);

@@ -4,7 +4,6 @@ import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { DamageEvent } from 'parser/core/Events';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { StatisticBuilder } from '../../shared/helpers';
 
@@ -14,9 +13,7 @@ const DAMAGE_BONUS = 1;
 class ArcaneBombardment extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    abilityTracker: AbilityTracker,
   };
-  protected abilityTracker!: AbilityTracker;
 
   bonusDamage = 0;
 

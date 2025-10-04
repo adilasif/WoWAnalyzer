@@ -4,16 +4,13 @@ import { SpellIcon } from 'interface';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, { CastEvent, DamageEvent, GetRelatedEvents } from 'parser/core/Events';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 
 class ArcaneEcho extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    abilityTracker: AbilityTracker,
   };
-  protected abilityTracker!: AbilityTracker;
 
   arcaneEchoes: { touchMagiCast: number; damageEvents?: DamageEvent[]; totalDamage: number }[] = [];
 

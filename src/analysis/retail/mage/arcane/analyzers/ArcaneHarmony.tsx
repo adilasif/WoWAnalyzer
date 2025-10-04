@@ -4,7 +4,6 @@ import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { CastEvent, DamageEvent } from 'parser/core/Events';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { StatisticBuilder } from '../../shared/helpers';
 
@@ -13,9 +12,7 @@ const DAMAGE_BONUS_PER_STACK = 0.05;
 class ArcaneHarmony extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    abilityTracker: AbilityTracker,
   };
-  protected abilityTracker!: AbilityTracker;
 
   bonusDamage = 0;
   stacks = 0;

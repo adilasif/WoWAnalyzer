@@ -3,7 +3,6 @@ import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, { CastEvent } from 'parser/core/Events';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { getManaPercentage } from '../../shared/helpers';
@@ -11,10 +10,8 @@ import { getManaPercentage } from '../../shared/helpers';
 export default class ArcaneSurge extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    abilityTracker: AbilityTracker,
     chargeTracker: ArcaneChargeTracker,
   };
-  protected abilityTracker!: AbilityTracker;
   protected chargeTracker!: ArcaneChargeTracker;
 
   hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);

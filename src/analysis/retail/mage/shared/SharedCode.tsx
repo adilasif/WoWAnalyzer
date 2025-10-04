@@ -2,17 +2,12 @@ import SPELLS from 'common/SPELLS';
 import MageAnalyzer from './MageAnalyzer';
 import { SpellInfo } from 'parser/core/EventFilter';
 import { HasTarget, HasHitpoints, EventType, CastEvent, AnyEvent } from 'parser/core/Events';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import Enemies, { encodeTargetString } from 'parser/shared/modules/Enemies';
+import { encodeTargetString } from 'parser/shared/modules/Enemies';
 
 class SharedCode extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    abilityTracker: AbilityTracker,
-    enemies: Enemies,
   };
-  protected abilityTracker!: AbilityTracker;
-  protected enemies!: Enemies;
 
   /**
    * @param cast the cast event that should be evaluated

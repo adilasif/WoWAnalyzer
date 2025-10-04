@@ -3,18 +3,12 @@ import TALENTS from 'common/TALENTS/mage';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import MageAnalyzer from './MageAnalyzer';
 import Events, { CastEvent, GetRelatedEvents } from 'parser/core/Events';
-import Enemies from 'parser/shared/modules/Enemies';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import { TOUCH_OF_MAGI_DURATION } from './constants';
 
 export default class Supernova extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    enemies: Enemies,
-    abilityTracker: AbilityTracker,
   };
-  protected enemies!: Enemies;
-  protected abilityTracker!: AbilityTracker;
 
   hasUnerringProficiency: boolean = this.selectedCombatant.hasTalent(
     TALENTS.UNERRING_PROFICIENCY_TALENT,

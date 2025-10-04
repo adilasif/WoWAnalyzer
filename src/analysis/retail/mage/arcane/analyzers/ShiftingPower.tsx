@@ -2,7 +2,6 @@ import TALENTS from 'common/TALENTS/mage';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, { CastEvent, GetRelatedEvents } from 'parser/core/Events';
-import Enemies from 'parser/shared/modules/Enemies';
 import SPELLS from 'common/SPELLS';
 import { EventRelations } from '../../shared/helpers';
 
@@ -11,10 +10,7 @@ export const MAX_TICKS = 4;
 export default class ShiftingPowerArcane extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
-    enemies: Enemies,
   };
-
-  protected enemies!: Enemies;
 
   hasArcaneSurge: boolean = this.selectedCombatant.hasTalent(TALENTS.ARCANE_SURGE_TALENT);
   hasTouchOfTheMagi: boolean = this.selectedCombatant.hasTalent(TALENTS.TOUCH_OF_THE_MAGI_TALENT);

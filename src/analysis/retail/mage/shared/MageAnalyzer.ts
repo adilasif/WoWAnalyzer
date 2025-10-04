@@ -1,6 +1,8 @@
 import Analyzer from 'parser/core/Analyzer';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import EventHistory from 'parser/shared/modules/EventHistory';
+import AbilityTracker from 'parser/shared/modules/AbilityTracker';
+import Enemies from 'parser/shared/modules/Enemies';
 import { CastEvent, EventType } from 'parser/core/Events';
 
 /**
@@ -9,13 +11,14 @@ import { CastEvent, EventType } from 'parser/core/Events';
  * cooldowns, and other common patterns.
  *
  * All helper methods automatically access the required dependencies (selectedCombatant,
- * spellUsable, etc.) so you don't need to pass them manually.
+ * spellUsable, abilityTracker, enemies, etc.) so you don't need to pass them manually.
  *
  * @example
  * class MyAnalyzer extends MageAnalyzer {
  *   onCast(event: CastEvent) {
  *     const stacks = this.getBuffStacks(SPELLS.NETHER_PRECISION_BUFF.id);
  *     const cd = this.getCooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id);
+ *     const casts = this.abilityTracker.getAbility(SPELLS.FIREBALL.id).casts;
  *   }
  * }
  */
@@ -24,10 +27,14 @@ export default class MageAnalyzer extends Analyzer {
     ...Analyzer.dependencies,
     spellUsable: SpellUsable,
     eventHistory: EventHistory,
+    abilityTracker: AbilityTracker,
+    enemies: Enemies,
   };
 
   protected spellUsable!: SpellUsable;
   protected eventHistory!: EventHistory;
+  protected abilityTracker!: AbilityTracker;
+  protected enemies!: Enemies;
 
   // =============================================================================
   // BUFF HELPERS
