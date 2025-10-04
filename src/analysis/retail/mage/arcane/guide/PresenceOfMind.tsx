@@ -5,10 +5,10 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import Analyzer from 'parser/core/Analyzer';
 import { evaluateEvent } from '../../shared/components';
+import { GuideBuilder } from '../../shared/builders';
 
 const AOE_TARGET_THRESHOLD = 4;
 const CAST_DELAY_THRESHOLD = 500; // 500ms
-import { GuideBuilder } from '../../shared/components';
 import PresenceOfMind from '../analyzers/PresenceOfMind';
 
 class PresenceOfMindGuide extends Analyzer {

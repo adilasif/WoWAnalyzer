@@ -51,7 +51,7 @@ import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../arcane/Guide';
 import UptimeStackBar from 'parser/ui/UptimeStackBar';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Spell from 'common/SPELLS/Spell';
-import { ExpandableConfig } from './GuideEvaluation';
+import { ExpandableConfig } from '../components/GuideEvaluation';
 
 /**
  * Main fluent builder class for creating guide subsections
@@ -487,11 +487,17 @@ export function generateExpandableBreakdown(config: {
     const expandableConfig = config.expandableConfig;
 
     const timestamp = expandableConfig.getTimestamp(cast);
-    const checklistItems = expandableConfig.checklistItems.map((item) => ({
-      label: item.label,
-      result: <PassFailCheckmark pass={item.getResult(cast, evaluatedEntry)} />,
-      details: item.getDetails(cast),
-    }));
+    const checklistItems = expandableConfig.checklistItems.map(
+      (item: {
+        label: JSX.Element;
+        getResult: (data: unknown, evaluatedData: BoxRowEntry) => boolean;
+        getDetails: (data: unknown) => string;
+      }) => ({
+        label: item.label,
+        result: <PassFailCheckmark pass={item.getResult(cast, evaluatedEntry)} />,
+        details: item.getDetails(cast),
+      }),
+    );
 
     const header = (
       <>

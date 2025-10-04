@@ -4,7 +4,7 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
 import { evaluateEvent } from '../../shared/components';
-import { GuideBuilder } from '../../shared/components';
+import { GuideBuilder } from '../../shared/builders';
 import { ARCANE_TEMPO_MAX_STACKS } from '../../shared/constants';
 
 import ArcaneTempo from '../analyzers/ArcaneTempo';

@@ -1,3 +1,3 @@
-export { GuideBuilder } from './GuideBuilder';
+export { GuideBuilder, generateExpandableBreakdown } from './GuideBuilder';
 export { default as ChartBuilder, createChart } from './ChartBuilder';
 export { StatisticBuilder, DropdownTableBuilder } from './StatisticBuilder';

@@ -4,7 +4,7 @@ import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
 import { evaluateEvent } from '../../shared/components';
-import { GuideBuilder } from '../../shared/components';
+import { GuideBuilder } from '../../shared/builders';
 import Analyzer from 'parser/core/Analyzer';
 
 import ArcaneBarrage from '../analyzers/ArcaneBarrage';

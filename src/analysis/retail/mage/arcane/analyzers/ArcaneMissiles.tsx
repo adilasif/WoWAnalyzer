@@ -5,7 +5,7 @@ import Events, { CastEvent, GetRelatedEvents, DamageEvent, EventType } from 'par
 import { ARCANE_MISSILES_MAX_TICKS, CLEARCASTING_MAX_STACKS } from '../../shared';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import EventHistory from 'parser/shared/modules/EventHistory';
-import { EventRelations } from '../../shared/helpers';
+import { EventRelations, getBuffStacks, isBuffCapped } from '../../shared/helpers';
 
 export default class ArcaneMissiles extends Analyzer {
   static dependencies = {
@@ -32,7 +32,6 @@ export default class ArcaneMissiles extends Analyzer {
       event,
       EventRelations.DAMAGE,
     );
-    const clearcastingData = this.getClearcastingData();
 
     this.missileCasts.push({
       cast: event,
@@ -42,21 +41,14 @@ export default class ArcaneMissiles extends Analyzer {
       netherPrecision: this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id),
       arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
       clipped: damageTicks && damageTicks.length < ARCANE_MISSILES_MAX_TICKS,
-      // Complex values from helpers
-      clearcastingCapped: clearcastingData.capped,
-      clearcastingProcs: clearcastingData.stacks,
+      // Complex values from shared helpers
+      clearcastingCapped: isBuffCapped(
+        this.selectedCombatant,
+        SPELLS.CLEARCASTING_ARCANE.id,
+        CLEARCASTING_MAX_STACKS,
+      ), // ✅ Shared helper
+      clearcastingProcs: getBuffStacks(this.selectedCombatant, SPELLS.CLEARCASTING_ARCANE.id), // ✅ Shared helper
     });
-  }
-
-  private getClearcastingData(): { capped: boolean; stacks: number } {
-    const buff = this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id);
-    if (!buff) {
-      return { capped: false, stacks: 0 };
-    }
-    return {
-      capped: buff.stacks === CLEARCASTING_MAX_STACKS,
-      stacks: buff.stacks || 0,
-    };
   }
 
   onFightEnd() {

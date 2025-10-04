@@ -6,7 +6,7 @@ import { formatDurationMillisMinSec } from 'common/format';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import Analyzer from 'parser/core/Analyzer';
 import { evaluateEvent, evaluatePerformance } from '../../shared/components';
-import { GuideBuilder } from '../../shared/components';
+import { GuideBuilder } from '../../shared/builders';
 
 import ArcaneMissiles from '../analyzers/ArcaneMissiles';
 

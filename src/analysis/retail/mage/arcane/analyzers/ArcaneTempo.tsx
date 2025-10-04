@@ -94,7 +94,7 @@ class ArcaneTempo extends Analyzer {
   }
 
   statistic() {
-    const dropdown = new DropdownTableBuilder()
+    const dropdown = new DropdownTableBuilder<{ time: number; stacks: number }>()
       .column(
         'Haste-Bonus',
         (data) => `${formatPercentage(data.stacks * ARCANE_TEMPO_HASTE_PER_STACK, 0)}%`,

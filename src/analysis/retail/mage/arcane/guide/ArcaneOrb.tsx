@@ -4,7 +4,7 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import Analyzer from 'parser/core/Analyzer';
 import { evaluateEvents, evaluatePerformance } from '../../shared/components';
-import { GuideBuilder } from '../../shared/components';
+import { GuideBuilder } from '../../shared/builders';
 
 import ArcaneOrb from '../analyzers/ArcaneOrb';
 

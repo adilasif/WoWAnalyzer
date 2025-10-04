@@ -11,10 +11,9 @@ import {
   evaluateEvents,
   evaluatePerformance,
   createExpandableConfig,
-  generateExpandableBreakdown,
   ExpandableConfig,
 } from '../../shared/components';
-import { GuideBuilder } from '../../shared/components';
+import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 
 import TouchOfTheMagi, { TouchOfTheMagiCast } from '../analyzers/TouchOfTheMagi';
 

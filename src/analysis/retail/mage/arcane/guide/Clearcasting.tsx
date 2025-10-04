@@ -4,7 +4,7 @@ import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
 import { evaluateEvents } from '../../shared/components';
-import { GuideBuilder } from '../../shared/components';
+import { GuideBuilder } from '../../shared/builders';
 
 import Clearcasting, { ClearcastingProc } from '../analyzers/Clearcasting';
 

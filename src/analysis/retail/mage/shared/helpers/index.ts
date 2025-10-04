@@ -13,14 +13,11 @@ export {
   hasAnyBuff,
   hasAllBuffs,
   getBuffRemainingDuration,
+  isBuffCapped,
   // Cooldown helpers
   getCooldownRemaining,
   isSpellAvailable,
   isSpellOnCooldown,
-  // Fight context helpers
-  isDuringOpener,
-  isNearFightEnd,
-  getFightTimeRemaining,
 } from './eventHelpers';
 
 // Guide-related helpers

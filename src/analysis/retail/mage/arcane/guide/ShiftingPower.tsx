@@ -3,13 +3,8 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import Analyzer from 'parser/core/Analyzer';
-import {
-  evaluateEvents,
-  createExpandableConfig,
-  generateExpandableBreakdown,
-  ExpandableConfig,
-} from '../../shared/components';
-import { GuideBuilder } from '../../shared/components';
+import { evaluateEvents, createExpandableConfig, ExpandableConfig } from '../../shared/components';
+import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerCast } from '../analyzers/ShiftingPower';
 
 class ShiftingPowerGuide extends Analyzer {

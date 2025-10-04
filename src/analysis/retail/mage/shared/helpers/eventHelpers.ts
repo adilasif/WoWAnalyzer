@@ -177,6 +177,21 @@ export function getBuffRemainingDuration(
   return buff.end - currentTimestamp;
 }
 
+/**
+ * Check if a buff is at maximum stacks (capped).
+ *
+ * Used across: ArcaneMissiles (Clearcasting)
+ *
+ * @param combatant The combatant to check
+ * @param buffId The buff to check
+ * @param maxStacks The maximum number of stacks for this buff
+ * @returns true if buff is at max stacks, false otherwise
+ */
+export function isBuffCapped(combatant: Combatant, buffId: number, maxStacks: number): boolean {
+  const buff = combatant.getBuff(buffId);
+  return buff ? buff.stacks === maxStacks : false;
+}
+
 // =============================================================================
 // COOLDOWN HELPERS
 // =============================================================================
@@ -208,49 +223,4 @@ export function isSpellAvailable(spellUsable: SpellUsable, spellId: number): boo
  */
 export function isSpellOnCooldown(spellUsable: SpellUsable, spellId: number): boolean {
   return spellUsable.isOnCooldown(spellId);
-}
-
-// =============================================================================
-// FIGHT CONTEXT HELPERS
-// =============================================================================
-
-/**
- * Check if an event happened during the opener (first 20 seconds).
- *
- * @param eventTimestamp When the event occurred
- * @param fightStartTime When the fight started
- * @param openerDuration How long opener lasts (default 20s)
- * @returns true if event was during opener
- */
-export function isDuringOpener(
-  eventTimestamp: number,
-  fightStartTime: number,
-  openerDuration = 20000,
-): boolean {
-  return eventTimestamp - fightStartTime < openerDuration;
-}
-
-/**
- * Check if an event happened near the end of a fight.
- *
- * @param eventTimestamp When the event occurred
- * @param fightEndTime When the fight ended
- * @param threshold How many milliseconds before end counts as "near end" (default 60s)
- * @returns true if event was near fight end
- */
-export function isNearFightEnd(
-  eventTimestamp: number,
-  fightEndTime: number,
-  threshold = 60000,
-): boolean {
-  return fightEndTime - eventTimestamp < threshold;
-}
-
-/**
- * Get how much time is remaining in the fight.
- *
- * @returns Milliseconds remaining in fight
- */
-export function getFightTimeRemaining(eventTimestamp: number, fightEndTime: number): number {
-  return fightEndTime - eventTimestamp;
 }

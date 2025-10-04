@@ -5,7 +5,7 @@ import GeneralizedChart, {
   AnnotationEvent,
   DataSeries,
   ChartConfig,
-} from './GeneralizedChart';
+} from '../components/GeneralizedChart';
 
 /**
  * Simplified builder for creating charts with common patterns
