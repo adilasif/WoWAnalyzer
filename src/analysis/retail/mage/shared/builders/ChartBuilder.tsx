@@ -22,6 +22,8 @@ export class ChartBuilder {
   };
   private startTime: number;
   private endTime: number;
+  private shouldFetchBossHealth = false;
+  private reportCode?: string;
 
   constructor(startTime: number, endTime: number) {
     this.startTime = startTime;
@@ -245,15 +247,30 @@ export class ChartBuilder {
 
   /**
    * Add boss health tracking (common pattern for mana charts)
+   * Can be called in two ways:
+   * 1. With data array: `.addBossHealth(bossHealthData)` - adds static boss health data
+   * 2. With report code: `.addBossHealth(reportCode)` - fetches boss health on render
+   *
+   * @param dataOrReportCode Either boss health data points or a WCL report code
    */
-  addBossHealth(bossHealthData: Array<{ timestamp: number; value: number }>): ChartBuilder {
-    return this.addSeries({
-      name: 'Boss Health',
-      data: bossHealthData,
-      color: '#FF4444',
-      type: 'line',
-      opacity: 0.8,
-    });
+  addBossHealth(
+    dataOrReportCode: Array<{ timestamp: number; value: number }> | string,
+  ): ChartBuilder {
+    if (typeof dataOrReportCode === 'string') {
+      // Store report code for async fetching during build
+      this.shouldFetchBossHealth = true;
+      this.reportCode = dataOrReportCode;
+    } else {
+      // Add static boss health data immediately
+      return this.addSeries({
+        name: 'Boss Health',
+        data: dataOrReportCode,
+        color: '#FF4444',
+        type: 'line',
+        opacity: 0.8,
+      });
+    }
+    return this;
   }
 
   /**
@@ -302,7 +319,17 @@ export class ChartBuilder {
    * Get boss health data for the current fight
    *
    * ⚠️ **ASYNC METHOD**: This method fetches data from the WarcraftLogs API and must be awaited.
-   * Consider using `buildWithBossHealth()` instead if you want automatic async handling.
+   *
+   * **Recommended approach**: Use `.addBossHealth(reportCode)` instead for automatic async handling:
+   * ```tsx
+   * const chart = createChart(startTime, endTime)
+   *   .asManaChart()
+   *   .addManaTracking(manaUpdates)
+   *   .addBossHealth(this.owner.report.code)  // Fetches automatically!
+   *   .build();
+   * ```
+   *
+   * Only use this method directly if you need to manually control the async fetching.
    *
    * @param reportCode - The WarcraftLogs report code
    * @returns Promise that resolves to boss health data points, or null if fetch fails
@@ -378,8 +405,16 @@ export class ChartBuilder {
 
   /**
    * Build and return the chart component
+   * If boss health fetching was requested via `.addBossHealth(reportCode)`,
+   * this will return an async component that fetches the data on mount.
    */
   build(): JSX.Element {
+    // If boss health should be fetched, delegate to buildWithBossHealth
+    if (this.shouldFetchBossHealth && this.reportCode) {
+      return this.buildWithBossHealth(this.reportCode);
+    }
+
+    // Otherwise, build synchronously
     return (
       <GeneralizedChart
         series={this.series}
@@ -394,48 +429,38 @@ export class ChartBuilder {
   /**
    * Build chart with boss health data fetched automatically
    *
+   * ⚠️ **DEPRECATED**: Use `.addBossHealth(reportCode).build()` instead for a cleaner API.
+   *
+   * **Recommended approach:**
+   * ```tsx
+   * const chart = createChart(startTime, endTime)
+   *   .asManaChart()
+   *   .addManaTracking(manaUpdates)
+   *   .addBossHealth(this.owner.report.code)  // Pass report code here
+   *   .build();  // Then call build()
+   * ```
+   *
+   * This method still works but is kept for backwards compatibility.
+   * The new `.addBossHealth(reportCode)` pattern is preferred because:
+   * - More consistent with the builder pattern
+   * - Clearer API - boss health is just another data series
+   * - Same async behavior under the hood
+   *
    * ⚠️ **ASYNC WARNING**: This method returns a React component that performs asynchronous
    * data fetching on mount. The chart will show a "Loading chart data..." message while
    * fetching boss health data from the WCL API.
-   *
-   * **How it works:**
-   * 1. Returns a wrapper component that fetches boss health data on mount
-   * 2. Shows loading state while fetching
-   * 3. Rebuilds the chart with boss health data once loaded
-   * 4. If fetch fails or returns no data, builds chart without boss health
-   *
-   * **Usage example:**
-   * ```tsx
-   * // In a guide component
-   * const chart = new ChartBuilder(info.fightStart, info.fightEnd)
-   *   .addManaTracking(manaUpdates)
-   *   .addCastAnnotations(casts)
-   *   .asManaChart()
-   *   .buildWithBossHealth(info.report.code);
-   *
-   * return <div>{chart}</div>;
-   * ```
-   *
-   * **Alternative (synchronous):**
-   * If you need synchronous rendering or want to handle boss health fetching yourself,
-   * use `build()` instead and manage the async data externally:
-   * ```tsx
-   * const [bossHealth, setBossHealth] = useState<Array<{timestamp: number, value: number}>>();
-   *
-   * useEffect(() => {
-   *   builder.fetchBossHealth(reportCode).then(setBossHealth);
-   * }, []);
-   *
-   * const chart = builder
-   *   .addManaTracking(manaUpdates)
-   *   .addBossHealth(bossHealth || [])
-   *   .build();
-   * ```
    *
    * @param reportCode - The WarcraftLogs report code to fetch boss health data from
    * @returns A React component that handles async boss health loading and renders the chart
    */
   buildWithBossHealth(reportCode: string): JSX.Element {
+    // Capture current builder state
+    const currentSeries = [...this.series];
+    const currentAnnotations = [...this.annotations];
+    const currentConfig = { ...this.config };
+    const startTime = this.startTime;
+    const endTime = this.endTime;
+
     const ChartWithAsyncBossHealth: React.FC = () => {
       const [bossHealthData, setBossHealthData] = React.useState<Array<{
         timestamp: number;
@@ -445,9 +470,33 @@ export class ChartBuilder {
 
       React.useEffect(() => {
         const loadBossHealth = async () => {
-          const data = await this.fetchBossHealth(reportCode);
-          setBossHealthData(data);
-          setLoading(false);
+          try {
+            const fetchWcl = (await import('common/fetchWclApi')).default;
+            const json = await fetchWcl(`report/graph/resources/${reportCode}`, {
+              start: startTime,
+              end: endTime,
+              sourceclass: 'Boss',
+              hostility: 'Enemies',
+              abilityid: 1000,
+            });
+
+            const bossData = json as { series?: Array<{ data: Array<[number, number]> }> };
+
+            if (bossData?.series?.[0]?.data) {
+              const healthData = bossData.series[0].data.map((dataPoint: [number, number]) => ({
+                timestamp: dataPoint[0],
+                value: dataPoint[1],
+              }));
+              setBossHealthData(healthData);
+            } else {
+              setBossHealthData(null);
+            }
+          } catch (error) {
+            console.error('Failed to load boss health data:', error);
+            setBossHealthData(null);
+          } finally {
+            setLoading(false);
+          }
         };
         loadBossHealth();
       }, []);
@@ -456,17 +505,28 @@ export class ChartBuilder {
         return <div>Loading chart data...</div>;
       }
 
-      // Clone builder and add boss health if available
-      const finalBuilder = new ChartBuilder(this.startTime, this.endTime);
-      finalBuilder.series = [...this.series];
-      finalBuilder.annotations = [...this.annotations];
-      finalBuilder.config = { ...this.config };
-
-      if (bossHealthData) {
-        finalBuilder.addBossHealth(bossHealthData);
+      // Build final series array
+      const finalSeries = [...currentSeries];
+      if (bossHealthData && bossHealthData.length > 0) {
+        finalSeries.push({
+          name: 'Boss Health',
+          data: bossHealthData,
+          color: '#FF4444',
+          type: 'line' as const,
+          opacity: 0.8,
+          backgroundColor: '#FF444440',
+        });
       }
 
-      return finalBuilder.build();
+      return (
+        <GeneralizedChart
+          series={finalSeries}
+          annotations={currentAnnotations}
+          config={currentConfig}
+          startTime={startTime}
+          endTime={endTime}
+        />
+      );
     };
 
     return <ChartWithAsyncBossHealth />;

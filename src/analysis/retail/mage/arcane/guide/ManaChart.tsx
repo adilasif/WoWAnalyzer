@@ -1,10 +1,10 @@
 import React from 'react';
-import { SubSection } from 'interface/guide';
 import TALENTS from 'common/TALENTS/mage';
+import SPELLS from 'common/SPELLS';
+import { SpellLink } from 'interface';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { ArcaneManaExplanation } from '../../shared/components';
-import { createChart } from '../../shared/builders';
+import { ChartBuilder, GuideBuilder } from '../../shared/builders';
 import ManaValues from 'parser/shared/modules/ManaValues';
 import ArcaneSurge from '../analyzers/ArcaneSurge';
 import TouchOfTheMagi from '../analyzers/TouchOfTheMagi';
@@ -67,25 +67,58 @@ class ManaChart extends MageAnalyzer {
   }
 
   get guideSubsection(): JSX.Element {
+    const arcaneSurge = <SpellLink spell={TALENTS.ARCANE_SURGE_TALENT} />;
+    const touchOfTheMagi = <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />;
+    const evocation = <SpellLink spell={TALENTS.EVOCATION_TALENT} />;
+    const arcaneBarrage = <SpellLink spell={SPELLS.ARCANE_BARRAGE} />;
+
+    const explanation = (
+      <>
+        <div>
+          <b>Mana Management</b> is crucial for Arcane Mage performance. Proper mana usage involves:
+        </div>
+        <div>
+          <ul>
+            <li>
+              <strong>Burn Phase:</strong> Use {arcaneSurge} and {touchOfTheMagi} while maintaining
+              mana for the full duration. Don't go OOM during major cooldowns.
+            </li>
+            <li>
+              <strong>Conserve Phase:</strong> Use {arcaneBarrage} at 4 stacks to maintain mana
+              efficiency while waiting for cooldowns.
+            </li>
+            <li>
+              <strong>Mana Recovery:</strong> Use {evocation} to restore mana during conserve phases
+              or between burn windows.
+            </li>
+            <li>
+              <strong>Fight Ending:</strong> Aim to end fights with minimal mana remaining - unused
+              mana is wasted potential damage.
+            </li>
+          </ul>
+        </div>
+      </>
+    );
+
     const arcaneSurgeCasts = this.arcaneSurge.surgeCasts.map((cast) => ({
       timestamp: cast.cast,
       spell: TALENTS.ARCANE_SURGE_TALENT,
     }));
 
-    const chart = createChart(this.owner.fight.start_time, this.owner.fight.end_time)
+    const chart = new ChartBuilder(this.owner.fight.start_time, this.owner.fight.end_time)
       .asManaChart()
       .addManaTracking(this.manaUpdates)
       .addCastAnnotations(arcaneSurgeCasts, SPELL_COLORS.ARCANE_SURGE)
       .addCastAnnotations(this.evocationCasts, SPELL_COLORS.EVOCATION)
       .addLowResourceWarnings(this.manaUpdates, 0.1, 'Low Mana')
-      .buildWithBossHealth(this.owner.report.code);
+      .addBossHealth(this.owner.report.code)
+      .build();
 
-    return (
-      <SubSection title="Mana Management">
-        <ArcaneManaExplanation />
-        <div style={{ marginTop: '16px' }}>{chart}</div>
-      </SubSection>
-    );
+    return new GuideBuilder(TALENTS.EVOCATION_TALENT, 'Mana Management')
+      .explanation(explanation)
+      .verticalLayout()
+      .addChart(chart)
+      .build();
   }
 }
 

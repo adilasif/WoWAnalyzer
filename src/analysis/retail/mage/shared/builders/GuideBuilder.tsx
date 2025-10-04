@@ -36,9 +36,10 @@
 import React, { ReactNode } from 'react';
 import { formatPercentage } from 'common/format';
 import { SpellLink, SpellIcon, TooltipElement } from 'interface';
-import { PassFailCheckmark } from 'interface/guide';
+import { PassFailCheckmark, SubSection } from 'interface/guide';
 import { RoundedPanel } from 'interface/guide/components/GuideDivs';
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
+import Explanation from 'interface/guide/components/Explanation';
 import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBreakdown';
 import CooldownExpandable from 'interface/guide/components/CooldownExpandable';
 import { PerformanceBoxRow, BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
@@ -64,6 +65,7 @@ export class GuideBuilder {
   private spell: Spell;
   private explanationContent: JSX.Element = (<></>);
   private components: JSX.Element[] = [];
+  private explanationPercent?: number;
 
   /**
    * Create a new guide builder for the given spell
@@ -81,6 +83,24 @@ export class GuideBuilder {
    */
   explanation(explanation: JSX.Element): GuideBuilder {
     this.explanationContent = explanation;
+    return this;
+  }
+
+  /**
+   * Set the layout to stack vertically instead of side-by-side
+   * Useful for charts or other wide content that needs full width
+   */
+  verticalLayout(): GuideBuilder {
+    this.explanationPercent = undefined;
+    return this;
+  }
+
+  /**
+   * Set custom explanation width percentage (default is 30% side-by-side)
+   * @param percent Width percentage for explanation column (0-100)
+   */
+  setExplanationWidth(percent: number): GuideBuilder {
+    this.explanationPercent = percent;
     return this;
   }
 
@@ -207,6 +227,15 @@ export class GuideBuilder {
   }
 
   /**
+   * Add a chart (built with ChartBuilder)
+   * Convenience method for adding charts with proper spacing
+   */
+  addChart(chart: JSX.Element): GuideBuilder {
+    this.components.push(<div style={{ marginTop: '16px' }}>{chart}</div>);
+    return this;
+  }
+
+  /**
    * Add expandable cast timelines showing spells cast around key events
    * Perfect for showing what was cast during cooldown windows or special events
    *
@@ -310,7 +339,25 @@ export class GuideBuilder {
       </RoundedPanel>
     );
 
-    return explanationAndDataSubsection(explanation, data, GUIDE_CORE_EXPLANATION_PERCENT, title);
+    // If explanationPercent is undefined, use vertical layout
+    if (this.explanationPercent === undefined) {
+      return (
+        <SubSection title={title}>
+          <div style={{ marginBottom: '16px' }}>
+            <Explanation>{explanation}</Explanation>
+          </div>
+          {data}
+        </SubSection>
+      );
+    }
+
+    // Otherwise use side-by-side layout
+    return explanationAndDataSubsection(
+      explanation,
+      data,
+      this.explanationPercent ?? GUIDE_CORE_EXPLANATION_PERCENT,
+      title,
+    );
   }
 
   private createPerCastSummary(spell: Spell, castEntries: BoxRowEntry[]): JSX.Element {
