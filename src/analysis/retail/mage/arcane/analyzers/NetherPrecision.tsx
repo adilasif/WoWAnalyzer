@@ -14,7 +14,7 @@ import Events, {
 import { EventRelations } from '../../shared/helpers';
 
 export default class NetherPrecision extends MageAnalyzer {
-  netherPrecisionBuffs: NetherPrecisionProc[] = [];
+  netherPrecisionData: NetherPrecisionData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -37,7 +37,7 @@ export default class NetherPrecision extends MageAnalyzer {
     const damage: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
     const overwritten = removeBuff?.type === EventType.RefreshBuff;
 
-    this.netherPrecisionBuffs.push({
+    this.netherPrecisionData.push({
       applied: event.timestamp,
       removed: removeBuff?.timestamp || this.owner.fight.end_time,
       overwritten: overwritten,
@@ -48,7 +48,7 @@ export default class NetherPrecision extends MageAnalyzer {
   //ADD STATISTIC
 }
 
-export interface NetherPrecisionProc {
+export interface NetherPrecisionData {
   applied: number;
   removed: number;
   damageEvents?: DamageEvent[];

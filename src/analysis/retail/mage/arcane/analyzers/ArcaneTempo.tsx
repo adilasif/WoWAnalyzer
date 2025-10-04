@@ -19,7 +19,6 @@ import HasteIcon from 'interface/icons/Haste';
 import { DropdownTableBuilder, StatisticBuilder } from '../../shared/helpers';
 
 class ArcaneTempo extends MageAnalyzer {
-  /** Time spent at each stack count (index = stack count) */
   timeAtStackCount: number[];
   lastStackChangeTime: number = this.owner.fight.start_time;
   lastStackCount = 0;
@@ -96,13 +95,18 @@ class ArcaneTempo extends MageAnalyzer {
 
   statistic() {
     const dropdown = new DropdownTableBuilder<{ time: number; stacks: number }>()
-      .column(
-        'Haste-Bonus',
-        (data) => `${formatPercentage(data.stacks * ARCANE_TEMPO_HASTE_PER_STACK, 0)}%`,
-        true,
-      )
-      .column('Time (s)', (data) => formatDuration(data.time))
-      .column('Time (%)', (data) => `${formatPercentage(data.time / this.owner.fightDuration)}%`)
+      .column({
+        header: 'Haste-Bonus',
+        getValue: (data) => `${formatPercentage(data.stacks * ARCANE_TEMPO_HASTE_PER_STACK, 0)}%`,
+      })
+      .column({
+        header: 'Time (s)',
+        getValue: (data) => formatDuration(data.time),
+      })
+      .column({
+        header: 'Time (%)',
+        getValue: (data) => `${formatPercentage(data.time / this.owner.fightDuration)}%`,
+      })
       .data(
         this.timeAtStackCount.map((time, stacks) => ({
           time,

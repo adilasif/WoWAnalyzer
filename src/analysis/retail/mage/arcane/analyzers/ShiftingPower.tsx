@@ -16,7 +16,7 @@ export default class ShiftingPowerArcane extends MageAnalyzer {
   hasTouchOfTheMagi: boolean = this.selectedCombatant.hasTalent(TALENTS.TOUCH_OF_THE_MAGI_TALENT);
   hasEvocation: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
 
-  casts: ShiftingPowerCast[] = [];
+  shiftingPowerData: ShiftingPowerData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -28,7 +28,6 @@ export default class ShiftingPowerArcane extends MageAnalyzer {
   }
 
   onShiftingPower(event: CastEvent) {
-    const ordinal = this.casts.length + 1;
     const timestamp = event.timestamp;
     const ticks = GetRelatedEvents(event, EventRelations.TICK).length;
     const spellsReduced = {
@@ -42,8 +41,7 @@ export default class ShiftingPowerArcane extends MageAnalyzer {
       siphonStorm: this.selectedCombatant.hasBuff(SPELLS.SIPHON_STORM_BUFF.id),
     };
 
-    this.casts.push({
-      ordinal,
+    this.shiftingPowerData.push({
       timestamp,
       ticks,
       spellsReduced,
@@ -52,8 +50,7 @@ export default class ShiftingPowerArcane extends MageAnalyzer {
   }
 }
 
-export interface ShiftingPowerCast {
-  ordinal: number;
+export interface ShiftingPowerData {
   timestamp: number;
   ticks: number;
   spellsReduced: { arcaneSurge: boolean; touchOfTheMagi: boolean; evocation: boolean };

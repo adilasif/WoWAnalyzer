@@ -11,7 +11,14 @@
  * Use this.getBuffStacks(), this.getCooldownRemaining(), this.getCastsInTimeWindow(), etc.
  */
 
-import { CastEvent, HasTarget, HasHitpoints, GetRelatedEvents, AnyEvent } from 'parser/core/Events';
+import {
+  CastEvent,
+  DamageEvent,
+  HasTarget,
+  HasHitpoints,
+  GetRelatedEvents,
+  AnyEvent,
+} from 'parser/core/Events';
 import { encodeTargetString } from 'parser/shared/modules/Enemies';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 
@@ -61,17 +68,29 @@ export function getResourceMax(event: CastEvent, resourceType: { id: number }): 
 // =============================================================================
 
 /**
- * Get target health percentage from a cast event.
+ * Get target health percentage from a cast or damage event.
  *
- * ⚠️ PREREQUISITE: Requires CastLinkNormalizer to link cast to damage events
+ * For CastEvent: Requires CastLinkNormalizer to link cast to damage events.
  * The normalizer must link damage events to the cast using 'SpellDamage' relation.
  *
- * Handles complex logic of matching cast target to damage target and extracting health.
- * Used across: ArcaneBarrage, ArcaneOrb
+ * For DamageEvent: Directly extracts hitPoints if available.
  *
+ * Handles complex logic of matching cast target to damage target and extracting health.
+ * Used across: ArcaneBarrage, ArcaneOrb, ArcaneBombardment
+ *
+ * @param event CastEvent or DamageEvent to extract health from
  * @returns Target health percentage (0.0 to 1.0) or undefined if not available
  */
-export function getTargetHealthPercentage(event: CastEvent): number | undefined {
+export function getTargetHealthPercentage(event: CastEvent | DamageEvent): number | undefined {
+  // If it's already a damage event with hitPoints, use it directly
+  if (event.type === 'damage') {
+    if (!HasHitpoints(event)) {
+      return undefined;
+    }
+    return event.hitPoints / event.maxHitPoints;
+  }
+
+  // Otherwise treat as CastEvent and find linked damage
   // Get the target we cast at
   const castTarget = HasTarget(event) && encodeTargetString(event.targetID, event.targetInstance);
   if (!castTarget) {

@@ -6,7 +6,7 @@ import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvents } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
-import Clearcasting, { ClearcastingProc } from '../analyzers/Clearcasting';
+import Clearcasting, { ClearcastingData } from '../analyzers/Clearcasting';
 
 class ClearcastingGuide extends MageAnalyzer {
   static dependencies = { ...MageAnalyzer.dependencies, clearcasting: Clearcasting };
@@ -16,7 +16,7 @@ class ClearcastingGuide extends MageAnalyzer {
   get clearcastingData(): BoxRowEntry[] {
     return evaluateEvents(
       this.clearcasting.clearcastingProcs,
-      (cc: ClearcastingProc) => ({
+      (cc: ClearcastingData) => ({
         actionName: 'Clearcasting',
 
         failConditions: [

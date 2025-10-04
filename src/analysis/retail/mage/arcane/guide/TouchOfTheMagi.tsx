@@ -15,7 +15,7 @@ import {
 } from '../../shared/components';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 
-import TouchOfTheMagi, { TouchOfTheMagiCast } from '../analyzers/TouchOfTheMagi';
+import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
 
 const MAX_ARCANE_CHARGES = 4;
 const TOUCH_WINDOW_BUFFER_MS = 5000; // 5 seconds before and after
@@ -37,7 +37,7 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
     return createExpandableConfig({
       spell: TALENTS.TOUCH_OF_THE_MAGI_TALENT,
       formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
-      getTimestamp: (cast: unknown) => (cast as TouchOfTheMagiCast).applied,
+      getTimestamp: (cast: unknown) => (cast as TouchOfTheMagiData).applied,
       checklistItems: [
         {
           label: (
@@ -46,13 +46,13 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
             </>
           ),
           getResult: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiCast;
+            const touchCast = cast as TouchOfTheMagiData;
             const noCharges = touchCast.charges === 0;
             const maxCharges = touchCast.charges === MAX_ARCANE_CHARGES;
             return noCharges || (maxCharges && touchCast.refundBuff);
           },
           getDetails: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiCast;
+            const touchCast = cast as TouchOfTheMagiData;
             return `${touchCast.charges} charges ${touchCast.refundBuff ? '(Refund)' : ''}`;
           },
         },
@@ -63,19 +63,19 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
             </>
           ),
           getResult: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiCast;
+            const touchCast = cast as TouchOfTheMagiData;
             const activeTime = touchCast.activeTime || 0;
             const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
             return activeTimePerf !== QualitativePerformance.Fail;
           },
           getDetails: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiCast;
+            const touchCast = cast as TouchOfTheMagiData;
             return `${formatPercentage(touchCast.activeTime || 0, 1)}% active time`;
           },
         },
       ],
       getCastEvents: (cast: unknown) => {
-        const touchCast = cast as TouchOfTheMagiCast;
+        const touchCast = cast as TouchOfTheMagiData;
         return this.getCastsInTimeWindow({
           timestamp: touchCast.applied,
           beforeMs: TOUCH_WINDOW_BUFFER_MS,
@@ -88,8 +88,8 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
 
   get touchOfTheMagiData(): BoxRowEntry[] {
     return evaluateEvents(
-      this.touchOfTheMagi.touchCasts,
-      (cast: TouchOfTheMagiCast) => {
+      this.touchOfTheMagi.touchData,
+      (cast: TouchOfTheMagiData) => {
         const noCharges = cast.charges === 0;
         const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
         const activeTime = cast.activeTime || 0;
@@ -223,7 +223,7 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
       })
       .addExpandableBreakdown({
         castBreakdowns: generateExpandableBreakdown({
-          castData: this.touchOfTheMagi.touchCasts,
+          castData: this.touchOfTheMagi.touchData,
           evaluatedData: this.touchOfTheMagiData,
           expandableConfig: this.expandableConfig,
         }),

@@ -56,6 +56,21 @@ import { ExpandableConfig } from '../components/GuideEvaluation';
 import { CastEvent } from 'parser/core/Events';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import CastTimeline from 'interface/guide/components/CastTimeline';
+import { getUptimesFromBuffHistory } from 'parser/ui/UptimeBar';
+import { getStackUptimesFromBuffHistory } from 'parser/ui/UptimeStackBar';
+import type { default as Combatant } from 'parser/core/Combatant';
+
+/** Type for accessing fight timestamps and combatant data */
+export interface FightInfo {
+  owner: {
+    fight: {
+      start_time: number;
+      end_time: number;
+    };
+    currentTimestamp: number;
+  };
+  selectedCombatant: Combatant;
+}
 
 /**
  * Main fluent builder class for creating guide subsections
@@ -175,35 +190,115 @@ export class GuideBuilder {
   }
 
   /**
-   * Add buff stack uptime with multiple stack levels
+   * Add a buff stack uptime bar with performance tracking (simplified - auto-fetches buff history)
+   * Perfect for stacking buffs where maintaining high stacks is important
+   *
+   * @example
+   * new GuideBuilder(TALENTS.ARCANE_TEMPO_TALENT)
+   *   .addBuffStackUptimeFromSpell({
+   *     analyzer: this,
+   *     buffSpell: SPELLS.ARCANE_TEMPO_BUFF,
+   *     castData: [tempoEntry],
+   *     maxStacks: ARCANE_TEMPO_MAX_STACKS,
+   *   })
+   */
+  addBuffStackUptimeFromSpell(config: {
+    /** The analyzer instance (typically `this` from your guide) for accessing buff history */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    analyzer: any;
+    /** The buff spell to track */
+    buffSpell: Spell;
+    /** Cast performance entries to display above the bar */
+    castData: BoxRowEntry[];
+    /** Maximum stacks for the buff */
+    maxStacks: number;
+    /** Fight start timestamp (defaults to fight start) */
+    startTime?: number;
+    /** Fight end timestamp (defaults to fight end) */
+    endTime?: number;
+    /** Color for the stack bar (defaults to purple) */
+    barColor?: string;
+    /** Color for the background bar (defaults to gray) */
+    backgroundBarColor?: string;
+    /** Tooltip text for average stacks (has sensible default) */
+    tooltip?: string;
+  }): GuideBuilder {
+    // Get buff history and calculate uptimes
+    const buffHistory = config.analyzer.selectedCombatant.getBuffHistory(config.buffSpell.id);
+    const currentTimestamp = config.analyzer.owner.currentTimestamp;
+    const overallUptimes = getUptimesFromBuffHistory(buffHistory, currentTimestamp);
+    const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, currentTimestamp);
+
+    // Use provided times or default to fight times
+    const startTime = config.startTime ?? config.analyzer.owner.fight.start_time;
+    const endTime = config.endTime ?? config.analyzer.owner.fight.end_time;
+
+    // Delegate to the existing method
+    return this.addBuffStackUptime({
+      stackData: stackUptimes,
+      castData: config.castData,
+      backgroundUptimes: overallUptimes,
+      startTime,
+      endTime,
+      maxStacks: config.maxStacks,
+      barColor: config.barColor,
+      backgroundBarColor: config.backgroundBarColor,
+      tooltip: config.tooltip,
+    });
+  }
+
+  /**
+   * Add buff stack uptime with multiple stack levels (advanced - provide your own data)
+   * Use this if you need custom data processing or partial time windows
    * Useful for abilities that can stack and where stack count matters
    */
   addBuffStackUptime(config: {
+    /** Stack uptime data for the detailed bar */
     stackData: { start: number; end: number; stacks: number }[];
-    averageStacks: number;
+    /** Cast performance entries to display above the bar */
     castData: BoxRowEntry[];
-    uptimePercentage: number;
+    /** Background uptime data (overall buff presence) */
     backgroundUptimes: { start: number; end: number }[];
+    /** Fight start timestamp */
     startTime: number;
+    /** Fight end timestamp */
     endTime: number;
+    /** Maximum stacks for the buff */
     maxStacks: number;
-    barColor: string;
-    backgroundBarColor: string;
+    /** Color for the stack bar (defaults to purple) */
+    barColor?: string;
+    /** Color for the background bar (defaults to gray) */
+    backgroundBarColor?: string;
+    /** Tooltip text for average stacks (has sensible default) */
     tooltip?: string;
   }): GuideBuilder {
+    // Calculate average stacks from stack data
+    const averageStacks = this.calculateAverageStacks(
+      config.stackData,
+      config.startTime,
+      config.endTime,
+    );
+
+    // Calculate uptime percentage from background uptimes
+    const uptimePercentage = this.calculateUptimePercentage(
+      config.backgroundUptimes,
+      config.startTime,
+      config.endTime,
+    );
+
     this.components.push(
       this.createBuffStackUptime(
         this.spell,
         config.stackData,
-        config.averageStacks,
+        averageStacks,
         config.castData,
-        config.uptimePercentage,
+        uptimePercentage,
         config.backgroundUptimes,
         config.startTime,
         config.endTime,
         config.maxStacks,
-        config.barColor,
-        config.backgroundBarColor,
+        config.barColor || '#cd1bdf',
+        config.backgroundBarColor || '#7e5da8',
         config.tooltip,
       ),
     );
@@ -375,6 +470,47 @@ export class GuideBuilder {
   private createCastSummaryAndBreakdown(castEntries: BoxRowEntry[]): JSX.Element {
     return <CastSummaryAndBreakdown spell={this.spell} castEntries={castEntries} />;
   }
+
+  // ===============================
+  // PRIVATE HELPER METHODS
+  // ===============================
+
+  /** Calculate average stacks from stack uptime data */
+  private calculateAverageStacks(
+    stackData: { start: number; end: number; stacks: number }[],
+    startTime: number,
+    endTime: number,
+  ): number {
+    const fightDuration = endTime - startTime;
+    let totalStackTime = 0;
+
+    stackData.forEach((data) => {
+      const duration = data.end - data.start;
+      totalStackTime += duration * data.stacks;
+    });
+
+    return totalStackTime / fightDuration;
+  }
+
+  /** Calculate uptime percentage from background uptime data */
+  private calculateUptimePercentage(
+    backgroundUptimes: { start: number; end: number }[],
+    startTime: number,
+    endTime: number,
+  ): number {
+    const fightDuration = endTime - startTime;
+    let totalUptime = 0;
+
+    backgroundUptimes.forEach((uptime) => {
+      totalUptime += uptime.end - uptime.start;
+    });
+
+    return totalUptime / fightDuration;
+  }
+
+  // ===============================
+  // PRIVATE COMPONENT CREATORS
+  // ===============================
 
   private createStatistic(
     spell: Spell,

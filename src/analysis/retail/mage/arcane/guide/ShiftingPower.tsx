@@ -5,7 +5,7 @@ import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvents, createExpandableConfig, ExpandableConfig } from '../../shared/components';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
-import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerCast } from '../analyzers/ShiftingPower';
+import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerData } from '../analyzers/ShiftingPower';
 
 class ShiftingPowerGuide extends MageAnalyzer {
   static dependencies = { ...MageAnalyzer.dependencies, shiftingPower: ShiftingPowerArcane };
@@ -16,16 +16,16 @@ class ShiftingPowerGuide extends MageAnalyzer {
     return createExpandableConfig({
       spell: TALENTS.SHIFTING_POWER_TALENT,
       formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
-      getTimestamp: (cast: unknown) => (cast as ShiftingPowerCast).timestamp,
+      getTimestamp: (cast: unknown) => (cast as ShiftingPowerData).timestamp,
       checklistItems: [
         {
           label: <>Channeled full duration</>,
           getResult: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return spCast.ticks >= MAX_TICKS;
           },
           getDetails: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return `${spCast.ticks}/${MAX_TICKS} ticks`;
           },
         },
@@ -36,11 +36,11 @@ class ShiftingPowerGuide extends MageAnalyzer {
             </>
           ),
           getResult: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return spCast.spellsReduced.arcaneSurge;
           },
           getDetails: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return spCast.spellsReduced.arcaneSurge ? 'Being reduced' : 'Not on cooldown';
           },
         },
@@ -51,11 +51,11 @@ class ShiftingPowerGuide extends MageAnalyzer {
             </>
           ),
           getResult: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return spCast.spellsReduced.touchOfTheMagi;
           },
           getDetails: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return spCast.spellsReduced.touchOfTheMagi ? 'Being reduced' : 'Not on cooldown';
           },
         },
@@ -66,18 +66,18 @@ class ShiftingPowerGuide extends MageAnalyzer {
             </>
           ),
           getResult: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return spCast.spellsReduced.evocation;
           },
           getDetails: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return spCast.spellsReduced.evocation ? 'Being reduced' : 'Not on cooldown';
           },
         },
         {
           label: <>In conserve phase</>,
           getResult: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             return (
               !spCast.cdsActive.arcaneSurge &&
               !spCast.cdsActive.touchOfTheMagi &&
@@ -85,7 +85,7 @@ class ShiftingPowerGuide extends MageAnalyzer {
             );
           },
           getDetails: (cast: unknown) => {
-            const spCast = cast as ShiftingPowerCast;
+            const spCast = cast as ShiftingPowerData;
             const activeCds = [];
             if (spCast.cdsActive.arcaneSurge) activeCds.push('Arcane Surge');
             if (spCast.cdsActive.touchOfTheMagi) activeCds.push('Touch of the Magi');
@@ -99,8 +99,8 @@ class ShiftingPowerGuide extends MageAnalyzer {
 
   get shiftingPowerData(): BoxRowEntry[] {
     return evaluateEvents(
-      this.shiftingPower.casts,
-      (cast: ShiftingPowerCast) => {
+      this.shiftingPower.shiftingPowerData,
+      (cast: ShiftingPowerData) => {
         const inConservePhase =
           !cast.cdsActive.arcaneSurge &&
           !cast.cdsActive.touchOfTheMagi &&
@@ -213,16 +213,18 @@ class ShiftingPowerGuide extends MageAnalyzer {
 
     return new GuideBuilder(TALENTS.SHIFTING_POWER_TALENT, 'Shifting Power')
       .explanation(explanation)
-      .when(this.shiftingPower.casts.length > 0, (builder: GuideBuilder) =>
+      .when(this.shiftingPower.shiftingPowerData.length > 0, (builder: GuideBuilder) =>
         builder.addExpandableBreakdown({
           castBreakdowns: generateExpandableBreakdown({
-            castData: this.shiftingPower.casts,
+            castData: this.shiftingPower.shiftingPowerData,
             evaluatedData: this.shiftingPowerData,
             expandableConfig: this.expandableConfig,
           }),
         }),
       )
-      .when(this.shiftingPower.casts.length === 0, (builder: GuideBuilder) => builder.addNoUsage())
+      .when(this.shiftingPower.shiftingPowerData.length === 0, (builder: GuideBuilder) =>
+        builder.addNoUsage(),
+      )
       .build();
   }
 }

@@ -50,19 +50,16 @@ class ArcaneHarmony extends MageAnalyzer {
     return this.totalStacks / this.abilityTracker.getAbility(SPELLS.ARCANE_BARRAGE.id).casts;
   }
 
-  get dpsIncrease() {
-    const fight = this.owner.fight;
-    const totalFightTime = fight.end_time - fight.start_time;
-
-    return (this.bonusDamage / totalFightTime) * 1000;
-  }
-
   statistic() {
     return new StatisticBuilder(SPELLS.ARCANE_HARMONY_BUFF)
       .category(STATISTIC_CATEGORY.TALENTS)
-      .value({ value: this.bonusDamage, label: 'Bonus Damage', format: 'number' })
-      .value({ value: this.dpsIncrease, label: 'DPS', format: 'number' })
-      .value({ value: this.averageStacks, label: 'Avg. stacks per Barrage', format: 'number' })
+      .dps({ amount: this.bonusDamage })
+      .value({
+        value: this.averageStacks,
+        label: 'Avg. stacks per Barrage',
+        format: 'number',
+        precision: 2,
+      })
       .build();
   }
 }

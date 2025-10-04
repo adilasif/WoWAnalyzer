@@ -15,7 +15,7 @@ class NetherPrecisionGuide extends MageAnalyzer {
   protected netherPrecision!: NetherPrecision;
 
   get netherPrecisionData(): BoxRowEntry[] {
-    return this.netherPrecision.netherPrecisionBuffs.map((np) => {
+    return this.netherPrecision.netherPrecisionData.map((np) => {
       const oneStackLost = np.damageEvents?.length === 1;
       const bothStacksLost = !np.damageEvents;
       const fightEndOneLost = this.owner.fight.end_time === np.removed && oneStackLost;

@@ -28,7 +28,7 @@ class ArcaneBarrageGuide extends MageAnalyzer {
   private readonly AOE_THRESHOLD = 3;
 
   get arcaneBarrageData(): BoxRowEntry[] {
-    return this.arcaneBarrage.barrageCasts.map((cast) => {
+    return this.arcaneBarrage.barrageData.map((cast) => {
       const hasMaxCharges = cast.charges >= this.MAX_ARCANE_CHARGES;
       const isAOE = cast.targetsHit >= this.AOE_THRESHOLD;
       const hasLowMana = cast.mana !== undefined && cast.mana <= this.LOW_MANA_THRESHOLD;

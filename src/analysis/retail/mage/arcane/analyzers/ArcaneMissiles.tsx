@@ -14,7 +14,7 @@ export default class ArcaneMissiles extends MageAnalyzer {
 
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
   hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.AETHER_ATTUNEMENT_TALENT);
-  missileCasts: ArcaneMissilesCast[] = [];
+  missileData: ArcaneMissilesData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -31,28 +31,30 @@ export default class ArcaneMissiles extends MageAnalyzer {
       EventRelations.DAMAGE,
     );
 
-    this.missileCasts.push({
+    this.missileData.push({
       cast: event,
-      // Simple inline values
       ticks: damageTicks.length,
       aetherAttunement: this.selectedCombatant.hasBuff(SPELLS.AETHER_ATTUNEMENT_PROC_BUFF.id),
       netherPrecision: this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id),
       arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
       clipped: damageTicks && damageTicks.length < ARCANE_MISSILES_MAX_TICKS,
-      // Complex values from shared helpers
-      clearcastingCapped: this.isBuffCapped(SPELLS.CLEARCASTING_ARCANE.id, CLEARCASTING_MAX_STACKS), // ✅ Shared helper
-      clearcastingProcs: this.getBuffStacks(SPELLS.CLEARCASTING_ARCANE.id), // ✅ Shared helper
+      clearcastingCapped: this.isBuffCapped(SPELLS.CLEARCASTING_ARCANE.id, CLEARCASTING_MAX_STACKS),
+      clearcastingProcs: this.getBuffStacks(SPELLS.CLEARCASTING_ARCANE.id),
     });
   }
 
   onFightEnd() {
-    this.missileCasts.forEach((m) => {
+    this.missileData.forEach((m) => {
       const cast = m.cast;
-      m.gcdEnd =
-        (cast.globalCooldown && cast.timestamp + cast.globalCooldown?.duration) ||
-        (cast.channel?.beginChannel.globalCooldown &&
-          cast.timestamp + cast.channel?.beginChannel.globalCooldown.duration);
+
+      const gcd = cast.globalCooldown || cast.channel?.beginChannel.globalCooldown;
+      m.gcdEnd = gcd ? cast.timestamp + gcd.duration : undefined;
+
       m.channelEnd = cast.channel?.timestamp;
+
+      if (!m.channelEnd) {
+        return;
+      }
 
       const nextCast = this.eventHistory.getEvents(EventType.Cast, {
         searchBackwards: false,
@@ -66,18 +68,17 @@ export default class ArcaneMissiles extends MageAnalyzer {
         startTimestamp: m.channelEnd,
         count: 1,
       })[0];
-      if (m.channelEnd && nextCast && nextCast.channel) {
-        m.channelEndDelay = nextCast.channel.beginChannel.timestamp - m.channelEnd;
-        m.nextCast = nextCast;
-      } else if (m.channelEnd && nextCast) {
-        m.channelEndDelay = nextCast.timestamp - m.channelEnd;
+
+      if (nextCast) {
+        const nextCastStart = nextCast.channel?.beginChannel.timestamp ?? nextCast.timestamp;
+        m.channelEndDelay = nextCastStart - m.channelEnd;
         m.nextCast = nextCast;
       }
     });
   }
 
   get averageChannelDelay() {
-    const castsWithNextCast = this.missileCasts.filter((m) => m.channelEndDelay !== undefined);
+    const castsWithNextCast = this.missileData.filter((m) => m.channelEndDelay !== undefined);
 
     let totalDelay = 0;
     castsWithNextCast.forEach((m) => (totalDelay += m.channelEndDelay || 0));
@@ -85,7 +86,7 @@ export default class ArcaneMissiles extends MageAnalyzer {
   }
 
   get castsWithoutNextCast() {
-    return this.missileCasts.filter((m) => !m.channelEndDelay).length;
+    return this.missileData.filter((m) => !m.channelEndDelay).length;
   }
 
   get channelDelayThresholds() {
@@ -101,7 +102,7 @@ export default class ArcaneMissiles extends MageAnalyzer {
   }
 }
 
-export interface ArcaneMissilesCast {
+export interface ArcaneMissilesData {
   cast: CastEvent;
   ticks: number;
   aetherAttunement: boolean;

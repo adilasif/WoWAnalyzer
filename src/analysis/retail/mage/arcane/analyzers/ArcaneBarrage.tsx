@@ -23,7 +23,7 @@ export default class ArcaneBarrage extends MageAnalyzer {
 
   protected arcaneChargeTracker!: ArcaneChargeTracker;
 
-  barrageCasts: ArcaneBarrageCast[] = [];
+  barrageData: ArcaneBarrageData[] = [];
   private lastTempoApply = 0;
 
   constructor(options: Options) {
@@ -51,9 +51,7 @@ export default class ArcaneBarrage extends MageAnalyzer {
   }
 
   onBarrage(event: CastEvent) {
-    const tempoData = this.getTempoData(event);
-
-    this.barrageCasts.push({
+    this.barrageData.push({
       cast: event,
       mana: getManaPercentage(event),
       charges: this.arcaneChargeTracker.current,
@@ -72,22 +70,20 @@ export default class ArcaneBarrage extends MageAnalyzer {
       arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
       netherPrecisionStacks: this.getBuffStacks(SPELLS.NETHER_PRECISION_BUFF.id),
       touchCD: this.getCooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
-      tempoRemaining: tempoData.remaining,
+      tempoRemaining: this.getTempoData(event),
       health: getTargetHealthPercentage(event),
     });
 
     this.arcaneChargeTracker.clearCharges(event);
   }
 
-  private getTempoData(event: CastEvent): { remaining: number | undefined } {
+  private getTempoData(event: CastEvent): number | undefined {
     const hasTempo = this.selectedCombatant.hasBuff(SPELLS.ARCANE_TEMPO_BUFF.id);
-    return {
-      remaining: hasTempo ? TEMPO_DURATION - (event.timestamp - this.lastTempoApply) : undefined,
-    };
+    return hasTempo ? TEMPO_DURATION - (event.timestamp - this.lastTempoApply) : undefined;
   }
 }
 
-export interface ArcaneBarrageCast {
+export interface ArcaneBarrageData {
   cast: CastEvent;
   mana?: number;
   charges: number;

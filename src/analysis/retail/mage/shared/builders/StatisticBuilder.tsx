@@ -6,6 +6,7 @@ import Statistic, { StatisticSize } from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
+import DamageIcon from 'interface/icons/Damage';
 
 type ValueFormatter = 'number' | 'percentage' | 'raw';
 
@@ -13,13 +14,13 @@ interface StatValueConfig {
   value: number | string;
   label: string;
   format?: ValueFormatter;
+  precision?: number;
   icon?: ReactNode;
 }
 
 interface ColumnConfig<T = unknown> {
   header: ReactNode;
   getValue: (data: T) => ReactNode;
-  isHeader?: boolean;
 }
 
 /**
@@ -27,20 +28,21 @@ interface ColumnConfig<T = unknown> {
  *
  * @example
  * ```tsx
- * // Define columns and add data
+ * // Define columns with positional parameters (first column automatically becomes row header)
  * const dropdown = new DropdownTableBuilder()
- *   .column('Haste-Bonus', (data) => `${formatPercentage(data.stacks * 0.02, 0)}%`, true)
+ *   .column('Stacks', (data) => `${data.stacks}`)  // First column cells render as <th>
  *   .column('Time (s)', (data) => formatDuration(data.time))
  *   .column('Time (%)', (data) => `${formatPercentage(data.time / this.owner.fightDuration)}%`)
  *   .data(this.stackData);
  *
- * // Or add rows individually
+ * // Or use config objects for columns
  * const dropdown = new DropdownTableBuilder()
- *   .column('Haste-Bonus', (d) => d.haste, true)
- *   .column('Time (s)', (d) => d.time)
- *   .addRow({ haste: '5%', time: '10s' })
- *   .addRow({ haste: '10%', time: '20s' });
+ *   .column({ header: 'Stacks', getValue: (d) => d.stacks })  // First column cells render as <th>
+ *   .column({ header: 'Time (s)', getValue: (d) => d.time })
+ *   .addRow({ stacks: 5, time: 1000 })
+ *   .addRow({ stacks: 10, time: 2000 });
  * ```
+
  */
 export class DropdownTableBuilder<T = unknown> {
   private _columns: ColumnConfig<T>[] = [];
@@ -48,12 +50,24 @@ export class DropdownTableBuilder<T = unknown> {
 
   /**
    * Add a column definition
-   * @param header - The header text for this column
-   * @param getValue - Function to extract the value from data object
-   * @param isHeader - Whether this column should render as <th> (default: false)
+   * @param headerOrConfig - Either the header text, or a config object with { header, getValue }
+   * @param getValue - Function to extract the value from data object (optional if using config object)
    */
-  column(header: ReactNode, getValue: (data: T) => ReactNode, isHeader = false): this {
-    this._columns.push({ header, getValue, isHeader });
+  column(headerOrConfig: ReactNode | ColumnConfig<T>, getValue?: (data: T) => ReactNode): this {
+    // If first argument is an object with getValue property, treat it as a config object
+    if (
+      typeof headerOrConfig === 'object' &&
+      headerOrConfig !== null &&
+      'getValue' in headerOrConfig
+    ) {
+      this._columns.push(headerOrConfig as ColumnConfig<T>);
+    } else {
+      // Otherwise, treat it as the old positional parameters
+      if (!getValue) {
+        throw new Error('getValue function is required when using positional parameters');
+      }
+      this._columns.push({ header: headerOrConfig, getValue });
+    }
     return this;
   }
 
@@ -91,7 +105,8 @@ export class DropdownTableBuilder<T = unknown> {
             <tr key={rowIdx}>
               {this._columns.map((col, colIdx) => {
                 const value = col.getValue(row);
-                if (col.isHeader) {
+                // First column is always a row header
+                if (colIdx === 0) {
                   return <th key={colIdx}>{value}</th>;
                 }
                 return <td key={colIdx}>{value}</td>;
@@ -109,10 +124,25 @@ export class DropdownTableBuilder<T = unknown> {
  *
  * @example
  * ```tsx
- * // Simple damage statistic
+ * // Single DPS statistic (shows damage per second with percentage)
  * statistic() {
  *   return new StatisticBuilder(TALENTS.ARCANE_BOMBARDMENT_TALENT)
- *     .damage({ amount: this.bonusDamage })
+ *     .dps({ amount: this.bonusDamage })
+ *     .build();
+ * }
+ *
+ * // Multiple DPS values with labels
+ * statistic() {
+ *   return new StatisticBuilder(SPELLS.ARCANE_HARMONY_BUFF)
+ *     .dps({ amount: this.dpsValue1, label: 'Bonus DPS' })
+ *     .dps({ amount: this.dpsValue2, label: 'DPS Increase' })
+ *     .build();
+ * }
+ *
+ * // Average damage statistic (shows raw damage amount)
+ * statistic() {
+ *   return new StatisticBuilder(TALENTS.ARCANE_ECHO_TALENT)
+ *     .averageDamage({ amount: this.averageDamage })
  *     .build();
  * }
  *
@@ -211,20 +241,55 @@ export class StatisticBuilder {
     value: number | string;
     label: string;
     format?: ValueFormatter;
+    precision?: number;
     icon?: ReactNode;
   }): this {
     this._values.push({
       value: config.value,
       label: config.label,
       format: config.format,
+      precision: config.precision,
       icon: config.icon,
     });
     return this;
   }
 
-  /** Set damage amount (uses ItemDamageDone component) */
-  damage(config: { amount: number }): this {
-    this._damageAmount = config.amount;
+  /** Set DPS damage amount (uses ItemDamageDone component, or formats as DPS value with custom label) */
+  dps(config: { amount: number; label?: string }): this {
+    if (config.label) {
+      // Custom label = format as value line for multiple DPS displays
+      // Assumes amount is already damage per second, or is total damage to be converted
+      this._values.push({
+        value: config.amount,
+        label: config.label,
+        format: 'number',
+        icon: <DamageIcon />,
+      });
+    } else {
+      // No label = use ItemDamageDone component for single DPS display
+      this._damageAmount = config.amount;
+    }
+    return this;
+  }
+
+  /** Set average damage amount (shows raw damage number) */
+  averageDamage(config: { amount: number; label?: string }): this {
+    this._values.push({
+      value: config.amount,
+      label: config.label ?? 'Average Damage',
+      format: 'number',
+      icon: <DamageIcon />,
+    });
+    return this;
+  }
+
+  /** @deprecated Use .dps() or .averageDamage() instead for clarity */
+  damage(config: { amount: number; label?: string }): this {
+    if (config.label) {
+      return this.averageDamage({ amount: config.amount, label: config.label });
+    } else {
+      return this.dps({ amount: config.amount });
+    }
     return this;
   }
 
@@ -245,20 +310,53 @@ export class StatisticBuilder {
     if (this._content !== undefined) {
       content = this._content;
     }
-    // Damage display
+    // Damage display with additional values
+    else if (this._damageAmount !== undefined && this._values.length > 0) {
+      content = (
+        <>
+          <ItemDamageDone amount={this._damageAmount} />
+          <br />
+          {this._values.map((item, idx) => {
+            let formattedValue: string | number = item.value;
+            if (item.format === 'number' && typeof item.value === 'number') {
+              // If precision is specified, use toFixed(), otherwise use formatNumber
+              formattedValue =
+                item.precision !== undefined
+                  ? item.value.toFixed(item.precision)
+                  : formatNumber(item.value);
+            } else if (item.format === 'percentage' && typeof item.value === 'number') {
+              formattedValue = formatPercentage(item.value, item.precision);
+            }
+
+            return (
+              <span key={idx}>
+                {item.icon && <>{item.icon} </>}
+                {formattedValue} <small>{item.label}</small>
+                {idx < this._values.length - 1 && <br />}
+              </span>
+            );
+          })}
+        </>
+      );
+    }
+    // Damage display only
     else if (this._damageAmount !== undefined) {
       content = <ItemDamageDone amount={this._damageAmount} />;
     }
-    // Formatted values
+    // Formatted values only
     else if (this._values.length > 0) {
       content = (
         <>
           {this._values.map((item, idx) => {
             let formattedValue: string | number = item.value;
             if (item.format === 'number' && typeof item.value === 'number') {
-              formattedValue = formatNumber(item.value);
+              // If precision is specified, use toFixed(), otherwise use formatNumber
+              formattedValue =
+                item.precision !== undefined
+                  ? item.value.toFixed(item.precision)
+                  : formatNumber(item.value);
             } else if (item.format === 'percentage' && typeof item.value === 'number') {
-              formattedValue = formatPercentage(item.value);
+              formattedValue = formatPercentage(item.value, item.precision);
             }
 
             return (

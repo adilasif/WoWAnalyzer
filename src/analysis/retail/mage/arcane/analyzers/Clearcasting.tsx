@@ -12,7 +12,7 @@ import Events, {
 import { EventRelations } from '../../shared/helpers';
 
 export default class Clearcasting extends MageAnalyzer {
-  clearcastingProcs: ClearcastingProc[] = [];
+  clearcastingProcs: ClearcastingData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -40,11 +40,9 @@ export default class Clearcasting extends MageAnalyzer {
       expired: !missiles,
     });
   }
-
-  //ADD STATISTIC
 }
 
-export interface ClearcastingProc {
+export interface ClearcastingData {
   applied: number;
   removed: number | undefined;
   missileCast: CastEvent | undefined;

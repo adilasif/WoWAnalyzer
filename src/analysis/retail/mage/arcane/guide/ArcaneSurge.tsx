@@ -6,7 +6,7 @@ import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvents, createExpandableConfig, ExpandableConfig } from '../../shared/components';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 
-import ArcaneSurge, { ArcaneSurgeCast } from '../analyzers/ArcaneSurge';
+import ArcaneSurge, { ArcaneSurgeData } from '../analyzers/ArcaneSurge';
 
 const ARCANE_CHARGE_MAX_STACKS = 4;
 const OPENER_DURATION = 20000;
@@ -21,8 +21,7 @@ class ArcaneSurgeGuide extends MageAnalyzer {
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
   get arcaneSurgeData() {
-    const transformedCasts = this.arcaneSurge.surgeCasts.map((cast) => ({
-      ordinal: cast.ordinal,
+    const transformedCasts = this.arcaneSurge.surgeData.map((cast) => ({
       timestamp: cast.cast,
       mana: cast.mana,
       charges: cast.charges,
@@ -33,7 +32,6 @@ class ArcaneSurgeGuide extends MageAnalyzer {
     return evaluateEvents(
       transformedCasts,
       (cast: {
-        ordinal: number;
         timestamp: number;
         mana?: number;
         charges: number;
@@ -113,7 +111,7 @@ class ArcaneSurgeGuide extends MageAnalyzer {
     return createExpandableConfig({
       spell: TALENTS.ARCANE_SURGE_TALENT,
       formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
-      getTimestamp: (cast: unknown) => (cast as ArcaneSurgeCast).cast,
+      getTimestamp: (cast: unknown) => (cast as ArcaneSurgeData).cast,
       checklistItems: [
         {
           label: (
@@ -122,12 +120,12 @@ class ArcaneSurgeGuide extends MageAnalyzer {
             </>
           ),
           getResult: (cast: unknown) => {
-            const surgeCast = cast as ArcaneSurgeCast;
+            const surgeCast = cast as ArcaneSurgeData;
             const opener = surgeCast.cast - this.owner.fight.start_time < OPENER_DURATION;
             return surgeCast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
           },
           getDetails: (cast: unknown) => {
-            const surgeCast = cast as ArcaneSurgeCast;
+            const surgeCast = cast as ArcaneSurgeData;
             const opener = surgeCast.cast - this.owner.fight.start_time < OPENER_DURATION;
             return opener
               ? `${surgeCast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges (opener)`
@@ -140,9 +138,9 @@ class ArcaneSurgeGuide extends MageAnalyzer {
               <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active
             </>
           ),
-          getResult: (cast: unknown) => (cast as ArcaneSurgeCast).siphonStormBuff,
+          getResult: (cast: unknown) => (cast as ArcaneSurgeData).siphonStormBuff,
           getDetails: (cast: unknown) =>
-            (cast as ArcaneSurgeCast).siphonStormBuff ? 'Active' : 'Not active',
+            (cast as ArcaneSurgeData).siphonStormBuff ? 'Active' : 'Not active',
         },
         {
           label: (
@@ -150,9 +148,9 @@ class ArcaneSurgeGuide extends MageAnalyzer {
               <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active
             </>
           ),
-          getResult: (cast: unknown) => (cast as ArcaneSurgeCast).netherPrecision,
+          getResult: (cast: unknown) => (cast as ArcaneSurgeData).netherPrecision,
           getDetails: (cast: unknown) =>
-            (cast as ArcaneSurgeCast).netherPrecision ? 'Active' : 'Not active',
+            (cast as ArcaneSurgeData).netherPrecision ? 'Active' : 'Not active',
         },
       ],
     });
@@ -208,7 +206,7 @@ class ArcaneSurgeGuide extends MageAnalyzer {
       .explanation(explanation)
       .addExpandableBreakdown({
         castBreakdowns: generateExpandableBreakdown({
-          castData: this.arcaneSurge.surgeCasts,
+          castData: this.arcaneSurge.surgeData,
           evaluatedData: this.arcaneSurgeData,
           expandableConfig: this.expandableConfig,
         }),

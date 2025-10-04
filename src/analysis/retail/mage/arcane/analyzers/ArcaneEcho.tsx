@@ -1,18 +1,17 @@
 import { formatNumber } from 'common/format';
 import TALENTS from 'common/TALENTS/mage';
-import { SpellIcon } from 'interface';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, { CastEvent, DamageEvent, GetRelatedEvents } from 'parser/core/Events';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 
-class ArcaneEcho extends MageAnalyzer {
+export default class ArcaneEcho extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
   };
 
-  arcaneEchoes: { touchMagiCast: number; damageEvents?: DamageEvent[]; totalDamage: number }[] = [];
+  arcaneEchoes: ArcaneEchoData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -25,14 +24,18 @@ class ArcaneEcho extends MageAnalyzer {
 
   onTouchMagiCast(event: CastEvent) {
     const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
-    let damage = 0;
-    damageEvents.forEach((a) => (damage += a.amount + (a.absorbed || 0)));
 
     this.arcaneEchoes.push({
       touchMagiCast: event.timestamp,
       damageEvents: damageEvents || [],
-      totalDamage: damage,
+      totalDamage: this.getTotalDamage(damageEvents),
     });
+  }
+
+  private getTotalDamage(damageEvents: DamageEvent[]): number {
+    let damage = 0;
+    damageEvents.forEach((a) => (damage += a.amount + (a.absorbed || 0)));
+    return damage;
   }
 
   get averageDamagePerTouch() {
@@ -44,22 +47,19 @@ class ArcaneEcho extends MageAnalyzer {
   statistic() {
     return new StatisticBuilder(TALENTS.ARCANE_ECHO_TALENT)
       .category(STATISTIC_CATEGORY.TALENTS)
-      .content({
-        content: (
-          <>
-            <SpellIcon spell={TALENTS.ARCANE_ECHO_TALENT} />{' '}
-            {formatNumber(this.averageDamagePerTouch)} <small>Average Damage</small>
-          </>
-        ),
-        tooltip: (
-          <>
-            On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the
-            Magi cast.
-          </>
-        ),
-      })
+      .averageDamage({ amount: this.averageDamagePerTouch })
+      .tooltip(
+        <>
+          On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the Magi
+          cast.
+        </>,
+      )
       .build();
   }
 }
 
-export default ArcaneEcho;
+export interface ArcaneEchoData {
+  touchMagiCast: number;
+  damageEvents?: DamageEvent[];
+  totalDamage: number;
+}

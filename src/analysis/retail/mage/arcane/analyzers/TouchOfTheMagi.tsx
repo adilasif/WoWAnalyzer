@@ -27,7 +27,7 @@ export default class TouchOfTheMagi extends MageAnalyzer {
   hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
-  touchCasts: TouchOfTheMagiCast[] = [];
+  touchData: TouchOfTheMagiData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -40,28 +40,42 @@ export default class TouchOfTheMagi extends MageAnalyzer {
   }
 
   onTouch(event: ApplyDebuffEvent) {
-    const ordinal = this.touchCasts.length + 1;
+    const damageEvents = this.getDamageEvents(event);
+
+    this.touchData.push({
+      applied: event.timestamp,
+      removed: this.getRemoveTimestamp(event),
+      charges: this.chargeTracker.current,
+      refundBuff: this.hasRefundBuff(event),
+      damage: damageEvents,
+      totalDamage: this.calculateTotalDamage(damageEvents),
+    });
+  }
+
+  private getRemoveTimestamp(event: ApplyDebuffEvent): number {
     const removeDebuff: RemoveDebuffEvent | undefined = GetRelatedEvent(
       event,
       EventRelations.REMOVE_DEBUFF,
     );
-    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
+    return removeDebuff?.timestamp ?? this.owner.fight.end_time;
+  }
+
+  private getDamageEvents(event: ApplyDebuffEvent): DamageEvent[] {
+    return GetRelatedEvents(event, EventRelations.DAMAGE);
+  }
+
+  private hasRefundBuff(event: ApplyDebuffEvent): boolean {
     const refundBuff: RemoveBuffEvent | undefined = GetRelatedEvent(
       event,
       EventRelations.REFUND_BUFF,
     );
+    return refundBuff !== undefined;
+  }
+
+  private calculateTotalDamage(damageEvents: DamageEvent[]): number {
     let damage = 0;
     damageEvents.forEach((d) => (damage += d.amount + (d.absorb || 0)));
-
-    this.touchCasts.push({
-      ordinal,
-      applied: event.timestamp,
-      removed: removeDebuff?.timestamp || this.owner.fight.end_time,
-      charges: this.chargeTracker.current,
-      refundBuff: refundBuff ? true : false,
-      damage: damageEvents || [],
-      totalDamage: damage,
-    });
+    return damage;
   }
 
   onFightEnd() {
@@ -69,7 +83,7 @@ export default class TouchOfTheMagi extends MageAnalyzer {
   }
 
   analyzeTouch = () => {
-    this.touchCasts.forEach((t) => {
+    this.touchData.forEach((t) => {
       const activeTime = this.alwaysBeCasting.getActiveTimeMillisecondsInWindow(
         t.applied,
         t.removed || this.owner.fight.end_time,
@@ -81,13 +95,13 @@ export default class TouchOfTheMagi extends MageAnalyzer {
 
   get averageDamage() {
     let total = 0;
-    this.touchCasts.forEach((t) => (total += t.totalDamage));
+    this.touchData.forEach((t) => (total += t.totalDamage));
     return total / this.abilityTracker.getAbility(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id).casts;
   }
 
   get averageActiveTime() {
     let active = 0;
-    this.touchCasts.forEach((t) => (active += t.activeTime || 0));
+    this.touchData.forEach((t) => (active += t.activeTime || 0));
     return active / this.abilityTracker.getAbility(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id).casts;
   }
 
@@ -104,8 +118,7 @@ export default class TouchOfTheMagi extends MageAnalyzer {
   }
 }
 
-export interface TouchOfTheMagiCast {
-  ordinal: number;
+export interface TouchOfTheMagiData {
   applied: number;
   removed: number;
   charges: number;

@@ -100,7 +100,7 @@ class ManaChart extends MageAnalyzer {
       </>
     );
 
-    const arcaneSurgeCasts = this.arcaneSurge.surgeCasts.map((cast) => ({
+    const arcaneSurgeCasts = this.arcaneSurge.surgeData.map((cast) => ({
       timestamp: cast.cast,
       spell: TALENTS.ARCANE_SURGE_TALENT,
     }));

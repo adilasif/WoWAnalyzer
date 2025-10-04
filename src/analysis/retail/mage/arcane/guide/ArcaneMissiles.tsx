@@ -29,7 +29,7 @@ class ArcaneMissilesGuide extends MageAnalyzer {
   }
 
   get arcaneMissilesData(): BoxRowEntry[] {
-    return this.arcaneMissiles.missileCasts.map((am) => {
+    return this.arcaneMissiles.missileData.map((am) => {
       const clippedBeforeGCD =
         am.channelEnd && am.gcdEnd && am.gcdEnd - am.channelEnd > MISSILE_EARLY_CLIP_DELAY;
       const hadBuffNP = this.hasNetherPrecision && am.netherPrecision;

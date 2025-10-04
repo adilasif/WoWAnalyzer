@@ -42,7 +42,6 @@ export default class Supernova extends MageAnalyzer {
       touchDebuff && TOUCH_OF_MAGI_DURATION - (event.timestamp - touchDebuff.start);
 
     this.casts.push({
-      ordinal: this.casts.length + 1,
       timestamp: event.timestamp,
       targetsHit: targetsHit.length || 0,
       unerringStacks: this.hasUnerringProficiency ? unerringStacks : undefined,
@@ -58,7 +57,6 @@ export default class Supernova extends MageAnalyzer {
 }
 
 export interface SupernovaCast {
-  ordinal: number;
   timestamp: number;
   targetsHit: number;
   unerringStacks?: number;

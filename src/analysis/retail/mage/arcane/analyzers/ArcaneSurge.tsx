@@ -17,7 +17,7 @@ export default class ArcaneSurge extends MageAnalyzer {
   hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
-  surgeCasts: ArcaneSurgeCast[] = [];
+  surgeData: ArcaneSurgeData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -29,21 +29,18 @@ export default class ArcaneSurge extends MageAnalyzer {
   }
 
   onSurgeCast(event: CastEvent) {
-    this.surgeCasts.push({
-      ordinal: this.surgeCasts.length + 1,
+    this.surgeData.push({
       cast: event.timestamp,
-      // Simple inline values
       charges: this.chargeTracker.current,
       siphonStormBuff: this.selectedCombatant.hasBuff(SPELLS.SIPHON_STORM_BUFF.id),
       netherPrecision: this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id),
-      // Complex values from shared helpers
-      mana: getManaPercentage(event), // ✅ Shared helper
+      mana: getManaPercentage(event),
     });
   }
 
   get averageManaPercent() {
     let manaPercentTotal = 0;
-    this.surgeCasts.forEach((s) => (manaPercentTotal += s.mana || 0));
+    this.surgeData.forEach((s) => (manaPercentTotal += s.mana || 0));
     return manaPercentTotal / this.abilityTracker.getAbility(TALENTS.ARCANE_SURGE_TALENT.id).casts;
   }
 
@@ -60,8 +57,7 @@ export default class ArcaneSurge extends MageAnalyzer {
   }
 }
 
-export interface ArcaneSurgeCast {
-  ordinal: number;
+export interface ArcaneSurgeData {
   cast: number;
   mana?: number;
   charges: number;

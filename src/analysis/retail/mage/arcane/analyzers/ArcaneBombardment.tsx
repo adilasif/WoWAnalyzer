@@ -6,6 +6,7 @@ import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { DamageEvent } from 'parser/core/Events';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { StatisticBuilder } from '../../shared/helpers';
+import { getTargetHealthPercentage } from '../../shared/helpers/eventHelpers';
 
 const HEALTH_THRESHOLD = 0.35;
 const DAMAGE_BONUS = 1;
@@ -27,19 +28,17 @@ class ArcaneBombardment extends MageAnalyzer {
   }
 
   onBarrageDamage(event: DamageEvent) {
-    if (!event.hitPoints || !event.maxHitPoints) {
+    const enemyHealth = getTargetHealthPercentage(event);
+    if (enemyHealth === undefined || enemyHealth > HEALTH_THRESHOLD) {
       return;
     }
-    const enemyHealth = event.hitPoints / event.maxHitPoints;
-    if (enemyHealth <= HEALTH_THRESHOLD) {
-      this.bonusDamage += calculateEffectiveDamage(event, DAMAGE_BONUS);
-    }
+    this.bonusDamage += calculateEffectiveDamage(event, DAMAGE_BONUS);
   }
 
   statistic() {
     return new StatisticBuilder(TALENTS.ARCANE_BOMBARDMENT_TALENT)
       .category(STATISTIC_CATEGORY.TALENTS)
-      .damage({ amount: this.bonusDamage })
+      .dps({ amount: this.bonusDamage })
       .build();
   }
 }

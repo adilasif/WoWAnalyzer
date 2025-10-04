@@ -65,6 +65,7 @@ const EVENT_LINKS = createEventLinks(
     links: [
       LinkPatterns.cast({
         id: SPELLS.SHIFTING_POWER_TICK.id,
+        relation: EventRelations.TICK,
         forwardBuffer: 5000,
         anyTarget: true,
       }),

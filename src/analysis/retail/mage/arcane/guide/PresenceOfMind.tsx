@@ -17,7 +17,7 @@ class PresenceOfMindGuide extends MageAnalyzer {
   protected presenceOfMind!: PresenceOfMind;
 
   get presenceOfMindData(): BoxRowEntry[] {
-    return this.presenceOfMind.pomCasts.map((cast) => {
+    return this.presenceOfMind.pomData.map((cast) => {
       const ST = cast.targets && cast.targets < AOE_TARGET_THRESHOLD;
       const AOE = cast.targets && cast.targets >= AOE_TARGET_THRESHOLD;
       const touchAtEnd = cast.usedTouchEnd;
@@ -132,12 +132,12 @@ class PresenceOfMindGuide extends MageAnalyzer {
 
     return new GuideBuilder(TALENTS.PRESENCE_OF_MIND_TALENT, 'Presence of Mind')
       .explanation(explanation)
-      .when(this.presenceOfMind.pomCasts.length > 0, (builder: GuideBuilder) =>
+      .when(this.presenceOfMind.pomData.length > 0, (builder: GuideBuilder) =>
         builder.addCastSummary({
           castData: this.presenceOfMindData,
         }),
       )
-      .when(this.presenceOfMind.pomCasts.length === 0, (builder: GuideBuilder) =>
+      .when(this.presenceOfMind.pomData.length === 0, (builder: GuideBuilder) =>
         builder.addNoUsage(),
       )
       .build();

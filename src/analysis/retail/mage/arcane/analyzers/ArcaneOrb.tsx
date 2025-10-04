@@ -14,18 +14,14 @@ import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 
-class ArcaneOrb extends MageAnalyzer {
+export default class ArcaneOrb extends MageAnalyzer {
   static dependencies = {
     ...MageAnalyzer.dependencies,
     arcaneChargeTracker: ArcaneChargeTracker,
   };
   protected arcaneChargeTracker!: ArcaneChargeTracker;
 
-  orbCasts: {
-    timestamp: number;
-    targetsHit: number;
-    chargesBefore: number;
-  }[] = [];
+  orbData: ArcaneOrbData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -36,18 +32,13 @@ class ArcaneOrb extends MageAnalyzer {
     const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
     const energize: ResourceChangeEvent[] = GetRelatedEvents(event, EventRelations.RESOURCE_CHANGE);
 
-    this.orbCasts.push({
+    this.orbData.push({
       timestamp: event.timestamp,
-      // Complex values from helpers
       targetsHit: this.getTargetsHit(damageEvents),
       chargesBefore: this.getChargesBefore(energize, event),
     });
   }
 
-  /**
-   * Get unique targets hit by Arcane Orb.
-   * HELPER REASON: Needs Set operations and mapping.
-   */
   private getTargetsHit(damageEvents: DamageEvent[]): number {
     return new Set(damageEvents.map((d) => encodeEventTargetString(d))).size;
   }
@@ -59,13 +50,13 @@ class ArcaneOrb extends MageAnalyzer {
   }
 
   get missedOrbs() {
-    const missed = this.orbCasts.filter((o) => o.targetsHit === 0);
+    const missed = this.orbData.filter((o) => o.targetsHit === 0);
     return missed.length;
   }
 
   get averageHitsPerCast() {
     let totalHits = 0;
-    this.orbCasts.forEach((o) => {
+    this.orbData.forEach((o) => {
       totalHits += o.targetsHit;
     });
     return totalHits / this.abilityTracker.getAbility(SPELLS.ARCANE_ORB.id).casts;
@@ -93,11 +84,15 @@ class ArcaneOrb extends MageAnalyzer {
 
     return new StatisticBuilder(SPELLS.ARCANE_ORB)
       .category(STATISTIC_CATEGORY.TALENTS)
-      .value({ value: this.averageHitsPerCast.toFixed(2), label: 'Average hits per cast' })
+      .value({ value: this.averageHitsPerCast, label: 'Average hits per cast', precision: 2 })
       .value({ value: this.missedOrbs, label: 'Orbs cast with no targets hit' })
       .tooltip(tooltipText)
       .build();
   }
 }
 
-export default ArcaneOrb;
+export interface ArcaneOrbData {
+  timestamp: number;
+  targetsHit: number;
+  chargesBefore: number;
+}

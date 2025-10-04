@@ -19,7 +19,7 @@ export default class PresenceOfMind extends MageAnalyzer {
   };
   protected chargeTracker!: ArcaneChargeTracker;
 
-  pomCasts: PresenceOfMindCast[] = [];
+  pomData: PresenceOfMindData[] = [];
 
   constructor(options: Options) {
     super(options);
@@ -31,13 +31,36 @@ export default class PresenceOfMind extends MageAnalyzer {
   }
 
   onPresenceMind(event: CastEvent) {
-    const blasts: CastEvent[] | undefined = GetRelatedEvents(event, EventRelations.CAST);
+    const touchCancelDelay = this.getTouchCancelDelay(event);
+
+    this.pomData.push({
+      cast: event,
+      targets: this.getBarrageTargetCount(event),
+      charges: this.chargeTracker.current,
+      stacksUsed: this.getBuffedCastCount(event),
+      usedTouchEnd: touchCancelDelay !== undefined,
+      touchCancelDelay,
+    });
+  }
+
+  private getBarrageTargetCount(event: CastEvent): number | undefined {
     const barrage: CastEvent | undefined = GetRelatedEvent(event, EventRelations.BARRAGE_CAST);
-    const barrageHits: DamageEvent[] | undefined =
-      barrage && GetRelatedEvents(barrage, EventRelations.DAMAGE);
+    if (!barrage) {
+      return undefined;
+    }
+    const barrageHits: DamageEvent[] | undefined = GetRelatedEvents(barrage, EventRelations.DAMAGE);
+    return barrageHits?.length;
+  }
+
+  private getBuffedCastCount(event: CastEvent): number {
+    const blasts: CastEvent[] | undefined = GetRelatedEvents(event, EventRelations.CAST);
     const buffedCasts = blasts.filter((b) =>
       this.selectedCombatant.hasBuff(TALENTS.PRESENCE_OF_MIND_TALENT.id, b.timestamp),
     );
+    return buffedCasts.length || 0;
+  }
+
+  private getTouchCancelDelay(event: CastEvent): number | undefined {
     const buffRemove: RemoveBuffEvent | undefined = GetRelatedEvent(
       event,
       EventRelations.REMOVE_BUFF,
@@ -46,25 +69,16 @@ export default class PresenceOfMind extends MageAnalyzer {
       event,
       EventRelations.REMOVE_DEBUFF,
     );
-    const touchCancelDelay =
-      touchRemove && buffRemove && buffRemove.timestamp > touchRemove.timestamp
-        ? buffRemove.timestamp - touchRemove.timestamp
-        : undefined;
 
-    this.pomCasts.push({
-      ordinal: this.pomCasts.length + 1,
-      cast: event,
-      targets: barrageHits?.length,
-      charges: this.chargeTracker.current,
-      stacksUsed: buffedCasts.length || 0,
-      usedTouchEnd: touchCancelDelay !== undefined,
-      touchCancelDelay,
-    });
+    if (!touchRemove || !buffRemove || buffRemove.timestamp <= touchRemove.timestamp) {
+      return undefined;
+    }
+
+    return buffRemove.timestamp - touchRemove.timestamp;
   }
 }
 
-export interface PresenceOfMindCast {
-  ordinal: number;
+export interface PresenceOfMindData {
   cast: CastEvent;
   targets?: number;
   charges: number;
