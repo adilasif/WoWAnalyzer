@@ -3,7 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import Analyzer from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvent } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
@@ -11,10 +11,8 @@ const AOE_TARGET_THRESHOLD = 4;
 const CAST_DELAY_THRESHOLD = 500; // 500ms
 import PresenceOfMind from '../analyzers/PresenceOfMind';
 
-class PresenceOfMindGuide extends Analyzer {
-  static dependencies = {
-    presenceOfMind: PresenceOfMind,
-  };
+class PresenceOfMindGuide extends MageAnalyzer {
+  static dependencies = { ...MageAnalyzer.dependencies, presenceOfMind: PresenceOfMind };
 
   protected presenceOfMind!: PresenceOfMind;
 

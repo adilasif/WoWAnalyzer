@@ -8,18 +8,8 @@ export {
   getTargetHealthPercentage,
   getTargetsHitCount,
   getTargetsHit,
-  // Buff helpers
-  getBuffStacks,
-  hasAnyBuff,
-  hasAllBuffs,
-  getBuffRemainingDuration,
-  isBuffCapped,
-  // Cooldown helpers
-  getCooldownRemaining,
-  isSpellAvailable,
-  isSpellOnCooldown,
-  // Event filtering helpers
-  getCastsInTimeWindow,
+  // Note: Buff/Cooldown/Event helpers are now provided by MageAnalyzer base class
+  // Use this.getBuffStacks(), this.getCooldownRemaining(), this.getCastsInTimeWindow(), etc.
 } from './eventHelpers';
 
 // Guide-related helpers

@@ -1,6 +1,7 @@
 import { formatNumber } from 'common/format';
 import SPELLS from 'common/SPELLS';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, {
   CastEvent,
   DamageEvent,
@@ -14,8 +15,9 @@ import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { EventRelations, StatisticBuilder } from '../../shared/helpers';
 
-class ArcaneOrb extends Analyzer {
+class ArcaneOrb extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     abilityTracker: AbilityTracker,
     arcaneChargeTracker: ArcaneChargeTracker,
   };

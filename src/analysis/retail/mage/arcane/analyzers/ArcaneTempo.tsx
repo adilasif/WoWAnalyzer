@@ -1,6 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import { ARCANE_TEMPO_HASTE_PER_STACK, ARCANE_TEMPO_MAX_STACKS } from 'analysis/retail/mage/shared';
 import Events, {
@@ -17,7 +18,7 @@ import { formatDuration, formatPercentage } from 'common/format';
 import HasteIcon from 'interface/icons/Haste';
 import { DropdownTableBuilder, StatisticBuilder } from '../../shared/helpers';
 
-class ArcaneTempo extends Analyzer {
+class ArcaneTempo extends MageAnalyzer {
   /** Time spent at each stack count (index = stack count) */
   timeAtStackCount: number[];
   lastStackChangeTime: number = this.owner.fight.start_time;

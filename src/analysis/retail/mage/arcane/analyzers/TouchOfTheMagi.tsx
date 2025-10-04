@@ -1,6 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, {
   DamageEvent,
   ApplyDebuffEvent,
@@ -16,8 +17,9 @@ import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import AlwaysBeCasting from '../core/AlwaysBeCasting';
 import { EventRelations } from '../../shared/helpers';
 
-export default class TouchOfTheMagi extends Analyzer {
+export default class TouchOfTheMagi extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     chargeTracker: ArcaneChargeTracker,
     alwaysBeCasting: AlwaysBeCasting,
     abilityTracker: AbilityTracker,

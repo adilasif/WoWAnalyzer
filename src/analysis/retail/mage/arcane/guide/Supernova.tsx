@@ -2,7 +2,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import Analyzer from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvent } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
@@ -11,8 +11,9 @@ const TOUCH_DURATION_THRESHOLD = 3000;
 import { UNERRING_PROFICIENCY_MAX_STACKS } from '../../shared';
 import Supernova from '../../shared/Supernova';
 
-class SupernovaGuide extends Analyzer {
+class SupernovaGuide extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     supernova: Supernova,
   };
 

@@ -4,7 +4,7 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { formatDurationMillisMinSec } from 'common/format';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import Analyzer from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvent, evaluatePerformance } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
@@ -12,10 +12,8 @@ import ArcaneMissiles from '../analyzers/ArcaneMissiles';
 
 const MISSILE_EARLY_CLIP_DELAY = 200;
 
-class ArcaneMissilesGuide extends Analyzer {
-  static dependencies = {
-    arcaneMissiles: ArcaneMissiles,
-  };
+class ArcaneMissilesGuide extends MageAnalyzer {
+  static dependencies = { ...MageAnalyzer.dependencies, arcaneMissiles: ArcaneMissiles };
 
   protected arcaneMissiles!: ArcaneMissiles;
 

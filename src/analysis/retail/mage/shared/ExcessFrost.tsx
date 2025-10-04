@@ -1,15 +1,14 @@
 import SPECS from 'game/SPECS';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from './MageAnalyzer';
 import Events, { GetRelatedEvent, RemoveBuffEvent, DamageEvent } from 'parser/core/Events';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
 
-class ExcessFrost extends Analyzer {
+class ExcessFrost extends MageAnalyzer {
   static dependencies = {
-    spellUsable: SpellUsable,
+    ...MageAnalyzer.dependencies,
   };
-  protected spellUsable!: SpellUsable;
 
   constructor(options: Options) {
     super(options);

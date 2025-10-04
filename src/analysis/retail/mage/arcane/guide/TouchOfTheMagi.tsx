@@ -5,7 +5,7 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import Analyzer from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 
 import {
   evaluateEvents,
@@ -14,15 +14,15 @@ import {
   ExpandableConfig,
 } from '../../shared/components';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
-import { getCastsInTimeWindow } from '../../shared/helpers';
 
 import TouchOfTheMagi, { TouchOfTheMagiCast } from '../analyzers/TouchOfTheMagi';
 
 const MAX_ARCANE_CHARGES = 4;
 const TOUCH_WINDOW_BUFFER_MS = 5000; // 5 seconds before and after
 
-class TouchOfTheMagiGuide extends Analyzer {
+class TouchOfTheMagiGuide extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     touchOfTheMagi: TouchOfTheMagi,
   };
 
@@ -76,7 +76,7 @@ class TouchOfTheMagiGuide extends Analyzer {
       ],
       getCastEvents: (cast: unknown) => {
         const touchCast = cast as TouchOfTheMagiCast;
-        return getCastsInTimeWindow(this, {
+        return this.getCastsInTimeWindow({
           timestamp: touchCast.applied,
           beforeMs: TOUCH_WINDOW_BUFFER_MS,
           afterMs: TOUCH_WINDOW_BUFFER_MS,

@@ -1,4 +1,5 @@
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
   CastEvent,
   ApplyBuffEvent,
@@ -10,25 +11,17 @@ import Events, {
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
-import {
-  getManaPercentage,
-  getBuffStacks,
-  getCooldownRemaining,
-  getTargetHealthPercentage,
-  EventRelations,
-} from '../../shared/helpers';
+import { getManaPercentage, getTargetHealthPercentage, EventRelations } from '../../shared/helpers';
 
 const TEMPO_DURATION = 12000;
 
-export default class ArcaneBarrage extends Analyzer {
+export default class ArcaneBarrage extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     arcaneChargeTracker: ArcaneChargeTracker,
-    spellUsable: SpellUsable,
   };
 
   protected arcaneChargeTracker!: ArcaneChargeTracker;
-  protected spellUsable!: SpellUsable;
 
   barrageCasts: ArcaneBarrageCast[] = [];
   private lastTempoApply = 0;
@@ -62,8 +55,7 @@ export default class ArcaneBarrage extends Analyzer {
 
     this.barrageCasts.push({
       cast: event,
-      // Simple inline values
-      mana: getManaPercentage(event), // ✅ Shared helper
+      mana: getManaPercentage(event),
       charges: this.arcaneChargeTracker.current,
       precast: GetRelatedEvent(event, EventRelations.PRECAST),
       targetsHit: GetRelatedEvents(event, EventRelations.DAMAGE).length || 0,
@@ -78,11 +70,10 @@ export default class ArcaneBarrage extends Analyzer {
       ),
       intuition: this.selectedCombatant.hasBuff(SPELLS.INTUITION_BUFF.id),
       arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
-      // Complex values from shared helpers
-      netherPrecisionStacks: getBuffStacks(this.selectedCombatant, SPELLS.NETHER_PRECISION_BUFF.id), // ✅ Shared helper
-      touchCD: getCooldownRemaining(this.spellUsable, TALENTS.TOUCH_OF_THE_MAGI_TALENT.id), // ✅ Shared helper
+      netherPrecisionStacks: this.getBuffStacks(SPELLS.NETHER_PRECISION_BUFF.id),
+      touchCD: this.getCooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
       tempoRemaining: tempoData.remaining,
-      health: getTargetHealthPercentage(event), // ✅ Shared helper
+      health: getTargetHealthPercentage(event),
     });
 
     this.arcaneChargeTracker.clearCharges(event);

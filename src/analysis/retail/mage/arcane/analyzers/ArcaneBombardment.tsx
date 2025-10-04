@@ -1,6 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { DamageEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
@@ -10,8 +11,9 @@ import { StatisticBuilder } from '../../shared/helpers';
 const HEALTH_THRESHOLD = 0.35;
 const DAMAGE_BONUS = 1;
 
-class ArcaneBombardment extends Analyzer {
+class ArcaneBombardment extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     abilityTracker: AbilityTracker,
   };
   protected abilityTracker!: AbilityTracker;

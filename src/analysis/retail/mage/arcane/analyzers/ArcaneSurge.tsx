@@ -1,14 +1,16 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, { CastEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { getManaPercentage } from '../../shared/helpers';
 
-export default class ArcaneSurge extends Analyzer {
+export default class ArcaneSurge extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     abilityTracker: AbilityTracker,
     chargeTracker: ArcaneChargeTracker,
   };

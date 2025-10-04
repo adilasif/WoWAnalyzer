@@ -2,7 +2,7 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import Analyzer from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvents, evaluatePerformance } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
@@ -16,10 +16,8 @@ interface ArcaneOrbCast {
 
 const ORB_EFFICIENT_CHARGE_THRESHOLD = 2;
 
-class ArcaneOrbGuide extends Analyzer {
-  static dependencies = {
-    arcaneOrb: ArcaneOrb,
-  };
+class ArcaneOrbGuide extends MageAnalyzer {
+  static dependencies = { ...MageAnalyzer.dependencies, arcaneOrb: ArcaneOrb };
 
   protected arcaneOrb!: ArcaneOrb;
 

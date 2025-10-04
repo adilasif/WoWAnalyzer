@@ -2,9 +2,9 @@ import { formatNumber } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
-import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import MageAnalyzer from './MageAnalyzer';
 import Events, { CastEvent } from 'parser/core/Events';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
@@ -12,11 +12,10 @@ import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { SHIFTING_POWER_MS_REDUCTION_PER_TICK, SHIFTING_POWER_REDUCTION_SPELLS } from './constants';
 
 const debug = false;
-class ShiftingPower extends Analyzer {
+class ShiftingPower extends MageAnalyzer {
   static dependencies = {
-    spellUsable: SpellUsable,
+    ...MageAnalyzer.dependencies,
   };
-  protected spellUsable!: SpellUsable;
 
   spellReductions: Record<number, number> = {};
 

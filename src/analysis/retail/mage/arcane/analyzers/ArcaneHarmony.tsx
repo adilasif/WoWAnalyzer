@@ -1,6 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import Events, { CastEvent, DamageEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
@@ -9,8 +10,9 @@ import { StatisticBuilder } from '../../shared/helpers';
 
 const DAMAGE_BONUS_PER_STACK = 0.05;
 
-class ArcaneHarmony extends Analyzer {
+class ArcaneHarmony extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     abilityTracker: AbilityTracker,
   };
   protected abilityTracker!: AbilityTracker;

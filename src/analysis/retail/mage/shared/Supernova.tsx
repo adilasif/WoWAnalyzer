@@ -1,13 +1,15 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import MageAnalyzer from './MageAnalyzer';
 import Events, { CastEvent, GetRelatedEvents } from 'parser/core/Events';
 import Enemies from 'parser/shared/modules/Enemies';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import { TOUCH_OF_MAGI_DURATION } from './constants';
 
-export default class Supernova extends Analyzer {
+export default class Supernova extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     enemies: Enemies,
     abilityTracker: AbilityTracker,
   };

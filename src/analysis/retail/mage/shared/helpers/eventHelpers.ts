@@ -6,17 +6,14 @@
  *
  * IMPORTANT: Many of these helpers rely on CastLinkNormalizer to link events together.
  * Make sure your CombatLogParser includes the appropriate normalizer before these modules.
+ *
+ * NOTE: Buff/Cooldown/Event helpers have been moved to MageAnalyzer base class.
+ * Use this.getBuffStacks(), this.getCooldownRemaining(), this.getCastsInTimeWindow(), etc.
  */
 
 import { CastEvent, HasTarget, HasHitpoints, GetRelatedEvents, AnyEvent } from 'parser/core/Events';
 import { encodeTargetString } from 'parser/shared/modules/Enemies';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
-import Combatant from 'parser/core/Combatant';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
-import EventHistory from 'parser/shared/modules/EventHistory';
-import { EventType } from 'parser/core/Events';
-import Analyzer from 'parser/core/Analyzer';
-import type CombatLogParser from 'parser/core/CombatLogParser';
 
 // =============================================================================
 // RESOURCE HELPERS
@@ -128,156 +125,4 @@ export function getTargetsHit(event: CastEvent): string[] {
     .filter((d): d is AnyEvent & { targetID: number; targetInstance?: number } => HasTarget(d))
     .map((d) => encodeTargetString(d.targetID, d.targetInstance))
     .filter((target, index, self) => self.indexOf(target) === index); // unique only
-}
-
-// =============================================================================
-// BUFF HELPERS
-// =============================================================================
-
-/**
- * Get the number of stacks for a buff on a combatant.
- *
- * Used across: ArcaneBarrage (Nether Precision), many other files
- *
- * @returns Number of stacks (0 if buff not active)
- */
-export function getBuffStacks(combatant: Combatant, buffId: number): number {
-  const buff = combatant.getBuff(buffId);
-  return buff ? buff.stacks || 0 : 0;
-}
-
-/**
- * Check if a combatant has any of several buffs active.
- *
- * @returns true if any of the specified buffs are active
- */
-export function hasAnyBuff(combatant: Combatant, buffIds: number[], timestamp?: number): boolean {
-  return buffIds.some((id) => combatant.hasBuff(id, timestamp));
-}
-
-/**
- * Check if a combatant has all of several buffs active.
- *
- * @returns true only if ALL specified buffs are active
- */
-export function hasAllBuffs(combatant: Combatant, buffIds: number[], timestamp?: number): boolean {
-  return buffIds.every((id) => combatant.hasBuff(id, timestamp));
-}
-
-/**
- * Get remaining duration of a buff in milliseconds.
- *
- * @returns Milliseconds remaining, or undefined if buff not active
- */
-export function getBuffRemainingDuration(
-  combatant: Combatant,
-  buffId: number,
-  currentTimestamp: number,
-): number | undefined {
-  const buff = combatant.getBuff(buffId);
-  if (!buff || buff.end === null) {
-    return undefined;
-  }
-  return buff.end - currentTimestamp;
-}
-
-/**
- * Check if a buff is at maximum stacks (capped).
- *
- * Used across: ArcaneMissiles (Clearcasting)
- *
- * @param combatant The combatant to check
- * @param buffId The buff to check
- * @param maxStacks The maximum number of stacks for this buff
- * @returns true if buff is at max stacks, false otherwise
- */
-export function isBuffCapped(combatant: Combatant, buffId: number, maxStacks: number): boolean {
-  const buff = combatant.getBuff(buffId);
-  return buff ? buff.stacks === maxStacks : false;
-}
-
-// =============================================================================
-// COOLDOWN HELPERS
-// =============================================================================
-
-/**
- * Get remaining cooldown for a spell in milliseconds.
- *
- * Used across: ArcaneBarrage (Touch CD), many other files
- *
- * @returns Milliseconds remaining on cooldown (0 if available)
- */
-export function getCooldownRemaining(spellUsable: SpellUsable, spellId: number): number {
-  return spellUsable.cooldownRemaining(spellId);
-}
-
-/**
- * Check if a spell is off cooldown and available to cast.
- *
- * @returns true if spell can be cast now
- */
-export function isSpellAvailable(spellUsable: SpellUsable, spellId: number): boolean {
-  return spellUsable.isAvailable(spellId);
-}
-
-/**
- * Check if a spell is on cooldown.
- *
- * @returns true if spell is on cooldown (cannot be cast)
- */
-export function isSpellOnCooldown(spellUsable: SpellUsable, spellId: number): boolean {
-  return spellUsable.isOnCooldown(spellId);
-}
-
-// =============================================================================
-// EVENT FILTERING HELPERS
-// =============================================================================
-
-/**
- * Get all cast events within a time window around a specific timestamp.
- * Useful for showing what was cast before/after a key event (cooldowns, procs, etc.)
- * Automatically accesses EventHistory from the analyzer - no manual dependencies needed!
- *
- * Used across: TouchOfTheMagi guide (showing casts around Touch windows)
- *
- * @param analyzer The analyzer instance (provides access to EventHistory)
- * @param config.timestamp The center timestamp to search around
- * @param config.beforeMs Milliseconds to look backward (default: 0)
- * @param config.afterMs Milliseconds to look forward (default: 0)
- * @returns Array of cast events within the time window
- *
- * @example
- * // Get casts 5 seconds before and after Touch of the Magi
- * const casts = getCastsInTimeWindow(this, {
- *   timestamp: touchCast.applied,
- *   beforeMs: 5000,
- *   afterMs: 5000,
- * });
- */
-export function getCastsInTimeWindow(
-  analyzer: Analyzer,
-  config: {
-    timestamp: number;
-    beforeMs?: number;
-    afterMs?: number;
-  },
-): CastEvent[] {
-  const { timestamp, beforeMs = 0, afterMs = 0 } = config;
-  const windowStart = timestamp - beforeMs;
-  const windowEnd = timestamp + afterMs;
-
-  // Get EventHistory from the analyzer's owner (using type assertion like fightHelpers)
-  const owner = (analyzer as unknown as { owner: CombatLogParser }).owner;
-  const eventHistory = owner.getModule(EventHistory);
-
-  const events = eventHistory.getEvents(EventType.Cast, {
-    searchBackwards: false,
-    startTimestamp: windowStart,
-    duration: windowEnd - windowStart,
-  });
-
-  return events.filter(
-    (event: AnyEvent): event is CastEvent =>
-      event.type === 'cast' && event.timestamp >= windowStart && event.timestamp <= windowEnd,
-  );
 }

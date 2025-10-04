@@ -1,7 +1,8 @@
 import { formatNumber, formatPercentage } from 'common/format';
 import TALENTS from 'common/TALENTS/mage';
 import SPECS from 'game/SPECS';
-import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import MageAnalyzer from './MageAnalyzer';
 import Events, { AbsorbedEvent } from 'parser/core/Events';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import DamageTaken from 'parser/shared/modules/throughput/DamageTaken';
@@ -9,8 +10,9 @@ import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 
-class ElementalBarrier extends Analyzer {
+class ElementalBarrier extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     abilityTracker: AbilityTracker,
     damageTaken: DamageTaken,
   };

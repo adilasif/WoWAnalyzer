@@ -1,14 +1,13 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from './MageAnalyzer';
 import Events, { CastEvent, ApplyDebuffEvent } from 'parser/core/Events';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
 
-class FlameAndFrost extends Analyzer {
+class FlameAndFrost extends MageAnalyzer {
   static dependencies = {
-    spellUsable: SpellUsable,
+    ...MageAnalyzer.dependencies,
   };
-  protected spellUsable!: SpellUsable;
 
   constructor(options: Options) {
     super(options);

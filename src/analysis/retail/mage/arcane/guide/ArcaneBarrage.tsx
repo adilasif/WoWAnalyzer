@@ -5,13 +5,14 @@ import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
 import { evaluateEvent } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
-import Analyzer from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 
 import ArcaneBarrage from '../analyzers/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 
-class ArcaneBarrageGuide extends Analyzer {
+class ArcaneBarrageGuide extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     arcaneBarrage: ArcaneBarrage,
   };
 

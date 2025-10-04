@@ -1,6 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, {
   EventType,
   DamageEvent,
@@ -12,7 +13,7 @@ import Events, {
 } from 'parser/core/Events';
 import { EventRelations } from '../../shared/helpers';
 
-export default class NetherPrecision extends Analyzer {
+export default class NetherPrecision extends MageAnalyzer {
   netherPrecisionBuffs: NetherPrecisionProc[] = [];
 
   constructor(options: Options) {

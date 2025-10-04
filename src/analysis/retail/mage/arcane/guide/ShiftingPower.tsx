@@ -2,15 +2,13 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import Analyzer from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { evaluateEvents, createExpandableConfig, ExpandableConfig } from '../../shared/components';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerCast } from '../analyzers/ShiftingPower';
 
-class ShiftingPowerGuide extends Analyzer {
-  static dependencies = {
-    shiftingPower: ShiftingPowerArcane,
-  };
+class ShiftingPowerGuide extends MageAnalyzer {
+  static dependencies = { ...MageAnalyzer.dependencies, shiftingPower: ShiftingPowerArcane };
 
   protected shiftingPower!: ShiftingPowerArcane;
 

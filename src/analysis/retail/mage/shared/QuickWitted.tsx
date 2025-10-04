@@ -1,16 +1,15 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from './MageAnalyzer';
 import Events, { InterruptEvent } from 'parser/core/Events';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
 
 const COOLDOWN_REDUCTION_MS = 4000;
 
-class QuickWitted extends Analyzer {
+class QuickWitted extends MageAnalyzer {
   static dependencies = {
-    spellUsable: SpellUsable,
+    ...MageAnalyzer.dependencies,
   };
-  protected spellUsable!: SpellUsable;
 
   constructor(options: Options) {
     super(options);

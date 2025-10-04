@@ -1,13 +1,13 @@
 import React from 'react';
 import { SubSection } from 'interface/guide';
 import TALENTS from 'common/TALENTS/mage';
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import MageAnalyzer from '../../shared/MageAnalyzer';
 import { ArcaneManaExplanation } from '../../shared/components';
 import { createChart } from '../../shared/builders';
 import ManaValues from 'parser/shared/modules/ManaValues';
 import ArcaneSurge from '../analyzers/ArcaneSurge';
 import TouchOfTheMagi from '../analyzers/TouchOfTheMagi';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
 import Events, { CastEvent } from 'parser/core/Events';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import Spell from 'common/SPELLS/Spell';
@@ -18,18 +18,17 @@ const SPELL_COLORS = {
   TOUCH_OF_THE_MAGI: '#F59E0B', // Orange
 } as const;
 
-class ManaChart extends Analyzer {
+class ManaChart extends MageAnalyzer {
   static dependencies = {
+    ...MageAnalyzer.dependencies,
     manaValues: ManaValues,
     arcaneSurge: ArcaneSurge,
     touchOfTheMagi: TouchOfTheMagi,
-    spellUsable: SpellUsable,
   };
 
   protected manaValues!: ManaValues;
   protected arcaneSurge!: ArcaneSurge;
   protected touchOfTheMagi!: TouchOfTheMagi;
-  protected spellUsable!: SpellUsable;
 
   private manaUpdates: Array<{ timestamp: number; current: number; max: number; used: number }> =
     [];
