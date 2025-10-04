@@ -14,10 +14,12 @@ import {
   ExpandableConfig,
 } from '../../shared/components';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
+import { getCastsInTimeWindow } from '../../shared/helpers';
 
 import TouchOfTheMagi, { TouchOfTheMagiCast } from '../analyzers/TouchOfTheMagi';
 
 const MAX_ARCANE_CHARGES = 4;
+const TOUCH_WINDOW_BUFFER_MS = 5000; // 5 seconds before and after
 
 class TouchOfTheMagiGuide extends Analyzer {
   static dependencies = {
@@ -72,6 +74,15 @@ class TouchOfTheMagiGuide extends Analyzer {
           },
         },
       ],
+      getCastEvents: (cast: unknown) => {
+        const touchCast = cast as TouchOfTheMagiCast;
+        return getCastsInTimeWindow(this, {
+          timestamp: touchCast.applied,
+          beforeMs: TOUCH_WINDOW_BUFFER_MS,
+          afterMs: TOUCH_WINDOW_BUFFER_MS,
+        });
+      },
+      castTimelineDescription: 'Casts 5 seconds before and after Touch of the Magi',
     });
   }
 

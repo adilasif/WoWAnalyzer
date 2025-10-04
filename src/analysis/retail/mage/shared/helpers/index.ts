@@ -18,6 +18,8 @@ export {
   getCooldownRemaining,
   isSpellAvailable,
   isSpellOnCooldown,
+  // Event filtering helpers
+  getCastsInTimeWindow,
 } from './eventHelpers';
 
 // Guide-related helpers

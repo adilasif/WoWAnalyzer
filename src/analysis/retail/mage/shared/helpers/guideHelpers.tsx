@@ -2,6 +2,7 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { PerformanceMark } from 'interface/guide';
 import Spell from 'common/SPELLS/Spell';
+import { CastEvent } from 'parser/core/Events';
 
 /**
  * Guide Helper Functions
@@ -182,6 +183,10 @@ export interface ExpandableConfig {
   getTimestamp: (data: unknown) => number;
   /** Array of checklist item configurations */
   checklistItems: ExpandableChecklistItem[];
+  /** Optional: Function to get cast events for timeline display */
+  getCastEvents?: (data: unknown) => CastEvent[];
+  /** Optional: Description for the cast timeline window */
+  castTimelineDescription?: string;
 }
 
 /**
@@ -209,6 +214,8 @@ export function createExpandableConfig(config: {
     getResult: (cast: unknown, evaluatedData: BoxRowEntry) => boolean;
     getDetails: (cast: unknown) => string;
   }>;
+  getCastEvents?: (cast: unknown) => CastEvent[];
+  castTimelineDescription?: string;
 }): ExpandableConfig {
   return {
     spell: config.spell,
@@ -219,5 +226,7 @@ export function createExpandableConfig(config: {
       getResult: item.getResult,
       getDetails: item.getDetails,
     })),
+    getCastEvents: config.getCastEvents,
+    castTimelineDescription: config.castTimelineDescription,
   };
 }

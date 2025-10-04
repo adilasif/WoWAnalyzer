@@ -13,6 +13,10 @@ import { encodeTargetString } from 'parser/shared/modules/Enemies';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import Combatant from 'parser/core/Combatant';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
+import EventHistory from 'parser/shared/modules/EventHistory';
+import { EventType } from 'parser/core/Events';
+import Analyzer from 'parser/core/Analyzer';
+import type CombatLogParser from 'parser/core/CombatLogParser';
 
 // =============================================================================
 // RESOURCE HELPERS
@@ -223,4 +227,57 @@ export function isSpellAvailable(spellUsable: SpellUsable, spellId: number): boo
  */
 export function isSpellOnCooldown(spellUsable: SpellUsable, spellId: number): boolean {
   return spellUsable.isOnCooldown(spellId);
+}
+
+// =============================================================================
+// EVENT FILTERING HELPERS
+// =============================================================================
+
+/**
+ * Get all cast events within a time window around a specific timestamp.
+ * Useful for showing what was cast before/after a key event (cooldowns, procs, etc.)
+ * Automatically accesses EventHistory from the analyzer - no manual dependencies needed!
+ *
+ * Used across: TouchOfTheMagi guide (showing casts around Touch windows)
+ *
+ * @param analyzer The analyzer instance (provides access to EventHistory)
+ * @param config.timestamp The center timestamp to search around
+ * @param config.beforeMs Milliseconds to look backward (default: 0)
+ * @param config.afterMs Milliseconds to look forward (default: 0)
+ * @returns Array of cast events within the time window
+ *
+ * @example
+ * // Get casts 5 seconds before and after Touch of the Magi
+ * const casts = getCastsInTimeWindow(this, {
+ *   timestamp: touchCast.applied,
+ *   beforeMs: 5000,
+ *   afterMs: 5000,
+ * });
+ */
+export function getCastsInTimeWindow(
+  analyzer: Analyzer,
+  config: {
+    timestamp: number;
+    beforeMs?: number;
+    afterMs?: number;
+  },
+): CastEvent[] {
+  const { timestamp, beforeMs = 0, afterMs = 0 } = config;
+  const windowStart = timestamp - beforeMs;
+  const windowEnd = timestamp + afterMs;
+
+  // Get EventHistory from the analyzer's owner (using type assertion like fightHelpers)
+  const owner = (analyzer as unknown as { owner: CombatLogParser }).owner;
+  const eventHistory = owner.getModule(EventHistory);
+
+  const events = eventHistory.getEvents(EventType.Cast, {
+    searchBackwards: false,
+    startTimestamp: windowStart,
+    duration: windowEnd - windowStart,
+  });
+
+  return events.filter(
+    (event: AnyEvent): event is CastEvent =>
+      event.type === 'cast' && event.timestamp >= windowStart && event.timestamp <= windowEnd,
+  );
 }

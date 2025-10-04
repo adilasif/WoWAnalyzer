@@ -33,7 +33,7 @@
  *   .build()
  */
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { formatPercentage } from 'common/format';
 import { SpellLink, SpellIcon, TooltipElement } from 'interface';
 import { PassFailCheckmark } from 'interface/guide';
@@ -52,6 +52,9 @@ import UptimeStackBar from 'parser/ui/UptimeStackBar';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Spell from 'common/SPELLS/Spell';
 import { ExpandableConfig } from '../components/GuideEvaluation';
+import { CastEvent } from 'parser/core/Events';
+import { SpellSeq } from 'parser/ui/SpellSeq';
+import CastTimeline from 'interface/guide/components/CastTimeline';
 
 /**
  * Main fluent builder class for creating guide subsections
@@ -200,6 +203,53 @@ export class GuideBuilder {
    */
   addCustomComponent(config: { component: JSX.Element }): GuideBuilder {
     this.components.push(config.component);
+    return this;
+  }
+
+  /**
+   * Add expandable cast timelines showing spells cast around key events
+   * Perfect for showing what was cast during cooldown windows or special events
+   *
+   * @param config Configuration for the cast timelines
+   * @param config.events Array of events to show timelines for
+   * @param config.getCastEvents Function to get cast events for a given event
+   * @param config.formatTimestamp Function to format timestamps
+   * @param config.getEventTimestamp Function to get timestamp from an event
+   * @param config.getEventHeader Function to generate header for each timeline
+   * @param config.performanceData Optional performance data for each event
+   * @param config.windowDescription Optional description of what the window represents
+   *
+   * @example
+   * .addCastTimelines({
+   *   events: touchCasts,
+   *   getCastEvents: (cast) => this.getCastsInWindow(cast.timestamp - 5000, cast.timestamp + 5000),
+   *   formatTimestamp: this.owner.formatTimestamp,
+   *   getEventTimestamp: (cast) => cast.timestamp,
+   *   getEventHeader: (cast, index) => <>Cast #{index + 1}</>,
+   *   performanceData: performanceBoxRow,
+   *   windowDescription: 'Spells cast during Touch of the Magi'
+   * })
+   */
+  addCastTimelines<T>(config: {
+    events: T[];
+    getCastEvents: (event: T) => CastEvent[];
+    formatTimestamp: (timestamp: number) => string;
+    getEventTimestamp: (event: T) => number;
+    getEventHeader: (event: T, index: number) => ReactNode;
+    performanceData?: BoxRowEntry[];
+    windowDescription?: string;
+  }): GuideBuilder {
+    this.components.push(
+      this.createCastTimelines(
+        config.events,
+        config.getCastEvents,
+        config.formatTimestamp,
+        config.getEventTimestamp,
+        config.getEventHeader,
+        config.performanceData,
+        config.windowDescription,
+      ),
+    );
     return this;
   }
 
@@ -468,6 +518,29 @@ export class GuideBuilder {
       </RoundedPanel>
     );
   }
+
+  private createCastTimelines<T>(
+    events: T[],
+    getCastEvents: (event: T) => CastEvent[],
+    formatTimestamp: (timestamp: number) => string,
+    getEventTimestamp: (event: T) => number,
+    getEventHeader: (event: T, index: number) => ReactNode,
+    performanceData?: BoxRowEntry[],
+    windowDescription?: string,
+  ): JSX.Element {
+    const timelineEvents = events.map((event, index) => ({
+      timestamp: getEventTimestamp(event),
+      casts: getCastEvents(event),
+      header: (
+        <>
+          {getEventHeader(event, index)} @ {formatTimestamp(getEventTimestamp(event))}
+        </>
+      ),
+      performance: performanceData?.[index]?.value,
+    }));
+
+    return <CastTimeline events={timelineEvents} windowDescription={windowDescription} />;
+  }
 }
 
 /**
@@ -499,6 +572,35 @@ export function generateExpandableBreakdown(config: {
       }),
     );
 
+    // Add cast timeline if getCastEvents is provided
+    let detailItems: Array<{ label: React.ReactNode; details: React.ReactNode }> | undefined;
+    if (expandableConfig.getCastEvents) {
+      const casts = expandableConfig.getCastEvents(cast);
+      const spells = casts
+        .filter((castEvent) => castEvent.ability && castEvent.ability.guid)
+        .map((castEvent) => ({
+          id: castEvent.ability.guid,
+          name: castEvent.ability.name,
+          icon: castEvent.ability.abilityIcon.replace('.jpg', ''),
+        }));
+
+      detailItems = [
+        {
+          label: (
+            <div style={{ display: 'block', width: '100%' }}>
+              <div style={{ marginBottom: '6px' }}>
+                <strong>{expandableConfig.castTimelineDescription || 'Casts during window'}</strong>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <SpellSeq spells={spells} />
+              </div>
+            </div>
+          ),
+          details: <></>,
+        },
+      ];
+    }
+
     const header = (
       <>
         @ {expandableConfig.formatTimestamp(timestamp)} &mdash;{' '}
@@ -510,6 +612,7 @@ export function generateExpandableBreakdown(config: {
       <CooldownExpandable
         header={header}
         checklistItems={checklistItems}
+        detailItems={detailItems}
         perf={evaluatedEntry.value}
         key={index}
       />

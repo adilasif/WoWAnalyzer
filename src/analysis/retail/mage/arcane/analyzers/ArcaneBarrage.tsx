@@ -94,10 +94,6 @@ export default class ArcaneBarrage extends Analyzer {
       remaining: hasTempo ? TEMPO_DURATION - (event.timestamp - this.lastTempoApply) : undefined,
     };
   }
-
-  get data() {
-    return this.barrageCasts;
-  }
 }
 
 export interface ArcaneBarrageCast {
