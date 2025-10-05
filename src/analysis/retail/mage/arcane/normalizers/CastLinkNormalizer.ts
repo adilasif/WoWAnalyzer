@@ -15,10 +15,31 @@ import {
   EventRelations,
 } from 'analysis/retail/mage/shared/helpers/castLinkHelpers';
 
+/**
+ * Arcane Mage Cast Link Normalizer
+ *
+ * Links related events together (e.g., cast → damage, buff apply → buff remove)
+ * for easier analysis in spec modules.
+ *
+ * DEFAULTS (can be overridden per-link):
+ * - forwardBuffer: 75ms (CAST_BUFFER_MS)
+ * - backwardBuffer: 75ms (CAST_BUFFER_MS)
+ * - maxLinks: unlimited
+ * - anyTarget: false (links only to same target)
+ * - anySource: false (links only to same source)
+ * - id: parent spell ID (auto-matches same spell)
+ * - reverseRelation: 'auto' (creates bidirectional link using parent EventType)
+ *
+ * USAGE:
+ * - Use LinkPatterns helpers for common patterns (damage, applyBuff, removeBuff, etc.)
+ * - Override defaults by spreading: LinkPatterns.damage({ forwardBuffer: 2000, anyTarget: true })
+ * - Set forwardBuffer to match spell duration for removeBuff/removeDebuff
+ * - Use maxLinks to limit number of linked events (e.g., maxLinks: 1 for single-target abilities)
+ * - Set anyTarget: true for AoE abilities that hit multiple targets
+ * - Add condition functions for complex filtering logic
+ */
+
 const EVENT_LINKS = createEventLinks(
-  // ============================================================================
-  // CORE DAMAGE SPELLS
-  // ============================================================================
   {
     spell: SPELLS.ARCANE_EXPLOSION.id,
     parentType: EventType.Cast,
