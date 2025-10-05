@@ -122,6 +122,11 @@ export class GuideBuilder {
   /**
    * Add a statistic showing a key metric in a rounded panel
    * Perfect for showing percentages, averages, or other summary stats
+   * @param config Configuration for the statistic
+   * @param config.value The value to display (e.g., "85.2%", "2.1")
+   * @param config.label Label describing what the value represents
+   * @param config.performance Performance level for color coding
+   * @param config.tooltip Optional tooltip with additional details
    */
   addStatistic(config: {
     value: string;
@@ -144,6 +149,9 @@ export class GuideBuilder {
   /**
    * Add a cast summary showing performance rectangles for each cast with clickable expansion
    * This creates the consolidated summary bar that can be clicked to expand details
+   * @param config Configuration for the cast summary
+   * @param config.castData Array of BoxRowEntry data for each cast to display
+   * @param config.title Optional custom title for the summary section
    */
   addCastSummary(config: { castData: BoxRowEntry[]; title?: string }): GuideBuilder {
     this.components.push(this.createCastSummaryAndBreakdown(config.castData));
@@ -169,6 +177,9 @@ export class GuideBuilder {
   /**
    * Add expandable per-cast breakdown with detailed analysis
    * Perfect for complex abilities where each cast needs individual scrutiny
+   * @param config Configuration for the breakdown
+   * @param config.castBreakdowns Array of React nodes, one for each cast
+   * @param config.title Optional custom title for the breakdown section
    */
   addExpandableBreakdown(config: {
     castBreakdowns: React.ReactNode[];
@@ -181,6 +192,9 @@ export class GuideBuilder {
   /**
    * Add a buff uptime visualization
    * Great for showing how well players maintained important buffs
+   * @param config Configuration for the buff uptime
+   * @param config.uptimePercentage The uptime percentage (0-1) to display
+   * @param config.uptimeGraph Optional custom uptime graph component
    */
   addBuffUptime(config: { uptimePercentage: number; uptimeGraph?: JSX.Element }): GuideBuilder {
     this.components.push(
@@ -315,6 +329,8 @@ export class GuideBuilder {
 
   /**
    * Add a custom component if the built-in options don't fit your needs
+   * @param config Configuration for the custom component
+   * @param config.component The JSX element to add
    */
   addCustomComponent(config: { component: JSX.Element }): GuideBuilder {
     this.components.push(config.component);
@@ -324,6 +340,7 @@ export class GuideBuilder {
   /**
    * Add a chart (built with ChartBuilder)
    * Convenience method for adding charts with proper spacing
+   * @param chart The chart component to add
    */
   addChart(chart: JSX.Element): GuideBuilder {
     this.components.push(<div style={{ marginTop: '16px' }}>{chart}</div>);

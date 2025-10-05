@@ -204,6 +204,13 @@ export interface ExpandableChecklistItem {
 /**
  * Helper function to create an ExpandableConfig with clean, simple parameters.
  * Reduces boilerplate when setting up expandable breakdowns.
+ * @param config Configuration for the expandable
+ * @param config.spell The spell/ability to show in the header
+ * @param config.formatTimestamp Function to format timestamps for display
+ * @param config.getTimestamp Function to extract timestamp from cast data
+ * @param config.checklistItems Array of checklist item configurations
+ * @param config.getCastEvents Optional function to get cast events for timeline display
+ * @param config.castTimelineDescription Optional description for the cast timeline window
  */
 export function createExpandableConfig(config: {
   spell: Spell;

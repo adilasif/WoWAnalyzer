@@ -32,6 +32,12 @@ export class ChartBuilder {
 
   /**
    * Add a data series to the chart
+   * @param config Configuration for the series
+   * @param config.name Name of the series (shown in legend)
+   * @param config.data Array of timestamp-value pairs to plot
+   * @param config.color Optional color for the series
+   * @param config.type Optional type of visualization (line, area, or bar)
+   * @param config.opacity Optional opacity (0-1) for the series
    */
   addSeries(config: {
     name: string;
@@ -53,6 +59,7 @@ export class ChartBuilder {
 
   /**
    * Add mana tracking (common pattern)
+   * @param manaUpdates Array of mana update events with current and max mana
    */
   addManaTracking(
     manaUpdates: Array<{ timestamp: number; current: number; max: number }>,
@@ -90,6 +97,7 @@ export class ChartBuilder {
 
   /**
    * Add health tracking
+   * @param healthUpdates Array of health update events with current and max health
    */
   addHealthTracking(
     healthUpdates: Array<{ timestamp: number; current: number; max: number }>,
@@ -110,6 +118,9 @@ export class ChartBuilder {
 
   /**
    * Add buff/debuff uptime tracking
+   * @param name Name of the buff/debuff
+   * @param buffHistory Array of buff application periods
+   * @param color Optional color for the uptime visualization
    */
   addBuffUptime(
     name: string,
@@ -157,6 +168,8 @@ export class ChartBuilder {
 
   /**
    * Add spell cast annotations
+   * @param casts Array of cast events with timestamp and spell
+   * @param color Optional color for the cast markers
    */
   addCastAnnotations(
     casts: Array<{ timestamp: number; spell: Spell }>,
@@ -175,6 +188,8 @@ export class ChartBuilder {
 
   /**
    * Add buff application annotations
+   * @param buffs Array of buff events with timestamp and spell
+   * @param color Optional color for the buff markers
    */
   addBuffAnnotations(
     buffs: Array<{ timestamp: number; spell: Spell }>,
@@ -193,6 +208,8 @@ export class ChartBuilder {
 
   /**
    * Add damage taken annotations
+   * @param damage Array of damage events with timestamp and optional spell/label
+   * @param color Optional color for the damage markers
    */
   addDamageAnnotations(
     damage: Array<{ timestamp: number; spell?: Spell; label?: string }>,
@@ -212,6 +229,8 @@ export class ChartBuilder {
 
   /**
    * Add death annotations
+   * @param deaths Array of death events with timestamp and optional label
+   * @param color Optional color for the death markers
    */
   addDeathAnnotations(
     deaths: Array<{ timestamp: number; label?: string }>,
@@ -230,6 +249,7 @@ export class ChartBuilder {
 
   /**
    * Add custom event annotations
+   * @param events Array of custom events with timestamp, label, and optional color
    */
   addCustomAnnotations(
     events: Array<{ timestamp: number; label: string; color?: string }>,
@@ -275,6 +295,10 @@ export class ChartBuilder {
 
   /**
    * Add low resource warnings (common pattern)
+   * @param resourceData Array of resource update events with current and max values
+   * @param threshold Threshold percentage (0-1) below which to show warnings (default: 0.1)
+   * @param label Label for the warning annotations (default: 'Low Resource')
+   * @param color Color for the warning markers (default: '#EF4444')
    */
   addLowResourceWarnings(
     resourceData: Array<{ timestamp: number; current: number; max: number }>,
@@ -364,6 +388,7 @@ export class ChartBuilder {
 
   /**
    * Configure chart appearance
+   * @param config Partial chart configuration to merge with existing config
    */
   setConfig(config: Partial<ChartConfig>): ChartBuilder {
     this.config = { ...this.config, ...config };
@@ -372,6 +397,9 @@ export class ChartBuilder {
 
   /**
    * Set grid line configuration
+   * @param options Grid line visibility options
+   * @param options.showXGrid Whether to show vertical grid lines
+   * @param options.showYGrid Whether to show horizontal grid lines
    */
   setGridLines(options: { showXGrid?: boolean; showYGrid?: boolean }): ChartBuilder {
     this.config.showXGrid = options.showXGrid;
@@ -381,6 +409,7 @@ export class ChartBuilder {
 
   /**
    * Set chart title
+   * @param title The title to display above the chart
    */
   setTitle(title: string): ChartBuilder {
     this.config.title = title;
@@ -389,6 +418,11 @@ export class ChartBuilder {
 
   /**
    * Set Y-axis configuration
+   * @param config Y-axis configuration options
+   * @param config.label Label to display on the Y-axis
+   * @param config.format Format for Y-axis values (percentage, number, or time)
+   * @param config.min Minimum value for Y-axis
+   * @param config.max Maximum value for Y-axis
    */
   setYAxis(config: {
     label?: string;
@@ -409,9 +443,85 @@ export class ChartBuilder {
    * this will return an async component that fetches the data on mount.
    */
   build(): JSX.Element {
-    // If boss health should be fetched, delegate to buildWithBossHealth
+    // If boss health should be fetched, use async component
     if (this.shouldFetchBossHealth && this.reportCode) {
-      return this.buildWithBossHealth(this.reportCode);
+      // Capture current builder state
+      const currentSeries = [...this.series];
+      const currentAnnotations = [...this.annotations];
+      const currentConfig = { ...this.config };
+      const startTime = this.startTime;
+      const endTime = this.endTime;
+      const reportCode = this.reportCode;
+
+      const ChartWithAsyncBossHealth: React.FC = () => {
+        const [bossHealthData, setBossHealthData] = React.useState<Array<{
+          timestamp: number;
+          value: number;
+        }> | null>(null);
+        const [loading, setLoading] = React.useState(true);
+
+        React.useEffect(() => {
+          const loadBossHealth = async () => {
+            try {
+              const fetchWcl = (await import('common/fetchWclApi')).default;
+              const json = await fetchWcl(`report/graph/resources/${reportCode}`, {
+                start: startTime,
+                end: endTime,
+                sourceclass: 'Boss',
+                hostility: 'Enemies',
+                abilityid: 1000,
+              });
+
+              const bossData = json as { series?: Array<{ data: Array<[number, number]> }> };
+
+              if (bossData?.series?.[0]?.data) {
+                const healthData = bossData.series[0].data.map((dataPoint: [number, number]) => ({
+                  timestamp: dataPoint[0],
+                  value: dataPoint[1],
+                }));
+                setBossHealthData(healthData);
+              } else {
+                setBossHealthData(null);
+              }
+            } catch (error) {
+              console.error('Failed to load boss health data:', error);
+              setBossHealthData(null);
+            } finally {
+              setLoading(false);
+            }
+          };
+          loadBossHealth();
+        }, []);
+
+        if (loading) {
+          return <div>Loading chart data...</div>;
+        }
+
+        // Build final series array
+        const finalSeries = [...currentSeries];
+        if (bossHealthData && bossHealthData.length > 0) {
+          finalSeries.push({
+            name: 'Boss Health',
+            data: bossHealthData,
+            color: '#FF4444',
+            type: 'line' as const,
+            opacity: 0.8,
+            backgroundColor: '#FF444440',
+          });
+        }
+
+        return (
+          <GeneralizedChart
+            series={finalSeries}
+            annotations={currentAnnotations}
+            config={currentConfig}
+            startTime={startTime}
+            endTime={endTime}
+          />
+        );
+      };
+
+      return <ChartWithAsyncBossHealth />;
     }
 
     // Otherwise, build synchronously
@@ -424,112 +534,6 @@ export class ChartBuilder {
         endTime={this.endTime}
       />
     );
-  }
-
-  /**
-   * Build chart with boss health data fetched automatically
-   *
-   * ⚠️ **DEPRECATED**: Use `.addBossHealth(reportCode).build()` instead for a cleaner API.
-   *
-   * **Recommended approach:**
-   * ```tsx
-   * const chart = createChart(startTime, endTime)
-   *   .asManaChart()
-   *   .addManaTracking(manaUpdates)
-   *   .addBossHealth(this.owner.report.code)  // Pass report code here
-   *   .build();  // Then call build()
-   * ```
-   *
-   * This method still works but is kept for backwards compatibility.
-   * The new `.addBossHealth(reportCode)` pattern is preferred because:
-   * - More consistent with the builder pattern
-   * - Clearer API - boss health is just another data series
-   * - Same async behavior under the hood
-   *
-   * ⚠️ **ASYNC WARNING**: This method returns a React component that performs asynchronous
-   * data fetching on mount. The chart will show a "Loading chart data..." message while
-   * fetching boss health data from the WCL API.
-   *
-   * @param reportCode - The WarcraftLogs report code to fetch boss health data from
-   * @returns A React component that handles async boss health loading and renders the chart
-   */
-  buildWithBossHealth(reportCode: string): JSX.Element {
-    // Capture current builder state
-    const currentSeries = [...this.series];
-    const currentAnnotations = [...this.annotations];
-    const currentConfig = { ...this.config };
-    const startTime = this.startTime;
-    const endTime = this.endTime;
-
-    const ChartWithAsyncBossHealth: React.FC = () => {
-      const [bossHealthData, setBossHealthData] = React.useState<Array<{
-        timestamp: number;
-        value: number;
-      }> | null>(null);
-      const [loading, setLoading] = React.useState(true);
-
-      React.useEffect(() => {
-        const loadBossHealth = async () => {
-          try {
-            const fetchWcl = (await import('common/fetchWclApi')).default;
-            const json = await fetchWcl(`report/graph/resources/${reportCode}`, {
-              start: startTime,
-              end: endTime,
-              sourceclass: 'Boss',
-              hostility: 'Enemies',
-              abilityid: 1000,
-            });
-
-            const bossData = json as { series?: Array<{ data: Array<[number, number]> }> };
-
-            if (bossData?.series?.[0]?.data) {
-              const healthData = bossData.series[0].data.map((dataPoint: [number, number]) => ({
-                timestamp: dataPoint[0],
-                value: dataPoint[1],
-              }));
-              setBossHealthData(healthData);
-            } else {
-              setBossHealthData(null);
-            }
-          } catch (error) {
-            console.error('Failed to load boss health data:', error);
-            setBossHealthData(null);
-          } finally {
-            setLoading(false);
-          }
-        };
-        loadBossHealth();
-      }, []);
-
-      if (loading) {
-        return <div>Loading chart data...</div>;
-      }
-
-      // Build final series array
-      const finalSeries = [...currentSeries];
-      if (bossHealthData && bossHealthData.length > 0) {
-        finalSeries.push({
-          name: 'Boss Health',
-          data: bossHealthData,
-          color: '#FF4444',
-          type: 'line' as const,
-          opacity: 0.8,
-          backgroundColor: '#FF444440',
-        });
-      }
-
-      return (
-        <GeneralizedChart
-          series={finalSeries}
-          annotations={currentAnnotations}
-          config={currentConfig}
-          startTime={startTime}
-          endTime={endTime}
-        />
-      );
-    };
-
-    return <ChartWithAsyncBossHealth />;
   }
 }
 

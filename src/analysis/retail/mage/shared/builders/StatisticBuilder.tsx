@@ -283,16 +283,6 @@ export class StatisticBuilder {
     return this;
   }
 
-  /** @deprecated Use .dps() or .averageDamage() instead for clarity */
-  damage(config: { amount: number; label?: string }): this {
-    if (config.label) {
-      return this.averageDamage({ amount: config.amount, label: config.label });
-    } else {
-      return this.dps({ amount: config.amount });
-    }
-    return this;
-  }
-
   /** Set custom content (overrides values and damage) */
   content(config: { content: ReactNode; tooltip?: ReactNode }): this {
     this._content = config.content;
