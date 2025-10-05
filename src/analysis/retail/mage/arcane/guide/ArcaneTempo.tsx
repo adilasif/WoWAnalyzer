@@ -3,7 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvent } from '../../shared/components';
+import { evaluateEvents } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 import { ARCANE_TEMPO_MAX_STACKS } from '../../shared/constants';
 
@@ -42,35 +42,39 @@ class ArcaneTempoGuide extends MageAnalyzer {
     const thresholds = this.arcaneTempo.arcaneTempoUptimeThresholds.isLessThan;
     const uptimePercent = (tempoData.uptime * 100).toFixed(1);
 
-    const tempoEntry = evaluateEvent(tempoData.timestamp, tempoData, this, {
-      actionName: 'Arcane Tempo',
+    const castData = evaluateEvents({
+      events: [tempoData],
+      analyzer: this,
+      evaluationLogic: (data) => ({
+        actionName: 'Arcane Tempo',
 
-      perfectConditions: [
-        {
-          name: 'excellentUptime',
-          check: tempoData.uptime >= thresholds.minor,
-          description: `Excellent uptime (${uptimePercent}%) - maximizing Arcane Tempo benefits`,
-        },
-      ],
+        perfectConditions: [
+          {
+            name: 'excellentUptime',
+            check: data.uptime >= thresholds.minor,
+            description: `Excellent uptime (${uptimePercent}%) - maximizing Arcane Tempo benefits`,
+          },
+        ],
 
-      goodConditions: [
-        {
-          name: 'goodUptime',
-          check: tempoData.uptime >= thresholds.average,
-          description: `Good uptime (${uptimePercent}%) - maintaining most Arcane Tempo benefits`,
-        },
-      ],
+        goodConditions: [
+          {
+            name: 'goodUptime',
+            check: data.uptime >= thresholds.average,
+            description: `Good uptime (${uptimePercent}%) - maintaining most Arcane Tempo benefits`,
+          },
+        ],
 
-      okConditions: [
-        {
-          name: 'minimumUptime',
-          check: tempoData.uptime >= thresholds.major,
-          description: `Minimum acceptable uptime (${uptimePercent}%) - could be improved`,
-        },
-      ],
+        okConditions: [
+          {
+            name: 'minimumUptime',
+            check: data.uptime >= thresholds.major,
+            description: `Minimum acceptable uptime (${uptimePercent}%) - could be improved`,
+          },
+        ],
 
-      defaultPerformance: QualitativePerformance.Fail,
-      defaultMessage: `Very low uptime (${uptimePercent}%) - need to maintain Arcane Tempo better`,
+        defaultPerformance: QualitativePerformance.Fail,
+        defaultMessage: `Very low uptime (${uptimePercent}%) - need to maintain Arcane Tempo better`,
+      }),
     });
 
     return new GuideBuilder(TALENTS.ARCANE_TEMPO_TALENT)
@@ -78,7 +82,7 @@ class ArcaneTempoGuide extends MageAnalyzer {
       .addBuffStackUptimeFromSpell({
         analyzer: this,
         buffSpell: SPELLS.ARCANE_TEMPO_BUFF,
-        castData: [tempoEntry],
+        castData,
         maxStacks: ARCANE_TEMPO_MAX_STACKS,
         barColor: TEMPO_COLOR,
         backgroundBarColor: TEMPO_BG_COLOR,

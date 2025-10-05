@@ -3,7 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
-import { evaluateEvent } from '../../shared/components';
+import { evaluateEvents } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 
@@ -28,95 +28,98 @@ class ArcaneBarrageGuide extends MageAnalyzer {
   private readonly AOE_THRESHOLD = 3;
 
   get arcaneBarrageData(): BoxRowEntry[] {
-    return this.arcaneBarrage.barrageData.map((cast) => {
-      const hasMaxCharges = cast.charges >= this.MAX_ARCANE_CHARGES;
-      const isAOE = cast.targetsHit >= this.AOE_THRESHOLD;
-      const hasLowMana = cast.mana !== undefined && cast.mana <= this.LOW_MANA_THRESHOLD;
-      const hasLowHealth = cast.health !== undefined && cast.health < this.LOW_HEALTH_THRESHOLD;
-      const hasPrecastSurge = cast.precast?.ability.guid === TALENTS.ARCANE_SURGE_TALENT.id;
-      const tempoExpiring =
-        this.isSpellslinger &&
-        cast.tempoRemaining !== undefined &&
-        cast.tempoRemaining < this.TEMPO_THRESHOLD;
+    return evaluateEvents({
+      events: this.arcaneBarrage.barrageData,
+      analyzer: this,
+      evaluationLogic: (ab) => {
+        const hasMaxCharges = ab.charges >= this.MAX_ARCANE_CHARGES;
+        const isAOE = ab.targetsHit >= this.AOE_THRESHOLD;
+        const hasLowMana = ab.mana !== undefined && ab.mana <= this.LOW_MANA_THRESHOLD;
+        const hasLowHealth = ab.health !== undefined && ab.health < this.LOW_HEALTH_THRESHOLD;
+        const hasPrecastSurge = ab.precast?.ability.guid === TALENTS.ARCANE_SURGE_TALENT.id;
+        const tempoExpiring =
+          ab.tempoRemaining !== undefined && ab.tempoRemaining < this.TEMPO_THRESHOLD;
 
-      // Sunfury procs: Intuition, Glorious Incandescence, or Arcane Soul (with conditions)
-      const hasSunfuryProc =
-        this.isSunfury &&
-        (cast.intuition ||
-          cast.gloriousIncandescence ||
-          (cast.arcaneSoul && (cast.netherPrecisionStacks > 0 || !cast.clearcasting)));
+        const hasSunfuryProc =
+          ab.intuition ||
+          ab.gloriousIncandescence ||
+          (ab.arcaneSoul && (ab.netherPrecisionStacks > 0 || !ab.clearcasting));
 
-      // Spellslinger procs: Intuition or Arcane Orb available
-      const hasSpellslingerProc = this.isSpellslinger && (cast.intuition || cast.arcaneOrbAvail);
+        const hasSpellslingerProc = ab.intuition || ab.arcaneOrbAvail;
 
-      return evaluateEvent(cast.cast.timestamp, cast, this, {
-        actionName: 'Arcane Barrage',
+        return {
+          actionName: 'Arcane Barrage',
 
-        failConditions: [
-          {
-            name: 'insufficientCharges',
-            check: !hasMaxCharges,
-            description: `Insufficient Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES})`,
-          },
-        ],
+          failConditions: [
+            {
+              name: 'insufficientCharges',
+              check: !hasMaxCharges,
+              description: `Insufficient Arcane Charges (${ab.charges}/${this.MAX_ARCANE_CHARGES})`,
+            },
+          ],
 
-        perfectConditions: [
-          {
-            name: 'precastSurge',
-            check: hasMaxCharges && hasPrecastSurge,
-            description: 'Perfect combo - Arcane Surge + 4 charges for maximum damage!',
-          },
-          {
-            name: 'sunfuryProc',
-            check: hasMaxCharges && hasSunfuryProc,
-            description: 'Perfect Sunfury proc usage with max charges',
-          },
-          {
-            name: 'spellslingerProc',
-            check: hasMaxCharges && hasSpellslingerProc,
-            description: 'Perfect Spellslinger proc usage with max charges',
-          },
-          {
-            name: 'aoeOpportunity',
-            check: isAOE && hasMaxCharges,
-            description: `Excellent AOE usage - hit ${cast.targetsHit} targets with max charges`,
-          },
-          {
-            name: 'aoeWithTempo',
-            check: isAOE && tempoExpiring,
-            description: `Perfect AOE + Tempo management - hit ${cast.targetsHit} targets before Tempo expires`,
-          },
-        ],
+          perfectConditions: [
+            {
+              name: 'precastSurge',
+              check: hasMaxCharges && hasPrecastSurge,
+              description: 'Perfect combo - Arcane Surge + 4 charges for maximum damage!',
+            },
+            {
+              name: 'sunfuryProc',
+              active: this.isSunfury,
+              check: hasMaxCharges && hasSunfuryProc,
+              description: 'Perfect Sunfury proc usage with max charges',
+            },
+            {
+              name: 'spellslingerProc',
+              active: this.isSpellslinger,
+              check: hasMaxCharges && hasSpellslingerProc,
+              description: 'Perfect Spellslinger proc usage with max charges',
+            },
+            {
+              name: 'aoeOpportunity',
+              check: isAOE && hasMaxCharges,
+              description: `Excellent AOE usage - hit ${ab.targetsHit} targets with max charges`,
+            },
+            {
+              name: 'aoeWithTempo',
+              active: this.isSpellslinger,
+              check: isAOE && tempoExpiring,
+              description: `Perfect AOE + Tempo management - hit ${ab.targetsHit} targets before Tempo expires`,
+            },
+          ],
 
-        goodConditions: [
-          {
-            name: 'lowMana',
-            check: hasMaxCharges && hasLowMana,
-            description: `Good emergency usage - low mana (${cast.mana ? formatPercentage(cast.mana, 1) : '???'}%)`,
-          },
-          {
-            name: 'tempoExpiring',
-            check: hasMaxCharges && tempoExpiring,
-            description: 'Good timing - avoiding Arcane Tempo expiration',
-          },
-        ],
+          goodConditions: [
+            {
+              name: 'lowMana',
+              check: hasMaxCharges && hasLowMana,
+              description: `Good emergency usage - low mana (${ab.mana ? formatPercentage(ab.mana, 1) : '???'}%)`,
+            },
+            {
+              name: 'tempoExpiring',
+              active: this.isSpellslinger,
+              check: hasMaxCharges && tempoExpiring,
+              description: 'Good timing - avoiding Arcane Tempo expiration',
+            },
+          ],
 
-        okConditions: [
-          {
-            name: 'lowHealth',
-            check: hasMaxCharges && hasLowHealth,
-            description: `Target execute - ${cast.health ? formatPercentage(cast.health, 1) : '???'}% health remaining`,
-          },
-          {
-            name: 'basicAOE',
-            check: isAOE,
-            description: `AOE usage - hit ${cast.targetsHit} targets (could optimize with procs/buffs)`,
-          },
-        ],
+          okConditions: [
+            {
+              name: 'lowHealth',
+              check: hasMaxCharges && hasLowHealth,
+              description: `Target execute - ${ab.health ? formatPercentage(ab.health, 1) : '???'}% health remaining`,
+            },
+            {
+              name: 'basicAOE',
+              check: isAOE,
+              description: `AOE usage - hit ${ab.targetsHit} targets (could optimize with procs/buffs)`,
+            },
+          ],
 
-        defaultPerformance: QualitativePerformance.Fail,
-        defaultMessage: 'Wasted Arcane Charges - no clear benefit to casting Barrage',
-      });
+          defaultPerformance: QualitativePerformance.Fail,
+          defaultMessage: 'Wasted Arcane Charges - no clear benefit to casting Barrage',
+        };
+      },
     });
   }
 

@@ -37,6 +37,7 @@ export interface GuideCondition {
   name: string;
   check: boolean; // true means this condition is met
   description: string; // what to show in tooltip when this condition triggers
+  active?: boolean; // if false, skip this condition entirely (defaults to true)
 }
 
 /**
@@ -57,6 +58,8 @@ export interface GuideEvaluationConfig {
 }
 
 /**
+ * Internal evaluation function - use evaluateEvents instead.
+ *
  * Universal guide evaluation function that handles ALL action types.
  *
  * Evaluation Order:
@@ -75,7 +78,7 @@ export interface GuideEvaluationConfig {
  * @param config - Evaluation configuration specifying conditions
  * @returns BoxRowEntry for use in PerformanceBoxRow
  */
-export function evaluateEvent<T = GuideData>(
+function _evaluateEvent<T = GuideData>(
   timestamp: number,
   data: T,
   analyzer: Analyzer,
@@ -87,7 +90,7 @@ export function evaluateEvent<T = GuideData>(
   // This includes prerequisites not met, mistakes made, etc.
   if (config.failConditions) {
     for (const condition of config.failConditions) {
-      if (condition.check) {
+      if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
           analyzer,
           QualitativePerformance.Fail,
@@ -102,7 +105,7 @@ export function evaluateEvent<T = GuideData>(
   // Step 2: Check perfect conditions (any match = perfect)
   if (!finalEvaluation && config.perfectConditions) {
     for (const condition of config.perfectConditions) {
-      if (condition.check) {
+      if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
           analyzer,
           QualitativePerformance.Perfect,
@@ -117,7 +120,7 @@ export function evaluateEvent<T = GuideData>(
   // Step 3: Check good conditions (any match = good)
   if (!finalEvaluation && config.goodConditions) {
     for (const condition of config.goodConditions) {
-      if (condition.check) {
+      if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
           analyzer,
           QualitativePerformance.Good,
@@ -132,7 +135,7 @@ export function evaluateEvent<T = GuideData>(
   // Step 4: Check ok conditions (any match = ok)
   if (!finalEvaluation && config.okConditions) {
     for (const condition of config.okConditions) {
-      if (condition.check) {
+      if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
           analyzer,
           QualitativePerformance.Ok,
@@ -179,39 +182,70 @@ function createTooltipEntry(
 
 /**
  * Standardized evaluation helper for event data that reduces boilerplate.
- * Common pattern: map over events and evaluate each one with similar structure.
  *
  * @param events - Array of event data to evaluate
  * @param evaluationLogic - Function that takes an event and returns evaluation config
- * @param guide - Guide instance for tooltip generation
+ * @param analyzer - Guide instance for tooltip generation
  * @returns Array of BoxRowEntry evaluations
  *
  * @example
+ * // Object syntax
  * get arcaneOrbData(): BoxRowEntry[] {
- *   return evaluateEvents(
- *     this.arcaneOrb.orbCasts,
- *     (cast) => ({
- *       actionName: 'Arcane Orb',
- *       failConditions: [
- *         { name: 'missed', check: !cast.hitTargets, description: 'Failed to hit targets' }
- *       ],
- *       perfectConditions: [
- *         { name: 'optimal', check: cast.hitTargets && cast.chargesBefore <= 2, description: 'Perfect usage' }
- *       ],
- *     }),
- *     this
- *   );
+ *   return evaluateEvents({
+ *     events: this.arcaneOrb.orbCasts,
+ *     evaluationLogic: (cast) => ({ ... }),
+ *     analyzer: this,
+ *   });
  * }
  */
+
+// Object syntax overload
+export function evaluateEvents<
+  T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
+>(config: {
+  events: T[];
+  evaluationLogic: (event: T) => GuideEvaluationConfig;
+  analyzer: Analyzer;
+}): BoxRowEntry[];
+
+// Positional parameters overload (legacy)
 export function evaluateEvents<
   T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
 >(
   events: T[],
   evaluationLogic: (event: T) => GuideEvaluationConfig,
   analyzer: Analyzer,
+): BoxRowEntry[];
+
+// Implementation
+export function evaluateEvents<
+  T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
+>(
+  eventsOrConfig:
+    | T[]
+    | { events: T[]; evaluationLogic: (event: T) => GuideEvaluationConfig; analyzer: Analyzer },
+  evaluationLogic?: (event: T) => GuideEvaluationConfig,
+  analyzer?: Analyzer,
 ): BoxRowEntry[] {
+  // Handle both object and positional parameters
+  let events: T[];
+  let logic: (event: T) => GuideEvaluationConfig;
+  let analyzerInstance: Analyzer;
+
+  if (Array.isArray(eventsOrConfig)) {
+    // Positional parameters
+    events = eventsOrConfig;
+    logic = evaluationLogic!;
+    analyzerInstance = analyzer!;
+  } else {
+    // Object parameter
+    events = eventsOrConfig.events;
+    logic = eventsOrConfig.evaluationLogic;
+    analyzerInstance = eventsOrConfig.analyzer;
+  }
+
   return events.map((event: T) => {
     const timestamp = event.timestamp || event.applied || event.cast?.timestamp || 0;
-    return evaluateEvent(timestamp, event, analyzer, evaluationLogic(event));
+    return _evaluateEvent(timestamp, event, analyzerInstance, logic(event));
   });
 }

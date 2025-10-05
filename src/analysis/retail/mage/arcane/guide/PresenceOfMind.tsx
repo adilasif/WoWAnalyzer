@@ -4,7 +4,7 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvent } from '../../shared/components';
+import { evaluateEvents } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
 const AOE_TARGET_THRESHOLD = 4;
@@ -17,84 +17,88 @@ class PresenceOfMindGuide extends MageAnalyzer {
   protected presenceOfMind!: PresenceOfMind;
 
   get presenceOfMindData(): BoxRowEntry[] {
-    return this.presenceOfMind.pomData.map((cast) => {
-      const ST = cast.targets && cast.targets < AOE_TARGET_THRESHOLD;
-      const AOE = cast.targets && cast.targets >= AOE_TARGET_THRESHOLD;
-      const touchAtEnd = cast.usedTouchEnd;
-      const aoeCharges = cast.charges === 2 || cast.charges === 3;
-      const hasDelayIssue = cast.touchCancelDelay && cast.touchCancelDelay > CAST_DELAY_THRESHOLD;
+    return evaluateEvents({
+      events: this.presenceOfMind.pomData,
+      analyzer: this,
+      evaluationLogic: (cast) => {
+        const ST = cast.targets && cast.targets < AOE_TARGET_THRESHOLD;
+        const AOE = cast.targets && cast.targets >= AOE_TARGET_THRESHOLD;
+        const touchAtEnd = cast.usedTouchEnd;
+        const aoeCharges = cast.charges === 2 || cast.charges === 3;
+        const hasDelayIssue = cast.touchCancelDelay && cast.touchCancelDelay > CAST_DELAY_THRESHOLD;
 
-      return evaluateEvent(cast.cast.timestamp, cast, this, {
-        actionName: 'Presence of Mind',
+        return {
+          actionName: 'Presence of Mind',
 
-        failConditions: [
-          {
-            name: 'touchTimingFail',
-            check: Boolean(ST) && !touchAtEnd,
-            description:
-              'Not used at Touch end - should squeeze extra casts into Touch of the Magi window',
-          },
-          {
-            name: 'aoeChargesFail',
-            check: Boolean(AOE) && !aoeCharges,
-            description: `${cast.charges} charges (should be 2-3 for AoE) - use at proper charge count for faster Barrage"`,
-          },
-          {
-            name: 'touchDelayFail',
-            check: Boolean(hasDelayIssue),
-            description: cast.touchCancelDelay
-              ? `${cast.touchCancelDelay.toFixed(2)}ms delay - significant clipping issue`
-              : '',
-          },
-        ],
+          failConditions: [
+            {
+              name: 'touchTimingFail',
+              check: Boolean(ST) && !touchAtEnd,
+              description:
+                'Not used at Touch end - should squeeze extra casts into Touch of the Magi window',
+            },
+            {
+              name: 'aoeChargesFail',
+              check: Boolean(AOE) && !aoeCharges,
+              description: `${cast.charges} charges (should be 2-3 for AoE) - use at proper charge count for faster Barrage"`,
+            },
+            {
+              name: 'touchDelayFail',
+              check: Boolean(hasDelayIssue),
+              description: cast.touchCancelDelay
+                ? `${cast.touchCancelDelay.toFixed(2)}ms delay - significant clipping issue`
+                : '',
+            },
+          ],
 
-        perfectConditions: [
-          {
-            name: 'perfectSingleTarget',
-            check:
-              Boolean(ST) &&
-              Boolean(touchAtEnd) &&
-              (!cast.touchCancelDelay || cast.touchCancelDelay <= CAST_DELAY_THRESHOLD),
-            description: 'Perfect - used at Touch end with proper timing',
-          },
-          {
-            name: 'perfectAoe',
-            check: Boolean(AOE) && aoeCharges,
-            description: `Perfect - ${cast.charges} charges for AoE (optimal for faster Barrage)"`,
-          },
-        ],
+          perfectConditions: [
+            {
+              name: 'perfectSingleTarget',
+              check:
+                Boolean(ST) &&
+                Boolean(touchAtEnd) &&
+                (!cast.touchCancelDelay || cast.touchCancelDelay <= CAST_DELAY_THRESHOLD),
+              description: 'Perfect - used at Touch end with proper timing',
+            },
+            {
+              name: 'perfectAoe',
+              check: Boolean(AOE) && aoeCharges,
+              description: `Perfect - ${cast.charges} charges for AoE (optimal for faster Barrage)"`,
+            },
+          ],
 
-        goodConditions: [
-          {
-            name: 'goodSingleTarget',
-            check: Boolean(ST) && Boolean(touchAtEnd),
-            description: 'Good - used at Touch end to squeeze extra casts',
-          },
-          {
-            name: 'goodAoe',
-            check: Boolean(AOE) && aoeCharges,
-            description: `Good - ${cast.charges} charges for AoE usage"`,
-          },
-          {
-            name: 'goodTiming',
-            check: !cast.touchCancelDelay || cast.touchCancelDelay <= CAST_DELAY_THRESHOLD,
-            description: cast.touchCancelDelay
-              ? `${cast.touchCancelDelay.toFixed(2)}ms delay - acceptable timing`
-              : 'Good timing',
-          },
-        ],
+          goodConditions: [
+            {
+              name: 'goodSingleTarget',
+              check: Boolean(ST) && Boolean(touchAtEnd),
+              description: 'Good - used at Touch end to squeeze extra casts',
+            },
+            {
+              name: 'goodAoe',
+              check: Boolean(AOE) && aoeCharges,
+              description: `Good - ${cast.charges} charges for AoE usage"`,
+            },
+            {
+              name: 'goodTiming',
+              check: !cast.touchCancelDelay || cast.touchCancelDelay <= CAST_DELAY_THRESHOLD,
+              description: cast.touchCancelDelay
+                ? `${cast.touchCancelDelay.toFixed(2)}ms delay - acceptable timing`
+                : 'Good timing',
+            },
+          ],
 
-        okConditions: [
-          {
-            name: 'informationalUsage',
-            check: true,
-            description: `Used with ${cast.charges} charges, ${cast.stacksUsed} stacks, ${cast.targets ? cast.targets : 'unknown'} targets hit by next Barrage`,
-          },
-        ],
+          okConditions: [
+            {
+              name: 'informationalUsage',
+              check: true,
+              description: `Used with ${cast.charges} charges, ${cast.stacksUsed} stacks, ${cast.targets ? cast.targets : 'unknown'} targets hit by next Barrage`,
+            },
+          ],
 
-        defaultPerformance: QualitativePerformance.Ok,
-        defaultMessage: `Standard usage - ${cast.charges} charges, ${cast.stacksUsed} stacks used`,
-      });
+          defaultPerformance: QualitativePerformance.Ok,
+          defaultMessage: `Standard usage - ${cast.charges} charges, ${cast.stacksUsed} stacks used`,
+        };
+      },
     });
   }
 

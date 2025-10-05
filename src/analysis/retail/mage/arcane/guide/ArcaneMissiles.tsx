@@ -5,7 +5,7 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { formatDurationMillisMinSec } from 'common/format';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvent, evaluatePerformance } from '../../shared/components';
+import { evaluateEvents, evaluatePerformance } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
 import ArcaneMissiles from '../analyzers/ArcaneMissiles';
@@ -29,83 +29,89 @@ class ArcaneMissilesGuide extends MageAnalyzer {
   }
 
   get arcaneMissilesData(): BoxRowEntry[] {
-    return this.arcaneMissiles.missileData.map((am) => {
-      const clippedBeforeGCD =
-        am.channelEnd && am.gcdEnd && am.gcdEnd - am.channelEnd > MISSILE_EARLY_CLIP_DELAY;
-      const hadBuffNP = this.hasNetherPrecision && am.netherPrecision;
-      const badClip = am.clipped && clippedBeforeGCD;
-      const noClip = !am.aetherAttunement && !am.clipped;
-      const hasValidTiming = am.channelEndDelay !== undefined && am.nextCast !== undefined;
-      const goodChannelDelay =
-        hasValidTiming &&
-        (this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Good ||
-          this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Perfect);
+    return evaluateEvents({
+      events: this.arcaneMissiles.missileData,
+      analyzer: this,
+      evaluationLogic: (am) => {
+        const clippedBeforeGCD =
+          am.channelEnd && am.gcdEnd && am.gcdEnd - am.channelEnd > MISSILE_EARLY_CLIP_DELAY;
+        const hasValidTiming = am.channelEndDelay !== undefined && am.nextCast !== undefined;
+        const goodChannelDelay =
+          hasValidTiming &&
+          (this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Good ||
+            this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Perfect);
 
-      return evaluateEvent(am.cast.timestamp, am, this, {
-        actionName: 'Arcane Missiles',
+        return {
+          actionName: 'Arcane Missiles',
 
-        failConditions: [
-          {
-            name: 'netherPrecisionWaste',
-            check: hadBuffNP && !am.clearcastingCapped,
-            description: 'Wasted Nether Precision buff - should not cast Missiles with this buff',
-          },
-          {
-            name: 'clippedEarly',
-            check: Boolean(badClip),
-            description: 'Clipped Missiles before GCD ended - significant DPS loss',
-          },
-          {
-            name: 'invalidTiming',
-            check: !hasValidTiming,
-            description: 'Cannot determine channel timing - likely data issue',
-          },
-        ],
+          failConditions: [
+            {
+              name: 'netherPrecisionWaste',
+              active: this.hasNetherPrecision,
+              check: am.netherPrecision && !am.clearcastingCapped,
+              description: 'Wasted Nether Precision buff - should not cast Missiles with this buff',
+            },
+            {
+              name: 'clippedEarly',
+              check: Boolean(clippedBeforeGCD),
+              description: 'Clipped Missiles before GCD ended - significant DPS loss',
+            },
+            {
+              name: 'invalidTiming',
+              check: !hasValidTiming,
+              description: 'Cannot determine channel timing - likely data issue',
+            },
+          ],
 
-        perfectConditions: [
-          {
-            name: 'cappedClearcasting',
-            check: am.clearcastingCapped,
-            description: 'Perfect - avoided munching Clearcasting charges by using when capped',
-          },
-          {
-            name: 'optimalClip',
-            check: am.clipped && am.aetherAttunement && goodChannelDelay,
-            description: 'Perfect clip timing with Aether Attunement and good delay',
-          },
-        ],
+          perfectConditions: [
+            {
+              name: 'cappedClearcasting',
+              check: am.clearcastingCapped,
+              description: 'Perfect - avoided munching Clearcasting charges by using when capped',
+            },
+            {
+              name: 'optimalClip',
+              active: this.hasAetherAttunement,
+              check: am.aetherAttunement && am.clipped && goodChannelDelay,
+              description: 'Perfect clip timing with Aether Attunement and good delay',
+            },
+          ],
 
-        goodConditions: [
-          {
-            name: 'goodClipTiming',
-            check: am.clipped && am.aetherAttunement,
-            description: 'Good clip timing with Aether Attunement',
-          },
-          {
-            name: 'fullChannelNoAether',
-            check: noClip && !this.hasAetherAttunement,
-            description: 'Good - full channel without Aether Attunement (optimal without talent)',
-          },
-          {
-            name: 'goodDelay',
-            check: goodChannelDelay,
-            description: `Good timing - ${am.channelEndDelay ? formatDurationMillisMinSec(am.channelEndDelay, 3) : '???'} delay to next cast`,
-          },
-        ],
+          goodConditions: [
+            {
+              name: 'goodClipTiming',
+              active: this.hasAetherAttunement,
+              check: am.aetherAttunement && am.clipped,
+              description: 'Good clip timing with Aether Attunement',
+            },
+            {
+              name: 'fullChannelNoAether',
+              active: !this.hasAetherAttunement,
+              check: !am.aetherAttunement && !am.clipped,
+              description: 'Good - full channel without Aether Attunement (optimal without talent)',
+            },
+            {
+              name: 'goodDelay',
+              check: goodChannelDelay,
+              description: `Good timing - ${am.channelEndDelay ? formatDurationMillisMinSec(am.channelEndDelay, 3) : '???'} delay to next cast`,
+            },
+          ],
 
-        okConditions: [
-          {
-            name: 'fullChannel',
-            check: noClip,
-            description: 'Full channel - not clipped but could be optimized with Aether Attunement',
-          },
-        ],
+          okConditions: [
+            {
+              name: 'fullChannel',
+              check: !am.aetherAttunement && !am.clipped,
+              description:
+                'Full channel - not clipped but could be optimized with Aether Attunement',
+            },
+          ],
 
-        defaultPerformance: QualitativePerformance.Ok,
-        defaultMessage: am.channelEndDelay
-          ? `Standard usage - ${formatDurationMillisMinSec(am.channelEndDelay, 3)} delay to next cast`
-          : 'Standard Arcane Missiles usage',
-      });
+          defaultPerformance: QualitativePerformance.Ok,
+          defaultMessage: am.channelEndDelay
+            ? `Standard usage - ${formatDurationMillisMinSec(am.channelEndDelay, 3)} delay to next cast`
+            : 'Standard Arcane Missiles usage',
+        };
+      },
     });
   }
 

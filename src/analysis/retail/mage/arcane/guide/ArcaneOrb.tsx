@@ -23,7 +23,7 @@ class ArcaneOrbGuide extends MageAnalyzer {
 
   get arcaneOrbData(): BoxRowEntry[] {
     return evaluateEvents(
-      this.arcaneOrb.orbCasts,
+      this.arcaneOrb.orbData,
       (cast: ArcaneOrbCast) => {
         const hitTargets = cast.targetsHit > 0;
         const efficientCharges = cast.chargesBefore <= ORB_EFFICIENT_CHARGE_THRESHOLD;
@@ -88,7 +88,7 @@ class ArcaneOrbGuide extends MageAnalyzer {
 
     return new GuideBuilder(SPELLS.ARCANE_ORB)
       .explanation(explanation)
-      .when(this.arcaneOrb.orbCasts.length > 0, (builder: GuideBuilder) =>
+      .when(this.arcaneOrb.orbData.length > 0, (builder: GuideBuilder) =>
         builder
           .addStatistic({
             value: this.arcaneOrb.averageHitsPerCast.toFixed(2),
@@ -106,7 +106,7 @@ class ArcaneOrbGuide extends MageAnalyzer {
           })
           .addCooldownTimeline(),
       )
-      .when(this.arcaneOrb.orbCasts.length === 0, (builder: GuideBuilder) => builder.addNoUsage())
+      .when(this.arcaneOrb.orbData.length === 0, (builder: GuideBuilder) => builder.addNoUsage())
       .build();
   }
 }

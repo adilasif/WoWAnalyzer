@@ -4,7 +4,7 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvent } from '../../shared/components';
+import { evaluateEvents } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
 import NetherPrecision from '../analyzers/NetherPrecision';
@@ -15,48 +15,52 @@ class NetherPrecisionGuide extends MageAnalyzer {
   protected netherPrecision!: NetherPrecision;
 
   get netherPrecisionData(): BoxRowEntry[] {
-    return this.netherPrecision.netherPrecisionData.map((np) => {
-      const oneStackLost = np.damageEvents?.length === 1;
-      const bothStacksLost = !np.damageEvents;
-      const fightEndOneLost = this.owner.fight.end_time === np.removed && oneStackLost;
-      const fightEndBothLost = this.owner.fight.end_time === np.removed && bothStacksLost;
+    return evaluateEvents({
+      events: this.netherPrecision.netherPrecisionData,
+      analyzer: this,
+      evaluationLogic: (np) => {
+        const oneStackLost = np.damageEvents?.length === 1;
+        const bothStacksLost = !np.damageEvents;
+        const fightEndOneLost = this.owner.fight.end_time === np.removed && oneStackLost;
+        const fightEndBothLost = this.owner.fight.end_time === np.removed && bothStacksLost;
 
-      return evaluateEvent(np.applied, np, this, {
-        actionName: 'Nether Precision',
+        return {
+          actionName: 'Nether Precision',
 
-        failConditions: [
-          {
-            name: 'overwritten',
-            check: Boolean(np.overwritten),
-            description:
-              'Nether Precision buff overwritten - wasted proc by casting Arcane Missiles again',
-          },
-          {
-            name: 'stacksWasted',
-            check: (oneStackLost || bothStacksLost) && !(fightEndOneLost || fightEndBothLost),
-            description: `${oneStackLost ? 'One stack' : 'Both stacks'} lost - should have used before expiry`,
-          },
-        ],
+          failConditions: [
+            {
+              name: 'overwritten',
+              check: Boolean(np.overwritten),
+              description:
+                'Nether Precision buff overwritten - wasted proc by casting Arcane Missiles again',
+            },
+            {
+              name: 'stacksWasted',
+              check: (oneStackLost || bothStacksLost) && !(fightEndOneLost || fightEndBothLost),
+              description: `${oneStackLost ? 'One stack' : 'Both stacks'} lost - should have used before expiry`,
+            },
+          ],
 
-        perfectConditions: [
-          {
-            name: 'perfectUsage',
-            check: !np.overwritten && !(oneStackLost || bothStacksLost),
-            description: 'Perfect - used both Nether Precision stacks without overwriting',
-          },
-        ],
+          perfectConditions: [
+            {
+              name: 'perfectUsage',
+              check: !np.overwritten && !(oneStackLost || bothStacksLost),
+              description: 'Perfect - used both Nether Precision stacks without overwriting',
+            },
+          ],
 
-        okConditions: [
-          {
-            name: 'fightEndLoss',
-            check: !np.overwritten && (fightEndOneLost || fightEndBothLost),
-            description: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost at fight end - acceptable`,
-          },
-        ],
+          okConditions: [
+            {
+              name: 'fightEndLoss',
+              check: !np.overwritten && (fightEndOneLost || fightEndBothLost),
+              description: `${fightEndOneLost ? 'One stack' : 'Both stacks'} lost at fight end - acceptable`,
+            },
+          ],
 
-        defaultPerformance: QualitativePerformance.Fail,
-        defaultMessage: 'Nether Precision not used optimally',
-      });
+          defaultPerformance: QualitativePerformance.Fail,
+          defaultMessage: 'Nether Precision not used optimally',
+        };
+      },
     });
   }
 

@@ -5,7 +5,6 @@ export type { TimeValue, AnnotationEvent, DataSeries, ChartConfig } from './Gene
 // Guide evaluation utilities
 export {
   generateGuideTooltip,
-  evaluateEvent,
   evaluateEvents,
   evaluatePerformance,
   evaluateBoolean,

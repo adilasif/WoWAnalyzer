@@ -3,7 +3,7 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvent } from '../../shared/components';
+import { evaluateEvents } from '../../shared/components';
 import { GuideBuilder } from '../../shared/builders';
 
 const AOE_TARGET_THRESHOLD = 4;
@@ -25,92 +25,93 @@ class SupernovaGuide extends MageAnalyzer {
   );
 
   get supernovaData(): BoxRowEntry[] {
-    return this.supernova.casts.map((cast) => {
-      const ST = cast.targetsHit < AOE_TARGET_THRESHOLD;
-      const AOE = cast.targetsHit >= AOE_TARGET_THRESHOLD;
-      const goodTouchTiming =
-        this.hasTouchOfTheMagi &&
-        cast.touchRemaining != null &&
-        cast.touchRemaining < TOUCH_DURATION_THRESHOLD;
-      const maxUnerringStacks =
-        this.hasUnerringProficiency && cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS;
+    return evaluateEvents({
+      events: this.supernova.casts,
+      analyzer: this,
+      evaluationLogic: (cast) => {
+        const ST = cast.targetsHit < AOE_TARGET_THRESHOLD;
+        const AOE = cast.targetsHit >= AOE_TARGET_THRESHOLD;
+        const goodTouchTiming =
+          cast.touchRemaining != null && cast.touchRemaining < TOUCH_DURATION_THRESHOLD;
+        const maxUnerringStacks = cast.unerringStacks === UNERRING_PROFICIENCY_MAX_STACKS;
 
-      return evaluateEvent(cast.timestamp, cast, this, {
-        actionName: 'Supernova',
+        return {
+          actionName: 'Supernova',
 
-        failConditions: [
-          {
-            name: 'touchTimingFail',
-            check:
-              this.hasTouchOfTheMagi &&
-              ST &&
-              cast.touchRemaining != null &&
-              cast.touchRemaining >= TOUCH_DURATION_THRESHOLD,
-            description: cast.touchRemaining
-              ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining - should wait until Touch is almost expired`
-              : '',
-          },
-          {
-            name: 'unerringStacksFail',
-            check:
-              this.hasUnerringProficiency &&
-              AOE &&
-              cast.unerringStacks !== UNERRING_PROFICIENCY_MAX_STACKS,
-            description: cast.unerringStacks
-              ? `${cast.unerringStacks} stacks (need ${UNERRING_PROFICIENCY_MAX_STACKS}) - wait for max stacks for AoE`
-              : 'Missing Unerring Proficiency buff for AoE',
-          },
-        ],
+          failConditions: [
+            {
+              name: 'touchTimingFail',
+              active: this.hasTouchOfTheMagi,
+              check:
+                ST &&
+                cast.touchRemaining != null &&
+                cast.touchRemaining >= TOUCH_DURATION_THRESHOLD,
+              description: cast.touchRemaining
+                ? `${(cast.touchRemaining / 1000).toFixed(1)}s remaining - should wait until Touch is almost expired`
+                : '',
+            },
+            {
+              name: 'unerringStacksFail',
+              active: this.hasUnerringProficiency,
+              check: AOE && cast.unerringStacks !== UNERRING_PROFICIENCY_MAX_STACKS,
+              description: cast.unerringStacks
+                ? `${cast.unerringStacks} stacks (need ${UNERRING_PROFICIENCY_MAX_STACKS}) - wait for max stacks for AoE`
+                : 'Missing Unerring Proficiency buff for AoE',
+            },
+          ],
 
-        perfectConditions: [
-          {
-            name: 'perfectSingleTarget',
-            check: ST && goodTouchTiming,
-            description: cast.touchRemaining
-              ? `Perfect timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
-              : 'Perfect - used at Touch end',
-          },
-          {
-            name: 'perfectAoe',
-            check: AOE && maxUnerringStacks && cast.targetsHit >= AOE_TARGET_THRESHOLD,
-            description: `Perfect AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} Unerring stacks, ${cast.targetsHit} targets hit`,
-          },
-        ],
+          perfectConditions: [
+            {
+              name: 'perfectSingleTarget',
+              active: this.hasTouchOfTheMagi,
+              check: ST && goodTouchTiming,
+              description: cast.touchRemaining
+                ? `Perfect timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
+                : 'Perfect - used at Touch end',
+            },
+            {
+              name: 'perfectAoe',
+              active: this.hasUnerringProficiency,
+              check: AOE && maxUnerringStacks && cast.targetsHit >= AOE_TARGET_THRESHOLD,
+              description: `Perfect AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} Unerring stacks, ${cast.targetsHit} targets hit`,
+            },
+          ],
 
-        goodConditions: [
-          {
-            name: 'goodSingleTarget',
-            check: ST && (!this.hasTouchOfTheMagi || goodTouchTiming),
-            description:
-              this.hasTouchOfTheMagi && cast.touchRemaining
-                ? `Good timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
-                : 'Good single target usage',
-          },
-          {
-            name: 'goodAoe',
-            check: AOE && (!this.hasUnerringProficiency || maxUnerringStacks),
-            description: this.hasUnerringProficiency
-              ? `Good AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} stacks, ${cast.targetsHit} targets`
-              : `Good AoE - ${cast.targetsHit} targets hit`,
-          },
-          {
-            name: 'interruptUtility',
-            check: cast.targetsHit >= 1,
-            description: `Utility usage - ${cast.targetsHit} targets (can interrupt non-boss enemies)`,
-          },
-        ],
+          goodConditions: [
+            {
+              name: 'goodSingleTarget',
+              check: ST && (!this.hasTouchOfTheMagi || goodTouchTiming),
+              description:
+                this.hasTouchOfTheMagi && cast.touchRemaining
+                  ? `Good timing - ${(cast.touchRemaining / 1000).toFixed(1)}s Touch remaining`
+                  : 'Good single target usage',
+            },
+            {
+              name: 'goodAoe',
+              check: AOE && (!this.hasUnerringProficiency || maxUnerringStacks),
+              description: this.hasUnerringProficiency
+                ? `Good AoE - ${UNERRING_PROFICIENCY_MAX_STACKS} stacks, ${cast.targetsHit} targets`
+                : `Good AoE - ${cast.targetsHit} targets hit`,
+            },
+            {
+              name: 'interruptUtility',
+              check: cast.targetsHit >= 1,
+              description: `Utility usage - ${cast.targetsHit} targets (can interrupt non-boss enemies)`,
+            },
+          ],
 
-        okConditions: [
-          {
-            name: 'standardUsage',
-            check: true,
-            description: `Standard usage - ${cast.targetsHit} targets hit`,
-          },
-        ],
+          okConditions: [
+            {
+              name: 'standardUsage',
+              check: true,
+              description: `Standard usage - ${cast.targetsHit} targets hit`,
+            },
+          ],
 
-        defaultPerformance: QualitativePerformance.Ok,
-        defaultMessage: `Used on ${cast.targetsHit} targets - check timing for optimization`,
-      });
+          defaultPerformance: QualitativePerformance.Ok,
+          defaultMessage: `Used on ${cast.targetsHit} targets - check timing for optimization`,
+        };
+      },
     });
   }
 
