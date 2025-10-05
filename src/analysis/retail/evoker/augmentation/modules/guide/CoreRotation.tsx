@@ -52,8 +52,6 @@ export function CoreRotationSection({ modules, events, info }: GuideProps<typeof
 
       <BlisteringScalesSection modules={modules} events={events} info={info} />
 
-      {modules.ebonMight.guideSubsection()}
-
       <SubSection>
         <CooldownUsage analyzer={modules.prescience} title="Prescience" />
       </SubSection>
@@ -62,14 +60,19 @@ export function CoreRotationSection({ modules, events, info }: GuideProps<typeof
 
       {modules.shiftingSands.guideSubsection()}
 
-      {modules.t33Augmentation4P.guideSubsection()}
-
       {modules.moltenEmbers.guideSubsection()}
     </Section>
   );
 }
 
-function BlisteringScalesSection({ modules }: GuideProps<typeof CombatLogParser>) {
+function BlisteringScalesSection({ modules, info }: GuideProps<typeof CombatLogParser>) {
+  if (
+    !info.combatant.hasTalent(TALENTS_EVOKER.BLISTERING_SCALES_TALENT) ||
+    info.combatant.hasTalent(TALENTS_EVOKER.REGENERATIVE_CHITIN_TALENT)
+  ) {
+    return null;
+    //To-do: Possibly have a simpler uptime tracker here for Chitin?
+  }
   return (
     <SubSection title="Blistering Scales">
       <ExplanationRow>

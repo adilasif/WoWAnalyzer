@@ -4,17 +4,14 @@ import { formatNumber } from 'common/format';
 
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
-import Events, { ApplyBuffStackEvent, CastEvent, DamageEvent } from 'parser/core/Events';
+import Events, { ApplyBuffStackEvent, DamageEvent } from 'parser/core/Events';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
-import { REACTIVE_HIDE_MULTIPLIER } from '../../constants';
-import { chitinBuffStackGained } from '../normalizers/CastLinkNormalizer';
+import { REACTIVE_HIDE_MULTIPLIER, REGENERATIVE_CHITIN_MULTIPLIER } from '../../constants';
 
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import TalentSpellText from 'parser/ui/TalentSpellText';
-import DonutChart from 'parser/ui/DonutChart';
-import { SpellLink } from 'interface';
 
 /**
  * Blistering Scales is essentially Augmentations external
@@ -27,7 +24,7 @@ import { SpellLink } from 'interface';
  * Each time Blistering Scales explodes it deals 10% more damage for 12 sec, stacking 10 times.
  *
  * 2. Regenerative Chitin:
- * Blistering Scales has 5 more scales, and casting Eruption restores 1 scale.
+ * Blistering Scales no longer loses stacks and deals 20% additional damage.
  *
  * 3. Molten Blood:
  * When cast, Blistering Scales grants the target a shield that absorbs damage for 30 sec
@@ -39,12 +36,11 @@ class BlisteringScales extends Analyzer {
   hasReactiveHide = false;
   reactiveHideStacks = 0;
   reactiveHideDamage = 0;
+  regenerativeChitinDamage = 0;
   totalStacks = 0;
   onHitCount = 0;
 
   hasRegenerativeChitin = false;
-  stacksGained = 0;
-  stacksWasted = 0;
 
   constructor(options: Options) {
     super(options);
@@ -70,10 +66,6 @@ class BlisteringScales extends Analyzer {
       Events.removebuff.by(SELECTED_PLAYER).spell(SPELLS.REACTIVE_HIDE_BUFF),
       this.onRemove,
     );
-    this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.ERUPTION_TALENT),
-      this.onCast,
-    );
   }
 
   onApply() {
@@ -93,38 +85,19 @@ class BlisteringScales extends Analyzer {
       event,
       this.reactiveHideStacks * REACTIVE_HIDE_MULTIPLIER,
     );
+    if (this.hasRegenerativeChitin) {
+      this.regenerativeChitinDamage += calculateEffectiveDamage(
+        event,
+        REGENERATIVE_CHITIN_MULTIPLIER,
+      );
+    }
     this.blisteringScalesDamage += event.amount + (event.absorbed ?? 0);
     this.onHitCount += 1;
     this.totalStacks += this.reactiveHideStacks;
   }
 
-  onCast(event: CastEvent) {
-    if (!this.hasRegenerativeChitin) {
-      return;
-    }
-    if (chitinBuffStackGained(event)) {
-      this.stacksGained += 1;
-    } else {
-      this.stacksWasted += 1;
-    }
-  }
-
   statistic() {
     const averageStacks = this.totalStacks / this.onHitCount;
-    const damageSources = [
-      {
-        color: 'rgb(123,188,93)',
-        label: 'Stacks gained',
-        valueTooltip: formatNumber(this.stacksGained),
-        value: this.stacksGained,
-      },
-      {
-        color: 'rgb(216,59,59)',
-        label: 'Stacks wasted',
-        valueTooltip: formatNumber(this.stacksWasted),
-        value: this.stacksWasted,
-      },
-    ];
     return (
       <Statistic
         position={STATISTIC_ORDER.OPTIONAL(13)}
@@ -141,17 +114,16 @@ class BlisteringScales extends Analyzer {
           <ItemDamageDone amount={this.blisteringScalesDamage - this.reactiveHideDamage} />
         </TalentSpellText>
 
+        {this.hasRegenerativeChitin && (
+          <TalentSpellText talent={TALENTS.REGENERATIVE_CHITIN_TALENT}>
+            <ItemDamageDone amount={this.regenerativeChitinDamage} />
+          </TalentSpellText>
+        )}
+
         {this.hasReactiveHide && (
           <TalentSpellText talent={TALENTS.REACTIVE_HIDE_TALENT}>
             <ItemDamageDone amount={this.reactiveHideDamage} />
           </TalentSpellText>
-        )}
-
-        {this.hasRegenerativeChitin && (
-          <div className="pad">
-            <SpellLink spell={TALENTS.REGENERATIVE_CHITIN_TALENT} />
-            <DonutChart items={damageSources} />
-          </div>
         )}
       </Statistic>
     );

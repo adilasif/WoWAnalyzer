@@ -28,7 +28,6 @@ import HoardedPower from './modules/talents/HoardedPower';
 import MotesOfPossibility from './modules/talents/MotesOfPossibility';
 
 import BuffTrackerGraph from './modules/features/BuffTrackerGraph';
-import BuffTargetHelper from './modules/features/BuffTargetHelper/BuffTargetHelper';
 import BlisteringScalesGraph from './modules/talents/BlisteringScalesGraph';
 import BlisteringScalesStackTracker from './modules/talents/BlisteringScalesStackTracker';
 
@@ -38,7 +37,6 @@ import EbonMightNormalizer from './modules/normalizers/EbonMightNormalizer';
 
 // Tier
 import T32Augmentation2P from './modules/thewarwithin/T32Augmentation2P';
-import T33Augmentation4P from './modules/thewarwithin/T33Augmentation4P';
 
 //Shared
 import {
@@ -166,11 +164,9 @@ class CombatLogParser extends MainCombatLogParser {
 
     // Features
     buffTrackerGraph: BuffTrackerGraph,
-    buffTargetHelper: BuffTargetHelper,
 
     // Tier
     t32Augmentation2P: T32Augmentation2P,
-    t33Augmentation4P: T33Augmentation4P,
   };
   static guide = Guide;
 }

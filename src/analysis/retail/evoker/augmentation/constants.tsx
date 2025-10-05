@@ -21,14 +21,13 @@ export const BREATH_OF_EONS_EXTENSION_MS = 5000;
 export const DREAM_OF_SPRINGS_EXTENSION_MS = 1000;
 export const SANDS_OF_TIME_CRIT_MOD = 0.5;
 
-//Close as Clutchmates
-export const CLOSE_AS_CLUTCHMATES_MOD = 1.1;
-
 // Prescience
 export const PRESCIENCE_BASE_DURATION_MS = 18000;
 
 // Talent multipliers
+export const BLISTERING_SCALES_STACK_MAX = 15;
 export const REACTIVE_HIDE_MULTIPLIER = 0.15;
+export const REGENERATIVE_CHITIN_MULTIPLIER = 0.2;
 export const RICOCHETING_PYROCLAST_MULTIPLIER = 0.3;
 export const RICOCHETING_PYROCLAST_MAX_MULTIPLIER = 1.5;
 export const TECTONIC_LOCUS_MULTIPLIER = 0.5;
