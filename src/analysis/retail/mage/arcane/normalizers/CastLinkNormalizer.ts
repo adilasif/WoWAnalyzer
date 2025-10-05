@@ -64,9 +64,6 @@ const EVENT_LINKS = createEventLinks(
     links: [LinkPatterns.damage({ forwardBuffer: 2000, anyTarget: true })],
   },
 
-  // ============================================================================
-  // CHANNELED SPELLS
-  // ============================================================================
   {
     spell: TALENTS.ARCANE_MISSILES_TALENT.id,
     parentType: EventType.Cast,
@@ -93,9 +90,6 @@ const EVENT_LINKS = createEventLinks(
     ],
   },
 
-  // ============================================================================
-  // ARCANE ORB
-  // ============================================================================
   {
     spell: SPELLS.ARCANE_ORB.id,
     parentType: EventType.Cast,
@@ -110,18 +104,12 @@ const EVENT_LINKS = createEventLinks(
     ],
   },
 
-  // ============================================================================
-  // MAJOR COOLDOWNS - ARCANE SURGE
-  // ============================================================================
   {
     spell: TALENTS.ARCANE_SURGE_TALENT.id,
     parentType: EventType.Cast,
     links: [LinkPatterns.damage({ maxLinks: 1, anyTarget: true })],
   },
 
-  // ============================================================================
-  // MAJOR COOLDOWNS - TOUCH OF THE MAGI
-  // ============================================================================
   {
     spell: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id,
     parentType: EventType.Cast,
@@ -141,7 +129,7 @@ const EVENT_LINKS = createEventLinks(
         id: SPELLS.ARCANE_ECHO_DAMAGE.id,
         forwardBuffer: 14000,
         anyTarget: true,
-      }), // Arcane Echo during TotM
+      }),
     ],
   },
 
@@ -152,7 +140,6 @@ const EVENT_LINKS = createEventLinks(
       LinkPatterns.removeDebuff({ forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
       LinkPatterns.energize({ id: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id, anyTarget: true }),
       {
-        // Charge refund when TotM is applied
         relation: EventRelations.REFUND_BUFF,
         type: EventType.RemoveBuff,
         id: [
@@ -165,7 +152,6 @@ const EVENT_LINKS = createEventLinks(
         backwardBuffer: 500,
       },
       {
-        // Track all damage during TotM window
         relation: EventRelations.DAMAGE,
         type: EventType.Damage,
         id: [
@@ -184,9 +170,6 @@ const EVENT_LINKS = createEventLinks(
     ],
   },
 
-  // ============================================================================
-  // PROC BUFFS - CLEARCASTING
-  // ============================================================================
   {
     spell: SPELLS.CLEARCASTING_ARCANE.id,
     parentType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
@@ -208,9 +191,6 @@ const EVENT_LINKS = createEventLinks(
     ],
   },
 
-  // ============================================================================
-  // PROC BUFFS - NETHER PRECISION
-  // ============================================================================
   {
     spell: SPELLS.NETHER_PRECISION_BUFF.id,
     parentType: EventType.ApplyBuff,
@@ -243,9 +223,6 @@ const EVENT_LINKS = createEventLinks(
     links: [LinkPatterns.removeBuff({ forwardBuffer: 11000, maxLinks: 1, anyTarget: true })],
   },
 
-  // ============================================================================
-  // COOLDOWNS - PRESENCE OF MIND
-  // ============================================================================
   {
     spell: TALENTS.PRESENCE_OF_MIND_TALENT.id,
     parentType: EventType.Cast,
@@ -259,7 +236,6 @@ const EVENT_LINKS = createEventLinks(
       }),
       LinkPatterns.removeBuff({ forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
       {
-        // Next Barrage after PoM (for checking PoM → Barrage efficiency)
         relation: EventRelations.BARRAGE_CAST,
         type: EventType.Cast,
         id: SPELLS.ARCANE_BARRAGE.id,
@@ -284,9 +260,6 @@ const EVENT_LINKS = createEventLinks(
     ],
   },
 
-  // ============================================================================
-  // TALENT BUFFS
-  // ============================================================================
   {
     spell: SPELLS.BURDEN_OF_POWER_BUFF.id,
     parentType: EventType.RemoveBuff,
