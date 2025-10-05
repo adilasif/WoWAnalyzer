@@ -80,7 +80,7 @@ export class GuideBuilder {
   private spell: Spell;
   private explanationContent: JSX.Element = (<></>);
   private components: JSX.Element[] = [];
-  private explanationPercent?: number;
+  private explanationPercent?: number = GUIDE_CORE_EXPLANATION_PERCENT;
 
   /**
    * Create a new guide builder for the given spell
