@@ -81,6 +81,7 @@ export class GuideBuilder {
   private explanationContent: JSX.Element = (<></>);
   private components: JSX.Element[] = [];
   private explanationPercent?: number = GUIDE_CORE_EXPLANATION_PERCENT;
+  private lastConditionResult = false;
 
   /**
    * Create a new guide builder for the given spell
@@ -402,6 +403,7 @@ export class GuideBuilder {
    * @param builderFunc Function that receives this builder and adds components
    */
   when(condition: boolean, builderFunc: (builder: GuideBuilder) => GuideBuilder): GuideBuilder {
+    this.lastConditionResult = condition;
     if (condition) {
       builderFunc(this);
     }
@@ -413,10 +415,9 @@ export class GuideBuilder {
    * @param builderFunc Function that receives this builder and adds components
    */
   otherwise(builderFunc: (builder: GuideBuilder) => GuideBuilder): GuideBuilder {
-    // Note: This is a simplified implementation. A more sophisticated version would
-    // track the last condition state, but for most use cases this pattern works:
-    // when(condition, ...).otherwise(...) where otherwise is only called if when wasn't
-    builderFunc(this);
+    if (!this.lastConditionResult) {
+      builderFunc(this);
+    }
     return this;
   }
 

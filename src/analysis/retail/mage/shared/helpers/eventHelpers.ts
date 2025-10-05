@@ -35,7 +35,7 @@ import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
  */
 export function getManaPercentage(event: CastEvent): number | undefined {
   const resource = event.classResources?.find((r) => r.type === RESOURCE_TYPES.MANA.id);
-  return resource ? resource.amount / resource.max : undefined;
+  return resource && resource.max > 0 ? resource.amount / resource.max : undefined;
 }
 
 /**

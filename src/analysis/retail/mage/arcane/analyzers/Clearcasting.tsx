@@ -29,7 +29,7 @@ export default class Clearcasting extends MageAnalyzer {
   onClearcastingApply(event: ApplyBuffEvent | ApplyBuffStackEvent) {
     const removeBuff: RemoveBuffEvent | RemoveBuffStackEvent | undefined = GetRelatedEvent(
       event,
-      'BuffRemomve',
+      'BuffRemove',
     );
     const missiles: CastEvent | undefined = GetRelatedEvent(event, EventRelations.CAST);
 
