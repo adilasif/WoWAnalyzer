@@ -4,30 +4,11 @@ import Analyzer from 'parser/core/Analyzer';
 import type CombatLogParser from 'parser/core/CombatLogParser';
 import {
   generateGuideTooltip,
-  evaluatePerformance,
-  evaluateBoolean,
-  createBoxRowEntry,
-  createSimpleEntry,
-  createExpandableConfig,
   type ExpandableConfig,
   type ExpandableChecklistItem,
 } from '../helpers/guideHelpers';
-import { getFightContext } from '../helpers/fightHelpers';
 
-// Re-export for backwards compatibility
-export {
-  generateGuideTooltip,
-  evaluatePerformance,
-  evaluateBoolean,
-  createBoxRowEntry,
-  createSimpleEntry,
-  createExpandableConfig,
-  getFightContext,
-  type ExpandableConfig,
-  type ExpandableChecklistItem,
-};
-
-export type GuideData = Record<string, unknown>;
+export { type ExpandableConfig, type ExpandableChecklistItem };
 
 /**
  * Represents a condition that can result in performance evaluation.
@@ -35,9 +16,9 @@ export type GuideData = Record<string, unknown>;
  */
 export interface GuideCondition {
   name: string;
-  check: boolean; // true means this condition is met
-  description: string; // what to show in tooltip when this condition triggers
-  active?: boolean; // if false, skip this condition entirely (defaults to true)
+  check: boolean;
+  description: string;
+  active?: boolean;
 }
 
 /**
@@ -45,14 +26,10 @@ export interface GuideCondition {
  */
 export interface GuideEvaluationConfig {
   actionName: string;
-
-  // Conditions that result in failure (prerequisites not met, mistakes made, etc.)
   failConditions?: GuideCondition[];
   perfectConditions?: GuideCondition[];
   goodConditions?: GuideCondition[];
   okConditions?: GuideCondition[];
-
-  // Default performance if no conditions match
   defaultPerformance?: QualitativePerformance;
   defaultMessage?: string;
 }
@@ -78,7 +55,7 @@ export interface GuideEvaluationConfig {
  * @param config - Evaluation configuration specifying conditions
  * @returns BoxRowEntry for use in PerformanceBoxRow
  */
-function _evaluateEvent<T = GuideData>(
+function _evaluateEvent<T>(
   timestamp: number,
   data: T,
   analyzer: Analyzer,
@@ -183,14 +160,6 @@ function createTooltipEntry(
  * @param config.analyzer - Analyzer instance for tooltip generation
  * @returns Array of BoxRowEntry evaluations
  *
- * @example
- * get arcaneOrbData(): BoxRowEntry[] {
- *   return evaluateEvents({
- *     events: this.arcaneOrb.orbCasts,
- *     evaluationLogic: (cast) => ({ ... }),
- *     analyzer: this,
- *   });
- * }
  */
 export function evaluateEvents<
   T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },

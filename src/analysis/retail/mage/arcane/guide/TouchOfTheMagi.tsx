@@ -7,12 +7,8 @@ import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 
-import {
-  evaluateEvents,
-  evaluatePerformance,
-  createExpandableConfig,
-  ExpandableConfig,
-} from '../../shared/components';
+import { evaluateEvents, type ExpandableConfig } from '../../shared/components';
+import { evaluatePerformance, createExpandableConfig } from '../../shared/helpers';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 
 import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';

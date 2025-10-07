@@ -5,7 +5,6 @@ import { SpellIcon } from 'interface';
 import BaseChart, { formatTime } from 'parser/ui/BaseChart';
 import Spell from 'common/SPELLS/Spell';
 
-// Data point interfaces
 export interface TimeValue {
   timestamp: number;
   value: number;
@@ -29,7 +28,6 @@ export interface DataSeries {
   strokeWidth?: number;
 }
 
-// Chart configuration
 export interface ChartConfig {
   title?: string;
   height?: number;
@@ -167,7 +165,6 @@ class GeneralizedChart extends React.PureComponent<Props> {
   render() {
     const { series, annotations = [], config = {}, startTime } = this.props;
 
-    // Convert timestamps to relative time
     const processedSeries = series.map((s) => ({
       ...s,
       data: s.data.map((point) => {
@@ -190,8 +187,7 @@ class GeneralizedChart extends React.PureComponent<Props> {
       const seconds = Math.floor((relativeTime % 60000) / 1000);
       const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-      // Check for overlapping annotations within 1 second and offset them slightly
-      const overlapThreshold = 1000; // 1 second in milliseconds
+      const overlapThreshold = 1000;
       let adjustedTime = relativeTime;
 
       const overlappingAnnotations = annotations
@@ -201,13 +197,12 @@ class GeneralizedChart extends React.PureComponent<Props> {
         );
 
       if (overlappingAnnotations.length > 0) {
-        // Offset by 200ms per overlapping annotation to create visual separation
         adjustedTime = relativeTime + overlappingAnnotations.length * 200;
       }
 
       return {
         x: adjustedTime,
-        originalX: relativeTime, // Keep original time for tooltip
+        originalX: relativeTime,
         label: ann.label || (ann.spell ? ann.spell.name : 'Event'),
         color: ann.color || this.getAnnotationColor(ann.type),
         spell: ann.spell,
@@ -246,7 +241,6 @@ class GeneralizedChart extends React.PureComponent<Props> {
       },
     };
 
-    // Create layers for each series
     const seriesLayers = processedSeries.map((s, index) => ({
       data: { name: `series_${index}` },
       mark: {
@@ -274,7 +268,6 @@ class GeneralizedChart extends React.PureComponent<Props> {
       },
     }));
 
-    // Add annotation layer if annotations exist
     const annotationLayers =
       processedAnnotations.length > 0
         ? [
@@ -314,7 +307,6 @@ class GeneralizedChart extends React.PureComponent<Props> {
       layer: [...seriesLayers, ...annotationLayers],
     };
 
-    // Prepare data for the chart
     const chartData: Record<string, unknown> = {
       annotations: processedAnnotations,
     };

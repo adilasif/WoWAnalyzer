@@ -3,7 +3,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents, createExpandableConfig, ExpandableConfig } from '../../shared/components';
+import { evaluateEvents, type ExpandableConfig } from '../../shared/components';
+import { createExpandableConfig } from '../../shared/helpers';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 
 import ArcaneSurge, { ArcaneSurgeData } from '../analyzers/ArcaneSurge';

@@ -3,7 +3,8 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents, createExpandableConfig, ExpandableConfig } from '../../shared/components';
+import { evaluateEvents, type ExpandableConfig } from '../../shared/components';
+import { createExpandableConfig } from '../../shared/helpers';
 import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
 import ShiftingPowerArcane, { MAX_TICKS, ShiftingPowerData } from '../analyzers/ShiftingPower';
 
