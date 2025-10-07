@@ -87,9 +87,9 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
   }
 
   get touchOfTheMagiData(): BoxRowEntry[] {
-    return evaluateEvents(
-      this.touchOfTheMagi.touchData,
-      (cast: TouchOfTheMagiData) => {
+    return evaluateEvents({
+      events: this.touchOfTheMagi.touchData,
+      evaluationLogic: (cast: TouchOfTheMagiData) => {
         const noCharges = cast.charges === 0;
         const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
         const activeTime = cast.activeTime || 0;
@@ -140,8 +140,8 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
           defaultMessage: `Suboptimal Touch usage: ${cast.charges} charges, ${formatPercentage(activeTime, 1)}% active time`,
         };
       },
-      this,
-    );
+      analyzer: this,
+    });
   }
 
   get guideSubsection(): JSX.Element {

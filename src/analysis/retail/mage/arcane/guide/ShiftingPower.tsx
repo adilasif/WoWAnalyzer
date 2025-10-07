@@ -98,9 +98,9 @@ class ShiftingPowerGuide extends MageAnalyzer {
   }
 
   get shiftingPowerData(): BoxRowEntry[] {
-    return evaluateEvents(
-      this.shiftingPower.shiftingPowerData,
-      (cast: ShiftingPowerData) => {
+    return evaluateEvents({
+      events: this.shiftingPower.shiftingPowerData,
+      evaluationLogic: (cast: ShiftingPowerData) => {
         const inConservePhase =
           !cast.cdsActive.arcaneSurge &&
           !cast.cdsActive.touchOfTheMagi &&
@@ -191,8 +191,8 @@ class ShiftingPowerGuide extends MageAnalyzer {
           defaultMessage: `${cast.ticks}/${MAX_TICKS} ticks - check timing and duration`,
         };
       },
-      this,
-    );
+      analyzer: this,
+    });
   }
 
   get guideSubsection(): JSX.Element {

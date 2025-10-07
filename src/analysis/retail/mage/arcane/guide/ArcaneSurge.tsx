@@ -29,9 +29,9 @@ class ArcaneSurgeGuide extends MageAnalyzer {
       netherPrecision: cast.netherPrecision,
     }));
 
-    return evaluateEvents(
-      transformedCasts,
-      (cast: {
+    return evaluateEvents({
+      events: transformedCasts,
+      evaluationLogic: (cast: {
         timestamp: number;
         mana?: number;
         charges: number;
@@ -103,8 +103,8 @@ class ArcaneSurgeGuide extends MageAnalyzer {
           defaultMessage: 'Suboptimal Arcane Surge usage',
         };
       },
-      this,
-    );
+      analyzer: this,
+    });
   }
 
   private get expandableConfig(): ExpandableConfig {

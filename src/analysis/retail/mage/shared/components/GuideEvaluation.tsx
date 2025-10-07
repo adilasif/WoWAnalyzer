@@ -86,8 +86,6 @@ function _evaluateEvent<T = GuideData>(
 ): BoxRowEntry {
   let finalEvaluation: BoxRowEntry | null = null;
 
-  // Step 1: Check fail conditions - any condition that makes the cast a failure
-  // This includes prerequisites not met, mistakes made, etc.
   if (config.failConditions) {
     for (const condition of config.failConditions) {
       if (condition.active !== false && condition.check) {
@@ -102,7 +100,6 @@ function _evaluateEvent<T = GuideData>(
     }
   }
 
-  // Step 2: Check perfect conditions (any match = perfect)
   if (!finalEvaluation && config.perfectConditions) {
     for (const condition of config.perfectConditions) {
       if (condition.active !== false && condition.check) {
@@ -117,7 +114,6 @@ function _evaluateEvent<T = GuideData>(
     }
   }
 
-  // Step 3: Check good conditions (any match = good)
   if (!finalEvaluation && config.goodConditions) {
     for (const condition of config.goodConditions) {
       if (condition.active !== false && condition.check) {
@@ -132,7 +128,6 @@ function _evaluateEvent<T = GuideData>(
     }
   }
 
-  // Step 4: Check ok conditions (any match = ok)
   if (!finalEvaluation && config.okConditions) {
     for (const condition of config.okConditions) {
       if (condition.active !== false && condition.check) {
@@ -147,7 +142,6 @@ function _evaluateEvent<T = GuideData>(
     }
   }
 
-  // Step 5: Default fallback
   if (!finalEvaluation) {
     finalEvaluation = createTooltipEntry(
       analyzer,
@@ -183,13 +177,13 @@ function createTooltipEntry(
 /**
  * Standardized evaluation helper for event data that reduces boilerplate.
  *
- * @param events - Array of event data to evaluate
- * @param evaluationLogic - Function that takes an event and returns evaluation config
- * @param analyzer - Guide instance for tooltip generation
+ * @param config - Configuration object
+ * @param config.events - Array of event data to evaluate
+ * @param config.evaluationLogic - Function that takes an event and returns evaluation config
+ * @param config.analyzer - Analyzer instance for tooltip generation
  * @returns Array of BoxRowEntry evaluations
  *
  * @example
- * // Object syntax
  * get arcaneOrbData(): BoxRowEntry[] {
  *   return evaluateEvents({
  *     events: this.arcaneOrb.orbCasts,
@@ -198,54 +192,15 @@ function createTooltipEntry(
  *   });
  * }
  */
-
-// Object syntax overload
 export function evaluateEvents<
   T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
 >(config: {
   events: T[];
   evaluationLogic: (event: T) => GuideEvaluationConfig;
   analyzer: Analyzer;
-}): BoxRowEntry[];
-
-// Positional parameters overload (legacy)
-export function evaluateEvents<
-  T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
->(
-  events: T[],
-  evaluationLogic: (event: T) => GuideEvaluationConfig,
-  analyzer: Analyzer,
-): BoxRowEntry[];
-
-// Implementation
-export function evaluateEvents<
-  T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
->(
-  eventsOrConfig:
-    | T[]
-    | { events: T[]; evaluationLogic: (event: T) => GuideEvaluationConfig; analyzer: Analyzer },
-  evaluationLogic?: (event: T) => GuideEvaluationConfig,
-  analyzer?: Analyzer,
-): BoxRowEntry[] {
-  // Handle both object and positional parameters
-  let events: T[];
-  let logic: (event: T) => GuideEvaluationConfig;
-  let analyzerInstance: Analyzer;
-
-  if (Array.isArray(eventsOrConfig)) {
-    // Positional parameters
-    events = eventsOrConfig;
-    logic = evaluationLogic!;
-    analyzerInstance = analyzer!;
-  } else {
-    // Object parameter
-    events = eventsOrConfig.events;
-    logic = eventsOrConfig.evaluationLogic;
-    analyzerInstance = eventsOrConfig.analyzer;
-  }
-
-  return events.map((event: T) => {
+}): BoxRowEntry[] {
+  return config.events.map((event: T) => {
     const timestamp = event.timestamp || event.applied || event.cast?.timestamp || 0;
-    return _evaluateEvent(timestamp, event, analyzerInstance, logic(event));
+    return _evaluateEvent(timestamp, event, config.analyzer, config.evaluationLogic(event));
   });
 }

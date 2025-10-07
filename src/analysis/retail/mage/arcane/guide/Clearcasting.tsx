@@ -14,9 +14,9 @@ class ClearcastingGuide extends MageAnalyzer {
   protected clearcasting!: Clearcasting;
 
   get clearcastingData(): BoxRowEntry[] {
-    return evaluateEvents(
-      this.clearcasting.clearcastingProcs,
-      (cc: ClearcastingData) => ({
+    return evaluateEvents({
+      events: this.clearcasting.clearcastingProcs,
+      evaluationLogic: (cc: ClearcastingData) => ({
         actionName: 'Clearcasting',
 
         failConditions: [
@@ -38,8 +38,8 @@ class ClearcastingGuide extends MageAnalyzer {
         defaultPerformance: QualitativePerformance.Fail,
         defaultMessage: 'Clearcasting proc not handled properly',
       }),
-      this,
-    );
+      analyzer: this,
+    });
   }
 
   get guideSubsection(): JSX.Element {
