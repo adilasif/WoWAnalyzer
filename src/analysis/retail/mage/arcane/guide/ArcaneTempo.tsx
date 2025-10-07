@@ -79,7 +79,7 @@ class ArcaneTempoGuide extends MageAnalyzer {
 
     return new GuideBuilder(TALENTS.ARCANE_TEMPO_TALENT)
       .explanation(explanation)
-      .addBuffStackUptimeFromSpell({
+      .addBuffUptime({
         analyzer: this,
         buffSpell: SPELLS.ARCANE_TEMPO_BUFF,
         castData,

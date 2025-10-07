@@ -60,7 +60,6 @@ import { getUptimesFromBuffHistory } from 'parser/ui/UptimeBar';
 import { getStackUptimesFromBuffHistory } from 'parser/ui/UptimeStackBar';
 import type { default as Combatant } from 'parser/core/Combatant';
 
-/** Type for accessing fight timestamps and combatant data */
 export interface FightInfo {
   owner: {
     fight: {
@@ -72,9 +71,6 @@ export interface FightInfo {
   selectedCombatant: Combatant;
 }
 
-/**
- * Main fluent builder class for creating guide subsections
- */
 export class GuideBuilder {
   private title = '';
   private spell: Spell;
@@ -191,33 +187,30 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a buff uptime visualization
-   * Great for showing how well players maintained important buffs
-   * @param config Configuration for the buff uptime
-   * @param config.uptimePercentage The uptime percentage (0-1) to display
-   * @param config.uptimeGraph Optional custom uptime graph component
-   */
-  addBuffUptime(config: { uptimePercentage: number; uptimeGraph?: JSX.Element }): GuideBuilder {
-    this.components.push(
-      this.createBuffUptimeGraph(this.spell, config.uptimePercentage, config.uptimeGraph),
-    );
-    return this;
-  }
-
-  /**
-   * Add a buff stack uptime bar with performance tracking (simplified - auto-fetches buff history)
+   * Add a buff uptime visualization with performance tracking
    * Perfect for stacking buffs where maintaining high stacks is important
+   * Can also be used for simple on/off buffs by setting maxStacks: 1
    *
    * @example
+   * // Stacking buff
    * new GuideBuilder(TALENTS.ARCANE_TEMPO_TALENT)
-   *   .addBuffStackUptimeFromSpell({
+   *   .addBuffUptime({
    *     analyzer: this,
    *     buffSpell: SPELLS.ARCANE_TEMPO_BUFF,
    *     castData: [tempoEntry],
    *     maxStacks: ARCANE_TEMPO_MAX_STACKS,
    *   })
+   *
+   * // Simple on/off buff
+   * new GuideBuilder(SPELLS.SOME_BUFF)
+   *   .addBuffUptime({
+   *     analyzer: this,
+   *     buffSpell: SPELLS.SOME_BUFF,
+   *     castData: [],
+   *     maxStacks: 1,
+   *   })
    */
-  addBuffStackUptimeFromSpell(config: {
+  addBuffUptime(config: {
     /** The analyzer instance (typically `this` from your guide) for accessing buff history */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     analyzer: any;
@@ -225,7 +218,7 @@ export class GuideBuilder {
     buffSpell: Spell;
     /** Cast performance entries to display above the bar */
     castData: BoxRowEntry[];
-    /** Maximum stacks for the buff */
+    /** Maximum stacks for the buff (use 1 for simple on/off buffs) */
     maxStacks: number;
     /** Fight start timestamp (defaults to fight start) */
     startTime?: number;
@@ -248,69 +241,22 @@ export class GuideBuilder {
     const startTime = config.startTime ?? config.analyzer.owner.fight.start_time;
     const endTime = config.endTime ?? config.analyzer.owner.fight.end_time;
 
-    // Delegate to the existing method
-    return this.addBuffStackUptime({
-      stackData: stackUptimes,
-      castData: config.castData,
-      backgroundUptimes: overallUptimes,
-      startTime,
-      endTime,
-      maxStacks: config.maxStacks,
-      barColor: config.barColor,
-      backgroundBarColor: config.backgroundBarColor,
-      tooltip: config.tooltip,
-    });
-  }
-
-  /**
-   * Add buff stack uptime with multiple stack levels (advanced - provide your own data)
-   * Use this if you need custom data processing or partial time windows
-   * Useful for abilities that can stack and where stack count matters
-   */
-  addBuffStackUptime(config: {
-    /** Stack uptime data for the detailed bar */
-    stackData: { start: number; end: number; stacks: number }[];
-    /** Cast performance entries to display above the bar */
-    castData: BoxRowEntry[];
-    /** Background uptime data (overall buff presence) */
-    backgroundUptimes: { start: number; end: number }[];
-    /** Fight start timestamp */
-    startTime: number;
-    /** Fight end timestamp */
-    endTime: number;
-    /** Maximum stacks for the buff */
-    maxStacks: number;
-    /** Color for the stack bar (defaults to purple) */
-    barColor?: string;
-    /** Color for the background bar (defaults to gray) */
-    backgroundBarColor?: string;
-    /** Tooltip text for average stacks (has sensible default) */
-    tooltip?: string;
-  }): GuideBuilder {
     // Calculate average stacks from stack data
-    const averageStacks = this.calculateAverageStacks(
-      config.stackData,
-      config.startTime,
-      config.endTime,
-    );
+    const averageStacks = this.calculateAverageStacks(stackUptimes, startTime, endTime);
 
     // Calculate uptime percentage from background uptimes
-    const uptimePercentage = this.calculateUptimePercentage(
-      config.backgroundUptimes,
-      config.startTime,
-      config.endTime,
-    );
+    const uptimePercentage = this.calculateUptimePercentage(overallUptimes, startTime, endTime);
 
     this.components.push(
-      this.createBuffStackUptime(
+      this.createBuffUptime(
         this.spell,
-        config.stackData,
+        stackUptimes,
         averageStacks,
         config.castData,
         uptimePercentage,
-        config.backgroundUptimes,
-        config.startTime,
-        config.endTime,
+        overallUptimes,
+        startTime,
+        endTime,
         config.maxStacks,
         config.barColor || '#cd1bdf',
         config.backgroundBarColor || '#7e5da8',
@@ -421,16 +367,9 @@ export class GuideBuilder {
     return this;
   }
 
-  /**
-   * Build the final guide subsection JSX
-   */
   build(): JSX.Element {
     return this.createSubsection(this.explanationContent, this.components, this.title);
   }
-
-  // ========================================
-  // Private implementation methods
-  // ========================================
 
   private createSubsection(
     explanation: JSX.Element,
@@ -452,7 +391,6 @@ export class GuideBuilder {
       </RoundedPanel>
     );
 
-    // If explanationPercent is undefined, use vertical layout
     if (this.explanationPercent === undefined) {
       return (
         <SubSection title={title}>
@@ -489,11 +427,6 @@ export class GuideBuilder {
     return <CastSummaryAndBreakdown spell={this.spell} castEntries={castEntries} />;
   }
 
-  // ===============================
-  // PRIVATE HELPER METHODS
-  // ===============================
-
-  /** Calculate average stacks from stack uptime data */
   private calculateAverageStacks(
     stackData: { start: number; end: number; stacks: number }[],
     startTime: number,
@@ -510,7 +443,6 @@ export class GuideBuilder {
     return totalStackTime / fightDuration;
   }
 
-  /** Calculate uptime percentage from background uptime data */
   private calculateUptimePercentage(
     backgroundUptimes: { start: number; end: number }[],
     startTime: number,
@@ -525,10 +457,6 @@ export class GuideBuilder {
 
     return totalUptime / fightDuration;
   }
-
-  // ===============================
-  // PRIVATE COMPONENT CREATORS
-  // ===============================
 
   private createStatistic(
     spell: Spell,
@@ -636,24 +564,6 @@ export class GuideBuilder {
     );
   }
 
-  private createBuffUptimeGraph(
-    spell: Spell,
-    uptimePercentage: number,
-    uptimeGraph?: JSX.Element,
-  ): JSX.Element {
-    return (
-      <div>
-        <div>
-          <SpellIcon spell={spell} />{' '}
-          <strong>
-            {spell.name} Uptime: {uptimePercentage.toFixed(1)}%
-          </strong>
-        </div>
-        {uptimeGraph}
-      </div>
-    );
-  }
-
   private createNoUsageComponent(spell: Spell): JSX.Element {
     return (
       <div>
@@ -666,7 +576,7 @@ export class GuideBuilder {
     );
   }
 
-  private createBuffStackUptime(
+  private createBuffUptime(
     spell: Spell,
     stackData: { start: number; end: number; stacks: number }[],
     averageStacks: number,
@@ -773,7 +683,6 @@ export function generateExpandableBreakdown(config: {
       }),
     );
 
-    // Add cast timeline if getCastEvents is provided
     let detailItems: Array<{ label: React.ReactNode; details: React.ReactNode }> | undefined;
     if (expandableConfig.getCastEvents) {
       const casts = expandableConfig.getCastEvents(cast);
