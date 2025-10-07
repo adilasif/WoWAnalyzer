@@ -202,7 +202,7 @@ class ArcaneSurgeGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.ARCANE_SURGE_TALENT, 'Arcane Surge')
+    return new GuideBuilder(TALENTS.ARCANE_SURGE_TALENT)
       .explanation(explanation)
       .addExpandableBreakdown({
         castBreakdowns: generateExpandableBreakdown({

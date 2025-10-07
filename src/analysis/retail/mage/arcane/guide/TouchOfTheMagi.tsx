@@ -213,7 +213,7 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT, 'Touch of the Magi')
+    return new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT)
       .explanation(explanation)
       .addStatistic({
         value: `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,

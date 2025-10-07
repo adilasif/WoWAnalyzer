@@ -83,7 +83,7 @@ class NetherPrecisionGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.NETHER_PRECISION_TALENT, 'Nether Precision')
+    return new GuideBuilder(TALENTS.NETHER_PRECISION_TALENT)
       .explanation(explanation)
       .addCastSummary({
         castData: this.netherPrecisionData,

@@ -147,7 +147,7 @@ class SupernovaGuide extends MageAnalyzer {
       <>{this.supernova.averageTargetsHit.toFixed(2)} average targets hit per cast.</>
     );
 
-    return new GuideBuilder(TALENTS.SUPERNOVA_TALENT, 'Supernova')
+    return new GuideBuilder(TALENTS.SUPERNOVA_TALENT)
       .explanation(explanation)
       .when(this.supernova.casts.length > 0, (builder: GuideBuilder) =>
         builder

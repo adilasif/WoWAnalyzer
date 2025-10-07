@@ -211,7 +211,7 @@ class ShiftingPowerGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.SHIFTING_POWER_TALENT, 'Shifting Power')
+    return new GuideBuilder(TALENTS.SHIFTING_POWER_TALENT)
       .explanation(explanation)
       .when(this.shiftingPower.shiftingPowerData.length > 0, (builder: GuideBuilder) =>
         builder.addExpandableBreakdown({

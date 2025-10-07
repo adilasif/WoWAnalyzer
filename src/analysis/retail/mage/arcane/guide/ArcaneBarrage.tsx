@@ -163,7 +163,7 @@ class ArcaneBarrageGuide extends MageAnalyzer {
         </div>
       </>
     );
-    return new GuideBuilder(SPELLS.ARCANE_BARRAGE, 'Arcane Barrage')
+    return new GuideBuilder(SPELLS.ARCANE_BARRAGE)
       .explanation(explanation)
       .addCastSummary({
         castData: this.arcaneBarrageData,

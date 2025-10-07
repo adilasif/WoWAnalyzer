@@ -152,7 +152,7 @@ class ArcaneMissilesGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.ARCANE_MISSILES_TALENT, 'Arcane Missiles')
+    return new GuideBuilder(TALENTS.ARCANE_MISSILES_TALENT)
       .explanation(explanation)
       .addStatistic({
         value: formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),

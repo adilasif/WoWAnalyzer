@@ -18,9 +18,6 @@ import {
 /**
  * Arcane Mage Cast Link Normalizer
  *
- * Links related events together (e.g., cast → damage, buff apply → buff remove)
- * for easier analysis in spec modules.
- *
  * DEFAULTS (can be overridden per-link):
  * - forwardBuffer: 75ms (CAST_BUFFER_MS)
  * - backwardBuffer: 75ms (CAST_BUFFER_MS)

@@ -134,7 +134,7 @@ class PresenceOfMindGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.PRESENCE_OF_MIND_TALENT, 'Presence of Mind')
+    return new GuideBuilder(TALENTS.PRESENCE_OF_MIND_TALENT)
       .explanation(explanation)
       .when(this.presenceOfMind.pomData.length > 0, (builder: GuideBuilder) =>
         builder.addCastSummary({

@@ -62,7 +62,7 @@ class ClearcastingGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(SPELLS.CLEARCASTING_ARCANE, 'Clearcasting')
+    return new GuideBuilder(SPELLS.CLEARCASTING_ARCANE)
       .explanation(explanation)
       .addCastSummary({
         castData: this.clearcastingData,
