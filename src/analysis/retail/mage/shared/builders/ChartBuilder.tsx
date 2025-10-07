@@ -167,99 +167,37 @@ export class ChartBuilder {
   }
 
   /**
-   * Add spell cast annotations
-   * @param casts Array of cast events with timestamp and spell
-   * @param color Optional color for the cast markers
+   * Add annotations to the chart (spell casts, buffs, deaths, damage, or custom events)
+   * @param config Configuration for the annotations
+   * @param config.events Array of events with timestamp and additional fields
+   * @param config.type Type of annotation (cast, buff, damage, death, or custom)
+   * @param config.color Optional color override (defaults based on type)
    */
-  addCastAnnotations(
-    casts: Array<{ timestamp: number; spell: Spell }>,
-    color?: string,
-  ): ChartBuilder {
-    casts.forEach((cast) => {
-      this.annotations.push({
-        timestamp: cast.timestamp,
-        spell: cast.spell,
-        type: 'cast',
-        color: color || '#4CAF50',
-      });
-    });
-    return this;
-  }
+  addAnnotations(config: {
+    events: Array<{
+      timestamp: number;
+      spell?: Spell;
+      label?: string;
+      color?: string;
+    }>;
+    type: 'cast' | 'buff' | 'damage' | 'death' | 'custom';
+    color?: string;
+  }): ChartBuilder {
+    const defaultColors = {
+      cast: '#4CAF50',
+      buff: '#2196F3',
+      damage: '#F44336',
+      death: '#D32F2F',
+      custom: '#9E9E9E',
+    };
 
-  /**
-   * Add buff application annotations
-   * @param buffs Array of buff events with timestamp and spell
-   * @param color Optional color for the buff markers
-   */
-  addBuffAnnotations(
-    buffs: Array<{ timestamp: number; spell: Spell }>,
-    color?: string,
-  ): ChartBuilder {
-    buffs.forEach((buff) => {
-      this.annotations.push({
-        timestamp: buff.timestamp,
-        spell: buff.spell,
-        type: 'buff',
-        color: color || '#2196F3',
-      });
-    });
-    return this;
-  }
-
-  /**
-   * Add damage taken annotations
-   * @param damage Array of damage events with timestamp and optional spell/label
-   * @param color Optional color for the damage markers
-   */
-  addDamageAnnotations(
-    damage: Array<{ timestamp: number; spell?: Spell; label?: string }>,
-    color?: string,
-  ): ChartBuilder {
-    damage.forEach((dmg) => {
-      this.annotations.push({
-        timestamp: dmg.timestamp,
-        spell: dmg.spell,
-        label: dmg.label,
-        type: 'damage',
-        color: color || '#F44336',
-      });
-    });
-    return this;
-  }
-
-  /**
-   * Add death annotations
-   * @param deaths Array of death events with timestamp and optional label
-   * @param color Optional color for the death markers
-   */
-  addDeathAnnotations(
-    deaths: Array<{ timestamp: number; label?: string }>,
-    color?: string,
-  ): ChartBuilder {
-    deaths.forEach((death) => {
-      this.annotations.push({
-        timestamp: death.timestamp,
-        label: death.label || 'Death',
-        type: 'death',
-        color: color || '#D32F2F',
-      });
-    });
-    return this;
-  }
-
-  /**
-   * Add custom event annotations
-   * @param events Array of custom events with timestamp, label, and optional color
-   */
-  addCustomAnnotations(
-    events: Array<{ timestamp: number; label: string; color?: string }>,
-  ): ChartBuilder {
-    events.forEach((event) => {
+    config.events.forEach((event) => {
       this.annotations.push({
         timestamp: event.timestamp,
-        label: event.label,
-        type: 'custom',
-        color: event.color || '#9E9E9E',
+        spell: event.spell,
+        label: event.label || (config.type === 'death' ? 'Death' : undefined),
+        type: config.type,
+        color: event.color || config.color || defaultColors[config.type],
       });
     });
     return this;
@@ -317,7 +255,7 @@ export class ChartBuilder {
         color,
       }));
 
-    return this.addCustomAnnotations(warnings);
+    return this.addAnnotations({ events: warnings, type: 'custom' });
   }
 
   /**

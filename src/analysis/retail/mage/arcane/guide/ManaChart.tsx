@@ -108,8 +108,12 @@ class ManaChart extends MageAnalyzer {
     const chart = new ChartBuilder(this.owner.fight.start_time, this.owner.fight.end_time)
       .asManaChart()
       .addManaTracking(this.manaUpdates)
-      .addCastAnnotations(arcaneSurgeCasts, SPELL_COLORS.ARCANE_SURGE)
-      .addCastAnnotations(this.evocationCasts, SPELL_COLORS.EVOCATION)
+      .addAnnotations({
+        events: arcaneSurgeCasts,
+        type: 'cast',
+        color: SPELL_COLORS.ARCANE_SURGE,
+      })
+      .addAnnotations({ events: this.evocationCasts, type: 'cast', color: SPELL_COLORS.EVOCATION })
       .addLowResourceWarnings(this.manaUpdates, 0.1, 'Low Mana')
       .addBossHealth(this.owner.report.code)
       .build();
