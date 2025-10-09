@@ -18,7 +18,6 @@ export const sunfuryApl = build([
     spell: TALENTS.ARCANE_MISSILES_TALENT,
     condition: cnd.and(
       cnd.buffStacks(SPELLS.CLEARCASTING_ARCANE, { atLeast: 3 }),
-      cnd.buffMissing(SPELLS.NETHER_PRECISION_BUFF),
       cnd.buffPresent(SPELLS.ARCANE_SOUL_BUFF),
     ),
   },
@@ -31,10 +30,7 @@ export const sunfuryApl = build([
   // will expire in less than 2 seconds].
   {
     spell: SPELLS.ARCANE_BARRAGE,
-    condition: cnd.or(
-      cnd.buffPresent(SPELLS.INTUITION_BUFF),
-      cnd.buffRemaining(SPELLS.ARCANE_TEMPO_BUFF, 12000, { atMost: 1000 }),
-    ),
+    condition: cnd.or(cnd.buffRemaining(SPELLS.ARCANE_TEMPO_BUFF, 12000, { atMost: 1000 })),
   },
 
   // [Shifting Power after  Arcane Soul ends].
@@ -60,10 +56,7 @@ export const sunfuryApl = build([
   // [clip this off the GCD unless you have  Aether Attunement proc].
   {
     spell: TALENTS.ARCANE_MISSILES_TALENT,
-    condition: cnd.and(
-      cnd.buffPresent(SPELLS.CLEARCASTING_ARCANE),
-      cnd.buffMissing(SPELLS.NETHER_PRECISION_BUFF),
-    ),
+    condition: cnd.and(cnd.buffPresent(SPELLS.CLEARCASTING_ARCANE)),
   },
 
   // 7. Arcane Barrage if you have either Intuition or Glorious Incandescence,
@@ -74,14 +67,12 @@ export const sunfuryApl = build([
     spell: SPELLS.ARCANE_BARRAGE,
     condition: cnd.describe(
       cnd.or(
-        cnd.buffPresent(SPELLS.INTUITION_BUFF, 500),
         // cnd.buffPresent(SPELLS.GLORIOUS_INCANDESCENCE_BUFF, 500),
         cnd.buffPresent(SPELLS.GLORIOUS_INCANDESCENCE_BUFF, -200),
         cnd.buffPresent(SPELLS.BURDEN_OF_POWER_BUFF),
       ),
       (tense) => (
         <>
-          <SpellLink spell={SPELLS.INTUITION_BUFF} /> or{' '}
           <SpellLink spell={SPELLS.GLORIOUS_INCANDESCENCE_BUFF} /> {tenseAlt(tense, 'is', 'was')}{' '}
           present
         </>

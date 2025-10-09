@@ -11,7 +11,6 @@ export {
 export {
   isDuringOpener as isDuringOpenerFight,
   isNearFightEnd as isNearFightEndFight,
-  isShortFight,
   type FightContext,
 } from './fightHelpers';
 

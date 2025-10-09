@@ -67,7 +67,6 @@ const spells: number[] = [
   //endregion
 
   //region Mage
-  SPELLS.SHIFTING_POWER_TICK.id,
   SPELLS.GREATER_INVISIBILITY_BUFF.id,
   //endregion
 
