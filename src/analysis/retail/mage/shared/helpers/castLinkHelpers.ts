@@ -1,18 +1,9 @@
-/**
- * Cast Link Helpers
- *
- * Utilities for creating bidirectional event links between related game events
- * (e.g., cast → damage, buff application → removal).
- */
-
 import { EventLink } from 'parser/core/EventLinkNormalizer';
 import { EventType, AnyEvent } from 'parser/core/Events';
 
 const CAST_BUFFER_MS = 75;
 
-/** Event relation constants - use these with GetRelatedEvent(s) */
 export const EventRelations = {
-  // All standard EventTypes for automatic matching
   DESTROY: EventType.Destroy,
   HEAL: EventType.Heal,
   HEAL_ABSORBED: EventType.HealAbsorbed,
@@ -70,7 +61,6 @@ export interface SpellLinkSpec {
   spell: number;
   parentType: EventType | EventType[];
   links: LinkConfig[];
-  /** Override reverse relation for all links in this spec (can be overridden per link) */
   reverseRelation?:
     | string
     | ((parentType: EventType | EventType[]) => string | undefined)
@@ -89,18 +79,13 @@ function resolveReverseRelation(
   parentType: EventType | EventType[],
   relation: string,
 ): string | undefined {
-  // Explicit null means no reverse relation
   if (reverseRelation === null) {
     return undefined;
   }
 
-  // Default to 'auto' if not specified
   if (reverseRelation === undefined || reverseRelation === 'auto') {
-    // Can't auto-detect for multi-type specs - user must specify explicitly
     if (Array.isArray(parentType)) return undefined;
 
-    // Use the parent EventType directly as the reverse relation
-    // This automatically matches any event type
     return parentType;
   }
 
@@ -111,7 +96,11 @@ function resolveReverseRelation(
   return reverseRelation;
 }
 
-/** Creates EventLink objects from a SpellLinkSpec. Applies global buffer defaults (CAST_BUFFER_MS). */
+/**
+ * Creates EventLink objects from a SpellLinkSpec.
+ * @param spec The spell link specification
+ * @returns Array of EventLink objects
+ */
 export function defineSpellLinks(spec: SpellLinkSpec): EventLink[] {
   return spec.links.map((link) => ({
     linkingEventId: spec.spell,
@@ -270,7 +259,11 @@ export const LinkPatterns = {
   }),
 };
 
-/** Creates EventLinks from multiple SpellLinkSpecs */
+/**
+ * Creates EventLinks from multiple SpellLinkSpecs.
+ * @param specs The spell link specifications to combine
+ * @returns Array of EventLink objects from all specs
+ */
 export function createEventLinks(...specs: SpellLinkSpec[]): EventLink[] {
   return specs.flatMap(defineSpellLinks);
 }

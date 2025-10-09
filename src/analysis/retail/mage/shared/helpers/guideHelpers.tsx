@@ -5,12 +5,10 @@ import Spell from 'common/SPELLS/Spell';
 
 /**
  * Generates a standardized tooltip for guide performance entries.
- * This standalone function was extracted from BaseMageGuide to reduce unnecessary inheritance.
- *
- * @param formatTimestamp - Function to format the timestamp (typically from `owner.formatTimestamp`)
- * @param performance - Overall performance level for this entry
- * @param tooltipItems - Array of performance details to display
- * @param timestamp - Timestamp of the event for display
+ * @param formatTimestamp Function to format timestamps
+ * @param performance Overall performance level
+ * @param tooltipItems Array of performance details to display
+ * @param timestamp Timestamp of the event
  * @returns JSX tooltip element
  */
 export function generateGuideTooltip(
@@ -40,14 +38,11 @@ export function generateGuideTooltip(
 }
 
 /**
- * Universal performance evaluation method that handles all threshold-based scenarios.
- * Consolidates all performance evaluation patterns into a single flexible method.
- *
- * @param actual - The actual measured value
- * @param thresholds - Threshold object with minor/average/major properties
- * @param isGreaterThan - True if higher values are better, false if lower values are better
- * @returns QualitativePerformance level (Perfect/Good/Ok/Fail)
- *
+ * Universal performance evaluation based on threshold comparison.
+ * @param actual The actual measured value
+ * @param thresholds Threshold object with minor/average/major properties
+ * @param isGreaterThan True if higher values are better, false if lower values are better
+ * @returns QualitativePerformance level
  */
 export function evaluatePerformance(
   actual: number,
@@ -75,12 +70,10 @@ export function evaluatePerformance(
 }
 
 /**
- * Convenience method for boolean evaluations.
- *
- * @param condition - The boolean condition to evaluate
- * @param invertLogic - If true, false condition = Good, true condition = Fail (for negative conditions like "expired" or "overcapped")
+ * Performance evaluation for boolean conditions.
+ * @param condition The boolean condition to evaluate
+ * @param invertLogic If true, false = Good and true = Fail
  * @returns Performance level
- *
  */
 export function evaluateBoolean(condition: boolean, invertLogic = false): QualitativePerformance {
   const result = invertLogic ? !condition : condition;
@@ -88,7 +81,7 @@ export function evaluateBoolean(condition: boolean, invertLogic = false): Qualit
 }
 
 /**
- * Configuration for auto-generating expandable breakdown components
+ * Configuration for auto-generating expandable breakdown components.
  */
 export interface ExpandableConfig {
   spell: Spell;
@@ -98,7 +91,7 @@ export interface ExpandableConfig {
 }
 
 /**
- * Configuration for individual checklist items in expandable components
+ * Configuration for individual checklist items in expandable components.
  */
 export interface ExpandableChecklistItem {
   label: JSX.Element;
@@ -107,13 +100,13 @@ export interface ExpandableChecklistItem {
 }
 
 /**
- * Helper function to create an ExpandableConfig with clean, simple parameters.
- * Reduces boilerplate when setting up expandable breakdowns.
+ * Creates an ExpandableConfig with simplified parameters.
  * @param config Configuration for the expandable
  * @param config.spell The spell/ability to show in the header
- * @param config.formatTimestamp Function to format timestamps for display
+ * @param config.formatTimestamp Function to format timestamps
  * @param config.getTimestamp Function to extract timestamp from cast data
  * @param config.checklistItems Array of checklist item configurations
+ * @returns ExpandableConfig object
  */
 export function createExpandableConfig(config: {
   spell: Spell;

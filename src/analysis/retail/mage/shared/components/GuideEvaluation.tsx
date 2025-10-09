@@ -14,8 +14,7 @@ import {
 export { type ExpandableConfig, type ExpandableChecklistItem };
 
 /**
- * Represents a condition that can result in performance evaluation.
- * Used for fail/perfect/good/ok conditions.
+ * Represents a condition for performance evaluation.
  */
 export interface GuideCondition {
   name: string;
@@ -25,7 +24,7 @@ export interface GuideCondition {
 }
 
 /**
- * Configuration for evaluating any action using the universal guide evaluation system
+ * Configuration for universal guide evaluation system.
  */
 export interface GuideEvaluationConfig {
   actionName: string;
@@ -38,24 +37,11 @@ export interface GuideEvaluationConfig {
 }
 
 /**
- * Internal evaluation function - use evaluateEvents instead.
- *
- * Universal guide evaluation function that handles ALL action types.
- *
- * Evaluation Order:
- * 1. failConditions - Any condition that results in failure (auto-fail if true)
- * 2. perfectConditions - Check for perfect execution
- * 3. goodConditions - Check for good execution
- * 4. okConditions - Check for acceptable execution
- * 5. Default fallback performance
- *
- * Philosophy: "Any One Good Reason" - if you have ANY valid reason for an action, it's good.
- * But critical mistakes override everything.
- *
- * @param timestamp - When the action occurred
- * @param data - The action data
- * @param analyzer - Analyzer instance (used for formatTimestamp via owner.formatTimestamp)
- * @param config - Evaluation configuration specifying conditions
+ * Internal evaluation function.
+ * @param timestamp When the action occurred
+ * @param data The action data
+ * @param analyzer Analyzer instance for tooltip generation
+ * @param config Evaluation configuration
  * @returns BoxRowEntry for use in PerformanceBoxRow
  */
 function _evaluateEvent<T>(
@@ -135,7 +121,12 @@ function _evaluateEvent<T>(
 }
 
 /**
- * Helper function to create BoxRowEntry with proper tooltip integration
+ * Helper to create BoxRowEntry with tooltip.
+ * @param analyzer Analyzer instance
+ * @param performance Performance level
+ * @param message Tooltip message
+ * @param timestamp Event timestamp
+ * @returns BoxRowEntry
  */
 function createTooltipEntry(
   analyzer: Analyzer,
@@ -155,14 +146,12 @@ function createTooltipEntry(
 }
 
 /**
- * Standardized evaluation helper for event data that reduces boilerplate.
- *
- * @param config - Configuration object
- * @param config.events - Array of event data to evaluate
- * @param config.evaluationLogic - Function that takes an event and returns evaluation config
- * @param config.analyzer - Analyzer instance for tooltip generation
+ * Evaluates events using standardized evaluation logic.
+ * @param config Configuration object
+ * @param config.events Array of event data to evaluate
+ * @param config.evaluationLogic Function that returns evaluation config for each event
+ * @param config.analyzer Analyzer instance for tooltip generation
  * @returns Array of BoxRowEntry evaluations
- *
  */
 export function evaluateEvents<
   T extends { timestamp?: number; applied?: number; cast?: { timestamp: number } },
@@ -178,8 +167,7 @@ export function evaluateEvents<
 }
 
 /**
- * Interface for cast timeline events
- * Each event represents a point in time with associated casts and a display header
+ * Interface for cast timeline events.
  */
 export interface CastTimelineEvent {
   timestamp: number;
@@ -188,7 +176,7 @@ export interface CastTimelineEvent {
 }
 
 /**
- * Props for the CastTimeline component
+ * Props for the CastTimeline component.
  */
 interface CastTimelineProps {
   events: CastTimelineEvent[];
@@ -198,10 +186,12 @@ interface CastTimelineProps {
 }
 
 /**
- * Navigable cast timeline component
- * Displays spell sequences for events with previous/next navigation
- * Perfect for showing what was cast during ability windows or buff periods
- *  */
+ * Navigable cast timeline component with previous/next navigation.
+ * @param events Array of timeline events to display
+ * @param windowDescription Optional description of the timeline window
+ * @param title Optional custom title
+ * @param formatTimestamp Optional timestamp formatter
+ */
 export const CastTimeline = ({
   events,
   windowDescription,
@@ -310,16 +300,14 @@ export const CastTimeline = ({
 };
 
 /**
- * Helper function to create cast timeline events from raw event data
- * Automatically infers timestamps from common event fields if getEventTimestamp is not provided
- *  *  *
+ * Creates cast timeline events from raw event data.
  * @param config Configuration for creating timeline events
  * @param config.events Array of raw events to convert
  * @param config.timelineEvents Function that returns cast events for each event
  * @param config.formatTimestamp Optional timestamp formatter function
- * @param config.getEventTimestamp Optional function to extract timestamp (auto-inferred if not provided)
+ * @param config.getEventTimestamp Optional function to extract timestamp
  * @param config.getEventHeader Function to generate header for each event
- * @returns Array of CastTimelineEvent objects ready for display
+ * @returns Array of CastTimelineEvent objects
  */
 export function createCastTimelineEvents<T>(config: {
   events: T[];

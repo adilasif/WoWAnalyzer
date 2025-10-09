@@ -7,10 +7,6 @@ import GeneralizedChart, {
   ChartConfig,
 } from '../components/GeneralizedChart';
 
-/**
- * Simplified builder for creating charts with common patterns
- * Makes it easy to create resource tracking, cooldown timelines, etc.
- */
 export class ChartBuilder {
   private series: DataSeries[] = [];
   private annotations: AnnotationEvent[] = [];
@@ -31,13 +27,14 @@ export class ChartBuilder {
   }
 
   /**
-   * Add a data series to the chart
-   * @param config Configuration for the series
-   * @param config.name Name of the series (shown in legend)
+   * Adds a data series to the chart.
+   * @param config Series configuration
+   * @param config.name Name of the series
    * @param config.data Array of timestamp-value pairs to plot
-   * @param config.color Optional color for the series
-   * @param config.type Optional type of visualization (line, area, or bar)
-   * @param config.opacity Optional opacity (0-1) for the series
+   * @param config.color Color for the series
+   * @param config.type Type of visualization
+   * @param config.opacity Opacity for the series
+   * @returns This builder for method chaining
    */
   addSeries(config: {
     name: string;
@@ -58,8 +55,9 @@ export class ChartBuilder {
   }
 
   /**
-   * Add mana tracking (common pattern)
-   * @param manaUpdates Array of mana update events with current and max mana
+   * Adds mana tracking.
+   * @param manaUpdates Array of mana update events
+   * @returns This builder for method chaining
    */
   addManaTracking(
     manaUpdates: Array<{ timestamp: number; current: number; max: number }>,
@@ -67,11 +65,9 @@ export class ChartBuilder {
     let manaData: Array<{ timestamp: number; value: number }>;
 
     if (manaUpdates && manaUpdates.length > 0) {
-      // Add initial mana point like the old ManaChart did
       const initial = manaUpdates[0].current / manaUpdates[0].max;
       manaData = [{ timestamp: this.startTime, value: 100 * initial }];
 
-      // Add all mana update points
       const processedUpdates = manaUpdates.map((update) => ({
         timestamp: Math.max(update.timestamp, this.startTime),
         value: (update.current / update.max) * 100,
@@ -79,7 +75,6 @@ export class ChartBuilder {
 
       manaData.push(...processedUpdates);
     } else {
-      // Fallback: assume full mana throughout fight if no data
       manaData = [
         { timestamp: this.startTime, value: 100 },
         { timestamp: this.endTime, value: 100 },
@@ -96,8 +91,9 @@ export class ChartBuilder {
   }
 
   /**
-   * Add health tracking
-   * @param healthUpdates Array of health update events with current and max health
+   * Adds health tracking.
+   * @param healthUpdates Array of health update events
+   * @returns This builder for method chaining
    */
   addHealthTracking(
     healthUpdates: Array<{ timestamp: number; current: number; max: number }>,
@@ -117,10 +113,11 @@ export class ChartBuilder {
   }
 
   /**
-   * Add buff/debuff uptime tracking
+   * Adds buff/debuff uptime tracking.
    * @param name Name of the buff/debuff
    * @param buffHistory Array of buff application periods
-   * @param color Optional color for the uptime visualization
+   * @param color Color for the uptime visualization
+   * @returns This builder for method chaining
    */
   addBuffUptime(
     name: string,
@@ -129,31 +126,26 @@ export class ChartBuilder {
   ): ChartBuilder {
     const uptimeData: TimeValue[] = [];
 
-    // Create step function for buff uptime
     let currentTime = this.startTime;
     let isActive = false;
 
     const sortedBuffs = [...buffHistory].sort((a, b) => a.start - b.start);
 
     for (const buff of sortedBuffs) {
-      // Add point before buff starts (if not active)
       if (!isActive && buff.start > currentTime) {
         uptimeData.push({ timestamp: currentTime, value: 0 });
         uptimeData.push({ timestamp: buff.start, value: 0 });
       }
 
-      // Buff starts
       uptimeData.push({ timestamp: buff.start, value: 100 });
       isActive = true;
 
-      // Buff ends
       uptimeData.push({ timestamp: buff.end, value: 100 });
       uptimeData.push({ timestamp: buff.end, value: 0 });
       isActive = false;
       currentTime = buff.end;
     }
 
-    // Fill to end of fight if needed
     if (currentTime < this.endTime) {
       uptimeData.push({ timestamp: this.endTime, value: isActive ? 100 : 0 });
     }
@@ -167,11 +159,12 @@ export class ChartBuilder {
   }
 
   /**
-   * Add annotations to the chart (spell casts, buffs, deaths, damage, or custom events)
-   * @param config Configuration for the annotations
+   * Adds annotations to the chart.
+   * @param config Annotation configuration
    * @param config.events Array of events with timestamp and additional fields
-   * @param config.type Type of annotation (cast, buff, damage, death, or custom)
-   * @param config.color Optional color override (defaults based on type)
+   * @param config.type Type of annotation
+   * @param config.color Color override
+   * @returns This builder for method chaining
    */
   addAnnotations(config: {
     events: Array<{
@@ -204,22 +197,17 @@ export class ChartBuilder {
   }
 
   /**
-   * Add boss health tracking (common pattern for mana charts)
-   * Can be called in two ways:
-   * 1. With data array: `.addBossHealth(bossHealthData)` - adds static boss health data
-   * 2. With report code: `.addBossHealth(reportCode)` - fetches boss health on render
-   *
+   * Adds boss health tracking.
    * @param dataOrReportCode Either boss health data points or a WCL report code
+   * @returns This builder for method chaining
    */
   addBossHealth(
     dataOrReportCode: Array<{ timestamp: number; value: number }> | string,
   ): ChartBuilder {
     if (typeof dataOrReportCode === 'string') {
-      // Store report code for async fetching during build
       this.shouldFetchBossHealth = true;
       this.reportCode = dataOrReportCode;
     } else {
-      // Add static boss health data immediately
       return this.addSeries({
         name: 'Boss Health',
         data: dataOrReportCode,
@@ -232,11 +220,12 @@ export class ChartBuilder {
   }
 
   /**
-   * Add low resource warnings (common pattern)
-   * @param resourceData Array of resource update events with current and max values
-   * @param threshold Threshold percentage (0-1) below which to show warnings (default: 0.1)
-   * @param label Label for the warning annotations (default: 'Low Resource')
-   * @param color Color for the warning markers (default: '#EF4444')
+   * Adds low resource warnings.
+   * @param resourceData Array of resource update events
+   * @param threshold Threshold percentage below which to show warnings
+   * @param label Label for the warning annotations
+   * @param color Color for the warning markers
+   * @returns This builder for method chaining
    */
   addLowResourceWarnings(
     resourceData: Array<{ timestamp: number; current: number; max: number }>,
@@ -259,7 +248,8 @@ export class ChartBuilder {
   }
 
   /**
-   * Configure as a typical mana chart
+   * Configures as a typical mana chart.
+   * @returns This builder for method chaining
    */
   asManaChart(): ChartBuilder {
     return this.setYAxis({
@@ -278,22 +268,8 @@ export class ChartBuilder {
   }
 
   /**
-   * Get boss health data for the current fight
-   *
-   * ⚠️ **ASYNC METHOD**: This method fetches data from the WarcraftLogs API and must be awaited.
-   *
-   * **Recommended approach**: Use `.addBossHealth(reportCode)` instead for automatic async handling:
-   * ```tsx
-   * const chart = createChart(startTime, endTime)
-   *   .asManaChart()
-   *   .addManaTracking(manaUpdates)
-   *   .addBossHealth(this.owner.report.code)  // Fetches automatically!
-   *   .build();
-   * ```
-   *
-   * Only use this method directly if you need to manually control the async fetching.
-   *
-   * @param reportCode - The WarcraftLogs report code
+   * Gets boss health data for the current fight.
+   * @param reportCode The WarcraftLogs report code
    * @returns Promise that resolves to boss health data points, or null if fetch fails
    */
   async fetchBossHealth(
@@ -309,7 +285,6 @@ export class ChartBuilder {
         abilityid: 1000,
       });
 
-      // Type assertion for boss health response
       const bossData = json as { series?: Array<{ data: Array<[number, number]> }> };
 
       if (bossData?.series?.[0]?.data) {
@@ -325,8 +300,9 @@ export class ChartBuilder {
   }
 
   /**
-   * Configure chart appearance
+   * Configures chart appearance.
    * @param config Partial chart configuration to merge with existing config
+   * @returns This builder for method chaining
    */
   setConfig(config: Partial<ChartConfig>): ChartBuilder {
     this.config = { ...this.config, ...config };
@@ -334,10 +310,11 @@ export class ChartBuilder {
   }
 
   /**
-   * Set grid line configuration
+   * Sets grid line configuration.
    * @param options Grid line visibility options
    * @param options.showXGrid Whether to show vertical grid lines
    * @param options.showYGrid Whether to show horizontal grid lines
+   * @returns This builder for method chaining
    */
   setGridLines(options: { showXGrid?: boolean; showYGrid?: boolean }): ChartBuilder {
     this.config.showXGrid = options.showXGrid;
@@ -346,8 +323,9 @@ export class ChartBuilder {
   }
 
   /**
-   * Set chart title
+   * Sets chart title.
    * @param title The title to display above the chart
+   * @returns This builder for method chaining
    */
   setTitle(title: string): ChartBuilder {
     this.config.title = title;
@@ -355,12 +333,13 @@ export class ChartBuilder {
   }
 
   /**
-   * Set Y-axis configuration
+   * Sets Y-axis configuration.
    * @param config Y-axis configuration options
    * @param config.label Label to display on the Y-axis
-   * @param config.format Format for Y-axis values (percentage, number, or time)
+   * @param config.format Format for Y-axis values
    * @param config.min Minimum value for Y-axis
    * @param config.max Maximum value for Y-axis
+   * @returns This builder for method chaining
    */
   setYAxis(config: {
     label?: string;
@@ -376,14 +355,11 @@ export class ChartBuilder {
   }
 
   /**
-   * Build and return the chart component
-   * If boss health fetching was requested via `.addBossHealth(reportCode)`,
-   * this will return an async component that fetches the data on mount.
+   * Builds and returns the chart component.
+   * @returns The chart component
    */
   build(): JSX.Element {
-    // If boss health should be fetched, use async component
     if (this.shouldFetchBossHealth && this.reportCode) {
-      // Capture current builder state
       const currentSeries = [...this.series];
       const currentAnnotations = [...this.annotations];
       const currentConfig = { ...this.config };
@@ -435,7 +411,6 @@ export class ChartBuilder {
           return <div>Loading chart data...</div>;
         }
 
-        // Build final series array
         const finalSeries = [...currentSeries];
         if (bossHealthData && bossHealthData.length > 0) {
           finalSeries.push({
@@ -462,7 +437,6 @@ export class ChartBuilder {
       return <ChartWithAsyncBossHealth />;
     }
 
-    // Otherwise, build synchronously
     return (
       <GeneralizedChart
         series={this.series}

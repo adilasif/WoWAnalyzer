@@ -43,9 +43,9 @@ export class GuideBuilder {
   private lastConditionResult = false;
 
   /**
-   * Create a new guide builder for the given spell
+   * Creates a new guide builder for the given spell.
    * @param spell The spell this guide section is for
-   * @param title Optional custom title (defaults to spell name)
+   * @param title Optional custom title
    */
   constructor(spell: Spell, title?: string) {
     this.spell = spell;
@@ -53,8 +53,9 @@ export class GuideBuilder {
   }
 
   /**
-   * Set the explanation content (required)
-   * @param explanation JSX content explaining the ability/mechanic
+   * Sets the explanation content.
+   * @param explanation JSX content explaining the ability
+   * @returns This builder for method chaining
    */
   explanation(explanation: JSX.Element): GuideBuilder {
     this.explanationContent = explanation;
@@ -62,8 +63,8 @@ export class GuideBuilder {
   }
 
   /**
-   * Set the layout to stack vertically instead of side-by-side
-   * Useful for charts or other wide content that needs full width
+   * Sets layout to stack vertically instead of side-by-side.
+   * @returns This builder for method chaining
    */
   verticalLayout(): GuideBuilder {
     this.explanationPercent = undefined;
@@ -71,8 +72,9 @@ export class GuideBuilder {
   }
 
   /**
-   * Set custom explanation width percentage (default is 30% side-by-side)
-   * @param percent Width percentage for explanation column (0-100)
+   * Sets custom explanation width percentage.
+   * @param percent Width percentage for explanation column
+   * @returns This builder for method chaining
    */
   setExplanationWidth(percent: number): GuideBuilder {
     this.explanationPercent = percent;
@@ -80,13 +82,13 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a statistic showing a key metric in a rounded panel
-   * Perfect for showing percentages, averages, or other summary stats
+   * Adds a statistic panel showing a key metric.
    * @param config Configuration for the statistic
-   * @param config.value The value to display (e.g., "85.2%", "2.1")
-   * @param config.label Label describing what the value represents
+   * @param config.value The value to display
+   * @param config.label Label describing the value
    * @param config.performance Performance level for color coding
    * @param config.tooltip Optional tooltip with additional details
+   * @returns This builder for method chaining
    */
   addStatistic(config: {
     value: string;
@@ -107,11 +109,11 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a cast summary showing performance rectangles for each cast with clickable expansion
-   * This creates the consolidated summary bar that can be clicked to expand details
+   * Adds a cast summary with performance rectangles for each cast.
    * @param config Configuration for the cast summary
-   * @param config.castData Array of BoxRowEntry data for each cast to display
-   * @param config.title Optional custom title for the summary section
+   * @param config.castData Array of BoxRowEntry data for each cast
+   * @param config.title Optional custom title
+   * @returns This builder for method chaining
    */
   addCastSummary(config: { castData: BoxRowEntry[]; title?: string }): GuideBuilder {
     this.components.push(this.createCastSummaryAndBreakdown(config.castData));
@@ -119,7 +121,8 @@ export class GuideBuilder {
   }
 
   /**
-   * Add cast efficiency statistics (usage percent, etc.)
+   * Adds cast efficiency statistics.
+   * @returns This builder for method chaining
    */
   addCastEfficiency(): GuideBuilder {
     this.components.push(this.createCastEfficiencyStats(this.spell));
@@ -127,7 +130,8 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a cast efficiency timeline bar
+   * Adds a cast efficiency timeline bar.
+   * @returns This builder for method chaining
    */
   addCooldownTimeline(): GuideBuilder {
     this.components.push(this.createCastEfficiencyBar(this.spell));
@@ -135,11 +139,11 @@ export class GuideBuilder {
   }
 
   /**
-   * Add expandable per-cast breakdown with detailed analysis
-   * Perfect for complex abilities where each cast needs individual scrutiny
+   * Adds expandable per-cast breakdown with detailed analysis.
    * @param config Configuration for the breakdown
    * @param config.castBreakdowns Array of React nodes, one for each cast
    * @param config.title Optional custom title for the breakdown section
+   * @returns This builder for method chaining
    */
   addExpandableBreakdown(config: {
     castBreakdowns: React.ReactNode[];
@@ -150,64 +154,38 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a buff uptime visualization with performance tracking
-   * Perfect for stacking buffs where maintaining high stacks is important
-   * Can also be used for simple on/off buffs by setting maxStacks: 1
-   *
-   * @example
-   * // Stacking buff
-   * new GuideBuilder(TALENTS.ARCANE_TEMPO_TALENT)
-   *   .addBuffUptime({
-   *     analyzer: this,
-   *     buffSpell: SPELLS.ARCANE_TEMPO_BUFF,
-   *     castData: [tempoEntry],
-   *     maxStacks: ARCANE_TEMPO_MAX_STACKS,
-   *   })
-   *
-   * // Simple on/off buff
-   * new GuideBuilder(SPELLS.SOME_BUFF)
-   *   .addBuffUptime({
-   *     analyzer: this,
-   *     buffSpell: SPELLS.SOME_BUFF,
-   *     castData: [],
-   *     maxStacks: 1,
-   *   })
+   * Adds a buff uptime visualization with performance tracking.
+   * @param config Configuration for the buff uptime
+   * @param config.analyzer The analyzer instance for accessing buff history
+   * @param config.buffSpell The buff spell to track
+   * @param config.castData Cast performance entries to display above the bar
+   * @param config.maxStacks Maximum stacks for the buff
+   * @param config.startTime Fight start timestamp
+   * @param config.endTime Fight end timestamp
+   * @param config.barColor Color for the stack bar
+   * @param config.backgroundBarColor Color for the background bar
+   * @param config.tooltip Tooltip text for average stacks
+   * @returns This builder for method chaining
    */
   addBuffUptime(config: {
-    /** The analyzer instance (typically `this` from your guide) for accessing buff history */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     analyzer: any;
-    /** The buff spell to track */
     buffSpell: Spell;
-    /** Cast performance entries to display above the bar */
     castData: BoxRowEntry[];
-    /** Maximum stacks for the buff (use 1 for simple on/off buffs) */
     maxStacks: number;
-    /** Fight start timestamp (defaults to fight start) */
     startTime?: number;
-    /** Fight end timestamp (defaults to fight end) */
     endTime?: number;
-    /** Color for the stack bar (defaults to purple) */
     barColor?: string;
-    /** Color for the background bar (defaults to gray) */
     backgroundBarColor?: string;
-    /** Tooltip text for average stacks (has sensible default) */
     tooltip?: string;
   }): GuideBuilder {
-    // Get buff history and calculate uptimes
     const buffHistory = config.analyzer.selectedCombatant.getBuffHistory(config.buffSpell.id);
     const currentTimestamp = config.analyzer.owner.currentTimestamp;
     const overallUptimes = getUptimesFromBuffHistory(buffHistory, currentTimestamp);
     const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, currentTimestamp);
-
-    // Use provided times or default to fight times
     const startTime = config.startTime ?? config.analyzer.owner.fight.start_time;
     const endTime = config.endTime ?? config.analyzer.owner.fight.end_time;
-
-    // Calculate average stacks from stack data
     const averageStacks = this.calculateAverageStacks(stackUptimes, startTime, endTime);
-
-    // Calculate uptime percentage from background uptimes
     const uptimePercentage = this.calculateUptimePercentage(overallUptimes, startTime, endTime);
 
     this.components.push(
@@ -230,7 +208,8 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a "no usage" message when the ability wasn't used
+   * Adds a "no usage" message when the ability wasn't used.
+   * @returns This builder for method chaining
    */
   addNoUsage(): GuideBuilder {
     this.components.push(this.createNoUsageComponent(this.spell));
@@ -238,9 +217,10 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a custom component if the built-in options don't fit your needs
+   * Adds a custom component.
    * @param config Configuration for the custom component
    * @param config.component The JSX element to add
+   * @returns This builder for method chaining
    */
   addCustomComponent(config: { component: JSX.Element }): GuideBuilder {
     this.components.push(config.component);
@@ -248,9 +228,9 @@ export class GuideBuilder {
   }
 
   /**
-   * Add a chart (built with ChartBuilder)
-   * Convenience method for adding charts with proper spacing
+   * Adds a chart with proper spacing.
    * @param chart The chart component to add
+   * @returns This builder for method chaining
    */
   addChart(chart: JSX.Element): GuideBuilder {
     this.components.push(<div style={{ marginTop: '16px' }}>{chart}</div>);
@@ -258,20 +238,16 @@ export class GuideBuilder {
   }
 
   /**
-   * Add navigable cast timelines for events
-   * Shows a timeline of casts for each event with previous/next navigation
-   * Perfect for showing spell sequences during ability windows or buff periods
-   *
+   * Adds navigable cast timelines for events.
    * @param config Configuration for the cast timelines
    * @param config.events Array of events to create timelines for
    * @param config.timelineEvents Function that returns cast events for each event's window
-   * @param config.formatTimestamp Function to format timestamps (typically this.owner.formatTimestamp.bind(this.owner))
-   * @param config.getEventHeader Optional function to generate event header (auto-generated from headerPrefix if not provided)
-   * @param config.headerPrefix Prefix for auto-generated headers (e.g., 'Touch' → 'Touch #1', 'Touch #2')
-   * @param config.performanceData Optional performance data for each event
-   * @param config.windowDescription Optional description of what the timeline window represents
+   * @param config.formatTimestamp Function to format timestamps
+   * @param config.getEventHeader Function to generate event header
+   * @param config.headerPrefix Prefix for auto-generated headers
+   * @param config.performanceData Performance data for each event
+   * @param config.windowDescription Description of what the timeline window represents
    * @returns This builder for method chaining
-   *
    */
   addCastTimelines<T>(config: {
     events: T[];
@@ -304,11 +280,10 @@ export class GuideBuilder {
   }
 
   /**
-   * Conditional builder - only add components if condition is true
-   * Makes it easy to handle cases like "show timeline if data exists, otherwise show no usage"
-   *
+   * Conditionally adds components if condition is true.
    * @param condition The condition to check
    * @param builderFunc Function that receives this builder and adds components
+   * @returns This builder for method chaining
    */
   when(condition: boolean, builderFunc: (builder: GuideBuilder) => GuideBuilder): GuideBuilder {
     this.lastConditionResult = condition;
@@ -319,8 +294,9 @@ export class GuideBuilder {
   }
 
   /**
-   * Alternative path for when() - executes if the last when() condition was false
+   * Adds components if the last when() condition was false.
    * @param builderFunc Function that receives this builder and adds components
+   * @returns This builder for method chaining
    */
   otherwise(builderFunc: (builder: GuideBuilder) => GuideBuilder): GuideBuilder {
     if (!this.lastConditionResult) {

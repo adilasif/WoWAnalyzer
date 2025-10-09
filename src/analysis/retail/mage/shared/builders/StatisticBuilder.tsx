@@ -25,16 +25,16 @@ interface ColumnConfig<T = unknown> {
 
 /**
  * Builder for creating dropdown tables with consistent styling
- *
  */
 export class DropdownTableBuilder<T = unknown> {
   private _columns: ColumnConfig<T>[] = [];
   private _data: T[] = [];
 
   /**
-   * Add a column definition
-   * @param headerOrConfig - Either the header text, or a config object with { header, getValue }
-   * @param getValue - Function to extract the value from data object (optional if using config object)
+   * Adds a column definition.
+   * @param headerOrConfig Either the header text, or a config object
+   * @param getValue Function to extract the value from data object
+   * @returns This builder for method chaining
    */
   column(headerOrConfig: ReactNode | ColumnConfig<T>, getValue?: (data: T) => ReactNode): this {
     // If first argument is an object with getValue property, treat it as a config object
@@ -55,7 +55,9 @@ export class DropdownTableBuilder<T = unknown> {
   }
 
   /**
-   * Set all data at once (array of data objects)
+   * Sets all data at once.
+   * @param data Array of data objects
+   * @returns This builder for method chaining
    */
   data(data: T[]): this {
     this._data = data;
@@ -63,7 +65,9 @@ export class DropdownTableBuilder<T = unknown> {
   }
 
   /**
-   * Add a single row of data
+   * Adds a single row of data.
+   * @param row The data row to add
+   * @returns This builder for method chaining
    */
   addRow(row: T): this {
     this._data.push(row);
@@ -103,7 +107,6 @@ export class DropdownTableBuilder<T = unknown> {
 
 /**
  * Fluent builder for creating statistics with consistent styling
- *
  */
 export class StatisticBuilder {
   private _spell: Spell | Talent;
@@ -120,31 +123,51 @@ export class StatisticBuilder {
     this._spell = spell;
   }
 
-  /** Set the statistic category */
+  /**
+   * Sets the statistic category.
+   * @param category The statistic category
+   * @returns This builder for method chaining
+   */
   category(category: STATISTIC_CATEGORY): this {
     this._category = category;
     return this;
   }
 
-  /** Set the statistic size */
+  /**
+   * Sets the statistic size.
+   * @param size The statistic size
+   * @returns This builder for method chaining
+   */
   size(size: StatisticSize): this {
     this._size = size;
     return this;
   }
 
-  /** Set the statistic position */
+  /**
+   * Sets the statistic position.
+   * @param position The position value
+   * @returns This builder for method chaining
+   */
   position(position: number): this {
     this._position = position;
     return this;
   }
 
-  /** Set a tooltip to display on hover */
+  /**
+   * Sets a tooltip to display on hover.
+   * @param tooltip The tooltip content
+   * @returns This builder for method chaining
+   */
   tooltip(tooltip: ReactNode): this {
     this._tooltip = tooltip;
     return this;
   }
 
-  /** Set dropdown content (expandable section) - accepts ReactNode or DropdownTableBuilder */
+  /**
+   * Sets dropdown content.
+   * @param dropdown The dropdown content or DropdownTableBuilder
+   * @returns This builder for method chaining
+   */
   dropdown(dropdown: ReactNode | DropdownTableBuilder): this {
     if (dropdown instanceof DropdownTableBuilder) {
       this._dropdown = dropdown.build();
@@ -154,7 +177,16 @@ export class StatisticBuilder {
     return this;
   }
 
-  /** Add a formatted value line */
+  /**
+   * Adds a formatted value line.
+   * @param config Value configuration
+   * @param config.value The value to display
+   * @param config.label Label for the value
+   * @param config.format Format type
+   * @param config.precision Number precision
+   * @param config.icon Icon to display with the value
+   * @returns This builder for method chaining
+   */
   value(config: {
     value: number | string;
     label: string;
@@ -172,11 +204,15 @@ export class StatisticBuilder {
     return this;
   }
 
-  /** Set DPS damage amount (uses ItemDamageDone component, or formats as DPS value with custom label) */
+  /**
+   * Sets DPS damage amount.
+   * @param config DPS configuration
+   * @param config.amount The damage amount
+   * @param config.label Optional custom label
+   * @returns This builder for method chaining
+   */
   dps(config: { amount: number; label?: string }): this {
     if (config.label) {
-      // Custom label = format as value line for multiple DPS displays
-      // Assumes amount is already damage per second, or is total damage to be converted
       this._values.push({
         value: config.amount,
         label: config.label,
@@ -184,13 +220,18 @@ export class StatisticBuilder {
         icon: <DamageIcon />,
       });
     } else {
-      // No label = use ItemDamageDone component for single DPS display
       this._damageAmount = config.amount;
     }
     return this;
   }
 
-  /** Set average damage amount (shows raw damage number) */
+  /**
+   * Sets average damage amount.
+   * @param config Average damage configuration
+   * @param config.amount The damage amount
+   * @param config.label Optional custom label
+   * @returns This builder for method chaining
+   */
   averageDamage(config: { amount: number; label?: string }): this {
     this._values.push({
       value: config.amount,
@@ -201,7 +242,13 @@ export class StatisticBuilder {
     return this;
   }
 
-  /** Set custom content (overrides values and damage) */
+  /**
+   * Sets custom content.
+   * @param config Content configuration
+   * @param config.content The custom content
+   * @param config.tooltip Optional tooltip
+   * @returns This builder for method chaining
+   */
   content(config: { content: ReactNode; tooltip?: ReactNode }): this {
     this._content = config.content;
     if (config.tooltip !== undefined) {
@@ -210,16 +257,16 @@ export class StatisticBuilder {
     return this;
   }
 
-  /** Build and return the Statistic component */
+  /**
+   * Builds and returns the Statistic component.
+   * @returns The statistic component
+   */
   build(): ReactNode {
     let content: ReactNode;
 
-    // Custom content takes priority
     if (this._content !== undefined) {
       content = this._content;
-    }
-    // Damage display with additional values
-    else if (this._damageAmount !== undefined && this._values.length > 0) {
+    } else if (this._damageAmount !== undefined && this._values.length > 0) {
       content = (
         <>
           <ItemDamageDone amount={this._damageAmount} />
@@ -227,7 +274,6 @@ export class StatisticBuilder {
           {this._values.map((item, idx) => {
             let formattedValue: string | number = item.value;
             if (item.format === 'number' && typeof item.value === 'number') {
-              // If precision is specified, use toFixed(), otherwise use formatNumber
               formattedValue =
                 item.precision !== undefined
                   ? item.value.toFixed(item.precision)
@@ -246,19 +292,14 @@ export class StatisticBuilder {
           })}
         </>
       );
-    }
-    // Damage display only
-    else if (this._damageAmount !== undefined) {
+    } else if (this._damageAmount !== undefined) {
       content = <ItemDamageDone amount={this._damageAmount} />;
-    }
-    // Formatted values only
-    else if (this._values.length > 0) {
+    } else if (this._values.length > 0) {
       content = (
         <>
           {this._values.map((item, idx) => {
             let formattedValue: string | number = item.value;
             if (item.format === 'number' && typeof item.value === 'number') {
-              // If precision is specified, use toFixed(), otherwise use formatNumber
               formattedValue =
                 item.precision !== undefined
                   ? item.value.toFixed(item.precision)
