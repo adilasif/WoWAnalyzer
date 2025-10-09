@@ -50,7 +50,8 @@ const config: Config = {
       frontmatterType: 'guide',
       notes: (
         <AlertWarning>
-          This will be updated when Deam stops peeling grapes. Be sure to ping him repeatedly in the Alter Time Discord until he complies. <code>@deam</code>
+          This spec is not being updated for The War Within or Midnight Prepatch. All analysis is in
+          preparation of Midnight's full release.
         </AlertWarning>
       ),
     },
