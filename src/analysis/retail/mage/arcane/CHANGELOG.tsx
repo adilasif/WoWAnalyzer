@@ -5,6 +5,7 @@ import { change, date } from 'common/changelog';
 import { Sharrq, Sref, Earosselot } from 'CONTRIBUTORS';
 
 export default [
+  change(date(2025, 10, 8), <>Completely Redesign Arcane Mage Analysis, Guide, Charts, etc.</>, Sharrq),
   change(date(2025, 5, 21), <>Arcane Sunfury APL</>, Earosselot),
   change(date(2025, 4, 20), <>Added Defensives to Guide</>, Earosselot),
   change(date(2024, 11, 23), <>Updated Spec Support to 11.0.5 and updated Warning.</>, Sharrq),
