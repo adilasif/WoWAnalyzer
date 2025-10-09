@@ -15,11 +15,17 @@ import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import TalentSpellText from 'parser/ui/TalentSpellText';
 
-const ESSENCE_ABILITIES = [SPELLS.DISINTEGRATE, SPELLS.PYRE, TALENTS.ERUPTION_TALENT];
+const ESSENCE_ABILITIES = [
+  SPELLS.DISINTEGRATE,
+  SPELLS.PYRE,
+  TALENTS.ERUPTION_TALENT,
+  SPELLS.MASS_ERUPTION_DAMAGE,
+];
 const COLORS = [
   'rgb(41, 134, 204)', // Disintegrate
   'rgb(183, 65, 14)', // Pyre
   'rgb(129, 52, 5)', // Eruption
+  'rgb(183, 65, 14)', // Mass Eruption cleave (uses Pyre's colour because the two shouldn't ever overlap)
 ];
 
 class MeltArmor extends Analyzer {

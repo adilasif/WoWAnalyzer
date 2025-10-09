@@ -7,11 +7,10 @@ import AllCooldownUsageList from 'interface/guide/components/MajorDefensives/All
 import { SpellLink, TooltipElement } from 'interface';
 import { Highlight } from 'interface/Highlight';
 import TALENTS from 'common/TALENTS/evoker';
-import TwinGuardian from './TwinGuardian';
 import RenewingBlaze from './RenewingBlaze';
 
 const MajorDefensives = () => {
-  const defensiveAnalyzers = [ObsidianScales, TwinGuardian, RenewingBlaze];
+  const defensiveAnalyzers = [ObsidianScales, RenewingBlaze];
 
   return (
     <Section title="Defensives">
@@ -22,11 +21,9 @@ const MajorDefensives = () => {
           performance, as it will not only increase your own survivability, but also your entire
           raid by allowing healers to focus on keeping others alive.
           <br />
-          As an <span className="Evoker">Evoker</span> you have access to many short CD defensives
-          such as <SpellLink spell={TALENTS.OBSIDIAN_SCALES_TALENT} />,{' '}
-          <SpellLink spell={TALENTS.RENEWING_BLAZE_TALENT} />,{' '}
-          <SpellLink spell={TALENTS.ZEPHYR_TALENT} /> and{' '}
-          <SpellLink spell={TALENTS.TWIN_GUARDIAN_TALENT} />.
+          As an <span className="Evoker">Evoker</span> you have access to short CD defensives such
+          as <SpellLink spell={TALENTS.OBSIDIAN_SCALES_TALENT} /> and{' '}
+          <SpellLink spell={TALENTS.ZEPHYR_TALENT} />.
         </p>
         <p>There are two things you should look for in your cooldown usage:</p>
         <ol>

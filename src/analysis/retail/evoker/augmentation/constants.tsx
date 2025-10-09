@@ -23,6 +23,7 @@ export const SANDS_OF_TIME_CRIT_MOD = 0.5;
 
 // Prescience
 export const PRESCIENCE_BASE_DURATION_MS = 18000;
+export const GOLDEN_OPPORTUNITY_PRESCIENCE_MULTIPLIER = 0.15;
 
 // Talent multipliers
 export const BLISTERING_SCALES_STACK_MAX = 15;

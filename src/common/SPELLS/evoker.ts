@@ -42,11 +42,6 @@ const spells = {
     name: 'Dream Breath',
     icon: 'ability_evoker_dreambreath',
   },
-  TWIN_GUARDIAN_SHIELD: {
-    id: 370889,
-    name: 'Twin Guardian',
-    icon: 'ability_skyreach_shielded',
-  },
   TEMPORAL_ANOMALY_SHIELD: {
     id: 373862,
     name: 'Temporal Anomaly',
@@ -669,11 +664,6 @@ const spells = {
     name: 'Volcanic Upsurge',
     icon: 'ability_evoker_earthensky',
   },
-  GOLDEN_OPPORTUNITY_BUFF: {
-    id: 459878,
-    name: 'Golden Opportunity',
-    icon: 'achievement_faction_goldenlotus',
-  },
   MOTES_OF_ACCELERATION_BUFF: {
     id: 432061,
     name: 'Motes of Acceleration',
@@ -753,6 +743,11 @@ const spells = {
     id: 410263,
     name: "Inferno's Blessing",
     icon: 'ability_evoker_infernosblessing',
+  },
+  COMMAND_SQUADRON_PYRE: {
+    id: 1236970,
+    name: 'Pyre (Command Squadron)',
+    icon: 'ability_evoker_pyre',
   },
   // endregion
 } satisfies Record<string, Spell>;

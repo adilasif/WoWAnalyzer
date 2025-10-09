@@ -56,8 +56,6 @@ export const UPHEAVAL_REVERBERATION_BUFFER = 12_000; // This DoT last a very lon
 
 const VOLCANIC_UPSURGE_CONSUME = 'volcanicUpsurgeConsume';
 
-const GOLDEN_OPPORTUNITY_CONSUME = 'goldenOpportunityConsume';
-
 const ERUPTION_ESSENCE_BURST_CONSUME = 'eruptionEssenceBurstConsume';
 const DREAM_ESSENCE_BURST_CONSUME = 'dreamEssenceBurstConsume';
 export const EMPOWER_SANDS_APPLY = 'empowerSandsApply';
@@ -345,18 +343,6 @@ const EVENT_LINKS: EventLink[] = [
     maximumLinks: 1,
   },
   {
-    linkRelation: GOLDEN_OPPORTUNITY_CONSUME,
-    reverseLinkRelation: GOLDEN_OPPORTUNITY_CONSUME,
-    linkingEventId: SPELLS.PRESCIENCE_BUFF.id,
-    linkingEventType: [EventType.ApplyBuff, EventType.RefreshBuff],
-    referencedEventId: SPELLS.GOLDEN_OPPORTUNITY_BUFF.id,
-    referencedEventType: EventType.RemoveBuff,
-    anyTarget: true,
-    // Same buffer as Prescience casts
-    forwardBufferMs: PRESCIENCE_BUFFER,
-    backwardBufferMs: PRESCIENCE_BUFFER,
-  },
-  {
     linkRelation: ERUPTION_ESSENCE_BURST_CONSUME,
     reverseLinkRelation: ERUPTION_ESSENCE_BURST_CONSUME,
     linkingEventId: TALENTS.ERUPTION_TALENT.id,
@@ -528,10 +514,6 @@ export function getMassEruptionDamageEvents(event: CastEvent): DamageEvent[] {
 
 export function isVolcanicUpsurgeEruption(event: CastEvent) {
   return HasRelatedEvent(event, VOLCANIC_UPSURGE_CONSUME);
-}
-
-export function isGoldenOpportunityPrescience(event: ApplyBuffEvent | RefreshBuffEvent) {
-  return HasRelatedEvent(event, GOLDEN_OPPORTUNITY_CONSUME);
 }
 
 export function eruptionConsumedEssenceBurst(event: CastEvent) {

@@ -235,6 +235,14 @@ const talents = {
     entryIds: [128217],
     definitionIds: [{ id: 133024, specId: 1473 }],
   },
+  COMMAND_SQUADRON_TALENT: {
+    id: 1260745,
+    name: 'Command Squadron',
+    icon: 'ability_dragonriding_dynamicflight01',
+    maxRanks: 1,
+    entryIds: [136053],
+    definitionIds: [{ id: 140808, specId: 1473 }],
+  },
   CONDUIT_OF_FLAME_TALENT: {
     id: 444843,
     name: 'Conduit of Flame',
@@ -1250,6 +1258,14 @@ const talents = {
     maxRanks: 1,
     entryIds: [117542],
     definitionIds: [{ id: 122554, specId: 1468 }],
+  },
+  REFINED_ESSENCE_TALENT: {
+    id: 1261452,
+    name: 'Refined Essence',
+    icon: 'ability_evoker_essenceburststacks',
+    maxRanks: 1,
+    entryIds: [136051],
+    definitionIds: [{ id: 140806, specId: 1473 }],
   },
   REGENERATIVE_CHITIN_TALENT: {
     id: 406907,

@@ -58,7 +58,6 @@ import {
   DefensiveNormalizer,
   DefensiveCastLinkNormalizer,
   MobilityCastLinkNormalizer,
-  TwinGuardian,
   RenewingBlaze,
   ImminentDestruction,
   MeltArmor,
@@ -78,6 +77,8 @@ import {
   GoldenOpportunity,
   MotesOfAcceleration,
   TimeSpiral,
+  RefinedEssence,
+  CommandSquadron,
 } from 'analysis/retail/evoker/shared';
 
 class CombatLogParser extends MainCombatLogParser {
@@ -105,7 +106,6 @@ class CombatLogParser extends MainCombatLogParser {
     defensiveCastLinkNormalizer: DefensiveCastLinkNormalizer,
     mobilityCastLinkNormalizer: MobilityCastLinkNormalizer,
     defensiveNormalizer: DefensiveNormalizer,
-    twinGuardian: TwinGuardian,
     renewingBlaze: RenewingBlaze,
     timeSpiral: TimeSpiral,
     massDisintegrate: MassDisintegrate,
@@ -161,6 +161,8 @@ class CombatLogParser extends MainCombatLogParser {
     masterOfDestiny: MasterOfDestiny,
     goldenOpportunity: GoldenOpportunity,
     motesOfAcceleration: MotesOfAcceleration,
+    refinedEssence: RefinedEssence,
+    commandSquadron: CommandSquadron,
 
     // Features
     buffTrackerGraph: BuffTrackerGraph,

@@ -9,30 +9,34 @@ import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import TalentSpellText from 'parser/ui/TalentSpellText';
-import {
-  BLACK_DAMAGE_SPELLS,
-  MIGHT_OF_THE_BLACK_DRAGONFLIGHT_MULTIPLIER,
-} from 'analysis/retail/evoker/shared/constants';
+import { REFINED_ESSENCE_MULTIPLIER } from 'analysis/retail/evoker/shared/constants';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
+import SPELLS from 'common/SPELLS/evoker';
 
+const ESSENCE_ABILITIES = [
+  SPELLS.DISINTEGRATE,
+  SPELLS.PYRE,
+  TALENTS.ERUPTION_TALENT,
+  SPELLS.MASS_ERUPTION_DAMAGE,
+];
 /**
- * Black spells deal 20% increased damage.
+ * Essence spells deal 15% increased damage.
  */
-class MightOfTheBlackDragonflight extends Analyzer {
+class RefinedEssence extends Analyzer {
   extraDamage = 0;
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS.MIGHT_OF_THE_BLACK_DRAGONFLIGHT_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.REFINED_ESSENCE_TALENT);
 
     this.addEventListener(
-      Events.damage.by(SELECTED_PLAYER).spell(BLACK_DAMAGE_SPELLS),
+      Events.damage.by(SELECTED_PLAYER).spell(ESSENCE_ABILITIES),
       this.onDamage,
     );
   }
 
   onDamage(event: DamageEvent) {
-    this.extraDamage += calculateEffectiveDamage(event, MIGHT_OF_THE_BLACK_DRAGONFLIGHT_MULTIPLIER);
+    this.extraDamage += calculateEffectiveDamage(event, REFINED_ESSENCE_MULTIPLIER);
   }
 
   statistic() {
@@ -47,7 +51,7 @@ class MightOfTheBlackDragonflight extends Analyzer {
           </>
         }
       >
-        <TalentSpellText talent={TALENTS.MIGHT_OF_THE_BLACK_DRAGONFLIGHT_TALENT}>
+        <TalentSpellText talent={TALENTS.REFINED_ESSENCE_TALENT}>
           <ItemDamageDone amount={this.extraDamage} />
         </TalentSpellText>
       </Statistic>
@@ -55,4 +59,4 @@ class MightOfTheBlackDragonflight extends Analyzer {
   }
 }
 
-export default MightOfTheBlackDragonflight;
+export default RefinedEssence;

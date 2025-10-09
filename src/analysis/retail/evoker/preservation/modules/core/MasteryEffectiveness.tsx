@@ -20,12 +20,9 @@ import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 const debug = false;
 
 const TEMPORAL_ANOMALY_DURATION_MS = 15000;
-const TWIN_GUARDIAN_DURATION_MS = 5000;
 const TEMPORAL_ANOMALY_SHIELD_COEFF = 1.75;
-const TWIN_GUARDIAN_SHIELD_COEFF = 0.3;
 const SHIELD_DURATIONS_MAP = new Map([
   [SPELLS.TEMPORAL_ANOMALY_SHIELD.id, TEMPORAL_ANOMALY_DURATION_MS],
-  [SPELLS.TWIN_GUARDIAN_SHIELD.id, TWIN_GUARDIAN_DURATION_MS],
 ]);
 
 const SHIELD_DURATIONS = Object.fromEntries(SHIELD_DURATIONS_MAP);
@@ -52,7 +49,6 @@ class MasteryEffectiveness extends Analyzer {
   private prevokerHealthPercent = 0;
   private prevokerMaxHealth = 0;
   private anomalyShieldApplications = new Map<number, ShieldInfo | null>();
-  private twinGuardianShieldApplications = new Map<number, ShieldInfo | null>();
 
   totalShieldEvents = 0;
   totalShieldEventsAffectedByMastery = 0;
@@ -69,48 +65,16 @@ class MasteryEffectiveness extends Analyzer {
       this.onAnomalyShieldApplication,
     );
     this.addEventListener(
-      Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.TWIN_GUARDIAN_SHIELD),
-      this.onTwinGuardianShieldApplication,
-    );
-    this.addEventListener(
-      Events.refreshbuff
-        .by(SELECTED_PLAYER)
-        .spell([SPELLS.TEMPORAL_ANOMALY_SHIELD, SPELLS.TWIN_GUARDIAN_SHIELD]),
+      Events.refreshbuff.by(SELECTED_PLAYER).spell([SPELLS.TEMPORAL_ANOMALY_SHIELD]),
       this.onShieldRefresh,
     );
   }
 
   onShieldRefresh(event: RefreshBuffEvent) {
     //apply
-    if (this.isEventAbilityTwinGuardian(event.ability.guid)) {
-      this.onTwinGuardianShieldApplication(event);
-    }
     if (this.isEventAbilityAnomaly(event.ability.guid)) {
       this.onAnomalyShieldApplication(event);
     }
-  }
-
-  onTwinGuardianShieldApplication(event: ApplyBuffEvent | RefreshBuffEvent) {
-    this.totalShieldEvents += 1;
-    let existingAbsorb = 0;
-    //shield refresh event's absorb value is a sum of any exising absorb and the new absorb. find the existing absorb for calc in map then remove
-    if (this.twinGuardianShieldApplications.get(event.targetID)) {
-      existingAbsorb = this.twinGuardianShieldApplications.get(event.targetID)?.event.absorb || 0;
-      this.twinGuardianShieldApplications.set(event.targetID, null);
-    }
-    //check for mastery map
-    const masteryEvent = this.masteryBoostCheck(event, existingAbsorb);
-    if (masteryEvent) {
-      debug && console.log('mastery boosted TG found');
-      this.totalShieldEventsAffectedByMastery += 1;
-    }
-    //push new shield to map
-    this.twinGuardianShieldApplications.set(event.targetID, {
-      event: event,
-      baseShieldValue: this.calculateShield(event, existingAbsorb),
-      hasMasteryBoost: masteryEvent,
-      masteryValue: this.statTracker.currentMasteryPercentage,
-    });
   }
 
   onAnomalyShieldApplication(event: ApplyBuffEvent | RefreshBuffEvent) {
@@ -152,9 +116,6 @@ class MasteryEffectiveness extends Analyzer {
     if (this.isEventAbilityAnomaly(spellId)) {
       info = this.anomalyShieldApplications.get(event.targetID);
     }
-    if (this.isEventAbilityTwinGuardian(spellId)) {
-      info = this.twinGuardianShieldApplications.get(event.targetID);
-    }
     const shieldDurationMS = SHIELD_DURATIONS[event.ability.guid];
 
     if (
@@ -190,12 +151,6 @@ class MasteryEffectiveness extends Analyzer {
       const intellect = this.statTracker.currentIntellectRating;
       baseShielding = intellect * TEMPORAL_ANOMALY_SHIELD_COEFF * (1 + vers) + existingAbsorb;
     }
-
-    if (this.isEventAbilityTwinGuardian(event.ability.guid)) {
-      const initialShieldAmount = this.prevokerMaxHealth * TWIN_GUARDIAN_SHIELD_COEFF;
-      const versAddedShield = this.prevokerMaxHealth * TWIN_GUARDIAN_SHIELD_COEFF * vers;
-      baseShielding = initialShieldAmount + versAddedShield;
-    }
     return Math.round(baseShielding);
   }
 
@@ -214,10 +169,6 @@ class MasteryEffectiveness extends Analyzer {
 
   private isEventAbilityAnomaly(spellId: number) {
     return spellId === SPELLS.TEMPORAL_ANOMALY_SHIELD.id;
-  }
-
-  private isEventAbilityTwinGuardian(spellId: number) {
-    return spellId === SPELLS.TWIN_GUARDIAN_SHIELD.id;
   }
 
   get percentOfHealingAffectedByMastery() {
