@@ -118,13 +118,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           useThresholds
         />
       )}
-      {info.combatant.hasTalent(TALENTS.SHIFTING_POWER_TALENT) && (
-        <CastEfficiencyBar
-          spellId={TALENTS.SHIFTING_POWER_TALENT.id}
-          gapHighlightMode={GapHighlight.FullCooldown}
-          useThresholds
-        />
-      )}
       {info.combatant.hasTalent(TALENTS.PHOENIX_FLAMES_TALENT) && (
         <CastEfficiencyBar
           spellId={TALENTS.PHOENIX_FLAMES_TALENT.id}
