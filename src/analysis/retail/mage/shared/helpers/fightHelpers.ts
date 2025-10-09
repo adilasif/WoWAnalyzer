@@ -50,13 +50,3 @@ export function isDuringOpener(analyzer: Analyzer, timestamp: number): boolean {
 export function isNearFightEnd(analyzer: Analyzer, timestamp: number): boolean {
   return getFightContext(analyzer, timestamp).isFightEnd;
 }
-
-/**
- * Checks if the fight is short.
- * @param analyzer The analyzer instance
- * @param timestamp The timestamp to check
- * @returns true if less than 1 minute remaining in fight
- */
-export function isShortFight(analyzer: Analyzer, timestamp: number): boolean {
-  return getFightContext(analyzer, timestamp).isShortFight;
-}

@@ -32,7 +32,7 @@ class ArcaneMissilesGuide extends MageAnalyzer {
   get arcaneMissilesData(): BoxRowEntry[] {
     return evaluateEvents({
       events: this.arcaneMissiles.missileData,
-      analyzer: this,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (am) => {
         const clippedBeforeGCD =
           am.channelEnd && am.gcdEnd && am.gcdEnd - am.channelEnd > MISSILE_EARLY_CLIP_DELAY;

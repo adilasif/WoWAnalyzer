@@ -30,7 +30,7 @@ class ArcaneBarrageGuide extends MageAnalyzer {
   get arcaneBarrageData(): BoxRowEntry[] {
     return evaluateEvents({
       events: this.arcaneBarrage.barrageData,
-      analyzer: this,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (ab) => {
         const hasMaxCharges = ab.charges >= this.MAX_ARCANE_CHARGES;
         const isAOE = ab.targetsHit >= this.AOE_THRESHOLD;

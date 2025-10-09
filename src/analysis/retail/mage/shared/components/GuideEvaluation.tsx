@@ -3,8 +3,6 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { CastEvent } from 'parser/core/Events';
-import Analyzer from 'parser/core/Analyzer';
-import type CombatLogParser from 'parser/core/CombatLogParser';
 import {
   generateGuideTooltip,
   type ExpandableConfig,
@@ -40,14 +38,14 @@ export interface GuideEvaluationConfig {
  * Internal evaluation function.
  * @param timestamp When the action occurred
  * @param data The action data
- * @param analyzer Analyzer instance for tooltip generation
+ * @param formatTimestamp Function to format timestamps for tooltips
  * @param config Evaluation configuration
  * @returns BoxRowEntry for use in PerformanceBoxRow
  */
 function _evaluateEvent<T>(
   timestamp: number,
   data: T,
-  analyzer: Analyzer,
+  formatTimestamp: (timestamp: number) => string,
   config: GuideEvaluationConfig,
 ): BoxRowEntry {
   let finalEvaluation: BoxRowEntry | null = null;
@@ -56,7 +54,7 @@ function _evaluateEvent<T>(
     for (const condition of config.failConditions) {
       if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
-          analyzer,
+          formatTimestamp,
           QualitativePerformance.Fail,
           condition.description,
           timestamp,
@@ -70,7 +68,7 @@ function _evaluateEvent<T>(
     for (const condition of config.perfectConditions) {
       if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
-          analyzer,
+          formatTimestamp,
           QualitativePerformance.Perfect,
           condition.description,
           timestamp,
@@ -84,7 +82,7 @@ function _evaluateEvent<T>(
     for (const condition of config.goodConditions) {
       if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
-          analyzer,
+          formatTimestamp,
           QualitativePerformance.Good,
           condition.description,
           timestamp,
@@ -98,7 +96,7 @@ function _evaluateEvent<T>(
     for (const condition of config.okConditions) {
       if (condition.active !== false && condition.check) {
         finalEvaluation = createTooltipEntry(
-          analyzer,
+          formatTimestamp,
           QualitativePerformance.Ok,
           condition.description,
           timestamp,
@@ -110,7 +108,7 @@ function _evaluateEvent<T>(
 
   if (!finalEvaluation) {
     finalEvaluation = createTooltipEntry(
-      analyzer,
+      formatTimestamp,
       config.defaultPerformance || QualitativePerformance.Ok,
       config.defaultMessage || `${config.actionName} without specific conditions`,
       timestamp,
@@ -122,26 +120,20 @@ function _evaluateEvent<T>(
 
 /**
  * Helper to create BoxRowEntry with tooltip.
- * @param analyzer Analyzer instance
+ * @param formatTimestamp Function to format timestamps for tooltips
  * @param performance Performance level
  * @param message Tooltip message
  * @param timestamp Event timestamp
  * @returns BoxRowEntry
  */
 function createTooltipEntry(
-  analyzer: Analyzer,
+  formatTimestamp: (timestamp: number) => string,
   performance: QualitativePerformance,
   message: string,
   timestamp: number,
 ): BoxRowEntry {
   const tooltipItems = [{ perf: performance, detail: message }];
-  const owner = (analyzer as unknown as { owner: CombatLogParser }).owner;
-  const tooltip = generateGuideTooltip(
-    owner.formatTimestamp.bind(owner),
-    performance,
-    tooltipItems,
-    timestamp,
-  );
+  const tooltip = generateGuideTooltip(formatTimestamp, performance, tooltipItems, timestamp);
   return { value: performance, tooltip };
 }
 
@@ -150,7 +142,7 @@ function createTooltipEntry(
  * @param config Configuration object
  * @param config.events Array of event data to evaluate
  * @param config.evaluationLogic Function that returns evaluation config for each event
- * @param config.analyzer Analyzer instance for tooltip generation
+ * @param config.formatTimestamp Function to format timestamps for tooltips
  * @returns Array of BoxRowEntry evaluations
  */
 export function evaluateEvents<
@@ -158,11 +150,11 @@ export function evaluateEvents<
 >(config: {
   events: T[];
   evaluationLogic: (event: T) => GuideEvaluationConfig;
-  analyzer: Analyzer;
+  formatTimestamp: (timestamp: number) => string;
 }): BoxRowEntry[] {
   return config.events.map((event: T) => {
     const timestamp = event.timestamp || event.applied || event.cast?.timestamp || 0;
-    return _evaluateEvent(timestamp, event, config.analyzer, config.evaluationLogic(event));
+    return _evaluateEvent(timestamp, event, config.formatTimestamp, config.evaluationLogic(event));
   });
 }
 

@@ -44,7 +44,7 @@ class ArcaneTempoGuide extends MageAnalyzer {
 
     const castData = evaluateEvents({
       events: [tempoData],
-      analyzer: this,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (data) => ({
         actionName: 'Arcane Tempo',
 

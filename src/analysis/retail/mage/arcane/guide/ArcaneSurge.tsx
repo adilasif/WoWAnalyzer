@@ -31,6 +31,7 @@ class ArcaneSurgeGuide extends MageAnalyzer {
 
     return evaluateEvents({
       events: transformedCasts,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (cast: {
         timestamp: number;
         mana?: number;
@@ -96,7 +97,6 @@ class ArcaneSurgeGuide extends MageAnalyzer {
           defaultMessage: 'Suboptimal Arcane Surge usage',
         };
       },
-      analyzer: this,
     });
   }
 

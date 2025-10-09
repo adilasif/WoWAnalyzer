@@ -19,7 +19,7 @@ class PresenceOfMindGuide extends MageAnalyzer {
   get presenceOfMindData(): BoxRowEntry[] {
     return evaluateEvents({
       events: this.presenceOfMind.pomData,
-      analyzer: this,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (cast) => {
         const ST = cast.targets && cast.targets < AOE_TARGET_THRESHOLD;
         const AOE = cast.targets && cast.targets >= AOE_TARGET_THRESHOLD;

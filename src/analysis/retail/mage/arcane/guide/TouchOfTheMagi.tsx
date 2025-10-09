@@ -76,6 +76,7 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
   get touchOfTheMagiData(): BoxRowEntry[] {
     return evaluateEvents({
       events: this.touchOfTheMagi.touchData,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (cast: TouchOfTheMagiData) => {
         const noCharges = cast.charges === 0;
         const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
@@ -127,7 +128,6 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
           defaultMessage: `Suboptimal Touch usage: ${cast.charges} charges, ${formatPercentage(activeTime, 1)}% active time`,
         };
       },
-      analyzer: this,
     });
   }
 

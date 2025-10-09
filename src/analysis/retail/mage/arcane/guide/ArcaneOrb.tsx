@@ -25,6 +25,7 @@ class ArcaneOrbGuide extends MageAnalyzer {
   get arcaneOrbData(): BoxRowEntry[] {
     return evaluateEvents({
       events: this.arcaneOrb.orbData,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (cast: ArcaneOrbCast) => {
         const hitTargets = cast.targetsHit > 0;
         const efficientCharges = cast.chargesBefore <= ORB_EFFICIENT_CHARGE_THRESHOLD;
@@ -65,7 +66,6 @@ class ArcaneOrbGuide extends MageAnalyzer {
           defaultMessage: 'Arcane Orb usage needs improvement',
         };
       },
-      analyzer: this,
     });
   }
 

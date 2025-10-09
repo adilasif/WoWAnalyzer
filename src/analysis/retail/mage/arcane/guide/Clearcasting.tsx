@@ -16,6 +16,7 @@ class ClearcastingGuide extends MageAnalyzer {
   get clearcastingData(): BoxRowEntry[] {
     return evaluateEvents({
       events: this.clearcasting.clearcastingProcs,
+      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
       evaluationLogic: (cc: ClearcastingData) => ({
         actionName: 'Clearcasting',
 
@@ -38,7 +39,6 @@ class ClearcastingGuide extends MageAnalyzer {
         defaultPerformance: QualitativePerformance.Fail,
         defaultMessage: 'Clearcasting proc not handled properly',
       }),
-      analyzer: this,
     });
   }
 
