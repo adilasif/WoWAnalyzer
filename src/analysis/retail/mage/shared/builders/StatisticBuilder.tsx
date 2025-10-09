@@ -26,23 +26,6 @@ interface ColumnConfig<T = unknown> {
 /**
  * Builder for creating dropdown tables with consistent styling
  *
- * @example
- * ```tsx
- * // Define columns with positional parameters (first column automatically becomes row header)
- * const dropdown = new DropdownTableBuilder()
- *   .column('Stacks', (data) => `${data.stacks}`)  // First column cells render as <th>
- *   .column('Time (s)', (data) => formatDuration(data.time))
- *   .column('Time (%)', (data) => `${formatPercentage(data.time / this.owner.fightDuration)}%`)
- *   .data(this.stackData);
- *
- * // Or use config objects for columns
- * const dropdown = new DropdownTableBuilder()
- *   .column({ header: 'Stacks', getValue: (d) => d.stacks })  // First column cells render as <th>
- *   .column({ header: 'Time (s)', getValue: (d) => d.time })
- *   .addRow({ stacks: 5, time: 1000 })
- *   .addRow({ stacks: 10, time: 2000 });
- * ```
-
  */
 export class DropdownTableBuilder<T = unknown> {
   private _columns: ColumnConfig<T>[] = [];
@@ -87,7 +70,6 @@ export class DropdownTableBuilder<T = unknown> {
     return this;
   }
 
-  /** Build and return the table JSX */
   build(): ReactNode {
     return (
       <table className="table table-condensed">
@@ -122,70 +104,6 @@ export class DropdownTableBuilder<T = unknown> {
 /**
  * Fluent builder for creating statistics with consistent styling
  *
- * @example
- * ```tsx
- * // Single DPS statistic (shows damage per second with percentage)
- * statistic() {
- *   return new StatisticBuilder(TALENTS.ARCANE_BOMBARDMENT_TALENT)
- *     .dps({ amount: this.bonusDamage })
- *     .build();
- * }
- *
- * // Multiple DPS values with labels
- * statistic() {
- *   return new StatisticBuilder(SPELLS.ARCANE_HARMONY_BUFF)
- *     .dps({ amount: this.dpsValue1, label: 'Bonus DPS' })
- *     .dps({ amount: this.dpsValue2, label: 'DPS Increase' })
- *     .build();
- * }
- *
- * // Average damage statistic (shows raw damage amount)
- * statistic() {
- *   return new StatisticBuilder(TALENTS.ARCANE_ECHO_TALENT)
- *     .averageDamage({ amount: this.averageDamage })
- *     .build();
- * }
- *
- * // Multi-value statistic
- * statistic() {
- *   return new StatisticBuilder(SPELLS.ARCANE_HARMONY_BUFF)
- *     .value({ value: this.bonusDamage, label: 'Bonus Damage', format: 'number' })
- *     .value({ value: this.dpsIncrease, label: 'DPS', format: 'number' })
- *     .value({ value: this.averageStacks, label: 'Avg. stacks', format: 'number' })
- *     .build();
- * }
- *
- * // Value with custom icon
- * statistic() {
- *   return new StatisticBuilder(TALENTS.ARCANE_TEMPO_TALENT)
- *     .value({ value: this.averageHaste, label: 'average haste gained', format: 'percentage', icon: <HasteIcon /> })
- *     .build();
- * }
- *
- * // Custom content with tooltip
- * statistic() {
- *   return new StatisticBuilder(TALENTS.ARCANE_ECHO_TALENT)
- *     .content({
- *       content: <><SpellIcon spell={TALENTS.ARCANE_ECHO_TALENT} /> {formatNumber(this.avg)} <small>Average</small></>,
- *       tooltip: <>Custom tooltip content</>,
- *     })
- *     .build();
- * }
- *
- * // Statistic with dropdown table
- * statistic() {
- *   const dropdown = new DropdownTableBuilder()
- *     .column('Haste-Bonus', (data) => `${formatPercentage(data.haste, 0)}%`, true)
- *     .column('Time (s)', (data) => formatDuration(data.time))
- *     .column('Time (%)', (data) => `${formatPercentage(data.pct)}%`)
- *     .data(this.stackData);
- *
- *   return new StatisticBuilder(TALENTS.ARCANE_TEMPO_TALENT)
- *     .value({ value: this.averageHaste, label: 'average haste', format: 'percentage', icon: <HasteIcon /> })
- *     .dropdown(dropdown)
- *     .build();
- * }
- * ```
  */
 export class StatisticBuilder {
   private _spell: Spell | Talent;

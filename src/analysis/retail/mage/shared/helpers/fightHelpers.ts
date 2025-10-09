@@ -41,45 +41,7 @@ export interface FightContext {
  * @param timestamp - The timestamp to evaluate context for (typically event.timestamp)
  * @returns Complete fight context with boolean flags and timing values
  *
- * @example
- * ```typescript
- * // Example: Adjust mana thresholds based on fight phase
- * onArcaneSurge(event: CastEvent) {
- *   const context = getFightContext(this, event.timestamp);
- *   const mana = getManaPercentage(event);
- *
- *   let performance: QualitativePerformance;
- *   if (context.isOpener) {
- *     // Stricter threshold during opener - should be near 100%
- *     performance = evaluatePerformance(mana, { minor: 0.95, average: 0.90, major: 0.85 }, true);
- *   } else if (context.isFightEnd) {
- *     // More lenient at fight end - burn remaining mana
- *     performance = evaluatePerformance(mana, { minor: 0.50, average: 0.30, major: 0.10 }, true);
- *   } else {
- *     // Normal thresholds during middle of fight
- *     performance = evaluatePerformance(mana, { minor: 0.80, average: 0.70, major: 0.60 }, true);
- *   }
- * }
- * ```
- *
- * @example
- * ```typescript
- * // Example: Check if cooldown usage makes sense
- * onTouchOfTheMagi(event: ApplyDebuffEvent) {
- *   const context = getFightContext(this, event.timestamp);
- *
- *   // Don't penalize holding Touch if fight is almost over
- *   if (context.isFightEnd) {
- *     return QualitativePerformance.Good; // Any usage at fight end is fine
- *   }
- *
- *   // During opener, expect Touch to be used early
- *   if (context.isOpener && context.timeSinceStart > 15000) {
- *     return QualitativePerformance.Ok; // Slightly delayed opener
- *   }
- * }
- * ```
- */
+ * */
 export function getFightContext(analyzer: Analyzer, timestamp: number): FightContext {
   const owner = (analyzer as unknown as { owner: CombatLogParser }).owner;
   const fightStart = owner.fight.start_time;
@@ -106,21 +68,6 @@ export function getFightContext(analyzer: Analyzer, timestamp: number): FightCon
  * @param timestamp - The timestamp to check (typically event.timestamp)
  * @returns true if within first 20 seconds of fight
  *
- * @example
- * ```typescript
- * // Example: Different expectations for opener vs regular play
- * if (isDuringOpener(this, cast.timestamp)) {
- *   // During opener, expect higher charges
- *   if (charges < 3) {
- *     return QualitativePerformance.Ok;
- *   }
- * } else {
- *   // During regular play, 2+ charges is fine
- *   if (charges < 2) {
- *     return QualitativePerformance.Ok;
- *   }
- * }
- * ```
  */
 export function isDuringOpener(analyzer: Analyzer, timestamp: number): boolean {
   return getFightContext(analyzer, timestamp).isOpener;
@@ -136,16 +83,6 @@ export function isDuringOpener(analyzer: Analyzer, timestamp: number): boolean {
  * @param timestamp - The timestamp to check (typically event.timestamp)
  * @returns true if less than 5 seconds remaining in fight
  *
- * @example
- * ```typescript
- * // Example: Don't penalize holding cooldowns at fight end
- * if (isNearFightEnd(this, event.timestamp)) {
- *   return QualitativePerformance.Good; // Any usage is fine
- * }
- *
- * // Normal evaluation for mid-fight
- * return this.evaluateCooldownUsage(event);
- * ```
  */
 export function isNearFightEnd(analyzer: Analyzer, timestamp: number): boolean {
   return getFightContext(analyzer, timestamp).isFightEnd;
@@ -161,14 +98,6 @@ export function isNearFightEnd(analyzer: Analyzer, timestamp: number): boolean {
  * @param timestamp - The timestamp to check (typically event.timestamp)
  * @returns true if less than 1 minute remaining in fight
  *
- * @example
- * ```typescript
- * // Example: Adjust expectations for long cooldowns in short fights
- * if (isShortFight(this, event.timestamp)) {
- *   // Don't expect players to use 3-minute cooldowns if fight is almost over
- *   return QualitativePerformance.Good;
- * }
- * ```
  */
 export function isShortFight(analyzer: Analyzer, timestamp: number): boolean {
   return getFightContext(analyzer, timestamp).isShortFight;
