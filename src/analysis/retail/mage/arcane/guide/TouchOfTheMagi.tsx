@@ -70,15 +70,6 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
           },
         },
       ],
-      getCastEvents: (cast: unknown) => {
-        const touchCast = cast as TouchOfTheMagiData;
-        return this.getCastsInTimeWindow({
-          timestamp: touchCast.applied,
-          beforeMs: TOUCH_WINDOW_BUFFER_MS,
-          afterMs: TOUCH_WINDOW_BUFFER_MS,
-        });
-      },
-      castTimelineDescription: 'Casts 5 seconds before and after Touch of the Magi',
     });
   }
 
@@ -223,6 +214,18 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
           evaluatedData: this.touchOfTheMagiData,
           expandableConfig: this.expandableConfig,
         }),
+      })
+      .addCastTimelines({
+        events: this.touchOfTheMagi.touchData,
+        timelineEvents: (cast: TouchOfTheMagiData) =>
+          this.getCastsInTimeWindow({
+            timestamp: cast.applied,
+            beforeMs: TOUCH_WINDOW_BUFFER_MS,
+            afterMs: TOUCH_WINDOW_BUFFER_MS,
+          }),
+        formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
+        headerPrefix: 'Touch',
+        windowDescription: 'Casts 5 seconds before and after Touch of the Magi',
       })
       .build();
   }

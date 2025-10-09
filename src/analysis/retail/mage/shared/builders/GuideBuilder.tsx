@@ -1,38 +1,3 @@
-/**
- * Fluent Builder Pattern for Guide Components
- *
- * This builder provides an intuitive, English-like interface for creating guide subsections.
- * It's designed to be easy to use for non-programmers while maintaining full flexibility.
- *
- * Usage Example:
- * Simple ability with cast summary:
- * new GuideBuilder(SPELLS.ARCANE_ORB)
- *   .explanation(explanation)
- *   .addCastSummary({ castData: this.arcaneOrbData })
- *   .build()
- *
- * Complex ability with multiple components:
- * new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT, 'Touch of the Magi')
- *   .explanation(explanation)
- *   .addStatistic({
- *     value: '85.2%',
- *     label: 'Average Active Time',
- *     performance: QualitativePerformance.Good,
- *     tooltip
- *   })
- *   .addExpandableBreakdown({ castBreakdowns })
- *   .build()
- *
- * Arcane Orb with individual components:
- * new GuideBuilder(SPELLS.ARCANE_ORB)
- *   .explanation(explanation)
- *   .addStatistic({ value: '2.1', label: 'avg targets hit', performance: QualitativePerformance.Good })
- *   .addCastEfficiency()
- *   .addCastSummary({ castData: this.arcaneOrbData, title: 'Arcane Orb Usage' })
- *   .addCooldownTimeline()
- *   .build()
- */
-
 import React, { ReactNode } from 'react';
 import { formatPercentage } from 'common/format';
 import { SpellLink, SpellIcon, TooltipElement } from 'interface';
@@ -52,10 +17,8 @@ import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../arcane/Guide';
 import UptimeStackBar from 'parser/ui/UptimeStackBar';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Spell from 'common/SPELLS/Spell';
-import { ExpandableConfig } from '../components/GuideEvaluation';
+import { ExpandableConfig, CastTimeline, createCastTimelineEvents } from '../components';
 import { CastEvent } from 'parser/core/Events';
-import { SpellSeq } from 'parser/ui/SpellSeq';
-import CastTimeline from 'interface/guide/components/CastTimeline';
 import { getUptimesFromBuffHistory } from 'parser/ui/UptimeBar';
 import { getStackUptimesFromBuffHistory } from 'parser/ui/UptimeStackBar';
 import type { default as Combatant } from 'parser/core/Combatant';
@@ -295,45 +258,44 @@ export class GuideBuilder {
   }
 
   /**
-   * Add expandable cast timelines showing spells cast around key events
-   * Perfect for showing what was cast during cooldown windows or special events
+   * Add navigable cast timelines for events
+   * Shows a timeline of casts for each event with previous/next navigation
+   * Perfect for showing spell sequences during ability windows or buff periods
    *
    * @param config Configuration for the cast timelines
-   * @param config.events Array of events to show timelines for
-   * @param config.getCastEvents Function to get cast events for a given event
-   * @param config.formatTimestamp Function to format timestamps
-   * @param config.getEventTimestamp Function to get timestamp from an event
-   * @param config.getEventHeader Function to generate header for each timeline
+   * @param config.events Array of events to create timelines for
+   * @param config.timelineEvents Function that returns cast events for each event's window
+   * @param config.formatTimestamp Function to format timestamps (typically this.owner.formatTimestamp.bind(this.owner))
+   * @param config.getEventHeader Optional function to generate event header (auto-generated from headerPrefix if not provided)
+   * @param config.headerPrefix Prefix for auto-generated headers (e.g., 'Touch' → 'Touch #1', 'Touch #2')
    * @param config.performanceData Optional performance data for each event
-   * @param config.windowDescription Optional description of what the window represents
+   * @param config.windowDescription Optional description of what the timeline window represents
+   * @returns This builder for method chaining
    *
-   * @example
-   * .addCastTimelines({
-   *   events: touchCasts,
-   *   getCastEvents: (cast) => this.getCastsInWindow(cast.timestamp - 5000, cast.timestamp + 5000),
-   *   formatTimestamp: this.owner.formatTimestamp,
-   *   getEventTimestamp: (cast) => cast.timestamp,
-   *   getEventHeader: (cast, index) => <>Cast #{index + 1}</>,
-   *   performanceData: performanceBoxRow,
-   *   windowDescription: 'Spells cast during Touch of the Magi'
-   * })
    */
   addCastTimelines<T>(config: {
     events: T[];
-    getCastEvents: (event: T) => CastEvent[];
+    timelineEvents: (event: T) => CastEvent[];
     formatTimestamp: (timestamp: number) => string;
-    getEventTimestamp: (event: T) => number;
-    getEventHeader: (event: T, index: number) => ReactNode;
+    getEventHeader?: (event: T, index: number) => ReactNode;
+    headerPrefix?: string;
     performanceData?: BoxRowEntry[];
     windowDescription?: string;
   }): GuideBuilder {
+    const getEventHeader =
+      config.getEventHeader ||
+      ((event: T, index: number) => (
+        <>
+          {config.headerPrefix || 'Event'} #{index + 1}
+        </>
+      ));
+
     this.components.push(
       this.createCastTimelines(
         config.events,
-        config.getCastEvents,
+        config.timelineEvents,
         config.formatTimestamp,
-        config.getEventTimestamp,
-        config.getEventHeader,
+        getEventHeader,
         config.performanceData,
         config.windowDescription,
       ),
@@ -632,25 +594,26 @@ export class GuideBuilder {
 
   private createCastTimelines<T>(
     events: T[],
-    getCastEvents: (event: T) => CastEvent[],
+    timelineEvents: (event: T) => CastEvent[],
     formatTimestamp: (timestamp: number) => string,
-    getEventTimestamp: (event: T) => number,
-    getEventHeader: (event: T, index: number) => ReactNode,
+    getEventHeader?: (event: T, index: number) => ReactNode,
     performanceData?: BoxRowEntry[],
     windowDescription?: string,
   ): JSX.Element {
-    const timelineEvents = events.map((event, index) => ({
-      timestamp: getEventTimestamp(event),
-      casts: getCastEvents(event),
-      header: (
-        <>
-          {getEventHeader(event, index)} @ {formatTimestamp(getEventTimestamp(event))}
-        </>
-      ),
-      performance: performanceData?.[index]?.value,
-    }));
+    const castTimelineEvents = createCastTimelineEvents({
+      events,
+      timelineEvents,
+      formatTimestamp,
+      getEventHeader: getEventHeader!, // We know this won't be undefined because we set a default in addCastTimelines
+    });
 
-    return <CastTimeline events={timelineEvents} windowDescription={windowDescription} />;
+    return (
+      <CastTimeline
+        events={castTimelineEvents}
+        windowDescription={windowDescription}
+        formatTimestamp={formatTimestamp}
+      />
+    );
   }
 }
 
@@ -683,34 +646,6 @@ export function generateExpandableBreakdown(config: {
       }),
     );
 
-    let detailItems: Array<{ label: React.ReactNode; details: React.ReactNode }> | undefined;
-    if (expandableConfig.getCastEvents) {
-      const casts = expandableConfig.getCastEvents(cast);
-      const spells = casts
-        .filter((castEvent) => castEvent.ability && castEvent.ability.guid)
-        .map((castEvent) => ({
-          id: castEvent.ability.guid,
-          name: castEvent.ability.name,
-          icon: castEvent.ability.abilityIcon.replace('.jpg', ''),
-        }));
-
-      detailItems = [
-        {
-          label: (
-            <div style={{ display: 'block', width: '100%' }}>
-              <div style={{ marginBottom: '6px' }}>
-                <strong>{expandableConfig.castTimelineDescription || 'Casts during window'}</strong>
-              </div>
-              <div style={{ overflowX: 'auto' }}>
-                <SpellSeq spells={spells} />
-              </div>
-            </div>
-          ),
-          details: <></>,
-        },
-      ];
-    }
-
     const header = (
       <>
         @ {expandableConfig.formatTimestamp(timestamp)} &mdash;{' '}
@@ -722,7 +657,6 @@ export function generateExpandableBreakdown(config: {
       <CooldownExpandable
         header={header}
         checklistItems={checklistItems}
-        detailItems={detailItems}
         perf={evaluatedEntry.value}
         key={index}
       />

@@ -2,7 +2,6 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { PerformanceMark } from 'interface/guide';
 import Spell from 'common/SPELLS/Spell';
-import { CastEvent } from 'parser/core/Events';
 
 /**
  * Generates a standardized tooltip for guide performance entries.
@@ -96,8 +95,6 @@ export interface ExpandableConfig {
   formatTimestamp: (timestamp: number) => string;
   getTimestamp: (data: unknown) => number;
   checklistItems: ExpandableChecklistItem[];
-  getCastEvents?: (data: unknown) => CastEvent[];
-  castTimelineDescription?: string;
 }
 
 /**
@@ -117,8 +114,6 @@ export interface ExpandableChecklistItem {
  * @param config.formatTimestamp Function to format timestamps for display
  * @param config.getTimestamp Function to extract timestamp from cast data
  * @param config.checklistItems Array of checklist item configurations
- * @param config.getCastEvents Optional function to get cast events for timeline display
- * @param config.castTimelineDescription Optional description for the cast timeline window
  */
 export function createExpandableConfig(config: {
   spell: Spell;
@@ -129,8 +124,6 @@ export function createExpandableConfig(config: {
     getResult: (cast: unknown, evaluatedData: BoxRowEntry) => boolean;
     getDetails: (cast: unknown) => string;
   }>;
-  getCastEvents?: (cast: unknown) => CastEvent[];
-  castTimelineDescription?: string;
 }): ExpandableConfig {
   return {
     spell: config.spell,
@@ -141,7 +134,5 @@ export function createExpandableConfig(config: {
       getResult: item.getResult,
       getDetails: item.getDetails,
     })),
-    getCastEvents: config.getCastEvents,
-    castTimelineDescription: config.castTimelineDescription,
   };
 }
