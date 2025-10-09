@@ -329,12 +329,10 @@ export function createCastTimelineEvents<T>(config: {
   getEventHeader: (event: T, index: number) => ReactNode;
 }): CastTimelineEvent[] {
   return config.events.map((event, index) => {
-    // Auto-infer timestamp if not provided
     let timestamp: number;
     if (config.getEventTimestamp) {
       timestamp = config.getEventTimestamp(event);
     } else {
-      // Try common timestamp fields - cast to Record to safely access properties
       const eventRecord = event as Record<string, unknown>;
       const castRecord = eventRecord.cast as Record<string, unknown> | undefined;
       timestamp =
