@@ -33,7 +33,6 @@ export default class ArcaneSurge extends MageAnalyzer {
       cast: event.timestamp,
       charges: this.chargeTracker.current,
       siphonStormBuff: this.selectedCombatant.hasBuff(SPELLS.SIPHON_STORM_BUFF.id),
-      netherPrecision: this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id),
       mana: getManaPercentage(event),
     });
   }
@@ -62,5 +61,4 @@ export interface ArcaneSurgeData {
   mana?: number;
   charges: number;
   siphonStormBuff: boolean;
-  netherPrecision: boolean;
 }

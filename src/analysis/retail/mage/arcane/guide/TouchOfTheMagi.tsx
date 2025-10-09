@@ -137,14 +137,12 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
     const arcaneCharge = <SpellLink spell={SPELLS.ARCANE_CHARGE} />;
     const arcaneBarrage = <SpellLink spell={SPELLS.ARCANE_BARRAGE} />;
     const siphonStorm = <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} />;
-    const netherPrecision = <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} />;
     const evocation = <SpellLink spell={TALENTS.EVOCATION_TALENT} />;
     const arcaneBlast = <SpellLink spell={SPELLS.ARCANE_BLAST} />;
     const arcaneSurge = <SpellLink spell={TALENTS.ARCANE_SURGE_TALENT} />;
     const presenceOfMind = <SpellLink spell={TALENTS.PRESENCE_OF_MIND_TALENT} />;
     const burdenOfPower = <SpellLink spell={TALENTS.BURDEN_OF_POWER_TALENT} />;
     const gloriousIncandescence = <SpellLink spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />;
-    const intuition = <SpellLink spell={SPELLS.INTUITION_BUFF} />;
 
     const explanation = (
       <>
@@ -164,12 +162,11 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
               {arcaneBarrage}
               is in the air for some extra damage. cast
               {touchOfTheMagi} while {arcaneBarrage} is in the air. This should be done even if your
-              charges will be refunded anyway via {burdenOfPower}, {gloriousIncandescence}, or{' '}
-              {intuition}.
+              charges will be refunded anyway via {burdenOfPower}, {gloriousIncandescence}, or .
             </li>
             <li>
-              Major Burn Phase: Ensure you have {siphonStorm} and {netherPrecision}. Your cast
-              sequence would typically be{' '}
+              Major Burn Phase: Ensure you have {siphonStorm} and . Your cast sequence would
+              typically be{' '}
               <SpellSeq
                 spells={[
                   TALENTS.EVOCATION_TALENT,
@@ -183,7 +180,7 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
             </li>
             <li>
               Minor Burn Phase: {evocation} and {arcaneSurge} will not be available, but if possible
-              you should go into {touchOfTheMagi} with {netherPrecision}.
+              you should go into {touchOfTheMagi} with .
             </li>
             <li>
               Use {presenceOfMind} at the end of {touchOfTheMagi} to squeeze in a couple more{' '}

@@ -6,13 +6,11 @@ import AllCooldownUsageList from 'interface/guide/components/MajorDefensives/All
 import { SpellLink, TooltipElement } from 'interface';
 import { Highlight } from 'interface/Highlight';
 import TALENTS from 'common/TALENTS/mage';
-import GreaterInvisibility from './GreaterInvisibility';
 import IceBlock from './IceBlock';
 import IceCold from './IceCold';
-import MirrorImage from './MirrorImage';
 
 const MajorDefensives = () => {
-  const defensiveAnalyzers = useAnalyzers([MirrorImage, GreaterInvisibility, IceBlock, IceCold]);
+  const defensiveAnalyzers = useAnalyzers([IceBlock, IceCold]);
 
   return (
     <Section title="Defensives">
@@ -24,8 +22,6 @@ const MajorDefensives = () => {
           raid by allowing healers to focus on keeping others alive.
           <br />
           As an <span className="Mage">Mage</span> you have access to many defensives CDs such as{' '}
-          <SpellLink spell={TALENTS.MIRROR_IMAGE_TALENT} />,{' '}
-          <SpellLink spell={TALENTS.GREATER_INVISIBILITY_TALENT} /> and{' '}
           <SpellLink spell={TALENTS.ICE_BLOCK_TALENT} />/
           <SpellLink spell={TALENTS.ICE_COLD_TALENT} />.
         </p>

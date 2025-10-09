@@ -56,12 +56,6 @@ const EVENT_LINKS = createEventLinks(
   },
 
   {
-    spell: TALENTS.SUPERNOVA_TALENT.id,
-    parentType: EventType.Cast,
-    links: [LinkPatterns.damage({ forwardBuffer: 2000, anyTarget: true })],
-  },
-
-  {
     spell: TALENTS.ARCANE_MISSILES_TALENT.id,
     parentType: EventType.Cast,
     links: [
@@ -69,19 +63,6 @@ const EVENT_LINKS = createEventLinks(
         id: SPELLS.ARCANE_MISSILES_DAMAGE.id,
         forwardBuffer: 2600,
         maxLinks: 8,
-        anyTarget: true,
-      }),
-    ],
-  },
-
-  {
-    spell: TALENTS.SHIFTING_POWER_TALENT.id,
-    parentType: EventType.Cast,
-    links: [
-      LinkPatterns.cast({
-        id: SPELLS.SHIFTING_POWER_TICK.id,
-        relation: EventRelations.TICK,
-        forwardBuffer: 5000,
         anyTarget: true,
       }),
     ],
@@ -139,11 +120,7 @@ const EVENT_LINKS = createEventLinks(
       {
         relation: EventRelations.REFUND_BUFF,
         type: EventType.RemoveBuff,
-        id: [
-          SPELLS.BURDEN_OF_POWER_BUFF.id,
-          SPELLS.INTUITION_BUFF.id,
-          SPELLS.GLORIOUS_INCANDESCENCE_BUFF.id,
-        ],
+        id: [SPELLS.BURDEN_OF_POWER_BUFF.id, SPELLS.GLORIOUS_INCANDESCENCE_BUFF.id],
         maxLinks: 1,
         anyTarget: true,
         backwardBuffer: 500,
@@ -186,38 +163,6 @@ const EVENT_LINKS = createEventLinks(
         condition: (linking, referenced) => !HasRelatedEvent(referenced, EventRelations.CAST),
       }),
     ],
-  },
-
-  {
-    spell: SPELLS.NETHER_PRECISION_BUFF.id,
-    parentType: EventType.ApplyBuff,
-    links: [
-      LinkPatterns.removeBuff({
-        type: [EventType.RemoveBuff, EventType.RefreshBuff],
-        forwardBuffer: 11000,
-        maxLinks: 1,
-        anyTarget: true,
-      }),
-      LinkPatterns.damage({
-        relation: EventRelations.DAMAGE, // Not from cast, just damage events
-        id: [SPELLS.ARCANE_BLAST.id, SPELLS.ARCANE_BARRAGE.id],
-        maxLinks: 2,
-        anyTarget: true,
-        forwardBuffer: 10500,
-      }),
-      LinkPatterns.consumed({
-        id: TALENTS.ARCANE_MISSILES_TALENT.id,
-        forwardBuffer: 10500,
-        maxLinks: 1,
-        anyTarget: true,
-      }),
-    ],
-  },
-
-  {
-    spell: SPELLS.NETHER_PRECISION_BUFF.id,
-    parentType: EventType.RefreshBuff,
-    links: [LinkPatterns.removeBuff({ forwardBuffer: 11000, maxLinks: 1, anyTarget: true })],
   },
 
   {

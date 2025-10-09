@@ -68,19 +68,6 @@ class Abilities extends CoreAbilities {
             : 45,
       },
       {
-        spell: TALENTS.BLAST_WAVE_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL_AOE,
-        enabled: combatant.hasTalent(TALENTS.BLAST_WAVE_TALENT),
-        gcd: {
-          base: 1500,
-        },
-        cooldown:
-          combatant.spec === SPECS.FROST_MAGE &&
-          combatant.hasTalent(TALENTS.ELEMENTAL_AFFINITY_TALENT)
-            ? 30 / 1.3
-            : 30,
-      },
-      {
         spell: TALENTS.ICE_NOVA_TALENT.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         enabled: combatant.hasTalent(TALENTS.ICE_NOVA_TALENT),
@@ -94,19 +81,6 @@ class Abilities extends CoreAbilities {
             : 25,
         timelineSortIndex: 9,
         //damageSpellIds: [SPELLS.ICE_NOVA_TALENT.id], // needs verification
-      },
-      {
-        spell: TALENTS.SUPERNOVA_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: combatant.hasTalent(TALENTS.SUPERNOVA_TALENT),
-        gcd: {
-          base: 1500,
-        },
-        cooldown: 45,
-        castEfficiency: {
-          suggestion: true,
-          recommendedEfficiency: 0.9,
-        },
       },
       {
         spell: TALENTS.FROSTFIRE_BOLT_TALENT.id,
@@ -125,15 +99,6 @@ class Abilities extends CoreAbilities {
         gcd: null,
         cooldown: 300,
         timelineSortIndex: 18,
-      },
-      {
-        spell: TALENTS.SHIFTING_POWER_TALENT.id,
-        category: SPELL_CATEGORY.COOLDOWNS,
-        enabled: combatant.hasTalent(TALENTS.SHIFTING_POWER_TALENT),
-        gcd: {
-          base: 1500,
-        },
-        cooldown: 60,
       },
 
       //Defensives
@@ -208,15 +173,6 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: TALENTS.MASS_BARRIER_TALENT.id,
-        category: SPELL_CATEGORY.DEFENSIVE,
-        enabled: combatant.hasTalent(TALENTS.MASS_BARRIER_TALENT),
-        cooldown: 180,
-        gcd: {
-          base: 1500,
-        },
-      },
-      {
         spell: TALENTS.GREATER_INVISIBILITY_TALENT.id,
         buffSpellId: SPELLS.GREATER_INVISIBILITY_BUFF.id,
         category: SPELL_CATEGORY.DEFENSIVE,
@@ -265,28 +221,11 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: TALENTS.DISPLACEMENT_TALENT.id,
-        category: SPELL_CATEGORY.UTILITY,
-        enabled: combatant.hasTalent(TALENTS.DISPLACEMENT_TALENT),
-        cooldown: 45,
-        gcd: {
-          base: 1500,
-        },
-      },
-      {
         spell: TALENTS.SHIMMER_TALENT.id,
         category: SPELL_CATEGORY.UTILITY,
         enabled: combatant.hasTalent(TALENTS.SHIMMER_TALENT),
         cooldown: 25 - combatant.getTalentRank(TALENTS.FLOW_OF_TIME_TALENT) * 2,
         charges: 2,
-        gcd: null,
-      },
-      {
-        spell: TALENTS.ICE_FLOES_TALENT.id,
-        category: SPELL_CATEGORY.UTILITY,
-        enabled: combatant.hasTalent(TALENTS.ICE_FLOES_TALENT),
-        cooldown: 20,
-        charges: 3,
         gcd: null,
       },
       {

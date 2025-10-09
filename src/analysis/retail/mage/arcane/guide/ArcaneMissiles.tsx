@@ -47,12 +47,6 @@ class ArcaneMissilesGuide extends MageAnalyzer {
 
           failConditions: [
             {
-              name: 'netherPrecisionWaste',
-              active: this.hasNetherPrecision,
-              check: am.netherPrecision && !am.clearcastingCapped,
-              description: 'Wasted Nether Precision buff - should not cast Missiles with this buff',
-            },
-            {
               name: 'clippedEarly',
               check: Boolean(clippedBeforeGCD),
               description: 'Clipped Missiles before GCD ended - significant DPS loss',
@@ -119,7 +113,6 @@ class ArcaneMissilesGuide extends MageAnalyzer {
   get guideSubsection(): JSX.Element {
     const arcaneMissiles = <SpellLink spell={TALENTS.ARCANE_MISSILES_TALENT} />;
     const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
-    const netherPrecision = <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} />;
     const aetherAttunement = <SpellLink spell={TALENTS.AETHER_ATTUNEMENT_TALENT} />;
 
     const explanation = (
@@ -134,9 +127,7 @@ class ArcaneMissilesGuide extends MageAnalyzer {
               Cast {arcaneMissiles} immediately if capped on {clearcasting} charges, ignoring any of
               the below items, to avoid munching procs (gaining a charge while capped).
             </li>
-            <li>
-              Do not cast {arcaneMissiles} if you have {netherPrecision}.
-            </li>
+            <li>Do not cast {arcaneMissiles} if you have .</li>
             <li>
               If you don't have {aetherAttunement}, you can optionally clip your {arcaneMissiles}{' '}
               cast once the GCD ends for a small damage boost.

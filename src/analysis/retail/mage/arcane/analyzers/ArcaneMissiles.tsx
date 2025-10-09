@@ -35,7 +35,6 @@ export default class ArcaneMissiles extends MageAnalyzer {
       cast: event,
       ticks: damageTicks.length,
       aetherAttunement: this.selectedCombatant.hasBuff(SPELLS.AETHER_ATTUNEMENT_PROC_BUFF.id),
-      netherPrecision: this.selectedCombatant.hasBuff(SPELLS.NETHER_PRECISION_BUFF.id),
       arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
       clipped: damageTicks && damageTicks.length < ARCANE_MISSILES_MAX_TICKS,
       clearcastingCapped: this.isBuffCapped(SPELLS.CLEARCASTING_ARCANE.id, CLEARCASTING_MAX_STACKS),
@@ -106,7 +105,6 @@ export interface ArcaneMissilesData {
   cast: CastEvent;
   ticks: number;
   aetherAttunement: boolean;
-  netherPrecision: boolean;
   arcaneSoul: boolean;
   clearcastingCapped: boolean;
   clearcastingProcs: number;

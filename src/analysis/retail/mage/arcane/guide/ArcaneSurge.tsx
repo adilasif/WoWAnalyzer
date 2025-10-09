@@ -27,7 +27,6 @@ class ArcaneSurgeGuide extends MageAnalyzer {
       mana: cast.mana,
       charges: cast.charges,
       siphonStormBuff: cast.siphonStormBuff,
-      netherPrecision: cast.netherPrecision,
     }));
 
     return evaluateEvents({
@@ -37,7 +36,6 @@ class ArcaneSurgeGuide extends MageAnalyzer {
         mana?: number;
         charges: number;
         siphonStormBuff: boolean;
-        netherPrecision: boolean;
       }) => {
         const opener = cast.timestamp - this.owner.fight.start_time < OPENER_DURATION;
         const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
@@ -60,19 +58,13 @@ class ArcaneSurgeGuide extends MageAnalyzer {
           perfectConditions: [
             {
               name: 'allBuffsCombo',
-              check:
-                hasMaxCharges &&
-                (!this.hasSiphonStorm || cast.siphonStormBuff) &&
-                (!this.hasNetherPrecision || cast.netherPrecision),
+              check: hasMaxCharges && (!this.hasSiphonStorm || cast.siphonStormBuff),
               description:
                 'Perfect combo: max charges + all available buffs (Siphon Storm + Nether Precision)',
             },
             {
               name: 'openerPerfect',
-              check:
-                opener &&
-                (!this.hasSiphonStorm || cast.siphonStormBuff) &&
-                (!this.hasNetherPrecision || cast.netherPrecision),
+              check: opener && (!this.hasSiphonStorm || cast.siphonStormBuff),
               description: 'Perfect opener with available buffs',
             },
           ],
@@ -80,8 +72,8 @@ class ArcaneSurgeGuide extends MageAnalyzer {
           goodConditions: [
             {
               name: 'maxChargesGood',
-              check: hasMaxCharges && (cast.siphonStormBuff || cast.netherPrecision),
-              description: `Good usage: ${cast.charges} charges + ${cast.siphonStormBuff ? 'Siphon Storm' : ''}${cast.siphonStormBuff && cast.netherPrecision ? ' + ' : ''}${cast.netherPrecision ? 'Nether Precision' : ''}`,
+              check: hasMaxCharges && cast.siphonStormBuff,
+              description: `Good usage: ${cast.charges} charges + ${cast.siphonStormBuff ? 'Siphon Storm' : ''}${cast.siphonStormBuff ? ' + ' : ''} : ''}`,
             },
             {
               name: 'emergencyUsage',
@@ -143,16 +135,6 @@ class ArcaneSurgeGuide extends MageAnalyzer {
           getDetails: (cast: unknown) =>
             (cast as ArcaneSurgeData).siphonStormBuff ? 'Active' : 'Not active',
         },
-        {
-          label: (
-            <>
-              <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} /> Active
-            </>
-          ),
-          getResult: (cast: unknown) => (cast as ArcaneSurgeData).netherPrecision,
-          getDetails: (cast: unknown) =>
-            (cast as ArcaneSurgeData).netherPrecision ? 'Active' : 'Not active',
-        },
       ],
     });
   }
@@ -164,7 +146,6 @@ class ArcaneSurgeGuide extends MageAnalyzer {
     const evocation = <SpellLink spell={TALENTS.EVOCATION_TALENT} />;
     const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
     const arcaneMissiles = <SpellLink spell={TALENTS.ARCANE_MISSILES_TALENT} />;
-    const netherPrecision = <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} />;
     const siphonStorm = <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} />;
 
     const explanation = (
@@ -185,7 +166,7 @@ class ArcaneSurgeGuide extends MageAnalyzer {
             </li>
             <li>
               Channeling {evocation} will give you a {clearcasting} proc. Cast {arcaneMissiles} to
-              get {netherPrecision} before {arcaneSurge}
+              get before {arcaneSurge}
             </li>
           </ul>
         </div>

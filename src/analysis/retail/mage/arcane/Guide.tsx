@@ -116,10 +116,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
         {modules.arcaneOrbGuide.guideSubsection}
         {info.combatant.hasTalent(TALENTS.PRESENCE_OF_MIND_TALENT) &&
           modules.presenceOfMindGuide.guideSubsection}
-        {info.combatant.hasTalent(TALENTS.SHIFTING_POWER_TALENT) &&
-          modules.shiftingPowerGuide.guideSubsection}
-        {info.combatant.hasTalent(TALENTS.SUPERNOVA_TALENT) &&
-          modules.supernovaGuide.guideSubsection}
         <AplGuideSubsection info={info} />
       </Section>
 
@@ -133,8 +129,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           overall and burst damage.
         </>
         {modules.clearcastingGuide.guideSubsection}
-        {info.combatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT) &&
-          modules.netherPrecisionGuide.guideSubsection}
         {info.combatant.hasTalent(TALENTS.ARCANE_TEMPO_TALENT) &&
           modules.arcaneTempoGuide.guideSubsection}
       </Section>
@@ -168,10 +162,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
             useThresholds
           />
         )}
-        <CastEfficiencyBar
-          spellId={TALENTS.SHIFTING_POWER_TALENT.id}
-          gapHighlightMode={GapHighlight.FullCooldown}
-        />
       </Section>
       <MajorDefensives />
       <PreparationSection />

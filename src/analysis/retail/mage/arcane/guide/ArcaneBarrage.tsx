@@ -40,12 +40,9 @@ class ArcaneBarrageGuide extends MageAnalyzer {
         const tempoExpiring =
           ab.tempoRemaining !== undefined && ab.tempoRemaining < this.TEMPO_THRESHOLD;
 
-        const hasSunfuryProc =
-          ab.intuition ||
-          ab.gloriousIncandescence ||
-          (ab.arcaneSoul && (ab.netherPrecisionStacks > 0 || !ab.clearcasting));
+        const hasSunfuryProc = ab.gloriousIncandescence || (ab.arcaneSoul && !ab.clearcasting);
 
-        const hasSpellslingerProc = ab.intuition || ab.arcaneOrbAvail;
+        const hasSpellslingerProc = ab.arcaneOrbAvail;
 
         return {
           actionName: 'Arcane Barrage',
@@ -130,8 +127,6 @@ class ArcaneBarrageGuide extends MageAnalyzer {
     const arcaneBarrage = <SpellLink spell={SPELLS.ARCANE_BARRAGE} />;
     const arcaneOrb = <SpellLink spell={SPELLS.ARCANE_ORB} />;
     const gloriousIncandescence = <SpellLink spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />;
-    const intuition = <SpellLink spell={SPELLS.INTUITION_BUFF} />;
-    const netherPrecision = <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} />;
     const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
 
     const explanation = (
@@ -146,19 +141,13 @@ class ArcaneBarrageGuide extends MageAnalyzer {
             <li>{touchOfTheMagi} is almost available or you are out of mana.</li>
             {this.isSunfury && (
               <>
+                <li>You have {gloriousIncandescence}.</li>
                 <li>
-                  You have {gloriousIncandescence}, or {intuition}.
-                </li>
-                <li>
-                  You have {arcaneSoul} and either {netherPrecision} or don't have {clearcasting}
+                  You have {arcaneSoul} and either or don't have {clearcasting}
                 </li>
               </>
             )}
-            {this.isSpellslinger && (
-              <li>
-                You have {intuition} or {arcaneOrb}.
-              </li>
-            )}
+            {this.isSpellslinger && <li>You have or {arcaneOrb}.</li>}
           </ul>
         </div>
       </>

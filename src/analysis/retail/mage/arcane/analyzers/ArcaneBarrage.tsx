@@ -66,9 +66,7 @@ export default class ArcaneBarrage extends MageAnalyzer {
       gloriousIncandescence: this.selectedCombatant.hasBuff(
         TALENTS.GLORIOUS_INCANDESCENCE_TALENT.id,
       ),
-      intuition: this.selectedCombatant.hasBuff(SPELLS.INTUITION_BUFF.id),
       arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
-      netherPrecisionStacks: this.getBuffStacks(SPELLS.NETHER_PRECISION_BUFF.id),
       touchCD: this.getCooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
       tempoRemaining: this.getTempoData(event),
       health: getTargetHealthPercentage(event),
@@ -93,9 +91,7 @@ export interface ArcaneBarrageData {
   arcaneSoul: boolean;
   burdenOfPower: boolean;
   gloriousIncandescence: boolean;
-  intuition: boolean;
   arcaneOrbAvail: boolean;
-  netherPrecisionStacks: number;
   touchCD: number;
   tempoRemaining?: number;
   health?: number;

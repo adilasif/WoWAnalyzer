@@ -1,16 +1,11 @@
 import {
   ArcaneIntellect,
   CancelledCasts,
-  DivertedEnergy,
   ElementalBarrier,
   QuickWitted,
-  MirrorImage,
-  ShiftingPower,
-  TempestBarrier,
   MasterOfTime,
   IceBlock,
   IceCold,
-  GreaterInvisibility,
 } from 'analysis/retail/mage/shared';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import Channeling from 'parser/shared/normalizers/Channeling';
@@ -31,14 +26,11 @@ import ArcaneSurge from './analyzers/ArcaneSurge';
 import Guide from './Guide';
 import ArcaneSurgeGuide from './guide/ArcaneSurge';
 import TouchOfTheMagiGuide from './guide/TouchOfTheMagi';
-import ShiftingPowerGuide from './guide/ShiftingPower';
 import ArcaneMissilesGuide from './guide/ArcaneMissiles';
 import ArcaneBarrageGuide from './guide/ArcaneBarrage';
 import ArcaneOrbGuide from './guide/ArcaneOrb';
 import PresenceOfMindGuide from './guide/PresenceOfMind';
-import SupernovaGuide from './guide/Supernova';
 import ClearcastingGuide from './guide/Clearcasting';
-import NetherPrecisionGuide from './guide/NetherPrecision';
 import ArcaneTempoGuide from './guide/ArcaneTempo';
 
 //Items
@@ -47,14 +39,9 @@ import ArcaneTempoGuide from './guide/ArcaneTempo';
 import ManaChart from './guide/ManaChart';
 import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
 
-import ArcaneBombardment from './analyzers/ArcaneBombardment';
 import ArcaneEcho from './analyzers/ArcaneEcho';
-import ArcaneHarmony from './analyzers/ArcaneHarmony';
 import TouchOfTheMagi from './analyzers/TouchOfTheMagi';
 import PresenceOfMind from './analyzers/PresenceOfMind';
-import ShiftingPowerArcane from './analyzers/ShiftingPower';
-import Supernova from '../shared/Supernova';
-import NetherPrecision from './analyzers/NetherPrecision';
 import ArcaneTempo from './analyzers/ArcaneTempo';
 
 //Normalizers
@@ -89,41 +76,28 @@ class CombatLogParser extends CoreCombatLogParser {
     // Guide
     arcaneSurgeGuide: ArcaneSurgeGuide,
     touchOfTheMagiGuide: TouchOfTheMagiGuide,
-    shiftingPowerGuide: ShiftingPowerGuide,
     arcaneMissilesGuide: ArcaneMissilesGuide,
     arcaneBarrageGuide: ArcaneBarrageGuide,
     presenceOfMindGuide: PresenceOfMindGuide,
     arcaneOrbGuide: ArcaneOrbGuide,
-    supernovaGuide: SupernovaGuide,
     clearcastingGuide: ClearcastingGuide,
-    netherPrecisionGuide: NetherPrecisionGuide,
     arcaneTempoGuide: ArcaneTempoGuide,
     manaChart: ManaChart,
 
     //Talents - Shared
-    divertedEnergy: DivertedEnergy,
     quickWitted: QuickWitted,
-    tempestBarrier: TempestBarrier,
     presenceOfMind: PresenceOfMind,
-    supernova: Supernova,
-    shiftingPower: ShiftingPower,
     elementalBarrier: ElementalBarrier,
     masterOfTime: MasterOfTime,
     arcaneIntellect: ArcaneIntellect,
 
     // Defensives - Shared
-    mirrorImage: MirrorImage,
     iceBlock: IceBlock,
     iceCold: IceCold,
-    greterInvisibility: GreaterInvisibility,
 
     // Talents - Arcane
     arcaneEcho: ArcaneEcho,
-    arcaneHarmony: ArcaneHarmony,
-    arcaneBombardment: ArcaneBombardment,
-    shiftingPowerArcane: ShiftingPowerArcane,
     touchOfTheMagi: TouchOfTheMagi,
-    netherPrecision: NetherPrecision,
     arcaneTempo: ArcaneTempo,
   };
   static guide = Guide;
