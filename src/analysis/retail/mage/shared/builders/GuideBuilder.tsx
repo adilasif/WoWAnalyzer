@@ -160,8 +160,6 @@ export class GuideBuilder {
    * @param config.buffSpell The buff spell to track
    * @param config.castData Cast performance entries to display above the bar
    * @param config.maxStacks Maximum stacks for the buff
-   * @param config.startTime Fight start timestamp
-   * @param config.endTime Fight end timestamp
    * @param config.barColor Color for the stack bar
    * @param config.backgroundBarColor Color for the background bar
    * @param config.tooltip Tooltip text for average stacks
@@ -173,8 +171,6 @@ export class GuideBuilder {
     buffSpell: Spell;
     castData: BoxRowEntry[];
     maxStacks: number;
-    startTime?: number;
-    endTime?: number;
     barColor?: string;
     backgroundBarColor?: string;
     tooltip?: string;
@@ -183,8 +179,8 @@ export class GuideBuilder {
     const currentTimestamp = config.analyzer.owner.currentTimestamp;
     const overallUptimes = getUptimesFromBuffHistory(buffHistory, currentTimestamp);
     const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, currentTimestamp);
-    const startTime = config.startTime ?? config.analyzer.owner.fight.start_time;
-    const endTime = config.endTime ?? config.analyzer.owner.fight.end_time;
+    const startTime = config.analyzer.owner.fight.start_time;
+    const endTime = config.analyzer.owner.fight.end_time;
     const averageStacks = this.calculateAverageStacks(stackUptimes, startTime, endTime);
     const uptimePercentage = this.calculateUptimePercentage(overallUptimes, startTime, endTime);
 
