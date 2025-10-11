@@ -94,7 +94,7 @@ class Duplicate extends Analyzer {
         value: this.petDamage,
       },
       {
-        color: 'rgb(216, 59, 59)',
+        color: 'rgb(129, 52, 5)',
         label: 'Personal damage',
         spellId: TALENTS_EVOKER.DUPLICATE_R4_TALENT.id,
         valueTooltip: formatNumber(this.personalDamage),
