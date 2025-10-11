@@ -227,6 +227,14 @@ const talents = {
     entryIds: [115706],
     definitionIds: [{ id: 120718, specId: 1473 }],
   },
+  CLAIRVOYANT_TALENT: {
+    id: 1250914,
+    name: 'Clairvoyant',
+    icon: 'ability_evoker_masterylifebinder_bronze',
+    maxRanks: 1,
+    entryIds: [115528],
+    definitionIds: [{ id: 120540, specId: 1473 }],
+  },
   CLOBBERING_SWEEP_TALENT: {
     id: 375443,
     name: 'Clobbering Sweep',

@@ -30,7 +30,7 @@ import { TIERS } from 'game/TIERS';
  */
 const FAILED_EXTENSION_LINK = 'failedExtensionLink';
 
-const PRESCIENCE_BUFF_CAST_LINK = 'prescienceBuffCastLink';
+export const PRESCIENCE_BUFF_CAST_LINK = 'prescienceBuffCastLink';
 export const PRESCIENCE_APPLY_REMOVE_LINK = 'prescienceApplyRemoveLink';
 export const BREATH_EBON_APPLY_LINK = 'breathEbonApplyLink';
 export const EBON_MIGHT_BUFF_LINKS = 'ebonMightBuffLinks';
