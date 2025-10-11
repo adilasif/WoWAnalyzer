@@ -26,6 +26,7 @@ import MomentumShift from './modules/talents/MomentumShift';
 import Overlord from './modules/talents/Overlord';
 import HoardedPower from './modules/talents/HoardedPower';
 import MotesOfPossibility from './modules/talents/MotesOfPossibility';
+import Duplicate from './modules/talents/Duplicate';
 
 import BuffTrackerGraph from './modules/features/BuffTrackerGraph';
 import BlisteringScalesGraph from './modules/talents/BlisteringScalesGraph';
@@ -144,6 +145,7 @@ class CombatLogParser extends MainCombatLogParser {
     overlord: Overlord,
     hoardedPower: HoardedPower,
     motesOfPossibility: MotesOfPossibility,
+    duplicate: Duplicate,
 
     // hero talents
     mightOfTheBlackDragonflight: MightOfTheBlackDragonflight,

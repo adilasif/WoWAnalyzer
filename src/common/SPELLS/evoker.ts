@@ -749,6 +749,21 @@ const spells = {
     name: 'Pyre (Command Squadron)',
     icon: 'ability_evoker_pyre',
   },
+  DUPLICATE_SELF_BUFF: {
+    id: 1259171,
+    name: 'Duplicate',
+    icon: 'ability_evoker_masterylifebinder_bronze',
+  },
+  DUPLICATE_ERUPTION: {
+    id: 1259172,
+    name: 'Eruption (Duplicate)',
+    icon: 'ability_evoker_eruption',
+  },
+  DUPLICATE_FIRE_BREATH: {
+    id: 431164,
+    name: 'Fire Breath (Duplicate)',
+    icon: 'ability_evoker_firebreath',
+  },
   // endregion
 } satisfies Record<string, Spell>;
 
