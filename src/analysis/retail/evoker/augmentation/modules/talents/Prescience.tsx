@@ -195,9 +195,8 @@ class Prescience extends MajorCooldown<PrescienceCooldownCast> {
             Buffed Tank: <span className={className}>{this.currentBuffedPlayer?.name}</span> with{' '}
             <SpellLink spell={TALENTS.PRESCIENCE_TALENT} />. This is situationally okay, but should
             be avoided. If you have an extra use of Prescience, such as due to{' '}
-            <SpellLink spell={TALENTS.TIME_SKIP_TALENT} /> or{' '}
-            <SpellLink spell={TALENTS.GOLDEN_OPPORTUNITY_TALENT} />, you should usually prioritise
-            buffing yourself before the tank.
+            <SpellLink spell={TALENTS.TIME_SKIP_TALENT} />, you should usually prioritise buffing
+            yourself before the tank.
           </div>
         );
       } else {

@@ -221,9 +221,7 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: TALENTS.RESCUE_TALENT.id,
-        category: combatant.hasTalent(TALENTS.TWIN_GUARDIAN_TALENT)
-          ? SPELL_CATEGORY.DEFENSIVE
-          : SPELL_CATEGORY.UTILITY,
+        category: SPELL_CATEGORY.UTILITY,
         cooldown: 60 * interwovenThreadsMultiplier,
         enabled: combatant.hasTalent(TALENTS.RESCUE_TALENT),
         gcd: {

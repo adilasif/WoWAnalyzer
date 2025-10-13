@@ -134,7 +134,7 @@ class Accretion extends Analyzer {
         value: this.accretionShiftingSands,
       },
       {
-        color: '#813405',
+        color: 'rgb(129, 52, 5)',
         label: 'Upheaval',
         spellId: SPELLS.UPHEAVAL.id,
         valueTooltip: formatNumber(this.accretionUpheaval),
@@ -143,7 +143,7 @@ class Accretion extends Analyzer {
       {
         color: 'rgb(212, 81, 19)',
         label: 'Ebon Might',
-        spellId: SPELLS.EBON_MIGHT_BUFF_PERSONAL.id,
+        spellId: SPELLS.EBON_MIGHT_BUFF_EXTERNAL.id,
         valueTooltip: formatNumber(this.accretionEbonMight),
         value: this.accretionEbonMight,
       },

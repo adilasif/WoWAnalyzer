@@ -16,7 +16,6 @@ export { default as ObsidianScales } from './modules/MajorDefensives/ObsidianSca
 export { default as DefensiveNormalizer } from './modules/normalizers/DefensiveNormalizer';
 export { default as DefensiveCastLinkNormalizer } from './modules/normalizers/DefensiveCastLinkNormalizer';
 export { default as MobilityCastLinkNormalizer } from './modules/normalizers/MobilityCastLinkNormalizer';
-export { default as TwinGuardian } from './modules/MajorDefensives/TwinGuardian';
 export { default as RenewingBlaze } from './modules/MajorDefensives/RenewingBlaze';
 export { default as Engulf } from './modules/talents/hero/flameshaper/Engulf';
 export { default as ExpandedLungs } from './modules/talents/hero/flameshaper/ExpandedLungs';
@@ -42,4 +41,6 @@ export { default as GoldenOpportunity } from './modules/talents/hero/chronowarde
 export { default as DoubleTime } from './modules/talents/hero/chronowarden/DoubleTime';
 export { default as MotesOfAcceleration } from './modules/talents/hero/chronowarden/MotesOfAcceleration';
 export { default as FlameSiphon } from './modules/talents/hero/flameshaper/FlameSiphon';
+export { default as RefinedEssence } from './modules/talents/hero/scalecommander/RefinedEssence';
+export { default as CommandSquadron } from './modules/talents/hero/scalecommander/CommandSquadron';
 export * from './constants';

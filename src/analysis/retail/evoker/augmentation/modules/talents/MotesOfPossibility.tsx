@@ -10,6 +10,7 @@ import {
   EMPOWER_SANDS_APPLY,
   FIRE_BREATH_INFERNOS_APPLY,
   EMERALD_BLOSSOM_SYMBIOTIC_APPLY,
+  PRESCIENCE_BUFF_CAST_LINK,
 } from '../normalizers/CastLinkNormalizer';
 import Events, { ApplyBuffEvent, HasRelatedEvent, RefreshBuffEvent } from 'parser/core/Events';
 import { VersatilityIcon } from 'interface/icons';
@@ -17,11 +18,13 @@ import DonutChart from 'parser/ui/DonutChart';
 import { SpellLink } from 'interface';
 /**
  * Eruption has a 25% chance to create a Mote of Possibility. Motes of Possibility can be consumed to grant a player Shifting Sands, Inferno's Blessing, or Symbiotic Bloom at random.
+ * Clairvoyant: Chance increased to 35%, and can instead grant Prescience.
  */
 class MotesOfPossibility extends Analyzer {
   sandsMotes = 0;
   infernoMotes = 0;
   blossomMotes = 0;
+  prescienceMotes = 0;
 
   constructor(options: Options) {
     super(options);
@@ -75,6 +78,28 @@ class MotesOfPossibility extends Analyzer {
         this.OnSymbioticApply,
       );
     }
+
+    if (this.selectedCombatant.hasTalent(TALENTS_EVOKER.CLAIRVOYANT_TALENT)) {
+      if (this.selectedCombatant.hasTalent(TALENTS_EVOKER.PRESCIENCE_TALENT)) {
+        this.addEventListener(
+          Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.PRESCIENCE_BUFF),
+          this.OnPrescienceApplyWithTalent,
+        );
+        this.addEventListener(
+          Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.PRESCIENCE_BUFF),
+          this.OnPrescienceApplyWithTalent,
+        );
+      } else {
+        this.addEventListener(
+          Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.PRESCIENCE_BUFF),
+          this.OnPrescienceApply,
+        );
+        this.addEventListener(
+          Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.PRESCIENCE_BUFF),
+          this.OnPrescienceApply,
+        );
+      }
+    }
   }
 
   OnSandsApply(event: ApplyBuffEvent | RefreshBuffEvent) {
@@ -103,30 +128,74 @@ class MotesOfPossibility extends Analyzer {
     }
   }
 
+  OnPrescienceApply(event: ApplyBuffEvent | RefreshBuffEvent) {
+    this.prescienceMotes += 1;
+  }
+
+  OnPrescienceApplyWithTalent(event: ApplyBuffEvent | RefreshBuffEvent) {
+    if (!HasRelatedEvent(event, PRESCIENCE_BUFF_CAST_LINK)) {
+      this.prescienceMotes += 1;
+    }
+  }
+
   statistic() {
-    const moteChart = [
-      {
-        color: 'rgb(255, 255, 0)',
-        label: SPELLS.SHIFTING_SANDS_BUFF.name,
-        spellId: SPELLS.SHIFTING_SANDS_BUFF.id,
-        valueTooltip: this.sandsMotes,
-        value: this.sandsMotes,
-      },
-      {
-        color: 'rgb(216, 59, 59)',
-        label: SPELLS.INFERNOS_BLESSING_BUFF.name,
-        spellId: SPELLS.INFERNOS_BLESSING_BUFF.id,
-        valueTooltip: this.infernoMotes,
-        value: this.infernoMotes,
-      },
-      {
-        color: 'rgb(46, 139, 87)',
-        label: SPELLS.SYMBIOTIC_BLOOM_BUFF.name,
-        spellId: SPELLS.SYMBIOTIC_BLOOM_BUFF.id,
-        valueTooltip: this.blossomMotes,
-        value: this.blossomMotes,
-      },
-    ];
+    let moteChart;
+    if (this.selectedCombatant.hasTalent(TALENTS_EVOKER.CLAIRVOYANT_TALENT)) {
+      moteChart = [
+        {
+          color: 'rgb(255, 255, 0)',
+          label: SPELLS.SHIFTING_SANDS_BUFF.name,
+          spellId: SPELLS.SHIFTING_SANDS_BUFF.id,
+          valueTooltip: this.sandsMotes,
+          value: this.sandsMotes,
+        },
+        {
+          color: 'rgb(216, 59, 59)',
+          label: SPELLS.INFERNOS_BLESSING_BUFF.name,
+          spellId: SPELLS.INFERNOS_BLESSING_BUFF.id,
+          valueTooltip: this.infernoMotes,
+          value: this.infernoMotes,
+        },
+        {
+          color: 'rgb(46, 139, 87)',
+          label: SPELLS.SYMBIOTIC_BLOOM_BUFF.name,
+          spellId: SPELLS.SYMBIOTIC_BLOOM_BUFF.id,
+          valueTooltip: this.blossomMotes,
+          value: this.blossomMotes,
+        },
+        {
+          color: 'rgb(200, 200, 0)',
+          label: TALENTS.PRESCIENCE_TALENT.name,
+          spellId: TALENTS.PRESCIENCE_TALENT.id,
+          valueTooltip: this.prescienceMotes,
+          value: this.prescienceMotes,
+        },
+      ];
+    } else {
+      moteChart = [
+        {
+          color: 'rgb(255, 255, 0)',
+          label: SPELLS.SHIFTING_SANDS_BUFF.name,
+          spellId: SPELLS.SHIFTING_SANDS_BUFF.id,
+          valueTooltip: this.sandsMotes,
+          value: this.sandsMotes,
+        },
+        {
+          color: 'rgb(216, 59, 59)',
+          label: SPELLS.INFERNOS_BLESSING_BUFF.name,
+          spellId: SPELLS.INFERNOS_BLESSING_BUFF.id,
+          valueTooltip: this.infernoMotes,
+          value: this.infernoMotes,
+        },
+        {
+          color: 'rgb(46, 139, 87)',
+          label: SPELLS.SYMBIOTIC_BLOOM_BUFF.name,
+          spellId: SPELLS.SYMBIOTIC_BLOOM_BUFF.id,
+          valueTooltip: this.blossomMotes,
+          value: this.blossomMotes,
+        },
+      ];
+    }
     return (
       <Statistic
         position={STATISTIC_ORDER.OPTIONAL(12)}
@@ -135,7 +204,8 @@ class MotesOfPossibility extends Analyzer {
       >
         <TalentSpellText talent={TALENTS_EVOKER.MOTES_OF_POSSIBILITY_TALENT}>
           <div>
-            <VersatilityIcon /> {this.sandsMotes + this.infernoMotes + this.blossomMotes}
+            <VersatilityIcon />{' '}
+            {this.sandsMotes + this.infernoMotes + this.blossomMotes + this.prescienceMotes}
             <small>
               {' '}
               <SpellLink spell={TALENTS.MOTES_OF_POSSIBILITY_TALENT} /> used

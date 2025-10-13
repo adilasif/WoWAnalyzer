@@ -26,9 +26,9 @@ import MomentumShift from './modules/talents/MomentumShift';
 import Overlord from './modules/talents/Overlord';
 import HoardedPower from './modules/talents/HoardedPower';
 import MotesOfPossibility from './modules/talents/MotesOfPossibility';
+import Duplicate from './modules/talents/Duplicate';
 
 import BuffTrackerGraph from './modules/features/BuffTrackerGraph';
-import BuffTargetHelper from './modules/features/BuffTargetHelper/BuffTargetHelper';
 import BlisteringScalesGraph from './modules/talents/BlisteringScalesGraph';
 import BlisteringScalesStackTracker from './modules/talents/BlisteringScalesStackTracker';
 
@@ -38,7 +38,6 @@ import EbonMightNormalizer from './modules/normalizers/EbonMightNormalizer';
 
 // Tier
 import T32Augmentation2P from './modules/thewarwithin/T32Augmentation2P';
-import T33Augmentation4P from './modules/thewarwithin/T33Augmentation4P';
 
 //Shared
 import {
@@ -60,7 +59,6 @@ import {
   DefensiveNormalizer,
   DefensiveCastLinkNormalizer,
   MobilityCastLinkNormalizer,
-  TwinGuardian,
   RenewingBlaze,
   ImminentDestruction,
   MeltArmor,
@@ -80,6 +78,8 @@ import {
   GoldenOpportunity,
   MotesOfAcceleration,
   TimeSpiral,
+  RefinedEssence,
+  CommandSquadron,
 } from 'analysis/retail/evoker/shared';
 
 class CombatLogParser extends MainCombatLogParser {
@@ -107,7 +107,6 @@ class CombatLogParser extends MainCombatLogParser {
     defensiveCastLinkNormalizer: DefensiveCastLinkNormalizer,
     mobilityCastLinkNormalizer: MobilityCastLinkNormalizer,
     defensiveNormalizer: DefensiveNormalizer,
-    twinGuardian: TwinGuardian,
     renewingBlaze: RenewingBlaze,
     timeSpiral: TimeSpiral,
     massDisintegrate: MassDisintegrate,
@@ -146,6 +145,7 @@ class CombatLogParser extends MainCombatLogParser {
     overlord: Overlord,
     hoardedPower: HoardedPower,
     motesOfPossibility: MotesOfPossibility,
+    duplicate: Duplicate,
 
     // hero talents
     mightOfTheBlackDragonflight: MightOfTheBlackDragonflight,
@@ -163,14 +163,14 @@ class CombatLogParser extends MainCombatLogParser {
     masterOfDestiny: MasterOfDestiny,
     goldenOpportunity: GoldenOpportunity,
     motesOfAcceleration: MotesOfAcceleration,
+    refinedEssence: RefinedEssence,
+    commandSquadron: CommandSquadron,
 
     // Features
     buffTrackerGraph: BuffTrackerGraph,
-    buffTargetHelper: BuffTargetHelper,
 
     // Tier
     t32Augmentation2P: T32Augmentation2P,
-    t33Augmentation4P: T33Augmentation4P,
   };
   static guide = Guide;
 }

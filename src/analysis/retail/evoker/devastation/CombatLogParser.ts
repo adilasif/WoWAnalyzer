@@ -54,7 +54,6 @@ import {
   DefensiveNormalizer,
   DefensiveCastLinkNormalizer,
   MobilityCastLinkNormalizer,
-  TwinGuardian,
   RenewingBlaze,
   Engulf,
   ImminentDestruction,
@@ -70,6 +69,8 @@ import {
   RedHot,
   TimeSpiral,
   FlameSiphon,
+  RefinedEssence,
+  CommandSquadron,
 } from 'analysis/retail/evoker/shared';
 import TWW2TierSet from './modules/tier/TWW2TierSet';
 
@@ -98,7 +99,6 @@ class CombatLogParser extends MainCombatLogParser {
     defensiveCastLinkNormalizer: DefensiveCastLinkNormalizer,
     defensiveNormalizer: DefensiveNormalizer,
     mobilityCastLinkNormalizer: MobilityCastLinkNormalizer,
-    twinGuardian: TwinGuardian,
     renewingBlaze: RenewingBlaze,
     timeSpiral: TimeSpiral,
 
@@ -147,6 +147,8 @@ class CombatLogParser extends MainCombatLogParser {
     wingLeader: Wingleader,
     slipstream: Slipstream,
     flameSiphon: FlameSiphon,
+    refinedEssence: RefinedEssence,
+    commandSquadron: CommandSquadron,
 
     // core abilities
     disintegrate: Disintegrate,

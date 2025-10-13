@@ -20,12 +20,14 @@ const AMPED_SPELLS = [
   SPELLS.LIVING_FLAME_DAMAGE,
   SPELLS.AZURE_STRIKE,
   TALENTS.ERUPTION_TALENT,
+  SPELLS.MASS_ERUPTION_DAMAGE,
 ];
 const COLORS = [
   'rgb(41, 134, 204)', // Disintegrate
   'rgb(216, 59, 59)', // Living Flame
   'rgb(153, 102, 255)', // Azure Strike
   'rgb(129, 52, 5)', // Eruption
+  'rgb(183, 65, 14)', // Mass Eruption cleave (uses Pyre's colour because the two shouldn't ever overlap)
 ];
 
 /**

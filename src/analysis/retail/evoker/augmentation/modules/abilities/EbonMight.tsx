@@ -22,21 +22,12 @@ import {
   BREATH_OF_EONS_SPELL_IDS,
   BREATH_OF_EONS_SPELLS,
   EBON_MIGHT_PERSONAL_DAMAGE_AMP,
-  CLOSE_AS_CLUTCHMATES_MOD,
 } from 'analysis/retail/evoker/augmentation/constants';
 import StatTracker from 'parser/shared/modules/StatTracker';
-import { ChecklistUsageInfo, SpellUse } from 'parser/core/SpellUsage/core';
-import { SpellLink } from 'interface';
-import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { combineQualitativePerformances } from 'common/combineQualitativePerformances';
-import ContextualSpellUsageSubSection from 'parser/core/SpellUsage/HideGoodCastsSpellUsageSubSection';
+import { SpellUse } from 'parser/core/SpellUsage/core';
 import { ebonIsFromBreath, getEbonMightBuffEvents } from '../normalizers/CastLinkNormalizer';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import Combatants from 'parser/shared/modules/Combatants';
-import classColor from 'game/classColor';
-import SPECS from 'game/SPECS';
-import ROLES from 'game/ROLES';
-import { isMythicPlus } from 'common/isMythicPlus';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
@@ -87,10 +78,6 @@ class EbonMight extends Analyzer {
   private uses: SpellUse[] = [];
   private ebonMightCasts: EbonMightCooldownCast[] = [];
   private prescienceCasts: PrescienceBuffs[] = [];
-
-  private personalDamageAmp = isMythicPlus(this.owner.fight)
-    ? EBON_MIGHT_PERSONAL_DAMAGE_AMP * CLOSE_AS_CLUTCHMATES_MOD
-    : EBON_MIGHT_PERSONAL_DAMAGE_AMP;
 
   ebonMightActive = false;
   currentEbonMightDuration = 0;
@@ -162,8 +149,6 @@ class EbonMight extends Analyzer {
       Events.damage.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_EXTERNAL),
       this.onExternalDamage,
     );
-
-    this.addEventListener(Events.fightend, this.finalize);
   }
 
   private onEbonApply(event: ApplyBuffEvent) {
@@ -222,7 +207,10 @@ class EbonMight extends Analyzer {
 
   private onPersonalDamage(event: DamageEvent) {
     if (this.selectedCombatant.hasBuff(SPELLS.EBON_MIGHT_BUFF_PERSONAL.id)) {
-      this.personalEbonMightDamage += calculateEffectiveDamage(event, this.personalDamageAmp);
+      this.personalEbonMightDamage += calculateEffectiveDamage(
+        event,
+        EBON_MIGHT_PERSONAL_DAMAGE_AMP,
+      );
     }
   }
 
@@ -233,7 +221,7 @@ class EbonMight extends Analyzer {
       reverbEvents.forEach((reverbEvent) => {
         this.personalEbonMightDamage += calculateEffectiveDamage(
           reverbEvent,
-          this.personalDamageAmp,
+          EBON_MIGHT_PERSONAL_DAMAGE_AMP,
         );
       });
     }
@@ -305,269 +293,6 @@ class EbonMight extends Analyzer {
       return 0;
     }
     return ebonMightTimeLeft;
-  }
-
-  private finalize() {
-    // finalize performances
-    this.uses = this.ebonMightCasts.map((ebonMightCooldownCast) =>
-      this.ebonMightUsage(ebonMightCooldownCast, this.prescienceCasts),
-    );
-  }
-
-  private ebonMightUsage(
-    ebonMightCooldownCast: EbonMightCooldownCast,
-    prescienceCasts: PrescienceBuffs[],
-  ): SpellUse {
-    const presciencePerformanceCheck = this.getPresciencePerformance(
-      ebonMightCooldownCast,
-      prescienceCasts,
-    );
-
-    const rolePerformanceCheck = this.getRolePerformance(ebonMightCooldownCast);
-
-    const checklistItems: ChecklistUsageInfo[] = [
-      {
-        check: 'prescience-performance',
-        timestamp: ebonMightCooldownCast.event.timestamp,
-        ...presciencePerformanceCheck,
-      },
-    ];
-    if (rolePerformanceCheck) {
-      checklistItems.push({
-        check: 'role-performance',
-        timestamp: ebonMightCooldownCast.event.timestamp,
-        ...rolePerformanceCheck,
-      });
-    }
-
-    const actualPerformance = combineQualitativePerformances(
-      checklistItems.map((item) => item.performance),
-    );
-
-    return {
-      event: ebonMightCooldownCast.event,
-      performance: actualPerformance,
-      checklistItems,
-      performanceExplanation:
-        actualPerformance !== QualitativePerformance.Fail
-          ? `${actualPerformance} Usage`
-          : 'Bad Usage',
-    };
-  }
-
-  /** Do Performance check for amount of prescience active on cast */
-  private getPresciencePerformance(
-    ebonMightCooldownCast: EbonMightCooldownCast,
-    prescienceCasts: PrescienceBuffs[],
-  ) {
-    const oldDuration = ebonMightCooldownCast.oldBuffRemainder;
-    const ebonMightPandemicAmount =
-      EBON_MIGHT_BASE_DURATION_MS *
-      (1 + TIMEWALKER_BASE_EXTENSION + ebonMightCooldownCast.currentMastery) *
-      PANDEMIC_WINDOW;
-
-    let performance;
-    let summary;
-    let details;
-    let prescienceBuffsActive = 0;
-
-    const PERFECT_PRESCIENCE_BUFFS = 2;
-    const OK_PRESCIENCE_BUFFS = 1;
-
-    prescienceCasts.forEach((event) => {
-      if (
-        event.event.timestamp <= ebonMightCooldownCast.event.timestamp &&
-        (event.event.type === 'applybuff' || event.event.type === 'removebuff')
-      ) {
-        if (event.event.type === 'applybuff') {
-          prescienceBuffsActive = prescienceBuffsActive + 1;
-        } else if (event.event.type === 'removebuff') {
-          prescienceBuffsActive = prescienceBuffsActive - 1;
-        }
-      }
-    });
-    if (oldDuration > 0) {
-      performance =
-        oldDuration < ebonMightPandemicAmount
-          ? QualitativePerformance.Good
-          : QualitativePerformance.Ok;
-      summary = (
-        <div>
-          Refreshed <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> inside the pandemic window.
-        </div>
-      );
-      details =
-        oldDuration < ebonMightPandemicAmount ? (
-          <div>
-            You refreshed <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> inside the pandemic
-            window. Good job!
-          </div>
-        ) : (
-          <div>
-            You refreshed <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> before the pandemic
-            window. <br />
-            <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> had ~{(oldDuration / 1000).toFixed(2)}s
-            remaining; Meaning you lost ~
-            {((oldDuration - ebonMightPandemicAmount) / 1000).toFixed(2)}s of uptime.
-          </div>
-        );
-    } else {
-      summary = (
-        <div>
-          You had {prescienceBuffsActive} <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> active on
-          cast.
-        </div>
-      );
-      if (prescienceBuffsActive >= PERFECT_PRESCIENCE_BUFFS) {
-        performance = QualitativePerformance.Perfect;
-        details = (
-          <div>
-            You had {prescienceBuffsActive} <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> active
-            on cast. Good job!
-          </div>
-        );
-      } else if (prescienceBuffsActive === OK_PRESCIENCE_BUFFS) {
-        performance = QualitativePerformance.Ok;
-        details = (
-          <div>
-            You had {prescienceBuffsActive} <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> active
-            on cast. Try to line it up so you have 2 active, so you can better control who your{' '}
-            <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> goes on.
-          </div>
-        );
-      } else {
-        performance = QualitativePerformance.Fail;
-        details = (
-          <div>
-            You didn't have any <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> active on cast! You
-            should always make sure to get your <SpellLink spell={TALENTS.PRESCIENCE_TALENT} />{' '}
-            buffs out, so you can control who your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} />{' '}
-            goes on.
-          </div>
-        );
-      }
-    }
-
-    const performanceCheck = {
-      performance: performance,
-      summary: summary,
-      details: details,
-    };
-
-    return performanceCheck;
-  }
-
-  /** Do role/spec Performance check for players
-   * getting buffed are DPS (excluding Aug this one is a crime!) */
-  private getRolePerformance(ebonMightCooldownCast: EbonMightCooldownCast) {
-    if (!ebonMightCooldownCast.buffedTargets) {
-      return;
-    }
-
-    // Only run the check if there is actually 4 dps players amongus
-    const players = Object.values(this.combatants.players);
-    const enoughDPSFound =
-      players.reduce((dpsCount, player) => {
-        const playerSpec = player.spec;
-        if (!playerSpec) {
-          return dpsCount;
-        }
-
-        const isRangedDPS = playerSpec.role === ROLES.DPS.RANGED;
-        const isMeleeDPS = playerSpec.role === ROLES.DPS.MELEE;
-        const isAugmentation = playerSpec === SPECS.AUGMENTATION_EVOKER;
-
-        return (isRangedDPS || isMeleeDPS) && !isAugmentation ? dpsCount + 1 : dpsCount;
-      }, 0) >= 4;
-
-    if (!enoughDPSFound) {
-      return;
-    }
-
-    let rolePerformance = QualitativePerformance.Perfect;
-
-    /** Figure out the specs of the buffed players */
-    const buffedPlayers = ebonMightCooldownCast.buffedTargets.reduce<JSX.Element[]>(
-      (acc, ebonMightApplication) => {
-        const player = this.combatants.players[ebonMightApplication.targetID];
-
-        /** No spec so we can't really judge or add styling */
-        if (!player?.spec) {
-          acc.push(<div key={player.id}>Buffed {player.name}</div>);
-          return acc;
-        }
-
-        let playerRole = 'DPS';
-        switch (player.spec.role) {
-          case ROLES.HEALER:
-            playerRole = 'Healer';
-            rolePerformance = QualitativePerformance.Fail;
-            break;
-          case ROLES.TANK:
-            playerRole = 'Tank';
-            rolePerformance = QualitativePerformance.Fail;
-            break;
-          default:
-            if (player.spec === SPECS.AUGMENTATION_EVOKER) {
-              playerRole = 'Augmentation';
-              rolePerformance = QualitativePerformance.Fail;
-            }
-            break;
-        }
-
-        acc.push(
-          <div key={player.id}>
-            Buffed {playerRole}: <span className={classColor(player)}>{player.name}</span>
-          </div>,
-        );
-
-        return acc;
-      },
-      [],
-    );
-
-    const performanceCheck = {
-      performance: rolePerformance,
-      summary: <div>Buffed 4 DPS</div>,
-      details: <div>{buffedPlayers}</div>,
-    };
-
-    return performanceCheck;
-  }
-
-  guideSubsection(): JSX.Element | null {
-    if (!this.active || isMythicPlus(this.owner.fight)) {
-      return null;
-    }
-
-    const explanation = (
-      <section>
-        <strong>
-          <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} />
-        </strong>{' '}
-        is one of the most important spells in your entire kit. It provides 4 allies with a
-        percentage of your mainstat, along with making them priority targets for{' '}
-        <SpellLink spell={SPELLS.SHIFTING_SANDS_BUFF} />.{' '}
-        <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> prefers targets with{' '}
-        <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> active.
-        <br />
-        <br />
-        If you recast <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> whilst it's still active you
-        will refresh the buff on your current targets.
-      </section>
-    );
-
-    return (
-      <ContextualSpellUsageSubSection
-        title="Ebon Might"
-        explanation={explanation}
-        uses={this.uses}
-        castBreakdownSmallText={
-          <> - These boxes represent each cast, colored by how good the usage was.</>
-        }
-        abovePerformanceDetails={<div style={{ marginBottom: 10 }}></div>}
-      />
-    );
   }
 
   statistic() {

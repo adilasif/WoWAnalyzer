@@ -15,8 +15,8 @@ import { formatNumber } from 'common/format';
 import {
   PRESCIENCE_BASE_DURATION_MS,
   TIMEWALKER_BASE_EXTENSION,
+  GOLDEN_OPPORTUNITY_PRESCIENCE_MULTIPLIER,
 } from 'analysis/retail/evoker/augmentation/constants';
-import { isGoldenOpportunityPrescience } from 'analysis/retail/evoker/augmentation/modules/normalizers/CastLinkNormalizer';
 import StatTracker from 'parser/shared/modules/StatTracker';
 import { InformationIcon } from 'interface/icons';
 
@@ -29,8 +29,8 @@ class GoldenOpportunity extends Analyzer {
     stats: StatTracker,
   };
   protected stats!: StatTracker;
-  goldenPrescienceApplyTimestamps: Record<number, number> = {};
-  goldenPrescienceTimestampExists: Record<number, boolean> = {};
+  prescienceApplyTimestamps: Record<number, number> = {};
+  prescienceTimestampExists: Record<number, boolean> = {};
   masteryAtPrescienceApplication: Record<number, number> = {};
   totalPrescienceExtension = 0;
   constructor(options: Options) {
@@ -53,9 +53,6 @@ class GoldenOpportunity extends Analyzer {
   }
 
   onApplyBuff(event: ApplyBuffEvent) {
-    if (!isGoldenOpportunityPrescience(event)) {
-      return;
-    }
     this.onPrescienceApply(event.targetID, event.timestamp);
   }
 
@@ -65,48 +62,46 @@ class GoldenOpportunity extends Analyzer {
 
   onRefreshBuff(event: RefreshBuffEvent) {
     this.onPrescienceRemove(event.targetID, event.timestamp, false);
-    if (!isGoldenOpportunityPrescience(event)) {
-      return;
-    }
     this.onPrescienceApply(event.targetID, event.timestamp);
   }
 
   onFightEnd(event: FightEndEvent) {
-    Object.keys(this.goldenPrescienceApplyTimestamps).forEach((targetID) => {
+    Object.keys(this.prescienceApplyTimestamps).forEach((targetID) => {
       this.onPrescienceRemove(Number(targetID), event.timestamp, true);
     });
   }
 
   onPrescienceApply(targetID: number, timestamp: number) {
-    this.goldenPrescienceApplyTimestamps[targetID] = timestamp;
-    this.goldenPrescienceTimestampExists[targetID] = true;
+    this.prescienceApplyTimestamps[targetID] = timestamp;
+    this.prescienceTimestampExists[targetID] = true;
     this.masteryAtPrescienceApplication[targetID] = this.stats.currentMasteryPercentage;
   }
 
-  onPrescienceRemove(targetID: number, timestamp: number, fightEnd: boolean) {
-    if (
-      !this.goldenPrescienceTimestampExists[targetID] ||
-      !this.goldenPrescienceApplyTimestamps[targetID]
-    ) {
+  onPrescienceRemove(targetID: number, timestamp: number, fightEndOrRefresh: boolean) {
+    if (!this.prescienceTimestampExists[targetID] || !this.prescienceApplyTimestamps[targetID]) {
       return;
     }
-    const prescienceDuration = (timestamp - this.goldenPrescienceApplyTimestamps[targetID]) / 1000;
+    const prescienceDuration = (timestamp - this.prescienceApplyTimestamps[targetID]) / 1000;
+    // This is the base Prescience duration before Golden Opportunity is factored in.
     const basePrescienceDuration =
       (PRESCIENCE_BASE_DURATION_MS *
         (1 + TIMEWALKER_BASE_EXTENSION + this.masteryAtPrescienceApplication[targetID])) /
       1000;
-    if (!fightEnd && prescienceDuration >= basePrescienceDuration * 1.9) {
-      // Use 1.9 as a threshold to account for variations in timestamps.
-      this.totalPrescienceExtension += prescienceDuration / 2;
+    if (!fightEndOrRefresh && prescienceDuration >= basePrescienceDuration * 1.05) {
+      // Duration checked to ensure it wasn't removed early due to cancelaura or death.
+      // Uses 1.05 to account for variations in timestamp, as this shouldn't occur often.
+      this.totalPrescienceExtension +=
+        prescienceDuration *
+        (GOLDEN_OPPORTUNITY_PRESCIENCE_MULTIPLIER / (GOLDEN_OPPORTUNITY_PRESCIENCE_MULTIPLIER + 1));
     } else {
-      // Prescience was removed early due to fight end, cancelaura, or death.
+      // Prescience was removed early due to fight end, refresh cancelaura, or death.
       // Approximately calculate extension value based on Mastery at the time of application.
       const extensionValue = prescienceDuration - basePrescienceDuration;
       if (extensionValue > 0) {
         this.totalPrescienceExtension += extensionValue;
       }
     }
-    this.goldenPrescienceTimestampExists[targetID] = false;
+    this.prescienceTimestampExists[targetID] = false;
   }
 
   statistic() {

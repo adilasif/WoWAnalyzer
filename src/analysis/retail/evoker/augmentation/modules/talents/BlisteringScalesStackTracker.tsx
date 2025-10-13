@@ -9,6 +9,7 @@ import Events, {
   RemoveBuffEvent,
   RemoveBuffStackEvent,
 } from 'parser/core/Events';
+import { BLISTERING_SCALES_STACK_MAX } from '../../constants';
 
 interface BuffStackUpdate {
   /** What triggered this update */
@@ -34,10 +35,6 @@ export default class BlisteringScalesStackTracker extends Analyzer {
   buffStackUpdates: BuffStackUpdate[] = [];
 
   startStacksGathered = false;
-
-  maxBlisteringStacks: number = this.selectedCombatant.hasTalent(TALENTS.REGENERATIVE_CHITIN_TALENT)
-    ? 20
-    : 15;
 
   //Unused in this module but exists because this is a custom implementation of BuffStackTracker that is used to render a graph that relies on these values being present
   static workaroundWeirdBuffEvents_experimental = false;
@@ -99,8 +96,8 @@ export default class BlisteringScalesStackTracker extends Analyzer {
       {
         type: event.type,
         timestamp: event.timestamp,
-        change: this.maxBlisteringStacks - this.current,
-        current: this.maxBlisteringStacks,
+        change: BLISTERING_SCALES_STACK_MAX - this.current,
+        current: BLISTERING_SCALES_STACK_MAX,
       },
       event.ability,
     );

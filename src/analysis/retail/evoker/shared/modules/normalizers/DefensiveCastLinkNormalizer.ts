@@ -1,4 +1,4 @@
-import { ApplyBuffEvent, EventType, GetRelatedEvent } from 'parser/core/Events';
+import { EventType } from 'parser/core/Events';
 import TALENTS from 'common/TALENTS/evoker';
 import SPELLS from 'common/SPELLS/evoker';
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
@@ -7,7 +7,6 @@ import { Options } from 'parser/core/Module';
 export const OBSIDIAN_SCALES = 'obsidianScales'; // links cast to buff apply
 export const RENEWING_BLAZE = 'renewingBlaze'; // links cast to buff apply
 export const RENEWING_BLAZE_HEAL = 'renewingBlazeHeal'; // links heal buff and healing
-const TWIN_GUARDIAN_PARTNER = 'twinGuardianPartner'; // links external and personal buffs
 
 const CAST_BUFFER = 50;
 /** Heal buff can get applied immediately on use, and keeps getting refreshed on damage until
@@ -48,30 +47,12 @@ const EVENT_LINKS: EventLink[] = [
     anySource: false, // We only want to be tracking our own Buffs, not any external ones
     forwardBufferMs: RENEWING_BLAZE_DURATION,
   },
-  {
-    linkRelation: TWIN_GUARDIAN_PARTNER,
-    reverseLinkRelation: TWIN_GUARDIAN_PARTNER,
-    linkingEventId: SPELLS.TWIN_GUARDIAN_SHIELD.id,
-    linkingEventType: EventType.ApplyBuff,
-    referencedEventId: SPELLS.TWIN_GUARDIAN_SHIELD.id,
-    referencedEventType: EventType.ApplyBuff,
-    anyTarget: true,
-    forwardBufferMs: 1000,
-  },
 ];
 
 class DefensiveCastLinkNormalizer extends EventLinkNormalizer {
   constructor(options: Options) {
     super(options, EVENT_LINKS);
   }
-}
-
-export function getTwinGuardianPartner(event: ApplyBuffEvent): ApplyBuffEvent | undefined {
-  return GetRelatedEvent(
-    event,
-    TWIN_GUARDIAN_PARTNER,
-    (e): e is ApplyBuffEvent => e.type === EventType.ApplyBuff,
-  );
 }
 
 export default DefensiveCastLinkNormalizer;
