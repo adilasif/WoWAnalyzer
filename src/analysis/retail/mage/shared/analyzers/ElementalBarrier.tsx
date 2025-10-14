@@ -2,7 +2,7 @@ import { formatNumber, formatPercentage } from 'common/format';
 import TALENTS from 'common/TALENTS/mage';
 import SPECS from 'game/SPECS';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
-import MageAnalyzer from './MageAnalyzer';
+import MageAnalyzer from '../MageAnalyzer';
 import Events, { AbsorbedEvent } from 'parser/core/Events';
 import DamageTaken from 'parser/shared/modules/throughput/DamageTaken';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';

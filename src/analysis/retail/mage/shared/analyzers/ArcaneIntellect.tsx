@@ -1,5 +1,5 @@
 import SPELLS from 'common/SPELLS';
-import MageAnalyzer from './MageAnalyzer';
+import MageAnalyzer from '../MageAnalyzer';
 
 class ArcaneIntellect extends MageAnalyzer {
   get uptime() {

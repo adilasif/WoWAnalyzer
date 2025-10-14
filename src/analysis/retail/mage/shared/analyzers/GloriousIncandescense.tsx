@@ -2,8 +2,8 @@ import SPECS from 'game/SPECS';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from './MageAnalyzer';
 import Events, { RemoveBuffEvent } from 'parser/core/Events';
+import MageAnalyzer from '../MageAnalyzer';
 
 class GloriousIncandescence extends MageAnalyzer {
   static dependencies = {
