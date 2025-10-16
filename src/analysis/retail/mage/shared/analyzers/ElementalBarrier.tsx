@@ -5,7 +5,6 @@ import MageAnalyzer from '../MageAnalyzer';
 import Events, { AbsorbedEvent } from 'parser/core/Events';
 import DamageTaken from 'parser/shared/modules/throughput/DamageTaken';
 import { MageStatistic } from '../components/statistics';
-import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 
 class ElementalBarrier extends MageAnalyzer {
   static dependencies = {
@@ -52,8 +51,6 @@ class ElementalBarrier extends MageAnalyzer {
     return (
       <MageStatistic
         spell={this.barrierSpell}
-        position={STATISTIC_ORDER.CORE(31)}
-        size="flexible"
         tooltip={
           <>
             This is the amount of damage that was absorbed by your {this.barrierSpell.name}. Try to
@@ -61,12 +58,11 @@ class ElementalBarrier extends MageAnalyzer {
             your healers need to heal.
           </>
         }
-        values={[
-          { value: this.damageAbsorbed, label: 'Damage absorbed', format: 'number' },
-          { value: this.absorbedPerCast, label: 'Avg. absorbed per barrier', format: 'number' },
-          { value: this.percentAbsorbed, label: '% of Damage absorbed', format: 'percentage' },
-        ]}
-      />
+      >
+        <MageStatistic.Number value={this.damageAbsorbed} label="Damage absorbed" />
+        <MageStatistic.Number value={this.absorbedPerCast} label="Avg. absorbed per barrier" />
+        <MageStatistic.Percentage value={this.percentAbsorbed} label="% of Damage absorbed" />
+      </MageStatistic>
     );
   }
 }

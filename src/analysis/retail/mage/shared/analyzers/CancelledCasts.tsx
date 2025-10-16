@@ -3,6 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { Options } from 'parser/core/Analyzer';
 import CoreCancelledCasts from 'parser/shared/modules/CancelledCasts';
 import { MageStatistic } from '../components/statistics';
+import { CrossIcon } from 'interface/icons';
 
 class CancelledCasts extends CoreCancelledCasts {
   constructor(options: Options) {
@@ -22,11 +23,15 @@ class CancelledCasts extends CoreCancelledCasts {
     return (
       <MageStatistic
         spell={SPELLS.FIRE_BLAST}
-        values={[
-          { value: this.cancelledPercentage, label: 'Cancelled Casts', format: 'percentage' },
-        ]}
-        tooltip={<span>Percentage of casts cancelled (excluding ignored abilities).</span>}
-      />
+        title="Cancelled Casts"
+        tooltip={<>Percentage of casts cancelled (excluding ignored abilities).</>}
+      >
+        <MageStatistic.Percentage
+          value={this.cancelledPercentage}
+          icon={<CrossIcon />}
+          label="CancelledCasts"
+        />
+      </MageStatistic>
     );
   }
 }

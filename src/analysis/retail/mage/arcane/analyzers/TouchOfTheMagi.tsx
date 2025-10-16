@@ -14,6 +14,7 @@ import Events, {
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import AlwaysBeCasting from '../core/AlwaysBeCasting';
+import { MageStatistic } from '../../shared/components';
 
 export default class TouchOfTheMagi extends MageAnalyzer {
   static dependencies = {
@@ -112,6 +113,14 @@ export default class TouchOfTheMagi extends MageAnalyzer {
       },
       style: ThresholdStyle.PERCENTAGE,
     };
+  }
+
+  statistic() {
+    return (
+      <MageStatistic spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT}>
+        <MageStatistic.Damage value={this.averageDamage} label="Average Damage" />
+      </MageStatistic>
+    );
   }
 }
 

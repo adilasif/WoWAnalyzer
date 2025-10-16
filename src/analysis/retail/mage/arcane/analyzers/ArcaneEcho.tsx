@@ -49,14 +49,15 @@ export default class ArcaneEcho extends MageAnalyzer {
       <MageStatistic
         spell={TALENTS.ARCANE_ECHO_TALENT}
         category={STATISTIC_CATEGORY.TALENTS}
-        values={[{ value: this.averageDamagePerTouch, label: 'Average Damage', format: 'number' }]}
         tooltip={
           <>
             On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the
             Magi cast.
           </>
         }
-      />
+      >
+        <MageStatistic.Number value={this.averageDamagePerTouch} label="Average Damage" />
+      </MageStatistic>
     );
   }
 }

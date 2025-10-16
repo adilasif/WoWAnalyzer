@@ -6,8 +6,7 @@ import {
   MajorDefensiveBuff,
 } from 'interface/guide/components/MajorDefensives/MajorDefensiveAnalyzer';
 import { SpellLink } from 'interface';
-import MajorDefensiveStatistic from 'interface/MajorDefensiveStatistic';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
+import { MageStatistic } from '../components';
 
 class IceBlock extends MajorDefensiveBuff {
   static dependencies = {
@@ -32,7 +31,14 @@ class IceBlock extends MajorDefensiveBuff {
   }
 
   statistic() {
-    return <MajorDefensiveStatistic analyzer={this} category={STATISTIC_CATEGORY.GENERAL} />;
+    return (
+      <MageStatistic
+        spell={TALENTS.ICE_BLOCK_TALENT}
+        tooltip={<MageStatistic.DefensiveTooltip analyzer={this} />}
+      >
+        <MageStatistic.Defensive analyzer={this} />
+      </MageStatistic>
+    );
   }
 }
 

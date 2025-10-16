@@ -87,17 +87,15 @@ export default class ArcaneOrb extends MageAnalyzer {
       <MageStatistic
         spell={SPELLS.ARCANE_ORB}
         category={STATISTIC_CATEGORY.TALENTS}
-        values={[
-          {
-            value: this.averageHitsPerCast,
-            label: 'Average hits per cast',
-            format: 'number',
-            precision: 2,
-          },
-          { value: this.missedOrbs, label: 'Orbs cast with no targets hit', format: 'number' },
-        ]}
         tooltip={tooltipText}
-      />
+      >
+        <MageStatistic.Number
+          value={this.averageHitsPerCast}
+          label="Average hits per cast"
+          precision={2}
+        />
+        <MageStatistic.Number value={this.missedOrbs} label="Orbs cast with no targets hit" />
+      </MageStatistic>
     );
   }
 }

@@ -13,9 +13,10 @@ class ArcaneIntellect extends MageAnalyzer {
     return (
       <MageStatistic
         spell={SPELLS.ARCANE_INTELLECT}
-        values={[{ value: this.uptime, label: 'Buff Uptime', format: 'percentage' }]}
         tooltip={<span>Percentage of fight with Arcane Intellect active.</span>}
-      />
+      >
+        <MageStatistic.Percentage value={this.uptime} label="Buff Uptime" />
+      </MageStatistic>
     );
   }
 }

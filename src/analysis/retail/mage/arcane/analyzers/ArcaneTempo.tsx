@@ -13,10 +13,9 @@ import Events, {
   RemoveBuffStackEvent,
 } from 'parser/core/Events';
 import { currentStacks } from 'parser/shared/modules/helpers/Stacks';
-import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import { formatDuration, formatPercentage } from 'common/format';
 import HasteIcon from 'interface/icons/Haste';
-import { MageStatistic, StatisticDropdownTable } from '../../shared/components/statistics';
+import { MageStatistic } from '../../shared/components/statistics';
 
 class ArcaneTempo extends MageAnalyzer {
   timeAtStackCount: number[];
@@ -115,17 +114,14 @@ class ArcaneTempo extends MageAnalyzer {
     return (
       <MageStatistic
         spell={TALENTS.ARCANE_TEMPO_TALENT}
-        position={STATISTIC_ORDER.CORE(7)}
-        values={[
-          {
-            value: this.averageHaste,
-            label: 'average haste gained',
-            format: 'percentage',
-            icon: <HasteIcon />,
-          },
-        ]}
-        dropdown={<StatisticDropdownTable columns={columns} data={data} />}
-      />
+        dropdown={<MageStatistic.DropdownTable columns={columns} data={data} />}
+      >
+        <MageStatistic.Percentage
+          value={this.averageHaste}
+          label="average haste gained"
+          icon={<HasteIcon />}
+        />
+      </MageStatistic>
     );
   }
 }
