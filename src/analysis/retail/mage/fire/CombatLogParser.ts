@@ -34,8 +34,8 @@ import Meteor from './talents/Meteor';
 import ImprovedScorch from './talents/ImprovedScorch';
 
 //Hero Talents
-import FlameAndFrost from '../shared/FlameAndFrost';
-import GloriousIncandescence from '../shared/GloriousIncandescense';
+import FlameAndFrost from '../shared/analyzers/FlameAndFrost';
+import GloriousIncandescence from '../shared/analyzers/GloriousIncandescense';
 
 //Guide
 import Guide from './Guide';
