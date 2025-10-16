@@ -3,9 +3,13 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents, type ExpandableConfig } from '../../shared/components';
-import { createExpandableConfig } from '../../shared/helpers';
-import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
+import {
+  evaluateEvents,
+  type ExpandableConfig,
+  MageGuideSection,
+  ExpandableBreakdown,
+} from '../../shared/components';
+import { createExpandableConfig } from '../../shared/components/guide/ExpandableBreakdown';
 
 import ArcaneSurge, { ArcaneSurgeData } from '../analyzers/ArcaneSurge';
 
@@ -150,50 +154,43 @@ class ArcaneSurgeGuide extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          <b>{arcaneSurge}</b> is your primary damage cooldown and will essentially convert all of
-          your mana into damage. Because of this, there are a few things that you should do to
-          ensure you maximize the amount of damage that {arcaneSurge} does:
-        </div>
-        <div>
-          <ul>
-            <li>
-              Ensure you have 4 {arcaneCharge}s. Cast {arcaneOrb} if you have less than 4.
-            </li>
-            <li>
-              Full channel {evocation} before each {arcaneSurge} cast to cap your mana and grant an
-              intellect buff from {siphonStorm}.
-            </li>
-            <li>
-              Channeling {evocation} will give you a {clearcasting} proc. Cast {arcaneMissiles} to
-              get before {arcaneSurge}
-            </li>
-          </ul>
-        </div>
-        <div>
-          When incorporating the above items, your spell sequence will look like this:{' '}
-          <SpellSeq
-            spells={[
-              TALENTS.EVOCATION_TALENT,
-              TALENTS.ARCANE_MISSILES_TALENT,
-              SPELLS.ARCANE_ORB,
-              TALENTS.ARCANE_SURGE_TALENT,
-            ]}
-          />
-        </div>
+        <b>{arcaneSurge}</b> is your primary damage cooldown and will essentially convert all of
+        your mana into damage. Because of this, there are a few things that you should do to ensure
+        you maximize the amount of damage that {arcaneSurge} does:
+        <ul>
+          <li>
+            Ensure you have 4 {arcaneCharge}s. Cast {arcaneOrb} if you have less than 4.
+          </li>
+          <li>
+            Full channel {evocation} before each {arcaneSurge} cast to cap your mana and grant an
+            intellect buff from {siphonStorm}.
+          </li>
+          <li>
+            Channeling {evocation} will give you a {clearcasting} proc. Cast {arcaneMissiles} to get
+            before {arcaneSurge}
+          </li>
+        </ul>
+        When incorporating the above items, your spell sequence will look like this:{' '}
+        <SpellSeq
+          spells={[
+            TALENTS.EVOCATION_TALENT,
+            TALENTS.ARCANE_MISSILES_TALENT,
+            SPELLS.ARCANE_ORB,
+            TALENTS.ARCANE_SURGE_TALENT,
+          ]}
+        />
       </>
     );
 
-    return new GuideBuilder(TALENTS.ARCANE_SURGE_TALENT)
-      .explanation(explanation)
-      .addExpandableBreakdown({
-        castBreakdowns: generateExpandableBreakdown({
-          castData: this.arcaneSurge.surgeData,
-          evaluatedData: this.arcaneSurgeData,
-          expandableConfig: this.expandableConfig,
-        }),
-      })
-      .build();
+    return (
+      <MageGuideSection spell={TALENTS.ARCANE_SURGE_TALENT} explanation={explanation}>
+        <ExpandableBreakdown
+          castData={this.arcaneSurge.surgeData}
+          evaluatedData={this.arcaneSurgeData}
+          expandableConfig={this.expandableConfig}
+        />
+      </MageGuideSection>
+    );
   }
 }
 

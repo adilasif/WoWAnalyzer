@@ -4,8 +4,12 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents } from '../../shared/components';
-import { GuideBuilder } from '../../shared/builders';
+import {
+  evaluateEvents,
+  MageGuideSection,
+  CastBreakdown,
+  NoCastsMessage,
+} from '../../shared/components';
 
 const AOE_TARGET_THRESHOLD = 4;
 const CAST_DELAY_THRESHOLD = 500; // 500ms
@@ -111,40 +115,39 @@ class PresenceOfMindGuide extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          <b>{presenceOfMind}</b> is a simple ability whos primary benefit is squeezing a couple
-          extra casts into a tight buff window or getting to a harder hitting ability faster. So
-          while it itself is not a major damage ability, it can help you get a little bit more out
-          of your other abilities. Use the below guidelines to add these benefits to your rotation.
-          <ul>
-            <li>
-              In Single Target, you should use {presenceOfMind} to squeeze a couple extra casts into
-              the final couple seconds of {touchOfTheMagi}
-            </li>
-            <li>
-              If you are unable to finish both {arcaneBlast} casts before {touchOfTheMagi} ends,
-              cancel the {presenceOfMind} buff so it's cooldown stays in sync with {touchOfTheMagi}
-            </li>
-            <li>
-              In AOE, you can use {presenceOfMind} at 2 or 3 {arcaneCharge}s to get to{' '}
-              {arcaneBarrage} (with 4 {arcaneCharge}s) faster.
-            </li>
-          </ul>
-        </div>
+        <b>{presenceOfMind}</b> is a simple ability whos primary benefit is squeezing a couple extra
+        casts into a tight buff window or getting to a harder hitting ability faster. So while it
+        itself is not a major damage ability, it can help you get a little bit more out of your
+        other abilities. Use the below guidelines to add these benefits to your rotation.
+        <ul>
+          <li>
+            In Single Target, you should use {presenceOfMind} to squeeze a couple extra casts into
+            the final couple seconds of {touchOfTheMagi}
+          </li>
+          <li>
+            If you are unable to finish both {arcaneBlast} casts before {touchOfTheMagi} ends,
+            cancel the {presenceOfMind} buff so it's cooldown stays in sync with {touchOfTheMagi}
+          </li>
+          <li>
+            In AOE, you can use {presenceOfMind} at 2 or 3 {arcaneCharge}s to get to {arcaneBarrage}{' '}
+            (with 4 {arcaneCharge}s) faster.
+          </li>
+        </ul>
       </>
     );
 
-    return new GuideBuilder(TALENTS.PRESENCE_OF_MIND_TALENT)
-      .explanation(explanation)
-      .when(this.presenceOfMind.pomData.length > 0, (builder: GuideBuilder) =>
-        builder.addCastSummary({
-          castData: this.presenceOfMindData,
-        }),
-      )
-      .when(this.presenceOfMind.pomData.length === 0, (builder: GuideBuilder) =>
-        builder.addNoUsage(),
-      )
-      .build();
+    return (
+      <MageGuideSection spell={TALENTS.PRESENCE_OF_MIND_TALENT} explanation={explanation}>
+        {this.presenceOfMind.pomData.length === 0 ? (
+          <NoCastsMessage spell={TALENTS.PRESENCE_OF_MIND_TALENT} />
+        ) : (
+          <CastBreakdown
+            spell={TALENTS.PRESENCE_OF_MIND_TALENT}
+            castEntries={this.presenceOfMindData}
+          />
+        )}
+      </MageGuideSection>
+    );
   }
 }
 

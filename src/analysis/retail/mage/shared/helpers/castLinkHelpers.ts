@@ -3,42 +3,6 @@ import { EventType, AnyEvent } from 'parser/core/Events';
 
 const CAST_BUFFER_MS = 75;
 
-export const EventRelations = {
-  DESTROY: EventType.Destroy,
-  HEAL: EventType.Heal,
-  HEAL_ABSORBED: EventType.HealAbsorbed,
-  ABSORBED: EventType.Absorbed,
-  DAMAGE: EventType.Damage,
-  BEGIN_CAST: EventType.BeginCast,
-  CAST: EventType.Cast,
-  DRAIN: EventType.Drain,
-  APPLY_BUFF: EventType.ApplyBuff,
-  APPLY_DEBUFF: EventType.ApplyDebuff,
-  APPLY_BUFF_STACK: EventType.ApplyBuffStack,
-  APPLY_DEBUFF_STACK: EventType.ApplyDebuffStack,
-  REMOVE_BUFF_STACK: EventType.RemoveBuffStack,
-  REMOVE_DEBUFF_STACK: EventType.RemoveDebuffStack,
-  CHANGE_BUFF_STACK: EventType.ChangeBuffStack,
-  CHANGE_DEBUFF_STACK: EventType.ChangeDebuffStack,
-  REFRESH_BUFF: EventType.RefreshBuff,
-  REFRESH_DEBUFF: EventType.RefreshDebuff,
-  REMOVE_BUFF: EventType.RemoveBuff,
-  REMOVE_DEBUFF: EventType.RemoveDebuff,
-  SUMMON: EventType.Summon,
-  RESOURCE_CHANGE: EventType.ResourceChange,
-  INTERRUPT: EventType.Interrupt,
-  DEATH: EventType.Death,
-  RESURRECT: EventType.Resurrect,
-
-  // Custom semantic relations that don't map to EventTypes
-  PRECAST: 'precast',
-  CONSUME: 'consume',
-  TICK: 'tick',
-  BARRAGE_CAST: 'BarrageCast',
-  REFUND_BUFF: 'RefundBuff',
-} as const;
-
-/** Configuration for a single event link */
 export interface LinkConfig {
   relation: string;
   reverseRelation?:
@@ -56,7 +20,6 @@ export interface LinkConfig {
   condition?: (linkingEvent: AnyEvent, referencedEvent: AnyEvent) => boolean;
 }
 
-/** Spell link specification - groups all event links for a single spell */
 export interface SpellLinkSpec {
   spell: number;
   parentType: EventType | EventType[];
@@ -128,132 +91,106 @@ export function defineSpellLinks(spec: SpellLinkSpec): EventLink[] {
  */
 export const LinkPatterns = {
   damage: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.DAMAGE,
+    relation: EventType.Damage,
     type: EventType.Damage,
     ...overrides,
   }),
-
-  /** Links cast to spell(s) cast immediately before (id required) */
-  preCast: (overrides: Partial<LinkConfig> & { id: number | number[] }): LinkConfig => ({
-    relation: EventRelations.PRECAST,
-    type: EventType.Cast,
+  custom: (relation: string, overrides: Partial<LinkConfig>): LinkConfig => ({
+    relation,
+    type: overrides.type ?? EventType.Cast,
     ...overrides,
   }),
-
   applyBuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.APPLY_BUFF,
+    relation: EventType.ApplyBuff,
     type: EventType.ApplyBuff,
     ...overrides,
   }),
-
   applyDebuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.APPLY_DEBUFF,
+    relation: EventType.ApplyDebuff,
     type: EventType.ApplyDebuff,
     ...overrides,
   }),
-
-  /** Usually requires forwardBuffer matching buff duration */
   removeBuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.REMOVE_BUFF,
+    relation: EventType.RemoveBuff,
     type: [EventType.RemoveBuff, EventType.RemoveBuffStack],
     ...overrides,
   }),
-
-  /** Usually requires forwardBuffer matching debuff duration */
   removeDebuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.REMOVE_DEBUFF,
+    relation: EventType.RemoveDebuff,
     type: EventType.RemoveDebuff,
     ...overrides,
   }),
-
-  /** Links to cast event(s) (id required) */
   cast: (overrides: Partial<LinkConfig> & { id: number | number[] }): LinkConfig => ({
-    relation: EventRelations.CAST,
+    relation: EventType.Cast,
     type: EventType.Cast,
     ...overrides,
   }),
-
-  /** Buff consumption by spell cast - semantic alias for cast() (id required) */
-  consumed: (overrides: Partial<LinkConfig> & { id: number | number[] }): LinkConfig => ({
-    relation: EventRelations.CAST,
-    type: EventType.Cast,
-    ...overrides,
-  }),
-
   energize: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.RESOURCE_CHANGE,
+    relation: EventType.ResourceChange,
     type: EventType.ResourceChange,
     ...overrides,
   }),
 
   heal: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.HEAL,
+    relation: EventType.Heal,
     type: EventType.Heal,
     ...overrides,
   }),
 
   absorbed: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.ABSORBED,
+    relation: EventType.Absorbed,
     type: EventType.Absorbed,
     ...overrides,
   }),
 
   beginCast: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.BEGIN_CAST,
+    relation: EventType.BeginCast,
     type: EventType.BeginCast,
     ...overrides,
   }),
 
   summon: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.SUMMON,
+    relation: EventType.Summon,
     type: EventType.Summon,
     ...overrides,
   }),
-
   interrupt: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.INTERRUPT,
+    relation: EventType.Interrupt,
     type: EventType.Interrupt,
     ...overrides,
   }),
-
   death: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.DEATH,
+    relation: EventType.Death,
     type: EventType.Death,
     ...overrides,
   }),
-
   applyBuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.APPLY_BUFF_STACK,
+    relation: EventType.ApplyBuffStack,
     type: EventType.ApplyBuffStack,
     ...overrides,
   }),
-
   applyDebuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.APPLY_DEBUFF_STACK,
+    relation: EventType.ApplyDebuffStack,
     type: EventType.ApplyDebuffStack,
     ...overrides,
   }),
-
   removeBuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.REMOVE_BUFF_STACK,
+    relation: EventType.RemoveBuffStack,
     type: EventType.RemoveBuffStack,
     ...overrides,
   }),
-
   removeDebuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.REMOVE_DEBUFF_STACK,
+    relation: EventType.RemoveDebuffStack,
     type: EventType.RemoveDebuffStack,
     ...overrides,
   }),
-
   refreshBuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.REFRESH_BUFF,
+    relation: EventType.RefreshBuff,
     type: EventType.RefreshBuff,
     ...overrides,
   }),
-
   refreshDebuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventRelations.REFRESH_DEBUFF,
+    relation: EventType.RefreshDebuff,
     type: EventType.RefreshDebuff,
     ...overrides,
   }),

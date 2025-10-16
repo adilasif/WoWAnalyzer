@@ -5,9 +5,13 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { formatDurationMillisMinSec } from 'common/format';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents } from '../../shared/components';
-import { evaluatePerformance } from '../../shared/helpers';
-import { GuideBuilder } from '../../shared/builders';
+import {
+  evaluateEvents,
+  MageGuideSection,
+  CastBreakdown,
+  InlineStatistic,
+} from '../../shared/components';
+import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 
 import ArcaneMissiles from '../analyzers/ArcaneMissiles';
 
@@ -22,11 +26,16 @@ class ArcaneMissilesGuide extends MageAnalyzer {
   hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.AETHER_ATTUNEMENT_TALENT);
 
   channelDelayUtil(delay: number) {
-    return evaluatePerformance(
-      delay,
-      this.arcaneMissiles.channelDelayThresholds.isGreaterThan,
-      false,
-    );
+    const thresholds = this.arcaneMissiles.channelDelayThresholds.isGreaterThan;
+    return evaluateQualitativePerformanceByThreshold({
+      actual: delay,
+      isGreaterThan: {
+        perfect: thresholds.minor,
+        good: thresholds.average,
+        ok: thresholds.major,
+        fail: 0,
+      },
+    });
   }
 
   get arcaneMissilesData(): BoxRowEntry[] {
@@ -117,23 +126,18 @@ class ArcaneMissilesGuide extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          Ensure you are spending your <b>{clearcasting}</b> procs effectively with {arcaneMissiles}
-          .
-        </div>
-        <div>
-          <ul>
-            <li>
-              Cast {arcaneMissiles} immediately if capped on {clearcasting} charges, ignoring any of
-              the below items, to avoid munching procs (gaining a charge while capped).
-            </li>
-            <li>Do not cast {arcaneMissiles} if you have .</li>
-            <li>
-              If you don't have {aetherAttunement}, you can optionally clip your {arcaneMissiles}{' '}
-              cast once the GCD ends for a small damage boost.
-            </li>
-          </ul>
-        </div>
+        Ensure you are spending your <b>{clearcasting}</b> procs effectively with {arcaneMissiles}.
+        <ul>
+          <li>
+            Cast {arcaneMissiles} immediately if capped on {clearcasting} charges, ignoring any of
+            the below items, to avoid munching procs (gaining a charge while capped).
+          </li>
+          <li>Do not cast {arcaneMissiles} if you have .</li>
+          <li>
+            If you don't have {aetherAttunement}, you can optionally clip your {arcaneMissiles} cast
+            once the GCD ends for a small damage boost.
+          </li>
+        </ul>
       </>
     );
 
@@ -144,18 +148,22 @@ class ArcaneMissilesGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.ARCANE_MISSILES_TALENT)
-      .explanation(explanation)
-      .addStatistic({
-        value: formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
-        label: 'Average Delay from Channel End to Next Cast',
-        performance: this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay),
-        tooltip: averageDelayTooltip,
-      })
-      .addCastSummary({
-        castData: this.arcaneMissilesData,
-      })
-      .build();
+    const averageDelayPerf = this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay);
+
+    return (
+      <MageGuideSection spell={TALENTS.ARCANE_MISSILES_TALENT} explanation={explanation}>
+        <InlineStatistic
+          value={formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3)}
+          label="Average Delay from Channel End to Next Cast"
+          tooltip={averageDelayTooltip}
+          performance={averageDelayPerf}
+        />
+        <CastBreakdown
+          spell={TALENTS.ARCANE_MISSILES_TALENT}
+          castEntries={this.arcaneMissilesData}
+        />
+      </MageGuideSection>
+    );
   }
 }
 

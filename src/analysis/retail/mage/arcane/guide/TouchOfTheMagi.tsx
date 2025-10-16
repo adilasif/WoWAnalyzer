@@ -1,15 +1,25 @@
-import { formatPercentage } from 'common/format';
+import { formatPercentage, formatDuration } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
+import { EventType } from 'parser/core/Events';
+import type { CastEvent } from 'parser/core/Events';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 
-import { evaluateEvents, type ExpandableConfig } from '../../shared/components';
-import { evaluatePerformance, createExpandableConfig } from '../../shared/helpers';
-import { GuideBuilder, generateExpandableBreakdown } from '../../shared/builders';
+import {
+  evaluateEvents,
+  type ExpandableConfig,
+  type CastTimelineEntry,
+  MageGuideSection,
+  CastTimeline,
+  ExpandableBreakdown,
+  InlineStatistic,
+} from '../../shared/components';
+import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
+import { createExpandableConfig } from '../../shared/components/guide/ExpandableBreakdown';
 
 import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
 
@@ -26,7 +36,15 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
 
   activeTimeUtil(activePercent: number) {
     const thresholds = this.touchOfTheMagi.touchMagiActiveTimeThresholds.isLessThan;
-    return evaluatePerformance(activePercent, thresholds, true);
+    return evaluateQualitativePerformanceByThreshold({
+      actual: activePercent,
+      isGreaterThan: {
+        perfect: thresholds.minor,
+        good: thresholds.average,
+        ok: thresholds.major,
+        fail: 0,
+      },
+    });
   }
 
   get expandableConfig(): ExpandableConfig {
@@ -146,50 +164,47 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          <b>{touchOfTheMagi}</b> is a short debuff available for each burn phase and grants you 4{' '}
-          {arcaneCharge}s and accumulates 20% of your damage for the duration. When the debuff
-          expires it explodes dealing damage to the target and reduced damage to nearby targets.
-        </div>
-        <div>
-          <ul>
-            <li>
-              Using the standard rotation, cast as many spells as possible at the debuffed target
-              until the debuff expires.
-            </li>
-            <li>
-              Spend your {arcaneCharge}s with {arcaneBarrage} and then cast {touchOfTheMagi} while{' '}
-              {arcaneBarrage}
-              is in the air for some extra damage. cast
-              {touchOfTheMagi} while {arcaneBarrage} is in the air. This should be done even if your
-              charges will be refunded anyway via {burdenOfPower}, {gloriousIncandescence}, or .
-            </li>
-            <li>
-              Major Burn Phase: Ensure you have {siphonStorm} and . Your cast sequence would
-              typically be{' '}
-              <SpellSeq
-                spells={[
-                  TALENTS.EVOCATION_TALENT,
-                  TALENTS.ARCANE_MISSILES_TALENT,
-                  TALENTS.ARCANE_SURGE_TALENT,
-                  SPELLS.ARCANE_BARRAGE,
-                  TALENTS.TOUCH_OF_THE_MAGI_TALENT,
-                ]}
-              />
-              . If you don't have 4 {arcaneCharge}s, cast {arcaneOrb} before {arcaneSurge}.
-            </li>
-            <li>
-              Minor Burn Phase: {evocation} and {arcaneSurge} will not be available, but if possible
-              you should go into {touchOfTheMagi} with .
-            </li>
-            <li>
-              Use {presenceOfMind} at the end of {touchOfTheMagi} to squeeze in a couple more{' '}
-              {arcaneBlast} casts.
-            </li>
-          </ul>
-        </div>
+        <b>{touchOfTheMagi}</b> is a short debuff available for each burn phase and grants you 4{' '}
+        {arcaneCharge}s and accumulates 20% of your damage for the duration. When the debuff expires
+        it explodes dealing damage to the target and reduced damage to nearby targets.
+        <ul>
+          <li>
+            Using the standard rotation, cast as many spells as possible at the debuffed target
+            until the debuff expires.
+          </li>
+          <li>
+            Spend your {arcaneCharge}s with {arcaneBarrage} and then cast {touchOfTheMagi} while{' '}
+            {arcaneBarrage}
+            is in the air for some extra damage. cast
+            {touchOfTheMagi} while {arcaneBarrage} is in the air. This should be done even if your
+            charges will be refunded anyway via {burdenOfPower}, {gloriousIncandescence}, or .
+          </li>
+          <li>
+            Major Burn Phase: Ensure you have {siphonStorm} and . Your cast sequence would typically
+            be{' '}
+            <SpellSeq
+              spells={[
+                TALENTS.EVOCATION_TALENT,
+                TALENTS.ARCANE_MISSILES_TALENT,
+                TALENTS.ARCANE_SURGE_TALENT,
+                SPELLS.ARCANE_BARRAGE,
+                TALENTS.TOUCH_OF_THE_MAGI_TALENT,
+              ]}
+            />
+            . If you don't have 4 {arcaneCharge}s, cast {arcaneOrb} before {arcaneSurge}.
+          </li>
+          <li>
+            Minor Burn Phase: {evocation} and {arcaneSurge} will not be available, but if possible
+            you should go into {touchOfTheMagi} with .
+          </li>
+          <li>
+            Use {presenceOfMind} at the end of {touchOfTheMagi} to squeeze in a couple more{' '}
+            {arcaneBlast} casts.
+          </li>
+        </ul>
       </>
     );
+
     const activeTimeTooltip = (
       <>
         {formatPercentage(this.touchOfTheMagi.averageActiveTime)}% average Active Time per Touch of
@@ -197,34 +212,45 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
       </>
     );
 
-    return new GuideBuilder(TALENTS.TOUCH_OF_THE_MAGI_TALENT)
-      .explanation(explanation)
-      .addStatistic({
-        value: `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,
-        label: 'Average Active Time',
-        performance: this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime),
-        tooltip: activeTimeTooltip,
-      })
-      .addExpandableBreakdown({
-        castBreakdowns: generateExpandableBreakdown({
-          castData: this.touchOfTheMagi.touchData,
-          evaluatedData: this.touchOfTheMagiData,
-          expandableConfig: this.expandableConfig,
-        }),
-      })
-      .addCastTimelines({
-        events: this.touchOfTheMagi.touchData,
-        timelineEvents: (cast: TouchOfTheMagiData) =>
-          this.getCastsInTimeWindow({
-            timestamp: cast.applied,
-            beforeMs: TOUCH_WINDOW_BUFFER_MS,
-            afterMs: TOUCH_WINDOW_BUFFER_MS,
-          }),
-        formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
-        headerPrefix: 'Touch',
-        windowDescription: 'Casts 5 seconds before and after Touch of the Magi',
-      })
-      .build();
+    const activeTimePerf = this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime);
+
+    // Get cast events for each Touch of the Magi window
+    const touchTimelineEvents: CastTimelineEntry<TouchOfTheMagiData>[] =
+      this.touchOfTheMagi.touchData.map((cast) => {
+        const windowStart = cast.applied - TOUCH_WINDOW_BUFFER_MS;
+        const windowEnd = cast.applied + TOUCH_WINDOW_BUFFER_MS;
+
+        return {
+          data: cast,
+          casts: this.eventHistory.getEvents(EventType.Cast, {
+            searchBackwards: false,
+            startTimestamp: windowStart,
+            duration: windowEnd - windowStart,
+          }) as CastEvent[],
+        };
+      });
+
+    return (
+      <MageGuideSection spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} explanation={explanation}>
+        <InlineStatistic
+          value={`${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`}
+          label="Average Active Time"
+          tooltip={activeTimeTooltip}
+          performance={activeTimePerf}
+        />
+        <ExpandableBreakdown
+          castData={this.touchOfTheMagi.touchData}
+          evaluatedData={this.touchOfTheMagiData}
+          expandableConfig={this.expandableConfig}
+        />
+        <CastTimeline
+          spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT}
+          events={touchTimelineEvents}
+          windowDescription="Casts 5 seconds before and after Touch of the Magi"
+          castTimestamp={(data) => formatDuration(data.applied - this.owner.fight.start_time)}
+        />
+      </MageGuideSection>
+    );
   }
 }
 

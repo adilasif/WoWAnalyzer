@@ -1,7 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from './MageAnalyzer';
+import MageAnalyzer from '../MageAnalyzer';
 import Events, { InterruptEvent } from 'parser/core/Events';
 
 const COOLDOWN_REDUCTION_MS = 4000;

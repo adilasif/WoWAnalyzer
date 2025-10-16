@@ -5,6 +5,7 @@ import MageAnalyzer from '../../shared/MageAnalyzer';
 import Events, {
   CastEvent,
   DamageEvent,
+  EventType,
   GetRelatedEvents,
   ResourceChangeEvent,
 } from 'parser/core/Events';
@@ -12,7 +13,7 @@ import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import { EventRelations, StatisticBuilder } from '../../shared/helpers';
+import { MageStatistic } from '../../shared/components/statistics';
 
 export default class ArcaneOrb extends MageAnalyzer {
   static dependencies = {
@@ -29,8 +30,8 @@ export default class ArcaneOrb extends MageAnalyzer {
   }
 
   onOrbCast(event: CastEvent) {
-    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
-    const energize: ResourceChangeEvent[] = GetRelatedEvents(event, EventRelations.RESOURCE_CHANGE);
+    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventType.Damage);
+    const energize: ResourceChangeEvent[] = GetRelatedEvents(event, EventType.ResourceChange);
 
     this.orbData.push({
       timestamp: event.timestamp,
@@ -82,12 +83,22 @@ export default class ArcaneOrb extends MageAnalyzer {
         : ''
     } Casting Arcane Orb when it will only hit one target is still beneficial and acceptable, but if you can aim it so that it hits multiple enemies then you should.`;
 
-    return new StatisticBuilder(SPELLS.ARCANE_ORB)
-      .category(STATISTIC_CATEGORY.TALENTS)
-      .value({ value: this.averageHitsPerCast, label: 'Average hits per cast', precision: 2 })
-      .value({ value: this.missedOrbs, label: 'Orbs cast with no targets hit' })
-      .tooltip(tooltipText)
-      .build();
+    return (
+      <MageStatistic
+        spell={SPELLS.ARCANE_ORB}
+        category={STATISTIC_CATEGORY.TALENTS}
+        values={[
+          {
+            value: this.averageHitsPerCast,
+            label: 'Average hits per cast',
+            format: 'number',
+            precision: 2,
+          },
+          { value: this.missedOrbs, label: 'Orbs cast with no targets hit', format: 'number' },
+        ]}
+        tooltip={tooltipText}
+      />
+    );
   }
 }
 

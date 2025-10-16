@@ -3,9 +3,16 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents } from '../../shared/components';
-import { evaluatePerformance } from '../../shared/helpers';
-import { GuideBuilder } from '../../shared/builders';
+import {
+  evaluateEvents,
+  MageGuideSection,
+  CastBreakdown,
+  InlineStatistic,
+  CastEfficiency,
+  CooldownTimeline,
+  NoCastsMessage,
+} from '../../shared/components';
+import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 
 import ArcaneOrb from '../analyzers/ArcaneOrb';
 
@@ -75,40 +82,43 @@ class ArcaneOrbGuide extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          <b>{arcaneOrb}</b> primary purpose is to quickly generate {arcaneCharge}s, as it is an
-          instant that generates at least 2 charges.
-        </div>
-        <div>
-          <ul>
-            <li>Try to use it on cooldown, but only when you have 2 or fewer {arcaneCharge}s.</li>
-          </ul>
-        </div>
+        <b>{arcaneOrb}</b> primary purpose is to quickly generate {arcaneCharge}s, as it is an
+        instant that generates at least 2 charges.
+        <ul>
+          <li>Try to use it on cooldown, but only when you have 2 or fewer {arcaneCharge}s.</li>
+        </ul>
       </>
     );
 
-    return new GuideBuilder(SPELLS.ARCANE_ORB)
-      .explanation(explanation)
-      .when(this.arcaneOrb.orbData.length > 0, (builder: GuideBuilder) =>
-        builder
-          .addStatistic({
-            value: this.arcaneOrb.averageHitsPerCast.toFixed(2),
-            label: 'avg targets hit',
-            performance: evaluatePerformance(
-              this.arcaneOrb.averageHitsPerCast,
-              { minor: 2.0, average: 1.5, major: 1.0 },
-              true,
-            ),
-          })
-          .addCastEfficiency()
-          .addCastSummary({
-            castData: this.arcaneOrbData,
-            title: 'Arcane Orb Usage',
-          })
-          .addCooldownTimeline(),
-      )
-      .when(this.arcaneOrb.orbData.length === 0, (builder: GuideBuilder) => builder.addNoUsage())
-      .build();
+    const avgHitsPerf = evaluateQualitativePerformanceByThreshold({
+      actual: this.arcaneOrb.averageHitsPerCast,
+      isGreaterThan: {
+        perfect: 2.0,
+        good: 1.5,
+        ok: 1.0,
+        fail: 0,
+      },
+    });
+
+    return (
+      <MageGuideSection spell={SPELLS.ARCANE_ORB} explanation={explanation}>
+        {this.arcaneOrb.orbData.length === 0 ? (
+          <NoCastsMessage spell={SPELLS.ARCANE_ORB} />
+        ) : (
+          <>
+            <InlineStatistic
+              value={this.arcaneOrb.averageHitsPerCast.toFixed(2)}
+              label="avg targets hit"
+              tooltip="Average targets hit per cast"
+              performance={avgHitsPerf}
+            />
+            <CastEfficiency spell={SPELLS.ARCANE_ORB} useThresholds />
+            <CastBreakdown spell={SPELLS.ARCANE_ORB} castEntries={this.arcaneOrbData} />
+            <CooldownTimeline spell={SPELLS.ARCANE_ORB} />
+          </>
+        )}
+      </MageGuideSection>
+    );
   }
 }
 

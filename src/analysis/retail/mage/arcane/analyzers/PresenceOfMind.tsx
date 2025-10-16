@@ -8,8 +8,8 @@ import Events, {
   GetRelatedEvent,
   RemoveBuffEvent,
   RemoveDebuffEvent,
+  EventType,
 } from 'parser/core/Events';
-import { EventRelations } from '../../shared/helpers';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 
 export default class PresenceOfMind extends MageAnalyzer {
@@ -44,16 +44,16 @@ export default class PresenceOfMind extends MageAnalyzer {
   }
 
   private getBarrageTargetCount(event: CastEvent): number | undefined {
-    const barrage: CastEvent | undefined = GetRelatedEvent(event, EventRelations.BARRAGE_CAST);
+    const barrage: CastEvent | undefined = GetRelatedEvent(event, 'barrageCast');
     if (!barrage) {
       return undefined;
     }
-    const barrageHits: DamageEvent[] | undefined = GetRelatedEvents(barrage, EventRelations.DAMAGE);
+    const barrageHits: DamageEvent[] | undefined = GetRelatedEvents(barrage, EventType.Damage);
     return barrageHits?.length;
   }
 
   private getBuffedCastCount(event: CastEvent): number {
-    const blasts: CastEvent[] | undefined = GetRelatedEvents(event, EventRelations.CAST);
+    const blasts: CastEvent[] | undefined = GetRelatedEvents(event, EventType.Cast);
     const buffedCasts = blasts.filter((b) =>
       this.selectedCombatant.hasBuff(TALENTS.PRESENCE_OF_MIND_TALENT.id, b.timestamp),
     );
@@ -61,13 +61,10 @@ export default class PresenceOfMind extends MageAnalyzer {
   }
 
   private getTouchCancelDelay(event: CastEvent): number | undefined {
-    const buffRemove: RemoveBuffEvent | undefined = GetRelatedEvent(
-      event,
-      EventRelations.REMOVE_BUFF,
-    );
+    const buffRemove: RemoveBuffEvent | undefined = GetRelatedEvent(event, EventType.RemoveBuff);
     const touchRemove: RemoveDebuffEvent | undefined = GetRelatedEvent(
       event,
-      EventRelations.REMOVE_DEBUFF,
+      EventType.RemoveDebuff,
     );
 
     if (!touchRemove || !buffRemove || buffRemove.timestamp <= touchRemove.timestamp) {

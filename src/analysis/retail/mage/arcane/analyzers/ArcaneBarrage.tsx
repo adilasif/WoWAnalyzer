@@ -7,11 +7,12 @@ import Events, {
   RefreshBuffEvent,
   GetRelatedEvents,
   GetRelatedEvent,
+  EventType,
 } from 'parser/core/Events';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
-import { getManaPercentage, getTargetHealthPercentage, EventRelations } from '../../shared/helpers';
+import { getManaPercentage, getTargetHealthPercentage } from '../../shared/helpers';
 
 const TEMPO_DURATION = 12000;
 
@@ -55,8 +56,8 @@ export default class ArcaneBarrage extends MageAnalyzer {
       cast: event,
       mana: getManaPercentage(event),
       charges: this.arcaneChargeTracker.current,
-      precast: GetRelatedEvent(event, EventRelations.PRECAST),
-      targetsHit: GetRelatedEvents(event, EventRelations.DAMAGE).length || 0,
+      precast: GetRelatedEvent(event, 'precast'),
+      targetsHit: GetRelatedEvents(event, EventType.Damage).length || 0,
       clearcasting: this.selectedCombatant.hasBuff(
         SPELLS.CLEARCASTING_ARCANE.id,
         event.timestamp - 10,

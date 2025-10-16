@@ -9,11 +9,11 @@ import Events, {
   GetRelatedEvent,
   GetRelatedEvents,
   RemoveBuffEvent,
+  EventType,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import AlwaysBeCasting from '../core/AlwaysBeCasting';
-import { EventRelations } from '../../shared/helpers';
 
 export default class TouchOfTheMagi extends MageAnalyzer {
   static dependencies = {
@@ -55,20 +55,17 @@ export default class TouchOfTheMagi extends MageAnalyzer {
   private getRemoveTimestamp(event: ApplyDebuffEvent): number {
     const removeDebuff: RemoveDebuffEvent | undefined = GetRelatedEvent(
       event,
-      EventRelations.REMOVE_DEBUFF,
+      EventType.RemoveDebuff,
     );
     return removeDebuff?.timestamp ?? this.owner.fight.end_time;
   }
 
   private getDamageEvents(event: ApplyDebuffEvent): DamageEvent[] {
-    return GetRelatedEvents(event, EventRelations.DAMAGE);
+    return GetRelatedEvents(event, EventType.Damage);
   }
 
   private hasRefundBuff(event: ApplyDebuffEvent): boolean {
-    const refundBuff: RemoveBuffEvent | undefined = GetRelatedEvent(
-      event,
-      EventRelations.REFUND_BUFF,
-    );
+    const refundBuff: RemoveBuffEvent | undefined = GetRelatedEvent(event, 'refundBuff');
     return refundBuff !== undefined;
   }
 

@@ -8,8 +8,8 @@ import Events, {
   RemoveBuffEvent,
   RemoveBuffStackEvent,
   GetRelatedEvent,
+  EventType,
 } from 'parser/core/Events';
-import { EventRelations } from '../../shared/helpers';
 
 export default class Clearcasting extends MageAnalyzer {
   clearcastingProcs: ClearcastingData[] = [];
@@ -31,7 +31,7 @@ export default class Clearcasting extends MageAnalyzer {
       event,
       'BuffRemove',
     );
-    const missiles: CastEvent | undefined = GetRelatedEvent(event, EventRelations.CAST);
+    const missiles: CastEvent | undefined = GetRelatedEvent(event, EventType.Cast);
 
     this.clearcastingProcs.push({
       applied: event.timestamp,

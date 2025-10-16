@@ -1,19 +1,14 @@
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { CastEvent } from 'parser/core/Events';
-import {
-  generateGuideTooltip,
-  type ExpandableConfig,
-  type ExpandableChecklistItem,
-} from '../helpers/guideHelpers';
+import type Spell from 'common/SPELLS/Spell';
+import GuideTooltip from './guide/GuideTooltip';
+import type { ExpandableConfig, ExpandableChecklistItem } from './guide/ExpandableBreakdown';
 
 export { type ExpandableConfig, type ExpandableChecklistItem };
 
-/**
- * Represents a condition for performance evaluation.
- */
 export interface GuideCondition {
   name: string;
   check: boolean;
@@ -21,9 +16,6 @@ export interface GuideCondition {
   active?: boolean;
 }
 
-/**
- * Configuration for universal guide evaluation system.
- */
 export interface GuideEvaluationConfig {
   actionName: string;
   failConditions?: GuideCondition[];
@@ -133,7 +125,14 @@ function createTooltipEntry(
   timestamp: number,
 ): BoxRowEntry {
   const tooltipItems = [{ perf: performance, detail: message }];
-  const tooltip = generateGuideTooltip(formatTimestamp, performance, tooltipItems, timestamp);
+  const tooltip = (
+    <GuideTooltip
+      formatTimestamp={formatTimestamp}
+      performance={performance}
+      tooltipItems={tooltipItems}
+      timestamp={timestamp}
+    />
+  );
   return { value: performance, tooltip };
 }
 
@@ -158,38 +157,34 @@ export function evaluateEvents<
   });
 }
 
-/**
- * Interface for cast timeline events.
- */
-export interface CastTimelineEvent {
-  timestamp: number;
+export interface CastTimelineEntry<T = unknown> {
+  data: T;
   casts: CastEvent[];
-  header: ReactNode;
 }
 
-/**
- * Props for the CastTimeline component.
- */
-interface CastTimelineProps {
-  events: CastTimelineEvent[];
+interface CastTimelineProps<T = unknown> {
+  spell: Spell;
+  events: CastTimelineEntry<T>[];
   windowDescription?: string;
   title?: string;
-  formatTimestamp?: (timestamp: number) => string;
+  castTimestamp: (data: T) => string;
 }
 
 /**
  * Navigable cast timeline component with previous/next navigation.
- * @param events Array of timeline events to display
+ * @param spell The spell being analyzed
+ * @param events Array of timeline entries to display
  * @param windowDescription Optional description of the timeline window
  * @param title Optional custom title
- * @param formatTimestamp Optional timestamp formatter
+ * @param castTimestamp Function to extract formatted timestamp string from source data
  */
-export const CastTimeline = ({
+export const CastTimeline = <T,>({
+  spell,
   events,
   windowDescription,
   title,
-  formatTimestamp,
-}: CastTimelineProps) => {
+  castTimestamp,
+}: CastTimelineProps<T>) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (!events || events.length === 0) {
@@ -197,6 +192,8 @@ export const CastTimeline = ({
   }
 
   const currentEvent = events[currentIndex];
+  const timestamp = castTimestamp(currentEvent.data);
+
   const spells = currentEvent.casts
     .filter((cast) => cast.ability && cast.ability.guid)
     .map((cast) => ({
@@ -213,7 +210,7 @@ export const CastTimeline = ({
     setCurrentIndex((prev) => (prev < events.length - 1 ? prev + 1 : 0));
   };
 
-  const timestampText = formatTimestamp ? ` @ ${formatTimestamp(currentEvent.timestamp)}` : '';
+  const timestampText = ` @ ${timestamp}`;
 
   return (
     <div style={{ marginTop: '10px' }}>
@@ -239,7 +236,7 @@ export const CastTimeline = ({
       >
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 'bold', fontSize: '13px' }}>
-            {currentEvent.header}
+            {spell.name} #{currentIndex + 1}
             {timestampText}
           </div>
           <div style={{ fontSize: '12px', color: '#999', marginTop: '2px' }}>
@@ -290,43 +287,3 @@ export const CastTimeline = ({
     </div>
   );
 };
-
-/**
- * Creates cast timeline events from raw event data.
- * @param config Configuration for creating timeline events
- * @param config.events Array of raw events to convert
- * @param config.timelineEvents Function that returns cast events for each event
- * @param config.formatTimestamp Optional timestamp formatter function
- * @param config.getEventTimestamp Optional function to extract timestamp
- * @param config.getEventHeader Function to generate header for each event
- * @returns Array of CastTimelineEvent objects
- */
-export function createCastTimelineEvents<T>(config: {
-  events: T[];
-  timelineEvents: (event: T) => CastEvent[];
-  formatTimestamp?: (timestamp: number) => string;
-  getEventTimestamp?: (event: T) => number;
-  getEventHeader: (event: T, index: number) => ReactNode;
-}): CastTimelineEvent[] {
-  return config.events.map((event, index) => {
-    let timestamp: number;
-    if (config.getEventTimestamp) {
-      timestamp = config.getEventTimestamp(event);
-    } else {
-      const eventRecord = event as Record<string, unknown>;
-      const castRecord = eventRecord.cast as Record<string, unknown> | undefined;
-      timestamp =
-        (eventRecord.timestamp as number | undefined) ??
-        (eventRecord.applied as number | undefined) ??
-        (eventRecord.removed as number | undefined) ??
-        (castRecord?.timestamp as number | undefined) ??
-        0;
-    }
-
-    return {
-      timestamp,
-      casts: config.timelineEvents(event),
-      header: config.getEventHeader(event, index),
-    };
-  });
-}

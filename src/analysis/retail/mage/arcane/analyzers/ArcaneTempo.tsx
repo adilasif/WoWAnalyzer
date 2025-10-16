@@ -16,7 +16,7 @@ import { currentStacks } from 'parser/shared/modules/helpers/Stacks';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import { formatDuration, formatPercentage } from 'common/format';
 import HasteIcon from 'interface/icons/Haste';
-import { DropdownTableBuilder, StatisticBuilder } from '../../shared/helpers';
+import { MageStatistic, StatisticDropdownTable } from '../../shared/components/statistics';
 
 class ArcaneTempo extends MageAnalyzer {
   timeAtStackCount: number[];
@@ -94,36 +94,39 @@ class ArcaneTempo extends MageAnalyzer {
   }
 
   statistic() {
-    const dropdown = new DropdownTableBuilder<{ time: number; stacks: number }>()
-      .column({
+    const columns = [
+      {
         header: 'Haste-Bonus',
-        getValue: (data) => `${formatPercentage(data.stacks * ARCANE_TEMPO_HASTE_PER_STACK, 0)}%`,
-      })
-      .column({
+        getValue: (data: { time: number; stacks: number }) =>
+          `${formatPercentage(data.stacks * ARCANE_TEMPO_HASTE_PER_STACK, 0)}%`,
+      },
+      {
         header: 'Time (s)',
-        getValue: (data) => formatDuration(data.time),
-      })
-      .column({
+        getValue: (data: { time: number; stacks: number }) => formatDuration(data.time),
+      },
+      {
         header: 'Time (%)',
-        getValue: (data) => `${formatPercentage(data.time / this.owner.fightDuration)}%`,
-      })
-      .data(
-        this.timeAtStackCount.map((time, stacks) => ({
-          time,
-          stacks,
-        })),
-      );
+        getValue: (data: { time: number; stacks: number }) =>
+          `${formatPercentage(data.time / this.owner.fightDuration)}%`,
+      },
+    ];
+    const data = this.timeAtStackCount.map((time, stacks) => ({ time, stacks }));
 
-    return new StatisticBuilder(TALENTS.ARCANE_TEMPO_TALENT)
-      .position(STATISTIC_ORDER.CORE(7))
-      .value({
-        value: this.averageHaste,
-        label: 'average haste gained',
-        format: 'percentage',
-        icon: <HasteIcon />,
-      })
-      .dropdown(dropdown)
-      .build();
+    return (
+      <MageStatistic
+        spell={TALENTS.ARCANE_TEMPO_TALENT}
+        position={STATISTIC_ORDER.CORE(7)}
+        values={[
+          {
+            value: this.averageHaste,
+            label: 'average haste gained',
+            format: 'percentage',
+            icon: <HasteIcon />,
+          },
+        ]}
+        dropdown={<StatisticDropdownTable columns={columns} data={data} />}
+      />
+    );
   }
 }
 

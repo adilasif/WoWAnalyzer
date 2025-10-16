@@ -1,7 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from './MageAnalyzer';
+import MageAnalyzer from '../MageAnalyzer';
 import Events, { CastEvent, ApplyDebuffEvent } from 'parser/core/Events';
 
 class FlameAndFrost extends MageAnalyzer {

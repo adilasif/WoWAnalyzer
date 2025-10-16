@@ -3,8 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
-import { evaluateEvents } from '../../shared/components';
-import { GuideBuilder } from '../../shared/builders';
+import { evaluateEvents, MageGuideSection, CastBreakdown } from '../../shared/components';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 
 import ArcaneBarrage from '../analyzers/ArcaneBarrage';
@@ -131,33 +130,29 @@ class ArcaneBarrageGuide extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          <b>{arcaneBarrage}</b> is your {arcaneCharge} spender, removing the associated increased
-          mana costs and damage. Only cast {arcaneBarrage} under one of the below conditions to
-          maintain the damage increase for as long as possible.
-        </div>
-        <div>
-          <ul>
-            <li>{touchOfTheMagi} is almost available or you are out of mana.</li>
-            {this.isSunfury && (
-              <>
-                <li>You have {gloriousIncandescence}.</li>
-                <li>
-                  You have {arcaneSoul} and either or don't have {clearcasting}
-                </li>
-              </>
-            )}
-            {this.isSpellslinger && <li>You have or {arcaneOrb}.</li>}
-          </ul>
-        </div>
+        <b>{arcaneBarrage}</b> is your {arcaneCharge} spender, removing the associated increased
+        mana costs and damage. Only cast {arcaneBarrage} under one of the below conditions to
+        maintain the damage increase for as long as possible.
+        <ul>
+          <li>{touchOfTheMagi} is almost available or you are out of mana.</li>
+          {this.isSunfury && (
+            <>
+              <li>You have {gloriousIncandescence}.</li>
+              <li>
+                You have {arcaneSoul} and either or don't have {clearcasting}
+              </li>
+            </>
+          )}
+          {this.isSpellslinger && <li>You have or {arcaneOrb}.</li>}
+        </ul>
       </>
     );
-    return new GuideBuilder(SPELLS.ARCANE_BARRAGE)
-      .explanation(explanation)
-      .addCastSummary({
-        castData: this.arcaneBarrageData,
-      })
-      .build();
+
+    return (
+      <MageGuideSection spell={SPELLS.ARCANE_BARRAGE} explanation={explanation}>
+        <CastBreakdown spell={SPELLS.ARCANE_BARRAGE} castEntries={this.arcaneBarrageData} />
+      </MageGuideSection>
+    );
   }
 }
 

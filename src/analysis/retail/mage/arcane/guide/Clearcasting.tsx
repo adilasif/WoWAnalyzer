@@ -3,8 +3,7 @@ import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents } from '../../shared/components';
-import { GuideBuilder } from '../../shared/builders';
+import { evaluateEvents, MageGuideSection, CastBreakdown } from '../../shared/components';
 
 import Clearcasting, { ClearcastingData } from '../analyzers/Clearcasting';
 
@@ -47,27 +46,22 @@ class ClearcastingGuide extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          Ensure you are spending your <b>{clearcasting}</b> procs effectively with {clearcasting}.
-        </div>
-        <div>
-          <ul>
-            <li>
-              Never let procs expire without getting used, unless you have no choice because of
-              forced downtime.
-            </li>
-            <li>Avoid overcapping on procs.</li>
-          </ul>
-        </div>
+        Ensure you are spending your <b>{clearcasting}</b> procs effectively with {clearcasting}.
+        <ul>
+          <li>
+            Never let procs expire without getting used, unless you have no choice because of forced
+            downtime.
+          </li>
+          <li>Avoid overcapping on procs.</li>
+        </ul>
       </>
     );
 
-    return new GuideBuilder(SPELLS.CLEARCASTING_ARCANE)
-      .explanation(explanation)
-      .addCastSummary({
-        castData: this.clearcastingData,
-      })
-      .build();
+    return (
+      <MageGuideSection spell={SPELLS.CLEARCASTING_ARCANE} explanation={explanation}>
+        <CastBreakdown spell={SPELLS.CLEARCASTING_ARCANE} castEntries={this.clearcastingData} />
+      </MageGuideSection>
+    );
   }
 }
 

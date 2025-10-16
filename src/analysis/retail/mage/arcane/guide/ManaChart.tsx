@@ -1,10 +1,9 @@
-import React from 'react';
 import TALENTS from 'common/TALENTS/mage';
 import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { ChartBuilder, GuideBuilder } from '../../shared/builders';
+import { MageGuideSection, ManaChart as ManaChartComponent } from '../../shared/components';
 import ManaValues from 'parser/shared/modules/ManaValues';
 import ArcaneSurge from '../analyzers/ArcaneSurge';
 import TouchOfTheMagi from '../analyzers/TouchOfTheMagi';
@@ -74,55 +73,60 @@ class ManaChart extends MageAnalyzer {
 
     const explanation = (
       <>
-        <div>
-          <b>Mana Management</b> is crucial for Arcane Mage performance. Proper mana usage involves:
-        </div>
-        <div>
-          <ul>
-            <li>
-              <strong>Burn Phase:</strong> Use {arcaneSurge} and {touchOfTheMagi} while maintaining
-              mana for the full duration. Don't go OOM during major cooldowns.
-            </li>
-            <li>
-              <strong>Conserve Phase:</strong> Use {arcaneBarrage} at 4 stacks to maintain mana
-              efficiency while waiting for cooldowns.
-            </li>
-            <li>
-              <strong>Mana Recovery:</strong> Use {evocation} to restore mana during conserve phases
-              or between burn windows.
-            </li>
-            <li>
-              <strong>Fight Ending:</strong> Aim to end fights with minimal mana remaining - unused
-              mana is wasted potential damage.
-            </li>
-          </ul>
-        </div>
+        <b>Mana Management</b> is crucial for Arcane Mage performance. Proper mana usage involves:
+        <ul>
+          <li>
+            <strong>Burn Phase:</strong> Use {arcaneSurge} and {touchOfTheMagi} while maintaining
+            mana for the full duration. Don't go OOM during major cooldowns.
+          </li>
+          <li>
+            <strong>Conserve Phase:</strong> Use {arcaneBarrage} at 4 stacks to maintain mana
+            efficiency while waiting for cooldowns.
+          </li>
+          <li>
+            <strong>Mana Recovery:</strong> Use {evocation} to restore mana during conserve phases
+            or between burn windows.
+          </li>
+          <li>
+            <strong>Fight Ending:</strong> Aim to end fights with minimal mana remaining - unused
+            mana is wasted potential damage.
+          </li>
+        </ul>
       </>
     );
 
     const arcaneSurgeCasts = this.arcaneSurge.surgeData.map((cast) => ({
       timestamp: cast.cast,
       spell: TALENTS.ARCANE_SURGE_TALENT,
+      color: SPELL_COLORS.ARCANE_SURGE,
     }));
 
-    const chart = new ChartBuilder(this.owner.fight.start_time, this.owner.fight.end_time)
-      .asManaChart()
-      .addManaTracking(this.manaUpdates)
-      .addAnnotations({
-        events: arcaneSurgeCasts,
-        type: 'cast',
-        color: SPELL_COLORS.ARCANE_SURGE,
-      })
-      .addAnnotations({ events: this.evocationCasts, type: 'cast', color: SPELL_COLORS.EVOCATION })
-      .addLowResourceWarnings(this.manaUpdates, 0.1, 'Low Mana')
-      .addBossHealth(this.owner.report.code)
-      .build();
+    const evocationCasts = this.evocationCasts.map((cast) => ({
+      ...cast,
+      color: SPELL_COLORS.EVOCATION,
+    }));
 
-    return new GuideBuilder(TALENTS.EVOCATION_TALENT, 'Mana Management')
-      .explanation(explanation)
-      .verticalLayout()
-      .addChart(chart)
-      .build();
+    return (
+      <MageGuideSection
+        spell={TALENTS.EVOCATION_TALENT}
+        title="Mana Management"
+        explanation={explanation}
+        verticalLayout
+      >
+        <ManaChartComponent
+          manaUpdates={this.manaUpdates}
+          startTime={this.owner.fight.start_time}
+          endTime={this.owner.fight.end_time}
+          annotations={[
+            { events: arcaneSurgeCasts, type: 'cast' },
+            { events: evocationCasts, type: 'cast' },
+          ]}
+          lowManaThreshold={0.1}
+          showBossHealth
+          reportCode={this.owner.report.code}
+        />
+      </MageGuideSection>
+    );
   }
 }
 

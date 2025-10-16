@@ -2,9 +2,9 @@ import { formatNumber } from 'common/format';
 import TALENTS from 'common/TALENTS/mage';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import Events, { CastEvent, DamageEvent, GetRelatedEvents } from 'parser/core/Events';
+import Events, { CastEvent, DamageEvent, EventType, GetRelatedEvents } from 'parser/core/Events';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import { EventRelations, StatisticBuilder } from '../../shared/helpers';
+import { MageStatistic } from '../../shared/components/statistics';
 
 export default class ArcaneEcho extends MageAnalyzer {
   static dependencies = {
@@ -23,7 +23,7 @@ export default class ArcaneEcho extends MageAnalyzer {
   }
 
   onTouchMagiCast(event: CastEvent) {
-    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventRelations.DAMAGE);
+    const damageEvents: DamageEvent[] = GetRelatedEvents(event, EventType.Damage);
 
     this.arcaneEchoes.push({
       touchMagiCast: event.timestamp,
@@ -45,16 +45,19 @@ export default class ArcaneEcho extends MageAnalyzer {
   }
 
   statistic() {
-    return new StatisticBuilder(TALENTS.ARCANE_ECHO_TALENT)
-      .category(STATISTIC_CATEGORY.TALENTS)
-      .averageDamage({ amount: this.averageDamagePerTouch })
-      .tooltip(
-        <>
-          On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the Magi
-          cast.
-        </>,
-      )
-      .build();
+    return (
+      <MageStatistic
+        spell={TALENTS.ARCANE_ECHO_TALENT}
+        category={STATISTIC_CATEGORY.TALENTS}
+        values={[{ value: this.averageDamagePerTouch, label: 'Average Damage', format: 'number' }]}
+        tooltip={
+          <>
+            On average you did {formatNumber(this.averageDamagePerTouch)} damage per Touch of the
+            Magi cast.
+          </>
+        }
+      />
+    );
   }
 }
 

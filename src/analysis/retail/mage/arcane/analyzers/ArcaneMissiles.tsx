@@ -5,7 +5,6 @@ import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent, GetRelatedEvents, DamageEvent, EventType } from 'parser/core/Events';
 import { ARCANE_MISSILES_MAX_TICKS, CLEARCASTING_MAX_STACKS } from '../../shared';
 import { ThresholdStyle } from 'parser/core/ParseResults';
-import { EventRelations } from '../../shared/helpers';
 
 export default class ArcaneMissiles extends MageAnalyzer {
   static dependencies = {
@@ -28,7 +27,7 @@ export default class ArcaneMissiles extends MageAnalyzer {
   onMissiles(event: CastEvent) {
     const damageTicks: DamageEvent | DamageEvent[] | undefined = GetRelatedEvents(
       event,
-      EventRelations.DAMAGE,
+      EventType.Damage,
     );
 
     this.missileData.push({
