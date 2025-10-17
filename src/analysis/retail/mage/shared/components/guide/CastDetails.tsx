@@ -294,27 +294,6 @@ export interface CastDetailsProps {
 }
 
 /**
- * Helper function to convert performance to color.
- * Centralizes color mapping so guides don't need to know about colors.
- */
-function getPerformanceColor(performance?: QualitativePerformance): string {
-  if (!performance) return '#ffffff';
-
-  switch (performance) {
-    case QualitativePerformance.Perfect:
-      return '#1eff00';
-    case QualitativePerformance.Good:
-      return '#fab700';
-    case QualitativePerformance.Ok:
-      return '#ff8800';
-    case QualitativePerformance.Fail:
-      return '#ff0000';
-    default:
-      return '#ffffff';
-  }
-}
-
-/**
  * Displays detailed cast information with navigation and filtering controls.
  * Always navigable - can step through casts one at a time or view all.
  */
@@ -405,7 +384,13 @@ export default function CastDetails({
               const content = (
                 <DetailItem key={index}>
                   <DetailLabel>{detail.label}</DetailLabel>
-                  <DetailValue color={getPerformanceColor(detail.performance)}>
+                  <DetailValue
+                    color={
+                      detail.performance
+                        ? qualitativePerformanceToColor(detail.performance)
+                        : undefined
+                    }
+                  >
                     {detail.value}
                   </DetailValue>
                 </DetailItem>

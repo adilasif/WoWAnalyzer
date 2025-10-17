@@ -202,26 +202,6 @@ export interface CastOverviewProps {
   title?: string;
 }
 
-/**
- * Helper function to convert performance to color.
- */
-function getPerformanceColor(performance?: QualitativePerformance): string {
-  if (!performance) return '#ffffff';
-
-  switch (performance) {
-    case QualitativePerformance.Perfect:
-      return '#1eff00';
-    case QualitativePerformance.Good:
-      return '#fab700';
-    case QualitativePerformance.Ok:
-      return '#ff8800';
-    case QualitativePerformance.Fail:
-      return '#ff0000';
-    default:
-      return '#ffffff';
-  }
-}
-
 const performanceLabels = {
   [QualitativePerformance.Perfect]: 'Perfect',
   [QualitativePerformance.Good]: 'Good',
@@ -281,7 +261,13 @@ export default function CastOverview({
             const content = (
               <StatItem key={index}>
                 <StatLabel>{stat.label}</StatLabel>
-                <StatValue color={getPerformanceColor(stat.performance)}>{stat.value}</StatValue>
+                <StatValue
+                  color={
+                    stat.performance ? qualitativePerformanceToColor(stat.performance) : undefined
+                  }
+                >
+                  {stat.value}
+                </StatValue>
               </StatItem>
             );
 
@@ -319,7 +305,13 @@ export default function CastOverview({
               const content = (
                 <CastDetailItem key={index}>
                   <CastDetailLabel>{detail.label}</CastDetailLabel>
-                  <CastDetailValue color={getPerformanceColor(detail.performance)}>
+                  <CastDetailValue
+                    color={
+                      detail.performance
+                        ? qualitativePerformanceToColor(detail.performance)
+                        : undefined
+                    }
+                  >
                     {detail.value}
                   </CastDetailValue>
                 </CastDetailItem>
