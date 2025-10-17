@@ -6,11 +6,11 @@ import MageAnalyzer from '../../shared/MageAnalyzer';
 import {
   evaluateEvents,
   MageGuideSection,
-  CastBreakdown,
   InlineStatistic,
   CastEfficiency,
   CooldownTimeline,
   NoCastsMessage,
+  CastSummary,
 } from '../../shared/components';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 
@@ -113,7 +113,7 @@ class ArcaneOrbGuide extends MageAnalyzer {
               performance={avgHitsPerf}
             />
             <CastEfficiency spell={SPELLS.ARCANE_ORB} useThresholds />
-            <CastBreakdown spell={SPELLS.ARCANE_ORB} castEntries={this.arcaneOrbData} />
+            <CastSummary spell={SPELLS.ARCANE_ORB} castEntries={this.arcaneOrbData} showBreakdown />
             <CooldownTimeline spell={SPELLS.ARCANE_ORB} />
           </>
         )}

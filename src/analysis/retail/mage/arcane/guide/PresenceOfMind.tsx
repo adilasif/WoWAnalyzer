@@ -7,7 +7,7 @@ import MageAnalyzer from '../../shared/MageAnalyzer';
 import {
   evaluateEvents,
   MageGuideSection,
-  CastBreakdown,
+  CastSummary,
   NoCastsMessage,
 } from '../../shared/components';
 
@@ -141,9 +141,10 @@ class PresenceOfMindGuide extends MageAnalyzer {
         {this.presenceOfMind.pomData.length === 0 ? (
           <NoCastsMessage spell={TALENTS.PRESENCE_OF_MIND_TALENT} />
         ) : (
-          <CastBreakdown
+          <CastSummary
             spell={TALENTS.PRESENCE_OF_MIND_TALENT}
             castEntries={this.presenceOfMindData}
+            showBreakdown
           />
         )}
       </MageGuideSection>

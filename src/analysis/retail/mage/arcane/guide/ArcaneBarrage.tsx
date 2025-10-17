@@ -3,7 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { formatPercentage } from 'common/format';
-import { evaluateEvents, MageGuideSection, CastBreakdown } from '../../shared/components';
+import { evaluateEvents, MageGuideSection, CastSummary } from '../../shared/components';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 
 import ArcaneBarrage from '../analyzers/ArcaneBarrage';
@@ -150,7 +150,11 @@ class ArcaneBarrageGuide extends MageAnalyzer {
 
     return (
       <MageGuideSection spell={SPELLS.ARCANE_BARRAGE} explanation={explanation}>
-        <CastBreakdown spell={SPELLS.ARCANE_BARRAGE} castEntries={this.arcaneBarrageData} />
+        <CastSummary
+          spell={SPELLS.ARCANE_BARRAGE}
+          castEntries={this.arcaneBarrageData}
+          showBreakdown
+        />
       </MageGuideSection>
     );
   }

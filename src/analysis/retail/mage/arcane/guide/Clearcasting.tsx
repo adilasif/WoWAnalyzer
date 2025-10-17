@@ -3,7 +3,7 @@ import { SpellLink } from 'interface';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents, MageGuideSection, CastBreakdown } from '../../shared/components';
+import { evaluateEvents, MageGuideSection, CastSummary } from '../../shared/components';
 
 import Clearcasting, { ClearcastingData } from '../analyzers/Clearcasting';
 
@@ -59,7 +59,11 @@ class ClearcastingGuide extends MageAnalyzer {
 
     return (
       <MageGuideSection spell={SPELLS.CLEARCASTING_ARCANE} explanation={explanation}>
-        <CastBreakdown spell={SPELLS.CLEARCASTING_ARCANE} castEntries={this.clearcastingData} />
+        <CastSummary
+          spell={SPELLS.CLEARCASTING_ARCANE}
+          castEntries={this.clearcastingData}
+          showBreakdown
+        />
       </MageGuideSection>
     );
   }

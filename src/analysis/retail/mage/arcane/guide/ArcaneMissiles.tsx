@@ -8,8 +8,8 @@ import MageAnalyzer from '../../shared/MageAnalyzer';
 import {
   evaluateEvents,
   MageGuideSection,
-  CastBreakdown,
   InlineStatistic,
+  CastSummary,
 } from '../../shared/components';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 
@@ -158,9 +158,10 @@ class ArcaneMissilesGuide extends MageAnalyzer {
           tooltip={averageDelayTooltip}
           performance={averageDelayPerf}
         />
-        <CastBreakdown
+        <CastSummary
           spell={TALENTS.ARCANE_MISSILES_TALENT}
           castEntries={this.arcaneMissilesData}
+          showBreakdown
         />
       </MageGuideSection>
     );
