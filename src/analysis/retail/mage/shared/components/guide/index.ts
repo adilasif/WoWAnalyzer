@@ -1,5 +1,6 @@
 export { default as MageGuideSection } from './MageGuideSection';
 export { default as CastSummary } from './CastSummary';
+export { default as CastTimeline, type CastTimelineEntry } from './CastTimeline';
 export { default as ManaChart } from './ManaChart';
 export { default as BuffUptimeBar } from './BuffUptimeBar';
 export { default as ExpandableBreakdown } from './ExpandableBreakdown';

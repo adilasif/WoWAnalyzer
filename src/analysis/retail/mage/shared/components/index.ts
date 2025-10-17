@@ -3,12 +3,10 @@ export type { TimeValue, AnnotationEvent, DataSeries, ChartConfig } from './Gene
 
 export {
   evaluateEvents,
-  CastTimeline,
   type GuideEvaluationConfig,
   type GuideCondition,
   type ExpandableConfig,
   type ExpandableChecklistItem,
-  type CastTimelineEntry,
 } from './GuideEvaluation';
 
 export * from './guide';
