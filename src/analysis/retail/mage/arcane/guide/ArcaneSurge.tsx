@@ -8,8 +8,8 @@ import {
   type ExpandableConfig,
   MageGuideSection,
   ExpandableBreakdown,
+  createExpandableConfig,
 } from '../../shared/components';
-import { createExpandableConfig } from '../../shared/components/guide/ExpandableBreakdown';
 
 import ArcaneSurge, { ArcaneSurgeData } from '../analyzers/ArcaneSurge';
 

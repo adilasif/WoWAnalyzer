@@ -1,9 +1,8 @@
 import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
-import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import MageAnalyzer from '../../shared/MageAnalyzer';
-import { evaluateEvents, MageGuideSection, CastSummary } from '../../shared/components';
+import { MageGuideSection, CastSummary, type CastEvaluation } from '../../shared/components';
 
 import Clearcasting, { ClearcastingData } from '../analyzers/Clearcasting';
 
@@ -12,33 +11,37 @@ class ClearcastingGuide extends MageAnalyzer {
 
   protected clearcasting!: Clearcasting;
 
-  get clearcastingData(): BoxRowEntry[] {
-    return evaluateEvents({
-      events: this.clearcasting.clearcastingProcs,
-      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
-      evaluationLogic: (cc: ClearcastingData) => ({
-        actionName: 'Clearcasting',
+  /**
+   * Evaluates a single Clearcasting proc for CastSummary.
+   * Returns performance and reason for tooltip display.
+   *
+   * Evaluation priority: fail → perfect → default
+   */
+  private evaluateClearcastingProc(cc: ClearcastingData): CastEvaluation {
+    // Fail conditions (highest priority)
+    if (cc.expired) {
+      return {
+        timestamp: cc.applied,
+        performance: QualitativePerformance.Fail,
+        reason: 'Expired unused - significant DPS loss',
+      };
+    }
 
-        failConditions: [
-          {
-            name: 'expired',
-            check: cc.expired,
-            description: 'Expired unused - significant DPS loss',
-          },
-        ],
+    // Perfect conditions
+    if (!cc.expired) {
+      return {
+        timestamp: cc.applied,
+        performance: QualitativePerformance.Perfect,
+        reason: 'Perfect - used Clearcasting proc before it expired',
+      };
+    }
 
-        perfectConditions: [
-          {
-            name: 'usedBeforeExpiry',
-            check: !cc.expired,
-            description: 'Perfect - used Clearcasting proc before it expired',
-          },
-        ],
-
-        defaultPerformance: QualitativePerformance.Fail,
-        defaultMessage: 'Clearcasting proc not handled properly',
-      }),
-    });
+    // Default
+    return {
+      timestamp: cc.applied,
+      performance: QualitativePerformance.Fail,
+      reason: 'Clearcasting proc not handled properly',
+    };
   }
 
   get guideSubsection(): JSX.Element {
@@ -61,7 +64,10 @@ class ClearcastingGuide extends MageAnalyzer {
       <MageGuideSection spell={SPELLS.CLEARCASTING_ARCANE} explanation={explanation}>
         <CastSummary
           spell={SPELLS.CLEARCASTING_ARCANE}
-          castEntries={this.clearcastingData}
+          casts={this.clearcasting.clearcastingProcs.map((proc) =>
+            this.evaluateClearcastingProc(proc),
+          )}
+          formatTimestamp={this.owner.formatTimestamp.bind(this.owner)}
           showBreakdown
         />
       </MageGuideSection>

@@ -9,7 +9,6 @@ import { AnyEvent } from 'parser/core/Events';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import { isApplicableEvent } from 'interface/report/Results/Timeline/Casts';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
-import { createExpandableConfig } from '../../shared/components/guide/ExpandableBreakdown';
 import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
 
 import {
@@ -20,6 +19,7 @@ import {
   CastTimeline,
   ExpandableBreakdown,
   InlineStatistic,
+  createExpandableConfig,
 } from '../../shared/components';
 
 const MAX_ARCANE_CHARGES = 4;

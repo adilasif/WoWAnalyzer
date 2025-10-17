@@ -3,10 +3,22 @@ import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBr
 import GradiatedPerformanceBar from 'interface/guide/components/GradiatedPerformanceBar';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import GuideTooltip from './GuideTooltip';
+
+/**
+ * Simple cast evaluation data structure.
+ * Guides build this directly instead of using helpers.
+ */
+export interface CastEvaluation {
+  timestamp: number;
+  performance: QualitativePerformance;
+  reason: string;
+}
 
 interface CastSummaryProps {
   spell: Spell;
-  castEntries: BoxRowEntry[];
+  casts: CastEvaluation[];
+  formatTimestamp: (timestamp: number) => string;
   /** If true, shows expandable breakdown. If false (default), only shows summary bar. */
   showBreakdown?: boolean;
 }
@@ -19,19 +31,31 @@ interface CastSummaryProps {
  */
 export default function CastSummary({
   spell,
-  castEntries,
+  casts,
+  formatTimestamp,
   showBreakdown = false,
 }: CastSummaryProps): JSX.Element {
-  // If breakdown is enabled, use the full component
+  // If breakdown is enabled, convert to BoxRowEntry format for backward compatibility
   if (showBreakdown) {
+    const castEntries: BoxRowEntry[] = casts.map((cast) => ({
+      value: cast.performance,
+      tooltip: (
+        <GuideTooltip
+          formatTimestamp={formatTimestamp}
+          performance={cast.performance}
+          tooltipItems={[{ perf: cast.performance, detail: cast.reason }]}
+          timestamp={cast.timestamp}
+        />
+      ),
+    }));
     return <CastSummaryAndBreakdown spell={spell} castEntries={castEntries} />;
   }
 
   // Otherwise, just show the performance bar
-  const perfect = castEntries.filter((it) => it.value === QualitativePerformance.Perfect).length;
-  const good = castEntries.filter((it) => it.value === QualitativePerformance.Good).length;
-  const ok = castEntries.filter((it) => it.value === QualitativePerformance.Ok).length;
-  const bad = castEntries.filter((it) => it.value === QualitativePerformance.Fail).length;
+  const perfect = casts.filter((c) => c.performance === QualitativePerformance.Perfect).length;
+  const good = casts.filter((c) => c.performance === QualitativePerformance.Good).length;
+  const ok = casts.filter((c) => c.performance === QualitativePerformance.Ok).length;
+  const bad = casts.filter((c) => c.performance === QualitativePerformance.Fail).length;
 
   return (
     <GradiatedPerformanceBar
