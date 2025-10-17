@@ -86,115 +86,21 @@ export function defineSpellLinks(spec: SpellLinkSpec): EventLink[] {
 }
 
 /**
- * Link pattern helpers - return LinkConfig objects with common defaults.
- * Override any property via spreading: `LinkPatterns.damage({ forwardBuffer: 2000, maxLinks: 3 })`
+ * Creates a link configuration for the specified relation.
+ * The relation determines both the link relation and the event type to link to.
+ *
+ * @param relation The event type to link to (also used as the relation name)
+ * @param overrides Optional overrides for any LinkConfig property
+ * @returns A LinkConfig object
+ *
  */
-export const LinkPatterns = {
-  damage: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.Damage,
-    type: EventType.Damage,
-    ...overrides,
-  }),
-  custom: (relation: string, overrides: Partial<LinkConfig>): LinkConfig => ({
+export function link(relation: EventType | string, overrides?: Partial<LinkConfig>): LinkConfig {
+  return {
     relation,
-    type: overrides.type ?? EventType.Cast,
+    type: typeof relation === 'string' ? EventType.Cast : relation,
     ...overrides,
-  }),
-  applyBuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.ApplyBuff,
-    type: EventType.ApplyBuff,
-    ...overrides,
-  }),
-  applyDebuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.ApplyDebuff,
-    type: EventType.ApplyDebuff,
-    ...overrides,
-  }),
-  removeBuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.RemoveBuff,
-    type: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    ...overrides,
-  }),
-  removeDebuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.RemoveDebuff,
-    type: EventType.RemoveDebuff,
-    ...overrides,
-  }),
-  cast: (overrides: Partial<LinkConfig> & { id: number | number[] }): LinkConfig => ({
-    relation: EventType.Cast,
-    type: EventType.Cast,
-    ...overrides,
-  }),
-  energize: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.ResourceChange,
-    type: EventType.ResourceChange,
-    ...overrides,
-  }),
-
-  heal: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.Heal,
-    type: EventType.Heal,
-    ...overrides,
-  }),
-
-  absorbed: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.Absorbed,
-    type: EventType.Absorbed,
-    ...overrides,
-  }),
-
-  beginCast: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.BeginCast,
-    type: EventType.BeginCast,
-    ...overrides,
-  }),
-
-  summon: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.Summon,
-    type: EventType.Summon,
-    ...overrides,
-  }),
-  interrupt: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.Interrupt,
-    type: EventType.Interrupt,
-    ...overrides,
-  }),
-  death: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.Death,
-    type: EventType.Death,
-    ...overrides,
-  }),
-  applyBuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.ApplyBuffStack,
-    type: EventType.ApplyBuffStack,
-    ...overrides,
-  }),
-  applyDebuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.ApplyDebuffStack,
-    type: EventType.ApplyDebuffStack,
-    ...overrides,
-  }),
-  removeBuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.RemoveBuffStack,
-    type: EventType.RemoveBuffStack,
-    ...overrides,
-  }),
-  removeDebuffStack: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.RemoveDebuffStack,
-    type: EventType.RemoveDebuffStack,
-    ...overrides,
-  }),
-  refreshBuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.RefreshBuff,
-    type: EventType.RefreshBuff,
-    ...overrides,
-  }),
-  refreshDebuff: (overrides?: Partial<LinkConfig>): LinkConfig => ({
-    relation: EventType.RefreshDebuff,
-    type: EventType.RefreshDebuff,
-    ...overrides,
-  }),
-};
+  };
+}
 
 /**
  * Creates EventLinks from multiple SpellLinkSpecs.

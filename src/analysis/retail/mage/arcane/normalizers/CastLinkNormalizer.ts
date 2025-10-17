@@ -9,10 +9,7 @@ import {
   HasRelatedEvent,
 } from 'parser/core/Events';
 import { Options } from 'parser/core/Module';
-import {
-  createEventLinks,
-  LinkPatterns,
-} from 'analysis/retail/mage/shared/helpers/castLinkHelpers';
+import { createEventLinks, link } from 'analysis/retail/mage/shared/helpers/castLinkHelpers';
 
 /**
  * Arcane Mage Cast Link Normalizer
@@ -27,15 +24,15 @@ import {
  * - reverseRelation: 'auto' (creates bidirectional link using parent EventType)
  *
  * USAGE:
- * - Use LinkPatterns helpers for common patterns (damage, applyBuff, removeBuff, etc.)
- * - Override defaults by spreading: LinkPatterns.damage({ forwardBuffer: 2000, anyTarget: true })
+ * - Use link() helper: link(EventType.Damage, { forwardBuffer: 2000, anyTarget: true })
+ * - For custom relations: link('myCustomRelation', { type: EventType.Cast, id: SPELL.id })
  * - Set forwardBuffer to match spell duration for removeBuff/removeDebuff
  * - Use maxLinks to limit number of linked events (e.g., maxLinks: 1 for single-target abilities)
  * - Set anyTarget: true for AoE abilities that hit multiple targets
  * - Add condition functions for complex filtering logic
  */
 
-const CustomRelations = {
+const CustomType = {
   PRECAST: 'precast',
   CONSUME: 'consume',
   TICK: 'tick',
@@ -47,15 +44,15 @@ const EVENT_LINKS = createEventLinks(
   {
     spell: SPELLS.ARCANE_EXPLOSION.id,
     parentType: EventType.Cast,
-    links: [LinkPatterns.damage({ anyTarget: true })],
+    links: [link(EventType.Damage, { anyTarget: true })],
   },
 
   {
     spell: SPELLS.ARCANE_BARRAGE.id,
     parentType: EventType.Cast,
     links: [
-      LinkPatterns.damage({ forwardBuffer: 2000, anyTarget: true }), // Barrage projectile travel time
-      LinkPatterns.custom(CustomRelations.PRECAST, {
+      link(EventType.Damage, { forwardBuffer: 2000, anyTarget: true }), // Barrage projectile travel time
+      link(CustomType.PRECAST, {
         id: [SPELLS.ARCANE_BLAST.id, TALENTS.ARCANE_SURGE_TALENT.id],
         anyTarget: true,
         type: EventType.Cast,
@@ -67,7 +64,7 @@ const EVENT_LINKS = createEventLinks(
     spell: TALENTS.ARCANE_MISSILES_TALENT.id,
     parentType: EventType.Cast,
     links: [
-      LinkPatterns.damage({
+      link(EventType.Damage, {
         id: SPELLS.ARCANE_MISSILES_DAMAGE.id,
         forwardBuffer: 2600,
         maxLinks: 8,
@@ -80,38 +77,38 @@ const EVENT_LINKS = createEventLinks(
     spell: SPELLS.ARCANE_ORB.id,
     parentType: EventType.Cast,
     links: [
-      LinkPatterns.damage({
+      link(EventType.Damage, {
         id: SPELLS.ARCANE_ORB_DAMAGE.id,
         forwardBuffer: 2500,
         anyTarget: true,
         condition: (linking, referenced) => !HasRelatedEvent(referenced, EventType.Cast),
       }),
-      LinkPatterns.energize({ anyTarget: true }),
+      link(EventType.ResourceChange, { anyTarget: true }),
     ],
   },
 
   {
     spell: TALENTS.ARCANE_SURGE_TALENT.id,
     parentType: EventType.Cast,
-    links: [LinkPatterns.damage({ maxLinks: 1, anyTarget: true })],
+    links: [link(EventType.Damage, { maxLinks: 1, anyTarget: true })],
   },
 
   {
     spell: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id,
     parentType: EventType.Cast,
     links: [
-      LinkPatterns.applyDebuff({
+      link(EventType.ApplyDebuff, {
         id: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
         maxLinks: 1,
         anyTarget: true,
       }),
-      LinkPatterns.removeDebuff({
+      link(EventType.RemoveDebuff, {
         id: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
         forwardBuffer: 14000,
         maxLinks: 1,
         anyTarget: true,
       }),
-      LinkPatterns.damage({
+      link(EventType.Damage, {
         id: SPELLS.ARCANE_ECHO_DAMAGE.id,
         forwardBuffer: 14000,
         anyTarget: true,
@@ -123,10 +120,10 @@ const EVENT_LINKS = createEventLinks(
     spell: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
     parentType: EventType.ApplyDebuff,
     links: [
-      LinkPatterns.removeDebuff({ forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
-      LinkPatterns.energize({ id: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id, anyTarget: true }),
+      link(EventType.RemoveDebuff, { forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
+      link(EventType.ResourceChange, { id: TALENTS.TOUCH_OF_THE_MAGI_TALENT.id, anyTarget: true }),
       {
-        relation: CustomRelations.REFUND_BUFF,
+        relation: CustomType.REFUND_BUFF,
         type: EventType.RemoveBuff,
         id: [SPELLS.BURDEN_OF_POWER_BUFF.id, SPELLS.GLORIOUS_INCANDESCENCE_BUFF.id],
         maxLinks: 1,
@@ -157,13 +154,13 @@ const EVENT_LINKS = createEventLinks(
     parentType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
     reverseRelation: EventType.ApplyBuff,
     links: [
-      LinkPatterns.removeBuff({
+      link(EventType.RemoveBuff, {
         forwardBuffer: 21000,
         maxLinks: 1,
         anyTarget: true,
         condition: (linking, referenced) => !HasRelatedEvent(referenced, EventType.ApplyBuff),
       }),
-      LinkPatterns.custom(CustomRelations.CONSUME, {
+      link(CustomType.CONSUME, {
         id: TALENTS.ARCANE_MISSILES_TALENT.id,
         forwardBuffer: 21000,
         maxLinks: 1,
@@ -178,17 +175,17 @@ const EVENT_LINKS = createEventLinks(
     spell: TALENTS.PRESENCE_OF_MIND_TALENT.id,
     parentType: EventType.Cast,
     links: [
-      LinkPatterns.applyBuff(),
-      LinkPatterns.custom(CustomRelations.CONSUME, {
+      link(EventType.ApplyBuff),
+      link(CustomType.CONSUME, {
         id: SPELLS.ARCANE_BLAST.id,
         maxLinks: 2,
         anyTarget: true,
         forwardBuffer: 15000,
         type: EventType.Cast,
       }),
-      LinkPatterns.removeBuff({ forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
+      link(EventType.RemoveBuff, { forwardBuffer: 15000, maxLinks: 1, anyTarget: true }),
       {
-        relation: CustomRelations.BARRAGE_CAST,
+        relation: CustomType.BARRAGE_CAST,
         type: EventType.Cast,
         id: SPELLS.ARCANE_BARRAGE.id,
         maxLinks: 1,
@@ -202,7 +199,7 @@ const EVENT_LINKS = createEventLinks(
     spell: TALENTS.PRESENCE_OF_MIND_TALENT.id,
     parentType: EventType.RemoveBuff,
     links: [
-      LinkPatterns.removeDebuff({
+      link(EventType.RemoveDebuff, {
         id: SPELLS.TOUCH_OF_THE_MAGI_DEBUFF.id,
         forwardBuffer: 5000,
         backwardBuffer: 5000,
@@ -216,7 +213,7 @@ const EVENT_LINKS = createEventLinks(
     spell: SPELLS.BURDEN_OF_POWER_BUFF.id,
     parentType: EventType.RemoveBuff,
     links: [
-      LinkPatterns.custom(CustomRelations.CONSUME, {
+      link(CustomType.CONSUME, {
         id: [SPELLS.ARCANE_BLAST.id, SPELLS.ARCANE_BARRAGE.id],
         maxLinks: 1,
         anyTarget: true,
@@ -229,8 +226,8 @@ const EVENT_LINKS = createEventLinks(
     spell: SPELLS.SIPHON_STORM_BUFF.id,
     parentType: EventType.ApplyBuff,
     links: [
-      LinkPatterns.removeBuff({ forwardBuffer: 25000, maxLinks: 1, anyTarget: true }),
-      LinkPatterns.damage({
+      link(EventType.RemoveBuff, { forwardBuffer: 25000, maxLinks: 1, anyTarget: true }),
+      link(EventType.Damage, {
         id: TALENTS.ARCANE_SURGE_TALENT.id,
         maxLinks: 1,
         anyTarget: true,
