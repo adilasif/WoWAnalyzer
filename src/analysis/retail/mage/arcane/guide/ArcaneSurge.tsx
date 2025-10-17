@@ -2,10 +2,11 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
+import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import {
-  evaluateEvents,
   type ExpandableConfig,
+  type CastEvaluation,
   MageGuideSection,
   ExpandableBreakdown,
   createExpandableConfig,
@@ -25,83 +26,74 @@ class ArcaneSurgeGuide extends MageAnalyzer {
   hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
 
-  get arcaneSurgeData() {
-    const transformedCasts = this.arcaneSurge.surgeData.map((cast) => ({
+  /**
+   * Evaluates a single Arcane Surge cast for CastSummary.
+   * Returns performance and reason for tooltip display.
+   *
+   * Evaluation priority: fail → perfect → good → ok → default
+   */
+  private evaluateArcaneSurgeCast(cast: ArcaneSurgeData): CastEvaluation {
+    const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
+    const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
+    const fightTimeRemaining = this.owner.fight.end_time - cast.cast;
+    const shortFight = fightTimeRemaining < SHORT_FIGHT_DURATION;
+
+    // Fail conditions (highest priority)
+    if (!hasMaxCharges) {
+      return {
+        timestamp: cast.cast,
+        performance: QualitativePerformance.Fail,
+        reason: opener
+          ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
+          : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
+      };
+    }
+
+    // Perfect conditions
+    if (hasMaxCharges && (!this.hasSiphonStorm || cast.siphonStormBuff)) {
+      return {
+        timestamp: cast.cast,
+        performance: QualitativePerformance.Perfect,
+        reason: opener
+          ? 'Perfect opener with available buffs'
+          : 'Perfect combo: max charges + all available buffs (Siphon Storm + Nether Precision)',
+      };
+    }
+
+    // Good conditions
+    if (hasMaxCharges && cast.siphonStormBuff) {
+      return {
+        timestamp: cast.cast,
+        performance: QualitativePerformance.Good,
+        reason: `Good usage: ${cast.charges} charges + Siphon Storm`,
+      };
+    }
+
+    if (hasMaxCharges && shortFight) {
+      return {
+        timestamp: cast.cast,
+        performance: QualitativePerformance.Good,
+        reason: 'Good emergency usage - short fight/encounter ending',
+      };
+    }
+
+    // Ok/default
+    if (hasMaxCharges) {
+      return {
+        timestamp: cast.cast,
+        performance: QualitativePerformance.Ok,
+        reason: opener
+          ? `Opener usage with ${cast.charges} charges`
+          : `Basic usage with ${cast.charges} charges - could optimize with buffs`,
+      };
+    }
+
+    // Fallback (should not reach here due to fail condition above)
+    return {
       timestamp: cast.cast,
-      mana: cast.mana,
-      charges: cast.charges,
-      siphonStormBuff: cast.siphonStormBuff,
-    }));
-
-    return evaluateEvents({
-      events: transformedCasts,
-      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
-      evaluationLogic: (cast: {
-        timestamp: number;
-        mana?: number;
-        charges: number;
-        siphonStormBuff: boolean;
-      }) => {
-        const opener = cast.timestamp - this.owner.fight.start_time < OPENER_DURATION;
-        const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
-        const fightTimeRemaining = this.owner.fight.end_time - cast.timestamp;
-        const shortFight = fightTimeRemaining < SHORT_FIGHT_DURATION;
-
-        return {
-          actionName: 'Arcane Surge',
-
-          failConditions: [
-            {
-              name: 'insufficientCharges',
-              check: !hasMaxCharges,
-              description: opener
-                ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
-                : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
-            },
-          ],
-
-          perfectConditions: [
-            {
-              name: 'allBuffsCombo',
-              check: hasMaxCharges && (!this.hasSiphonStorm || cast.siphonStormBuff),
-              description:
-                'Perfect combo: max charges + all available buffs (Siphon Storm + Nether Precision)',
-            },
-            {
-              name: 'openerPerfect',
-              check: opener && (!this.hasSiphonStorm || cast.siphonStormBuff),
-              description: 'Perfect opener with available buffs',
-            },
-          ],
-
-          goodConditions: [
-            {
-              name: 'maxChargesGood',
-              check: hasMaxCharges && cast.siphonStormBuff,
-              description: `Good usage: ${cast.charges} charges + ${cast.siphonStormBuff ? 'Siphon Storm' : ''}${cast.siphonStormBuff ? ' + ' : ''} : ''}`,
-            },
-            {
-              name: 'emergencyUsage',
-              check: hasMaxCharges && shortFight,
-              description: 'Good emergency usage - short fight/encounter ending',
-            },
-          ],
-
-          okConditions: [
-            {
-              name: 'basicUsage',
-              check: hasMaxCharges,
-              description: opener
-                ? `Opener usage with ${cast.charges} charges`
-                : `Basic usage with ${cast.charges} charges - could optimize with buffs`,
-            },
-          ],
-
-          defaultPerformance: undefined, // Let it fall through to Fail if requirements not met
-          defaultMessage: 'Suboptimal Arcane Surge usage',
-        };
-      },
-    });
+      performance: QualitativePerformance.Fail,
+      reason: 'Suboptimal Arcane Surge usage',
+    };
   }
 
   private get expandableConfig(): ExpandableConfig {
@@ -186,7 +178,13 @@ class ArcaneSurgeGuide extends MageAnalyzer {
       <MageGuideSection spell={TALENTS.ARCANE_SURGE_TALENT} explanation={explanation}>
         <ExpandableBreakdown
           castData={this.arcaneSurge.surgeData}
-          evaluatedData={this.arcaneSurgeData}
+          evaluatedData={this.arcaneSurge.surgeData.map((cast) => {
+            const evaluation = this.evaluateArcaneSurgeCast(cast);
+            return {
+              value: evaluation.performance,
+              tooltip: evaluation.reason,
+            };
+          })}
           expandableConfig={this.expandableConfig}
         />
       </MageGuideSection>

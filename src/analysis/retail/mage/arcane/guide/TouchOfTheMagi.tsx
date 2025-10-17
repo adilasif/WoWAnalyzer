@@ -4,7 +4,6 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
-import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { AnyEvent } from 'parser/core/Events';
 import MageAnalyzer from '../../shared/MageAnalyzer';
 import { isApplicableEvent } from 'interface/report/Results/Timeline/Casts';
@@ -12,8 +11,8 @@ import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/Qualitative
 import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
 
 import {
-  evaluateEvents,
   type ExpandableConfig,
+  type CastEvaluation,
   type CastTimelineEntry,
   MageGuideSection,
   CastTimeline,
@@ -90,62 +89,69 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
     });
   }
 
-  get touchOfTheMagiData(): BoxRowEntry[] {
-    return evaluateEvents({
-      events: this.touchOfTheMagi.touchData,
-      formatTimestamp: this.owner.formatTimestamp.bind(this.owner),
-      evaluationLogic: (cast: TouchOfTheMagiData) => {
-        const noCharges = cast.charges === 0;
-        const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
-        const activeTime = cast.activeTime || 0;
-        const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
-        const correctCharges = noCharges || (maxCharges && cast.refundBuff);
+  /**
+   * Evaluates a single Touch of the Magi cast for ExpandableBreakdown.
+   * Returns performance and reason for tooltip display.
+   *
+   * Evaluation priority: fail → perfect → good → ok → default
+   */
+  private evaluateTouchCast(cast: TouchOfTheMagiData): CastEvaluation {
+    const noCharges = cast.charges === 0;
+    const maxCharges = cast.charges === MAX_ARCANE_CHARGES;
+    const activeTime = cast.activeTime || 0;
+    const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
+    const correctCharges = noCharges || (maxCharges && cast.refundBuff);
 
-        return {
-          actionName: 'Touch of the Magi',
+    // Fail conditions (highest priority)
+    if (!correctCharges) {
+      return {
+        timestamp: cast.applied,
+        performance: QualitativePerformance.Fail,
+        reason: `Wrong charge count (${cast.charges}) - should have 0 or 4 charges with refund buff`,
+      };
+    }
 
-          failConditions: [
-            {
-              name: 'wrongCharges',
-              check: !correctCharges,
-              description: `Wrong charge count (${cast.charges}) - should have 0 or 4 charges with refund buff`,
-            },
-            {
-              name: 'veryLowActiveTime',
-              check: activeTimePerf === QualitativePerformance.Fail,
-              description: `Very low active time (${formatPercentage(activeTime, 1)}%) - need to cast more during Touch window`,
-            },
-          ],
+    if (activeTimePerf === QualitativePerformance.Fail) {
+      return {
+        timestamp: cast.applied,
+        performance: QualitativePerformance.Fail,
+        reason: `Very low active time (${formatPercentage(activeTime, 1)}%) - need to cast more during Touch window`,
+      };
+    }
 
-          perfectConditions: [
-            {
-              name: 'perfectActiveTime',
-              check: correctCharges && activeTimePerf === QualitativePerformance.Perfect,
-              description: `Perfect usage: correct charges (${cast.charges}) + excellent active time (${formatPercentage(activeTime, 1)}%)`,
-            },
-          ],
+    // Perfect conditions
+    if (correctCharges && activeTimePerf === QualitativePerformance.Perfect) {
+      return {
+        timestamp: cast.applied,
+        performance: QualitativePerformance.Perfect,
+        reason: `Perfect usage: correct charges (${cast.charges}) + excellent active time (${formatPercentage(activeTime, 1)}%)`,
+      };
+    }
 
-          goodConditions: [
-            {
-              name: 'goodActiveTime',
-              check: correctCharges && activeTimePerf === QualitativePerformance.Good,
-              description: `Good usage: correct charges (${cast.charges}) + good active time (${formatPercentage(activeTime, 1)}%)`,
-            },
-          ],
+    // Good conditions
+    if (correctCharges && activeTimePerf === QualitativePerformance.Good) {
+      return {
+        timestamp: cast.applied,
+        performance: QualitativePerformance.Good,
+        reason: `Good usage: correct charges (${cast.charges}) + good active time (${formatPercentage(activeTime, 1)}%)`,
+      };
+    }
 
-          okConditions: [
-            {
-              name: 'correctChargesOk',
-              check: correctCharges && activeTimePerf === QualitativePerformance.Ok,
-              description: `Acceptable: correct charges (${cast.charges}) but could improve active time (${formatPercentage(activeTime, 1)}%)`,
-            },
-          ],
+    // Ok conditions
+    if (correctCharges && activeTimePerf === QualitativePerformance.Ok) {
+      return {
+        timestamp: cast.applied,
+        performance: QualitativePerformance.Ok,
+        reason: `Acceptable: correct charges (${cast.charges}) but could improve active time (${formatPercentage(activeTime, 1)}%)`,
+      };
+    }
 
-          defaultPerformance: QualitativePerformance.Fail,
-          defaultMessage: `Suboptimal Touch usage: ${cast.charges} charges, ${formatPercentage(activeTime, 1)}% active time`,
-        };
-      },
-    });
+    // Default fallback
+    return {
+      timestamp: cast.applied,
+      performance: QualitativePerformance.Fail,
+      reason: `Suboptimal Touch usage: ${cast.charges} charges, ${formatPercentage(activeTime, 1)}% active time`,
+    };
   }
 
   get guideSubsection(): JSX.Element {
@@ -244,7 +250,13 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
         />
         <ExpandableBreakdown
           castData={this.touchOfTheMagi.touchData}
-          evaluatedData={this.touchOfTheMagiData}
+          evaluatedData={this.touchOfTheMagi.touchData.map((cast) => {
+            const evaluation = this.evaluateTouchCast(cast);
+            return {
+              value: evaluation.performance,
+              tooltip: evaluation.reason,
+            };
+          })}
           expandableConfig={this.expandableConfig}
         />
         <CastTimeline
