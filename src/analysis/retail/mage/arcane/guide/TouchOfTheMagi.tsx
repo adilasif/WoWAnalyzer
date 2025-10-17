@@ -5,9 +5,12 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { EventType } from 'parser/core/Events';
-import type { CastEvent } from 'parser/core/Events';
+import { AnyEvent } from 'parser/core/Events';
 import MageAnalyzer from '../../shared/MageAnalyzer';
+import { isApplicableEvent } from 'interface/report/Results/Timeline/Casts';
+import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
+import { createExpandableConfig } from '../../shared/components/guide/ExpandableBreakdown';
+import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
 
 import {
   evaluateEvents,
@@ -18,13 +21,9 @@ import {
   ExpandableBreakdown,
   InlineStatistic,
 } from '../../shared/components';
-import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
-import { createExpandableConfig } from '../../shared/components/guide/ExpandableBreakdown';
-
-import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
 
 const MAX_ARCANE_CHARGES = 4;
-const TOUCH_WINDOW_BUFFER_MS = 5000; // 5 seconds before and after
+const TOUCH_WINDOW_BUFFER_MS = 7500; // 7.5 seconds before and after
 
 class TouchOfTheMagiGuide extends MageAnalyzer {
   static dependencies = {
@@ -214,19 +213,24 @@ class TouchOfTheMagiGuide extends MageAnalyzer {
 
     const activeTimePerf = this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime);
 
-    // Get cast events for each Touch of the Magi window
+    // Get all applicable events for each Touch of the Magi window
+    const playerFilter = isApplicableEvent(this.selectedCombatant.id);
     const touchTimelineEvents: CastTimelineEntry<TouchOfTheMagiData>[] =
       this.touchOfTheMagi.touchData.map((cast) => {
         const windowStart = cast.applied - TOUCH_WINDOW_BUFFER_MS;
         const windowEnd = cast.applied + TOUCH_WINDOW_BUFFER_MS;
 
+        // Filter owner.eventHistory for all applicable timeline events (Cast, BeginChannel, EndChannel, GlobalCooldown, etc.)
+        const events = this.owner.eventHistory.filter(
+          (event: AnyEvent) =>
+            event.timestamp >= windowStart && event.timestamp <= windowEnd && playerFilter(event),
+        );
+
         return {
           data: cast,
-          casts: this.eventHistory.getEvents(EventType.Cast, {
-            searchBackwards: false,
-            startTimestamp: windowStart,
-            duration: windowEnd - windowStart,
-          }) as CastEvent[],
+          start: windowStart,
+          end: windowEnd,
+          casts: events,
         };
       });
 

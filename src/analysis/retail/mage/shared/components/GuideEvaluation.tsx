@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { SpellSeq } from 'parser/ui/SpellSeq';
-import { CastEvent } from 'parser/core/Events';
+import { AnyEvent } from 'parser/core/Events';
 import type Spell from 'common/SPELLS/Spell';
 import GuideTooltip from './guide/GuideTooltip';
 import type { ExpandableConfig, ExpandableChecklistItem } from './guide/ExpandableBreakdown';
+import EmbeddedTimelineContainer, {
+  SpellTimeline,
+} from 'interface/report/Results/Timeline/EmbeddedTimeline';
+import Casts from 'interface/report/Results/Timeline/Casts';
+import styled from '@emotion/styled';
 
 export { type ExpandableConfig, type ExpandableChecklistItem };
 
@@ -157,33 +161,61 @@ export function evaluateEvents<
   });
 }
 
+/**
+ * Timeline entry for CastTimeline component.
+ * Contains data, events, and optional explicit window boundaries.
+ */
 export interface CastTimelineEntry<T = unknown> {
+  /** Source data for this timeline entry */
   data: T;
-  casts: CastEvent[];
+  /** All timeline events (Cast, BeginChannel, EndChannel, GlobalCooldown, etc.) */
+  casts: AnyEvent[];
+  /** Optional window start timestamp (ms). If not provided, calculated from events. */
+  start?: number;
+  /** Optional window end timestamp (ms). If not provided, calculated from events. */
+  end?: number;
 }
+
+const TimelineScrollContainer = styled.div`
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+
+  &::-webkit-scrollbar {
+    height: 12px;
+    cursor: default !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(104, 103, 100, 0.15);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #fab700;
+  }
+`;
 
 interface CastTimelineProps<T = unknown> {
   spell: Spell;
   events: CastTimelineEntry<T>[];
   windowDescription?: string;
-  title?: string;
   castTimestamp: (data: T) => string;
+  secondWidth?: number;
 }
 
 /**
  * Navigable cast timeline component with previous/next navigation.
- * @param spell The spell being analyzed
- * @param events Array of timeline entries to display
- * @param windowDescription Optional description of the timeline window
- * @param title Optional custom title
- * @param castTimestamp Function to extract formatted timestamp string from source data
+ * Uses the Timeline tab visualization for temporal representation with horizontal bars.
+ * Includes custom styled scrollbar matching the main Timeline tab.
  */
 export const CastTimeline = <T,>({
   spell,
   events,
   windowDescription,
-  title,
   castTimestamp,
+  secondWidth = 50,
 }: CastTimelineProps<T>) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -194,13 +226,18 @@ export const CastTimeline = <T,>({
   const currentEvent = events[currentIndex];
   const timestamp = castTimestamp(currentEvent.data);
 
-  const spells = currentEvent.casts
-    .filter((cast) => cast.ability && cast.ability.guid)
-    .map((cast) => ({
-      id: cast.ability.guid,
-      name: cast.ability.name,
-      icon: cast.ability.abilityIcon.replace('.jpg', ''),
-    }));
+  // Calculate window duration from start/end, or fall back to earliest/latest event
+  let windowStart = currentEvent.start;
+  let windowEnd = currentEvent.end;
+
+  if (windowStart === undefined || windowEnd === undefined) {
+    // Fallback: calculate from events
+    const timestamps = currentEvent.casts.map((e) => e.timestamp);
+    windowStart = Math.min(...timestamps);
+    windowEnd = Math.max(...timestamps);
+  }
+
+  const duration = (windowEnd - windowStart) / 1000; // Convert to seconds
 
   const handlePrevious = () => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : events.length - 1));
@@ -281,9 +318,13 @@ export const CastTimeline = <T,>({
         </div>
       </div>
 
-      <div style={{ overflowX: 'auto', paddingBottom: '4px' }}>
-        <SpellSeq spells={spells} />
-      </div>
+      <TimelineScrollContainer>
+        <EmbeddedTimelineContainer secondWidth={secondWidth} secondsShown={duration}>
+          <SpellTimeline>
+            <Casts start={windowStart} secondWidth={secondWidth} events={currentEvent.casts} />
+          </SpellTimeline>
+        </EmbeddedTimelineContainer>
+      </TimelineScrollContainer>
     </div>
   );
 };
