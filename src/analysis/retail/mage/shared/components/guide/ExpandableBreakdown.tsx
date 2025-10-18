@@ -13,6 +13,10 @@ export interface ExpandableChecklistItem {
   getDetails: (data: unknown) => string;
 }
 
+/**
+ * Creates an expandable breakdown configuration.
+ * @param config - Configuration object with spell, timestamp functions, and checklist items
+ */
 export function createExpandableConfig(config: {
   spell: Spell;
   formatTimestamp: (timestamp: number) => string;
@@ -45,6 +49,12 @@ interface ExpandableBreakdownProps {
   expandableConfig: ExpandableConfig;
 }
 
+/**
+ * Displays expandable per-cast breakdown with checklist items.
+ * @param castData - Array of raw cast data
+ * @param evaluatedData - Array of evaluated performance data
+ * @param expandableConfig - Configuration for the breakdown display
+ */
 export default function ExpandableBreakdown({
   castData,
   evaluatedData,

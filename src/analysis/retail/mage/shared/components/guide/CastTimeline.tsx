@@ -7,18 +7,10 @@ import EmbeddedTimelineContainer, {
 import Casts from 'interface/report/Results/Timeline/Casts';
 import styled from '@emotion/styled';
 
-/**
- * Timeline entry for CastTimeline component.
- * Contains data, events, and optional explicit window boundaries.
- */
 export interface CastTimelineEntry<T = unknown> {
-  /** Source data for this timeline entry */
   data: T;
-  /** All timeline events (Cast, BeginChannel, EndChannel, GlobalCooldown, etc.) */
   casts: AnyEvent[];
-  /** Optional window start timestamp (ms). If not provided, calculated from events. */
   start?: number;
-  /** Optional window end timestamp (ms). If not provided, calculated from events. */
   end?: number;
 }
 
@@ -52,9 +44,12 @@ interface CastTimelineProps<T = unknown> {
 }
 
 /**
- * Navigable cast timeline component with previous/next navigation.
- * Uses the Timeline tab visualization for temporal representation with horizontal bars.
- * Includes custom styled scrollbar matching the main Timeline tab.
+ * Navigable cast timeline visualization with previous/next navigation.
+ * @param spell - The spell being analyzed
+ * @param events - Array of timeline entries containing cast data and events
+ * @param windowDescription - Optional description of the time window (e.g., "3s window")
+ * @param castTimestamp - Function to format timestamp from cast data
+ * @param secondWidth - Width in pixels per second for timeline scaling (default: 50)
  */
 export default function CastTimeline<T>({
   spell,

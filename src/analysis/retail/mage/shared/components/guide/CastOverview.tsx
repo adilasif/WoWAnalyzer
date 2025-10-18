@@ -172,13 +172,9 @@ export interface CastOverviewDetail {
 }
 
 export interface CastOverviewEntry {
-  /** The timestamp of the cast */
   timestamp: number;
-  /** Overall performance of the cast */
   performance: QualitativePerformance;
-  /** Details specific to this cast */
   details: CastOverviewDetail[];
-  /** Optional notes about this cast */
   notes?: ReactNode;
 }
 
@@ -190,15 +186,10 @@ export interface OverviewStat {
 }
 
 export interface CastOverviewProps {
-  /** The spell being analyzed */
   spell: Spell;
-  /** Overall statistics to display in summary card */
   stats: OverviewStat[];
-  /** Individual cast entries */
   casts: CastOverviewEntry[];
-  /** Function to format timestamps */
   formatTimestamp: (timestamp: number) => string;
-  /** Optional title override */
   title?: string;
 }
 
@@ -210,9 +201,12 @@ const performanceLabels = {
 };
 
 /**
- * Displays an overview card with encounter-level statistics and clickable
- * performance boxes for each cast. Click a box to see detailed information
- * about that specific cast.
+ * Displays overview statistics and clickable performance boxes for individual casts.
+ * @param spell - The spell being analyzed
+ * @param stats - Overall statistics to display in summary card
+ * @param casts - Individual cast entries with performance and details
+ * @param formatTimestamp - Function to format timestamps
+ * @param title - Optional title override (default: spell name)
  */
 export default function CastOverview({
   spell,
@@ -250,7 +244,6 @@ export default function CastOverview({
 
   return (
     <OverviewContainer>
-      {/* Summary Card */}
       <SummaryCard>
         <SummaryHeader style={{ marginBottom: '20px' }}>
           <SpellIcon spell={spell} style={{ width: '40px', height: '40px' }} />
@@ -282,12 +275,10 @@ export default function CastOverview({
         </SummaryStats>
       </SummaryCard>
 
-      {/* Performance Boxes - attached to bottom of summary card */}
       <PerformanceBoxesContainer>
         <PerformanceBoxRow values={boxRowEntries} onClickBox={handleBoxClick} />
       </PerformanceBoxesContainer>
 
-      {/* Selected Cast Details */}
       {selectedCast && selectedCastIndex !== null && (
         <CastDetailsPanel>
           <CastHeader>

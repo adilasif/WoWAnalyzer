@@ -5,10 +5,6 @@ import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import GuideTooltip from './GuideTooltip';
 
-/**
- * Simple cast evaluation data structure.
- * Guides build this directly instead of using helpers.
- */
 export interface CastEvaluation {
   timestamp: number;
   performance: QualitativePerformance;
@@ -19,15 +15,15 @@ interface CastSummaryProps {
   spell: Spell;
   casts: CastEvaluation[];
   formatTimestamp: (timestamp: number) => string;
-  /** If true, shows expandable breakdown. If false (default), only shows summary bar. */
   showBreakdown?: boolean;
 }
 
 /**
- * Displays cast performance summary and optionally detailed breakdown.
- *
- * By default, shows only a performance bar. Set `showBreakdown={true}` to enable
- * the expandable per-cast breakdown.
+ * Displays cast performance summary bar and optionally detailed per-cast breakdown.
+ * @param spell - The spell being analyzed
+ * @param casts - Array of cast evaluations with timestamps and performance ratings
+ * @param formatTimestamp - Function to format timestamps for display
+ * @param showBreakdown - Whether to show expandable per-cast breakdown (default: false)
  */
 export default function CastSummary({
   spell,

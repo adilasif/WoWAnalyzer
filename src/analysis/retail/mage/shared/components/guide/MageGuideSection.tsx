@@ -16,8 +16,13 @@ interface MageGuideSectionProps {
 }
 
 /**
- * Guide section component for Mage abilities.
- * Displays explanation and data in either side-by-side or vertical layout.
+ * Mage guide section with explanation and data panel in side-by-side or vertical layout.
+ * @param spell - The spell this section is about
+ * @param title - Custom title (default: uses spell name)
+ * @param explanation - Explanation content
+ * @param children - Data panel content
+ * @param verticalLayout - Use vertical instead of side-by-side layout (default: false)
+ * @param explanationPercent - Width percentage for explanation in side-by-side mode
  */
 export default function MageGuideSection({
   spell,

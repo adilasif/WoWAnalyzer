@@ -11,8 +11,12 @@ interface InlineStatisticProps {
 }
 
 /**
- * Displays an inline statistic with a large colored value and tooltip.
- * Used for showing key metrics like average delay, hit count, active time, etc.
+ * Displays an inline statistic with a large value and tooltip.
+ * @param value - The main value to display
+ * @param label - Label text displayed after the value in smaller font
+ * @param tooltip - Tooltip content
+ * @param performance - Optional performance rating for color coding
+ * @param fontSize - Font size for the value (default: '20px')
  */
 export default function InlineStatistic({
   value,

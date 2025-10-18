@@ -6,7 +6,8 @@ interface NoCastsMessageProps {
 }
 
 /**
- * Displays message when no casts of a talented spell are recorded
+ * Displays message when no casts of a talented spell are recorded.
+ * @param spell - The spell that had no casts
  */
 export const NoCastsMessage = ({ spell }: NoCastsMessageProps) => (
   <div>

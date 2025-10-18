@@ -377,8 +377,14 @@ function buildLegendItems(
 }
 
 /**
- * Displays a mana tracking chart for Mage specs.
- * Shows mana percentage over time with optional annotations and warnings.
+ * Displays mana percentage over time with optional boss health, annotations, and low mana warnings.
+ * @param manaUpdates - Array of mana state changes with timestamps and current/max values
+ * @param startTime - Fight start timestamp in ms
+ * @param endTime - Fight end timestamp in ms
+ * @param annotations - Array of annotation configurations to display on the chart
+ * @param lowManaThreshold - Mana percentage threshold to generate low mana warnings
+ * @param showBossHealth - Whether to fetch and display boss health overlay
+ * @param reportCode - WCL report code needed for boss health fetching
  */
 const defaultAnnotations: AnnotationConfig[] = [];
 export default function ManaChart({

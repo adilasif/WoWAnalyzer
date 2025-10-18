@@ -11,8 +11,9 @@ interface CastEfficiencyInlineProps {
 }
 
 /**
- * Displays cast efficiency as an inline statistic with optional threshold coloring.
- * Shows percentage and "X of Y possible casts" with tooltip.
+ * Displays cast efficiency as an inline statistic with optional performance coloring.
+ * @param spell - The spell to display cast efficiency for
+ * @param useThresholds - Whether to color the value based on efficiency thresholds
  */
 export default function CastEfficiencyInline({ spell, useThresholds }: CastEfficiencyInlineProps) {
   const castEfficObj = useAnalyzer(CastEfficiency)!.getCastEfficiencyForSpellId(spell.id);

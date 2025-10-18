@@ -23,6 +23,17 @@ interface MageStatisticProps {
   children: ReactNode;
 }
 
+/**
+ * Displays a mage statistic card with spell icon and configurable content.
+ * @param spell - The spell or talent to display
+ * @param category - Statistic category for tab grouping
+ * @param size - Size of the statistic card
+ * @param position - Sort order position
+ * @param tooltip - Tooltip content
+ * @param dropdown - Expandable dropdown content
+ * @param title - Custom title override
+ * @param children - Card body content
+ */
 function MageStatistic({
   spell,
   category = STATISTIC_CATEGORY.GENERAL,
@@ -63,9 +74,7 @@ interface ValueProps {
 }
 
 /**
- * Display a DPS value.
- *
- * Example: `<MageStatistic.DPS value={12345} />`
+ * Displays a DPS value.
  */
 MageStatistic.DPS = function DPS({ value, label = 'DPS', precision = 0, icon }: ValueProps) {
   return (
@@ -77,9 +86,7 @@ MageStatistic.DPS = function DPS({ value, label = 'DPS', precision = 0, icon }: 
 };
 
 /**
- * Display a raw number value.
- *
- * Example: `<MageStatistic.Number value={42} label="Casts" />`
+ * Displays a raw number value.
  */
 MageStatistic.Number = function Number({ value, label, precision, icon }: ValueProps) {
   const formattedValue = precision !== undefined ? value.toFixed(precision) : formatNumber(value);
@@ -92,9 +99,7 @@ MageStatistic.Number = function Number({ value, label, precision, icon }: ValueP
 };
 
 /**
- * Display a percentage value.
- *
- * Example: `<MageStatistic.Percentage value={0.95} label="Uptime" />`
+ * Displays a percentage value.
  */
 MageStatistic.Percentage = function Percentage({ value, label, precision = 2, icon }: ValueProps) {
   return (
@@ -106,9 +111,7 @@ MageStatistic.Percentage = function Percentage({ value, label, precision = 2, ic
 };
 
 /**
- * Display a duration value.
- *
- * Example: `<MageStatistic.Duration value={30000} label="Time active" />`
+ * Displays a duration value.
  */
 MageStatistic.Duration = function Duration({ value, label, icon }: Omit<ValueProps, 'precision'>) {
   return (
@@ -120,9 +123,7 @@ MageStatistic.Duration = function Duration({ value, label, icon }: Omit<ValuePro
 };
 
 /**
- * Display damage done.
- *
- * Example: `<MageStatistic.Damage value={123456} />`
+ * Displays damage done.
  */
 MageStatistic.Damage = function Damage({ value, label = 'damage', precision = 0 }: ValueProps) {
   return (
@@ -134,9 +135,7 @@ MageStatistic.Damage = function Damage({ value, label = 'damage', precision = 0 
 };
 
 /**
- * Display healing done.
- *
- * Example: `<MageStatistic.Healing value={123456} />`
+ * Displays healing done.
  */
 MageStatistic.Healing = function Healing({ value, label = 'healing', precision = 0 }: ValueProps) {
   return (
@@ -147,6 +146,9 @@ MageStatistic.Healing = function Healing({ value, label = 'healing', precision =
   );
 };
 
+/**
+ * Displays defensive damage mitigated.
+ */
 MageStatistic.Defensive = function Defensive<Apply extends EventType, Remove extends EventType>({
   value,
   analyzer,
@@ -175,9 +177,7 @@ MageStatistic.Defensive = function Defensive<Apply extends EventType, Remove ext
 };
 
 /**
- * Display a custom value with full control.
- *
- * Example: `<MageStatistic.Value>{customContent}</MageStatistic.Value>`
+ * Displays custom content.
  */
 MageStatistic.Value = function Value({ children }: { children: ReactNode }) {
   return <div>{children}</div>;
@@ -188,6 +188,9 @@ interface ColumnConfig<T = unknown> {
   getValue: (data: T) => ReactNode;
 }
 
+/**
+ * Displays a data table in the statistic dropdown.
+ */
 MageStatistic.DropdownTable = function DropdownTable<T = unknown>({
   columns,
   data,
@@ -211,7 +214,6 @@ MageStatistic.DropdownTable = function DropdownTable<T = unknown>({
           <tr key={rowIdx}>
             {columns.map((col, colIdx) => {
               const value = col.getValue(row);
-              // First column is always a row header
               if (colIdx === 0) {
                 return <th key={colIdx}>{value}</th>;
               }
@@ -224,6 +226,9 @@ MageStatistic.DropdownTable = function DropdownTable<T = unknown>({
   );
 };
 
+/**
+ * Displays defensive mitigation timeline tooltip.
+ */
 MageStatistic.DefensiveTooltip = function DefensiveTooltip<
   Apply extends EventType,
   Remove extends EventType,

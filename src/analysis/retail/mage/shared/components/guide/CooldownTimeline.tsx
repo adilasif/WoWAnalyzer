@@ -8,9 +8,8 @@ interface CooldownTimelineProps {
 }
 
 /**
- * Displays a cooldown timeline bar showing when the spell was cast and when it was available.
- * For abilities with charges, shows yellow (cooling down), red (all charges available), white lines (casts).
- * For single-charge abilities, shows red gaps (cooldown available but not used), white lines (casts).
+ * Displays a cooldown timeline bar showing when a spell was cast and when it was available.
+ * @param spell - The spell to display timeline for
  */
 export default function CooldownTimeline({ spell }: CooldownTimelineProps) {
   const ability = useAnalyzer(Abilities)!.getAbility(spell.id);

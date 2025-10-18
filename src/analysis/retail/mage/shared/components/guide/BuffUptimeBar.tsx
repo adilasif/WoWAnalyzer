@@ -17,8 +17,15 @@ interface BuffUptimeBarProps {
 }
 
 /**
- * Displays buff uptime with a stack visualization bar.
- * Shows uptime percentage, average stacks, and a timeline of stack counts.
+ * Displays buff uptime percentage with an optional stack visualization bar.
+ * @param spell - The buff spell to display
+ * @param buffHistory - Array of buff windows with start/end times and optional stack counts
+ * @param startTime - Fight start timestamp in ms
+ * @param endTime - Fight end timestamp in ms
+ * @param barColor - Color for the stack visualization (default: '#cd1bdf')
+ * @param backgroundBarColor - Color for the uptime background (default: '#7e5da8')
+ * @param maxStacks - Maximum possible stacks for the buff
+ * @param averageStacksTooltip - Custom tooltip content for average stacks display
  */
 export default function BuffUptimeBar({
   spell,

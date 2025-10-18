@@ -22,7 +22,6 @@ const CastDetailsContainer = styled.div<{ performance: QualitativePerformance }>
   }
 `;
 
-// Reusable flex containers
 const FlexRow = styled.div<{ gap?: number; justify?: string }>`
   display: flex;
   align-items: center;
@@ -36,7 +35,6 @@ const FlexColumn = styled.div<{ gap?: number }>`
   gap: ${(props) => props.gap || 12}px;
 `;
 
-// Cast header components
 const Header = FlexRow;
 const SpellIconWrapper = styled.div`
   flex-shrink: 0;
@@ -112,7 +110,6 @@ const Notes = styled.div`
   color: #ddd;
 `;
 
-// Navigation & Control components (reusing FlexColumn and FlexRow)
 const NavigationContainer = FlexColumn;
 
 const ControlBar = styled(FlexColumn)`
@@ -166,7 +163,6 @@ const CastCounter = styled.div`
   text-align: center;
 `;
 
-// View Toggle & Filters (reusing FlexRow)
 const FilterToggle = styled(FlexRow)`
   gap: 6px;
 `;
@@ -212,7 +208,6 @@ const ToggleSwitch = styled.input`
   }
 `;
 
-// Performance Filters (reusing FlexRow)
 const PerformanceFilter = styled(FlexRow)`
   gap: 6px;
 `;
@@ -235,7 +230,6 @@ const FilterButton = styled.button<{ active: boolean; color: string }>`
   }
 `;
 
-// Empty State
 const NoResultsMessage = styled.div`
   padding: 30px 20px;
   text-align: center;
@@ -264,38 +258,31 @@ export interface CastDetail {
 }
 
 export interface CastEntry {
-  /** The spell that was cast */
   spell: Spell;
-  /** The timestamp of the cast */
   timestamp: number;
-  /** Overall performance of the cast */
   performance: QualitativePerformance;
-  /** Array of detail items to display */
   details?: CastDetail[];
-  /** Optional notes or additional information */
   notes?: ReactNode;
-  /** Optional custom header content */
   headerContent?: ReactNode;
 }
 
 export interface CastDetailsProps {
-  /** Array of cast entries - can be single or multiple */
   casts: CastEntry[];
-  /** Function to format timestamps */
   formatTimestamp: (timestamp: number) => string;
-  /** Optional title for the section */
   title?: string;
-  /** Show view mode toggle (single vs list) - default true */
   showViewToggle?: boolean;
-  /** Show performance filter - default true */
   showPerformanceFilter?: boolean;
-  /** Default to showing only failures - default false */
   defaultShowFailuresOnly?: boolean;
 }
 
 /**
  * Displays detailed cast information with navigation and filtering controls.
- * Always navigable - can step through casts one at a time or view all.
+ * @param casts - Array of cast entries to display
+ * @param formatTimestamp - Function to format timestamps
+ * @param title - Optional title for the section
+ * @param showViewToggle - Show toggle between single/list view (default: true)
+ * @param showPerformanceFilter - Show performance quality filter (default: true)
+ * @param defaultShowFailuresOnly - Initially filter to only failed casts (default: false)
  */
 export default function CastDetails({
   casts,

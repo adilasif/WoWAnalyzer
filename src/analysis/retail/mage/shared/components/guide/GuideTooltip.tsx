@@ -8,6 +8,13 @@ interface GuideTooltipProps {
   timestamp: number;
 }
 
+/**
+ * Formatted tooltip for cast performance displays.
+ * @param formatTimestamp - Function to format the timestamp
+ * @param performance - Overall performance rating
+ * @param tooltipItems - Array of detail items with individual performance ratings
+ * @param timestamp - Event timestamp in ms
+ */
 export default function GuideTooltip({
   formatTimestamp,
   performance,
