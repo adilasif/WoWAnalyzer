@@ -1,13 +1,15 @@
 import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import { MageGuideSection, CastSummary, type CastEvaluation } from '../../shared/components';
 
 import Clearcasting, { ClearcastingData } from '../analyzers/Clearcasting';
 
-class ClearcastingGuide extends MageAnalyzer {
-  static dependencies = { ...MageAnalyzer.dependencies, clearcasting: Clearcasting };
+class ClearcastingGuide extends Analyzer {
+  static dependencies = { 
+    clearcasting: Clearcasting 
+  };
 
   protected clearcasting!: Clearcasting;
 

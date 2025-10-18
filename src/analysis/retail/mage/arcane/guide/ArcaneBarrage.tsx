@@ -9,13 +9,12 @@ import {
   type CastEntry,
   type CastDetail,
 } from '../../shared/components';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import ArcaneBarrage, { ArcaneBarrageData } from '../analyzers/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 
-class ArcaneBarrageGuide extends MageAnalyzer {
+class ArcaneBarrageGuide extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
     arcaneBarrage: ArcaneBarrage,
   };
 

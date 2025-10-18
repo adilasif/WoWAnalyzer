@@ -1,15 +1,17 @@
 import { formatNumber } from 'common/format';
 import TALENTS from 'common/TALENTS/mage';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
+import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import Events, { CastEvent, DamageEvent, EventType, GetRelatedEvents } from 'parser/core/Events';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { MageStatistic } from '../../shared/components/statistics';
 
-export default class ArcaneEcho extends MageAnalyzer {
+export default class ArcaneEcho extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
+    abilityTracker: AbilityTracker,
   };
+  protected abilityTracker!: AbilityTracker;
 
   arcaneEchoes: ArcaneEchoData[] = [];
 

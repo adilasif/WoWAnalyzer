@@ -2,13 +2,15 @@ import SPECS from 'game/SPECS';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from '../MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
+import SpellUsable from 'parser/shared/modules/SpellUsable';
 import Events, { RemoveBuffEvent } from 'parser/core/Events';
 
-class GloriousIncandescence extends MageAnalyzer {
+class GloriousIncandescence extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
+    spellUsable: SpellUsable,
   };
+  protected spellUsable!: SpellUsable;
 
   constructor(options: Options) {
     super(options);

@@ -1,15 +1,18 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent, GetRelatedEvents, DamageEvent, EventType } from 'parser/core/Events';
+import EventHistory from 'parser/shared/modules/EventHistory';
 import { ARCANE_MISSILES_MAX_TICKS, CLEARCASTING_MAX_STACKS } from '../../shared';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 
-export default class ArcaneMissiles extends MageAnalyzer {
+export default class ArcaneMissiles extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
+    eventHistory: EventHistory,
   };
+
+  protected eventHistory!: EventHistory;
 
   hasNetherPrecision: boolean = this.selectedCombatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT);
   hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.AETHER_ATTUNEMENT_TALENT);
@@ -36,8 +39,10 @@ export default class ArcaneMissiles extends MageAnalyzer {
       aetherAttunement: this.selectedCombatant.hasBuff(SPELLS.AETHER_ATTUNEMENT_PROC_BUFF.id),
       arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
       clipped: damageTicks && damageTicks.length < ARCANE_MISSILES_MAX_TICKS,
-      clearcastingCapped: this.isBuffCapped(SPELLS.CLEARCASTING_ARCANE.id, CLEARCASTING_MAX_STACKS),
-      clearcastingProcs: this.getBuffStacks(SPELLS.CLEARCASTING_ARCANE.id),
+      clearcastingCapped:
+        (this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id)?.stacks ?? 0) >=
+        CLEARCASTING_MAX_STACKS,
+      clearcastingProcs: this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id)?.stacks ?? 0,
     });
   }
 

@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import {
   MageGuideSection,
   CastOverview,
@@ -24,8 +24,10 @@ interface ArcaneOrbCast {
 const ORB_EFFICIENT_CHARGE_THRESHOLD = 2;
 const AOE_THRESHOLD = 2; // Perfect if hitting 2+ targets
 
-class ArcaneOrbGuide extends MageAnalyzer {
-  static dependencies = { ...MageAnalyzer.dependencies, arcaneOrb: ArcaneOrb };
+class ArcaneOrbGuide extends Analyzer {
+  static dependencies = { 
+    arcaneOrb: ArcaneOrb 
+  };
 
   protected arcaneOrb!: ArcaneOrb;
 

@@ -229,6 +229,43 @@ class EventHistory extends Module {
     );
     return filteredEvents;
   }
+
+  /**
+   * Get all events of specified type(s) within a time window around a specific timestamp.
+   *
+   * @param eventTypes the event type(s) to get (single EventType or array of EventTypes)
+   * @param timestamp the center point of the time window
+   * @param beforeMs how many milliseconds before the timestamp to search (default: 0)
+   * @param afterMs how many milliseconds after the timestamp to search (default: 0)
+   * @param spell optional spell filter(s)
+   * @returns array of events matching the criteria within the time window
+   */
+  getEventsInTimeWindow<ET extends EventType>(
+    eventTypes: ET | ET[],
+    timestamp: number,
+    beforeMs = 0,
+    afterMs = 0,
+    spell?: SpellInfo | SpellInfo[],
+  ): AnyEvent<ET>[] {
+    const windowStart = timestamp - beforeMs;
+    const windowEnd = timestamp + afterMs;
+    const types = Array.isArray(eventTypes) ? eventTypes : [eventTypes];
+
+    const allEvents: AnyEvent<ET>[] = [];
+    
+    types.forEach((eventType) => {
+      const events = this.getEvents(eventType, {
+        searchBackwards: false,
+        startTimestamp: windowStart,
+        duration: windowEnd - windowStart,
+        spell: spell,
+      });
+      allEvents.push(...events);
+    });
+
+    // Sort by timestamp to maintain chronological order when multiple event types are requested
+    return allEvents.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+  }
 }
 
 export default EventHistory;

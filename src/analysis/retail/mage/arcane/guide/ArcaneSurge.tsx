@@ -3,7 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import {
   type ExpandableConfig,
   type CastEvaluation,
@@ -18,8 +18,10 @@ const ARCANE_CHARGE_MAX_STACKS = 4;
 const OPENER_DURATION = 20000;
 const SHORT_FIGHT_DURATION = 60000;
 
-class ArcaneSurgeGuide extends MageAnalyzer {
-  static dependencies = { ...MageAnalyzer.dependencies, arcaneSurge: ArcaneSurge };
+class ArcaneSurgeGuide extends Analyzer {
+  static dependencies = { 
+    arcaneSurge: ArcaneSurge 
+  };
 
   protected arcaneSurge!: ArcaneSurge;
 

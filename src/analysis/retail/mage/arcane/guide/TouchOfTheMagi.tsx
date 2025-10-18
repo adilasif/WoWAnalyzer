@@ -5,7 +5,7 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { AnyEvent } from 'parser/core/Events';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import { isApplicableEvent } from 'interface/report/Results/Timeline/Casts';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
@@ -24,9 +24,8 @@ import {
 const MAX_ARCANE_CHARGES = 4;
 const TOUCH_WINDOW_BUFFER_MS = 7500; // 7.5 seconds before and after
 
-class TouchOfTheMagiGuide extends MageAnalyzer {
+class TouchOfTheMagiGuide extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
     touchOfTheMagi: TouchOfTheMagi,
   };
 

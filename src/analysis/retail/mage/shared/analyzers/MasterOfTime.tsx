@@ -1,13 +1,15 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from '../MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
+import SpellUsable from 'parser/shared/modules/SpellUsable';
 import Events, { RemoveBuffEvent } from 'parser/core/Events';
 
-class MasterOfTime extends MageAnalyzer {
+class MasterOfTime extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
+    spellUsable: SpellUsable,
   };
+  protected spellUsable!: SpellUsable;
 
   constructor(props: Options) {
     super(props);

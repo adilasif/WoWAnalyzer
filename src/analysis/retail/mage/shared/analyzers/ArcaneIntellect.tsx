@@ -1,8 +1,8 @@
 import SPELLS from 'common/SPELLS';
-import MageAnalyzer from '../MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import { MageStatistic } from '../components/statistics';
 
-class ArcaneIntellect extends MageAnalyzer {
+class ArcaneIntellect extends Analyzer {
   get uptime() {
     return (
       this.selectedCombatant.getBuffUptime(SPELLS.ARCANE_INTELLECT.id) / this.owner.fightDuration

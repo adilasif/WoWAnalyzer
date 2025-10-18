@@ -2,7 +2,7 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import {
   MageGuideSection,
   CastSummary,
@@ -15,8 +15,10 @@ import PresenceOfMind, { PresenceOfMindData } from '../analyzers/PresenceOfMind'
 const AOE_TARGET_THRESHOLD = 4;
 const CAST_DELAY_THRESHOLD = 500; // 500ms
 
-class PresenceOfMindGuide extends MageAnalyzer {
-  static dependencies = { ...MageAnalyzer.dependencies, presenceOfMind: PresenceOfMind };
+class PresenceOfMindGuide extends Analyzer {
+  static dependencies = { 
+    presenceOfMind: PresenceOfMind 
+  };
 
   protected presenceOfMind!: PresenceOfMind;
 

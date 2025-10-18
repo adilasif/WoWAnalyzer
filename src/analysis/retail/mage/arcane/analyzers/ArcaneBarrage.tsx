@@ -1,4 +1,4 @@
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
   CastEvent,
@@ -11,17 +11,19 @@ import Events, {
 } from 'parser/core/Events';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
+import SpellUsable from 'parser/shared/modules/SpellUsable';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { getManaPercentage, getTargetHealthPercentage } from '../../shared/helpers';
 
 const TEMPO_DURATION = 12000;
 
-export default class ArcaneBarrage extends MageAnalyzer {
+export default class ArcaneBarrage extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
+    spellUsable: SpellUsable,
     arcaneChargeTracker: ArcaneChargeTracker,
   };
 
+  protected spellUsable!: SpellUsable;
   protected arcaneChargeTracker!: ArcaneChargeTracker;
 
   barrageData: ArcaneBarrageData[] = [];
@@ -68,7 +70,7 @@ export default class ArcaneBarrage extends MageAnalyzer {
         TALENTS.GLORIOUS_INCANDESCENCE_TALENT.id,
       ),
       arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
-      touchCD: this.getCooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
+      touchCD: this.spellUsable.cooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
       tempoRemaining: this.getTempoData(event),
       health: getTargetHealthPercentage(event),
     });

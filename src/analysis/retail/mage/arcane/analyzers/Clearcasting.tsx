@@ -1,6 +1,6 @@
 import SPELLS from 'common/SPELLS';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import Events, {
   CastEvent,
   ApplyBuffEvent,
@@ -11,7 +11,7 @@ import Events, {
   EventType,
 } from 'parser/core/Events';
 
-export default class Clearcasting extends MageAnalyzer {
+export default class Clearcasting extends Analyzer {
   clearcastingProcs: ClearcastingData[] = [];
 
   constructor(options: Options) {

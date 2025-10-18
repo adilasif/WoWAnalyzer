@@ -2,7 +2,7 @@ import TALENTS from 'common/TALENTS/mage';
 import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import { MageGuideSection, ManaChart as ManaChartComponent } from '../../shared/components';
 import ManaValues from 'parser/shared/modules/ManaValues';
 import ArcaneSurge from '../analyzers/ArcaneSurge';
@@ -17,9 +17,8 @@ const SPELL_COLORS = {
   TOUCH_OF_THE_MAGI: '#F59E0B', // Orange
 } as const;
 
-class ManaChart extends MageAnalyzer {
+class ManaChart extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
     manaValues: ManaValues,
     arcaneSurge: ArcaneSurge,
     touchOfTheMagi: TouchOfTheMagi,

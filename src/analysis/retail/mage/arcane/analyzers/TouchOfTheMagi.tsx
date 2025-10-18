@@ -1,7 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import Events, {
   DamageEvent,
   ApplyDebuffEvent,
@@ -12,16 +12,18 @@ import Events, {
   EventType,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
+import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import AlwaysBeCasting from '../core/AlwaysBeCasting';
 import { MageStatistic } from '../../shared/components';
 
-export default class TouchOfTheMagi extends MageAnalyzer {
+export default class TouchOfTheMagi extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
+    abilityTracker: AbilityTracker,
     chargeTracker: ArcaneChargeTracker,
     alwaysBeCasting: AlwaysBeCasting,
   };
+  protected abilityTracker!: AbilityTracker;
   protected chargeTracker!: ArcaneChargeTracker;
   protected alwaysBeCasting!: AlwaysBeCasting;
 

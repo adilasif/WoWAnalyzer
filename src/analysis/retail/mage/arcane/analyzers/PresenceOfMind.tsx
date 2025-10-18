@@ -1,6 +1,6 @@
 import TALENTS from 'common/TALENTS/mage';
 import { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import Events, {
   CastEvent,
   DamageEvent,
@@ -12,9 +12,8 @@ import Events, {
 } from 'parser/core/Events';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 
-export default class PresenceOfMind extends MageAnalyzer {
+export default class PresenceOfMind extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
     chargeTracker: ArcaneChargeTracker,
   };
   protected chargeTracker!: ArcaneChargeTracker;

@@ -1,7 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
-import MageAnalyzer from '../../shared/MageAnalyzer';
+import Analyzer from 'parser/core/Analyzer';
 import { MageGuideSection, BuffUptimeBar } from '../../shared/components';
 import { ARCANE_TEMPO_MAX_STACKS } from '../../shared/constants';
 
@@ -10,9 +10,8 @@ import ArcaneTempo from '../analyzers/ArcaneTempo';
 const TEMPO_COLOR = '#cd1bdf';
 const TEMPO_BG_COLOR = '#7e5da8';
 
-class ArcaneTempoGuide extends MageAnalyzer {
+class ArcaneTempoGuide extends Analyzer {
   static dependencies = {
-    ...MageAnalyzer.dependencies,
     arcaneTempo: ArcaneTempo,
   };
 
