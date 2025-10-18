@@ -28,23 +28,6 @@ const LegendSymbol = styled.div<{ color: string }>`
   border-radius: 2px;
 `;
 
-export interface AnnotationEvent {
-  timestamp: number;
-  spell?: Spell;
-  label?: string;
-  color?: string;
-  type?: 'cast' | 'buff' | 'debuff' | 'damage' | 'heal' | 'death' | 'custom';
-}
-
-export interface DataSeries {
-  name: string;
-  data: Array<{ timestamp: number; value: number }>;
-  color?: string;
-  backgroundColor?: string;
-  type?: 'line' | 'area' | 'bar';
-  opacity?: number;
-  strokeWidth?: number;
-}
 interface ManaUpdate {
   timestamp: number;
   current: number;
@@ -68,91 +51,87 @@ interface ManaChartProps {
   reportCode?: string;
 }
 
-/**
- * Displays a mana tracking chart for Mage specs.
- * Shows mana percentage over time with optional annotations and warnings.
- */
-const defaultAnnotations: AnnotationConfig[] = [];
-export default function ManaChart({
-  manaUpdates,
-  startTime,
-  endTime,
-  annotations = defaultAnnotations,
-  lowManaThreshold,
-  showBossHealth = false,
-  reportCode,
-}: ManaChartProps): JSX.Element {
-  const [bossHealthData, setBossHealthData] = React.useState<Array<{
-    timestamp: number;
-    value: number;
-  }> | null>(null);
-  const [loading, setLoading] = React.useState(false);
+interface ProcessedDataPoint {
+  x: number;
+  y: number;
+  timeFormatted: string;
+}
 
-  // Fetch boss health if requested
-  React.useEffect(() => {
-    let cancelled = false;
-    if (!showBossHealth || !reportCode) {
-      return;
-    }
+interface ProcessedAnnotation {
+  x: number;
+  originalX: number;
+  label: string;
+  color: string;
+  spell?: Spell;
+  type: string;
+  timeFormatted: string;
+}
 
-    const fetchBossHealth = async () => {
-      try {
-        const fetchWcl = (await import('common/fetchWclApi')).default;
-        const json = await fetchWcl(`report/graph/resources/${reportCode}`, {
-          start: startTime,
-          end: endTime,
-          sourceclass: 'Boss',
-          hostility: 'Enemies',
-          abilityid: 1000,
-        });
+interface SeriesData {
+  name: string;
+  data: Array<{ timestamp: number; value: number }>;
+  color: string;
+  type: 'area' | 'line';
+  opacity: number;
+  backgroundColor?: string;
+}
 
-        const bossData = json as { series?: Array<{ data: Array<[number, number]> }> };
+interface ProcessedSeriesData {
+  name: string;
+  data: ProcessedDataPoint[];
+  color: string;
+  type: 'area' | 'line';
+  opacity: number;
+  backgroundColor?: string;
+}
 
-        if (bossData?.series?.[0]?.data && !cancelled) {
-          setBossHealthData(
-            bossData.series[0].data.map((dataPoint: [number, number]) => ({
-              timestamp: dataPoint[0],
-              value: dataPoint[1],
-            })),
-          );
-        }
-      } catch (error) {
-        if (!cancelled) {
-          console.error('Failed to load boss health data:', error);
-          setBossHealthData(null);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
+const DEFAULT_COLORS = {
+  cast: '#4CAF50',
+  buff: '#2196F3',
+  damage: '#F44336',
+  death: '#D32F2F',
+  custom: '#9E9E9E',
+} as const;
 
-    fetchBossHealth();
-    return () => {
-      cancelled = true;
-    };
-  }, [showBossHealth, reportCode, startTime, endTime]);
+function formatRelativeTime(relativeTime: number): string {
+  const minutes = Math.floor(relativeTime / 60000);
+  const seconds = Math.floor((relativeTime % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
 
-  // Build mana series
-  const series: DataSeries[] = [];
-
-  let manaData: Array<{ timestamp: number; value: number }>;
-  if (manaUpdates && manaUpdates.length > 0) {
-    const initial = manaUpdates[0].current / manaUpdates[0].max;
-    manaData = [{ timestamp: startTime, value: 100 * initial }];
-
-    const processedUpdates = manaUpdates.map((update) => ({
-      timestamp: Math.max(update.timestamp, startTime),
-      value: (update.current / update.max) * 100,
-    }));
-
-    manaData.push(...processedUpdates);
-  } else {
-    manaData = [
+function buildManaData(
+  manaUpdates: ManaUpdate[],
+  startTime: number,
+  endTime: number,
+): Array<{ timestamp: number; value: number }> {
+  if (!manaUpdates || manaUpdates.length === 0) {
+    return [
       { timestamp: startTime, value: 100 },
       { timestamp: endTime, value: 100 },
     ];
   }
 
+  const initial = manaUpdates[0].current / manaUpdates[0].max;
+  const manaData = [{ timestamp: startTime, value: 100 * initial }];
+
+  const processedUpdates = manaUpdates.map((update) => ({
+    timestamp: Math.max(update.timestamp, startTime),
+    value: (update.current / update.max) * 100,
+  }));
+
+  manaData.push(...processedUpdates);
+  return manaData;
+}
+
+function buildSeries(
+  manaUpdates: ManaUpdate[],
+  startTime: number,
+  endTime: number,
+  bossHealthData: Array<{ timestamp: number; value: number }> | null,
+): SeriesData[] {
+  const series: SeriesData[] = [];
+
+  const manaData = buildManaData(manaUpdates, startTime, endTime);
   series.push({
     name: manaUpdates && manaUpdates.length > 0 ? 'Mana' : 'Mana (No Data)',
     data: manaData,
@@ -162,7 +141,6 @@ export default function ManaChart({
     backgroundColor: '#2196F340',
   });
 
-  // Add boss health if loaded
   if (bossHealthData && bossHealthData.length > 0) {
     series.push({
       name: 'Boss Health',
@@ -174,15 +152,22 @@ export default function ManaChart({
     });
   }
 
-  // Build annotations
-  const allAnnotations: AnnotationEvent[] = [];
-  const defaultColors = {
-    cast: '#4CAF50',
-    buff: '#2196F3',
-    damage: '#F44336',
-    death: '#D32F2F',
-    custom: '#9E9E9E',
-  };
+  return series;
+}
+
+function buildAnnotations(
+  annotations: AnnotationConfig[],
+  manaUpdates: ManaUpdate[],
+  lowManaThreshold: number | undefined,
+  startTime: number,
+): Array<{ timestamp: number; spell?: Spell; label?: string; type: string; color: string }> {
+  const allAnnotations: Array<{
+    timestamp: number;
+    spell?: Spell;
+    label?: string;
+    type: string;
+    color: string;
+  }> = [];
 
   annotations.forEach((config) => {
     const annotationType = config.type || 'cast';
@@ -192,7 +177,7 @@ export default function ManaChart({
         spell: event.spell,
         label: event.label || (annotationType === 'death' ? 'Death' : undefined),
         type: annotationType,
-        color: event.color || config.color || defaultColors[annotationType],
+        color: event.color || config.color || DEFAULT_COLORS[annotationType],
       });
     });
   });
@@ -207,41 +192,47 @@ export default function ManaChart({
       .map((update) => ({
         timestamp: update.timestamp,
         label: 'Low Mana',
-        type: 'custom' as const,
+        type: 'custom',
         color: '#EF4444',
       }));
     allAnnotations.push(...warnings);
   }
 
-  if (loading) {
-    return <div>Loading chart data...</div>;
-  }
+  return allAnnotations;
+}
 
-  // Chart rendering logic (adapted from GeneralizedChart)
-  const processedSeries = series.map((s) => ({
+function processSeriesData(series: SeriesData[], startTime: number): ProcessedSeriesData[] {
+  return series.map((s) => ({
     ...s,
     data: s.data.map((point) => {
       const relativeTime = point.timestamp - startTime;
-      const minutes = Math.floor(relativeTime / 60000);
-      const seconds = Math.floor((relativeTime % 60000) / 1000);
-      const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
       return {
         x: relativeTime,
         y: point.value,
-        timeFormatted: formattedTime,
+        timeFormatted: formatRelativeTime(relativeTime),
       };
     }),
   }));
+}
 
-  const processedAnnotations = allAnnotations.map((ann, index) => {
+function processAnnotationsData(
+  annotations: Array<{
+    timestamp: number;
+    spell?: Spell;
+    label?: string;
+    type: string;
+    color: string;
+  }>,
+  startTime: number,
+): ProcessedAnnotation[] {
+  return annotations.map((ann, index) => {
     const relativeTime = ann.timestamp - startTime;
-    const minutes = Math.floor(relativeTime / 60000);
-    const seconds = Math.floor((relativeTime % 60000) / 1000);
-    const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const formattedTime = formatRelativeTime(relativeTime);
 
+    // Adjust overlapping annotations
     const overlapThreshold = 1000;
     let adjustedTime = relativeTime;
-    const overlappingAnnotations = allAnnotations
+    const overlappingAnnotations = annotations
       .slice(0, index)
       .filter(
         (prevAnn) => Math.abs(prevAnn.timestamp - startTime - relativeTime) < overlapThreshold,
@@ -249,6 +240,7 @@ export default function ManaChart({
     if (overlappingAnnotations.length > 0) {
       adjustedTime = relativeTime + overlappingAnnotations.length * 200;
     }
+
     return {
       x: adjustedTime,
       originalX: relativeTime,
@@ -259,7 +251,12 @@ export default function ManaChart({
       timeFormatted: formattedTime,
     };
   });
+}
 
+function buildVegaSpec(
+  processedSeries: ProcessedSeriesData[],
+  processedAnnotations: ProcessedAnnotation[],
+): VisualizationSpec {
   const baseEncoding = {
     x: {
       field: 'x',
@@ -292,16 +289,16 @@ export default function ManaChart({
     mark: {
       type: s.type || 'line',
       opacity: s.opacity || (s.type === 'area' ? 0.7 : 1),
-      strokeWidth: s.strokeWidth || 2,
+      strokeWidth: 2,
       ...(s.type === 'area' && {
         line: {
-          color: s.color || '#2196F3',
-          strokeWidth: s.strokeWidth || 1,
+          color: s.color,
+          strokeWidth: 1,
         },
-        color: s.backgroundColor || (s.color ? s.color + '40' : '#2196F340'),
+        color: s.backgroundColor || s.color + '40',
       }),
       ...(s.type !== 'area' && {
-        color: s.color || '#2196F3',
+        color: s.color,
       }),
     },
     encoding: {
@@ -341,26 +338,23 @@ export default function ManaChart({
         ]
       : [];
 
-  const spec: VisualizationSpec = {
+  return {
     title: undefined,
     layer: [...seriesLayers, ...annotationLayers],
   };
+}
 
-  const chartData: Record<string, unknown> = {
-    annotations: processedAnnotations,
-  };
-  processedSeries.forEach((s, index) => {
-    chartData[`series_${index}`] = s.data;
-  });
-
-  // Build legend items
+function buildLegendItems(
+  processedSeries: ProcessedSeriesData[],
+  processedAnnotations: ProcessedAnnotation[],
+): Array<{ label: string; color: string }> {
   const legendItems: Array<{ label: string; color: string }> = [];
 
   // Add series to legend
   processedSeries.forEach((s) => {
     legendItems.push({
       label: s.name,
-      color: s.color || '#2196F3',
+      color: s.color,
     });
   });
 
@@ -370,7 +364,7 @@ export default function ManaChart({
     processedAnnotations.forEach((ann) => {
       const label = ann.label || (ann.spell ? ann.spell.name : 'Event');
       if (!uniqueAnnotations.has(label)) {
-        uniqueAnnotations.set(label, ann.color || '#9E9E9E');
+        uniqueAnnotations.set(label, ann.color);
       }
     });
 
@@ -379,12 +373,101 @@ export default function ManaChart({
     });
   }
 
+  return legendItems;
+}
+
+/**
+ * Displays a mana tracking chart for Mage specs.
+ * Shows mana percentage over time with optional annotations and warnings.
+ */
+const defaultAnnotations: AnnotationConfig[] = [];
+export default function ManaChart({
+  manaUpdates,
+  startTime,
+  endTime,
+  annotations = defaultAnnotations,
+  lowManaThreshold,
+  showBossHealth = false,
+  reportCode,
+}: ManaChartProps): JSX.Element {
+  const [bossHealthData, setBossHealthData] = React.useState<Array<{
+    timestamp: number;
+    value: number;
+  }> | null>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  // Fetch boss health if requested
+  React.useEffect(() => {
+    let cancelled = false;
+    if (!showBossHealth || !reportCode) {
+      return;
+    }
+
+    const fetchBossHealth = async () => {
+      if (!cancelled) {
+        setLoading(true);
+      }
+      try {
+        const fetchWcl = (await import('common/fetchWclApi')).default;
+        const json = await fetchWcl(`report/graph/resources/${reportCode}`, {
+          start: startTime,
+          end: endTime,
+          sourceclass: 'Boss',
+          hostility: 'Enemies',
+          abilityid: 1000,
+        });
+
+        const bossData = json as { series?: Array<{ data: Array<[number, number]> }> };
+
+        if (bossData?.series?.[0]?.data && !cancelled) {
+          setBossHealthData(
+            bossData.series[0].data.map((dataPoint: [number, number]) => ({
+              timestamp: dataPoint[0],
+              value: dataPoint[1],
+            })),
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('Failed to load boss health data:', error);
+          setBossHealthData(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchBossHealth();
+    return () => {
+      cancelled = true;
+    };
+  }, [showBossHealth, reportCode, startTime, endTime]);
+
+  if (loading) {
+    return <div>Loading chart data...</div>;
+  }
+
+  // Build all chart data using helper functions
+  const series = buildSeries(manaUpdates, startTime, endTime, bossHealthData);
+  const allAnnotations = buildAnnotations(annotations, manaUpdates, lowManaThreshold, startTime);
+  const processedSeries = processSeriesData(series, startTime);
+  const processedAnnotations = processAnnotationsData(allAnnotations, startTime);
+  const spec = buildVegaSpec(processedSeries, processedAnnotations);
+  const legendItems = buildLegendItems(processedSeries, processedAnnotations);
+
+  const chartData: Record<string, unknown> = {
+    annotations: processedAnnotations,
+  };
+  processedSeries.forEach((s, index) => {
+    chartData[`series_${index}`] = s.data;
+  });
+
   return (
     <>
       {legendItems.length > 0 && (
         <LegendContainer>
-          {legendItems.map((item, index) => (
-            <LegendItem key={index}>
+          {legendItems.map((item) => (
+            <LegendItem key={item.label}>
               <LegendSymbol color={item.color} />
               <span>{item.label}</span>
             </LegendItem>
