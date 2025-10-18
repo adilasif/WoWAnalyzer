@@ -3,6 +3,30 @@ import Spell from 'common/SPELLS/Spell';
 import { VisualizationSpec } from 'react-vega';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import BaseChart, { formatTime } from 'parser/ui/BaseChart';
+import styled from '@emotion/styled';
+
+const LegendContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  justify-content: center;
+`;
+
+const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+`;
+
+const LegendSymbol = styled.div<{ color: string }>`
+  width: 16px;
+  height: 16px;
+  background-color: ${(props) => props.color};
+  border-radius: 2px;
+`;
 
 export interface AnnotationEvent {
   timestamp: number;
@@ -329,9 +353,47 @@ export default function ManaChart({
     chartData[`series_${index}`] = s.data;
   });
 
+  // Build legend items
+  const legendItems: Array<{ label: string; color: string }> = [];
+
+  // Add series to legend
+  processedSeries.forEach((s) => {
+    legendItems.push({
+      label: s.name,
+      color: s.color || '#2196F3',
+    });
+  });
+
+  // Add unique annotation labels to legend
+  if (processedAnnotations.length > 0) {
+    const uniqueAnnotations = new Map<string, string>();
+    processedAnnotations.forEach((ann) => {
+      const label = ann.label || (ann.spell ? ann.spell.name : 'Event');
+      if (!uniqueAnnotations.has(label)) {
+        uniqueAnnotations.set(label, ann.color || '#9E9E9E');
+      }
+    });
+
+    uniqueAnnotations.forEach((color, label) => {
+      legendItems.push({ label, color });
+    });
+  }
+
   return (
-    <AutoSizer disableHeight>
-      {({ width }) => <BaseChart height={400} width={width} spec={spec} data={chartData} />}
-    </AutoSizer>
+    <>
+      {legendItems.length > 0 && (
+        <LegendContainer>
+          {legendItems.map((item, index) => (
+            <LegendItem key={index}>
+              <LegendSymbol color={item.color} />
+              <span>{item.label}</span>
+            </LegendItem>
+          ))}
+        </LegendContainer>
+      )}
+      <AutoSizer disableHeight>
+        {({ width }) => <BaseChart height={400} width={width} spec={spec} data={chartData} />}
+      </AutoSizer>
+    </>
   );
 }
