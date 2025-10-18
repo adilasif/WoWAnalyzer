@@ -5,6 +5,7 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { qualitativePerformanceToColor } from 'interface/guide';
 import { PerformanceBoxRow, BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import styled from '@emotion/styled';
+import GuideTooltip from './GuideTooltip';
 
 // Reusable flex containers
 const FlexRow = styled.div<{ gap?: number; justify?: string }>`
@@ -227,13 +228,12 @@ export default function CastOverview({
   const boxRowEntries: BoxRowEntry[] = casts.map((cast, index) => ({
     value: cast.performance,
     tooltip: (
-      <>
-        <div>
-          <strong>Cast #{index + 1}</strong>
-        </div>
-        <div>{formatTimestamp(cast.timestamp)}</div>
-        <div>Performance: {performanceLabels[cast.performance]}</div>
-      </>
+      <GuideTooltip
+        formatTimestamp={formatTimestamp}
+        performance={cast.performance}
+        tooltipItems={[{ perf: cast.performance, detail: `Cast #${index + 1}` }]}
+        timestamp={cast.timestamp}
+      />
     ),
     className: selectedCastIndex === index ? 'selected' : undefined,
   }));
