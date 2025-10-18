@@ -95,9 +95,18 @@ export function defineSpellLinks(spec: SpellLinkSpec): EventLink[] {
  *
  */
 export function link(relation: EventType | string, overrides?: Partial<LinkConfig>): LinkConfig {
+  // Check if relation is a valid EventType by checking if it exists in EventType enum values
+  const isEventType = Object.values(EventType).includes(relation as EventType);
+
+  if (!isEventType && !overrides?.type) {
+    throw new Error(
+      `Custom relation '${relation}' requires explicit type specification in overrides. Example: link('${relation}', { type: EventType.Cast, ... })`,
+    );
+  }
+
   return {
     relation,
-    type: typeof relation === 'string' ? EventType.Cast : relation,
+    type: isEventType ? (relation as EventType) : overrides!.type!,
     ...overrides,
   };
 }

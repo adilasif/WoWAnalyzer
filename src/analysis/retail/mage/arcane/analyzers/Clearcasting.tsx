@@ -29,9 +29,9 @@ export default class Clearcasting extends Analyzer {
   onClearcastingApply(event: ApplyBuffEvent | ApplyBuffStackEvent) {
     const removeBuff: RemoveBuffEvent | RemoveBuffStackEvent | undefined = GetRelatedEvent(
       event,
-      'BuffRemove',
+      EventType.RemoveBuff,
     );
-    const missiles: CastEvent | undefined = GetRelatedEvent(event, EventType.Cast);
+    const missiles: CastEvent | undefined = GetRelatedEvent(event, 'consume');
 
     this.clearcastingProcs.push({
       applied: event.timestamp,

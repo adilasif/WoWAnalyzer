@@ -12,7 +12,6 @@ import Events, {
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
-import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { MageStatistic } from '../../shared/components/statistics';
 
@@ -37,13 +36,9 @@ export default class ArcaneOrb extends Analyzer {
 
     this.orbData.push({
       timestamp: event.timestamp,
-      targetsHit: this.getTargetsHit(damageEvents),
+      targetsHit: damageEvents.length || 0,
       chargesBefore: this.getChargesBefore(energize, event),
     });
-  }
-
-  private getTargetsHit(damageEvents: DamageEvent[]): number {
-    return new Set(damageEvents.map((d) => encodeEventTargetString(d))).size;
   }
 
   private getChargesBefore(energize: ResourceChangeEvent[], event: CastEvent): number {

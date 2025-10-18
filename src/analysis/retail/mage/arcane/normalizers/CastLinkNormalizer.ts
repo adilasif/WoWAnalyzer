@@ -20,16 +20,9 @@ import { createEventLinks, link } from 'analysis/retail/mage/shared/helpers/cast
  * - maxLinks: unlimited
  * - anyTarget: false (links only to same target)
  * - anySource: false (links only to same source)
- * - id: parent spell ID (auto-matches same spell)
+ * - id: parent spell ID (defaults to the same spell ID as the cast being linked)
  * - reverseRelation: 'auto' (creates bidirectional link using parent EventType)
  *
- * USAGE:
- * - Use link() helper: link(EventType.Damage, { forwardBuffer: 2000, anyTarget: true })
- * - For custom relations: link('myCustomRelation', { type: EventType.Cast, id: SPELL.id })
- * - Set forwardBuffer to match spell duration for removeBuff/removeDebuff
- * - Use maxLinks to limit number of linked events (e.g., maxLinks: 1 for single-target abilities)
- * - Set anyTarget: true for AoE abilities that hit multiple targets
- * - Add condition functions for complex filtering logic
  */
 
 const CustomType = {
@@ -83,7 +76,11 @@ const EVENT_LINKS = createEventLinks(
         anyTarget: true,
         condition: (linking, referenced) => !HasRelatedEvent(referenced, EventType.Cast),
       }),
-      link(EventType.ResourceChange, { anyTarget: true }),
+      link(EventType.ResourceChange, {
+        id: [SPELLS.ARCANE_ORB.id, SPELLS.ARCANE_ORB_DAMAGE.id],
+        anyTarget: true,
+        forwardBuffer: 2500,
+      }),
     ],
   },
 
