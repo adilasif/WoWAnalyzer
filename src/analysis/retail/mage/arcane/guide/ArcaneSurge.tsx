@@ -19,8 +19,8 @@ const OPENER_DURATION = 20000;
 const SHORT_FIGHT_DURATION = 60000;
 
 class ArcaneSurgeGuide extends Analyzer {
-  static dependencies = { 
-    arcaneSurge: ArcaneSurge 
+  static dependencies = {
+    arcaneSurge: ArcaneSurge,
   };
 
   protected arcaneSurge!: ArcaneSurge;
@@ -40,7 +40,6 @@ class ArcaneSurgeGuide extends Analyzer {
     const fightTimeRemaining = this.owner.fight.end_time - cast.cast;
     const shortFight = fightTimeRemaining < SHORT_FIGHT_DURATION;
 
-    // Fail conditions (highest priority)
     if (!hasMaxCharges) {
       return {
         timestamp: cast.cast,
