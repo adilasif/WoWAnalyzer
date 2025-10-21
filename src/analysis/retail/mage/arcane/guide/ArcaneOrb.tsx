@@ -25,8 +25,8 @@ const ORB_EFFICIENT_CHARGE_THRESHOLD = 2;
 const AOE_THRESHOLD = 2; // Perfect if hitting 2+ targets
 
 class ArcaneOrbGuide extends Analyzer {
-  static dependencies = { 
-    arcaneOrb: ArcaneOrb 
+  static dependencies = {
+    arcaneOrb: ArcaneOrb,
   };
 
   protected arcaneOrb!: ArcaneOrb;
@@ -262,7 +262,6 @@ class ArcaneOrbGuide extends Analyzer {
           spell={SPELLS.ARCANE_ORB}
           stats={this.overviewStats}
           casts={this.arcaneOrb.orbData.map((cast) => this.evaluateOrbCast(cast))}
-          formatTimestamp={this.owner.formatTimestamp.bind(this.owner)}
         />
         <CooldownTimeline spell={SPELLS.ARCANE_ORB} />
       </MageGuideSection>

@@ -3,6 +3,9 @@ import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBr
 import GradiatedPerformanceBar from 'interface/guide/components/GradiatedPerformanceBar';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import { useFight } from 'interface/report/context/FightContext';
+import { formatDuration } from 'common/format';
+import { SpellIcon } from 'interface';
 import GuideTooltip from './GuideTooltip';
 
 export interface CastEvaluation {
@@ -14,23 +17,37 @@ export interface CastEvaluation {
 interface CastSummaryProps {
   spell: Spell;
   casts: CastEvaluation[];
-  formatTimestamp: (timestamp: number) => string;
   showBreakdown?: boolean;
 }
 
 /**
  * Displays cast performance summary bar and optionally detailed per-cast breakdown.
+ * Shows a "no casts" message if the casts array is empty.
  * @param spell - The spell being analyzed
  * @param casts - Array of cast evaluations with timestamps and performance ratings
- * @param formatTimestamp - Function to format timestamps for display
  * @param showBreakdown - Whether to show expandable per-cast breakdown (default: false)
  */
 export default function CastSummary({
   spell,
   casts,
-  formatTimestamp,
   showBreakdown = false,
 }: CastSummaryProps): JSX.Element {
+  const { fight } = useFight();
+  const formatTimestamp = (timestamp: number) => formatDuration(timestamp - fight.start_time);
+
+  // Show "no casts" message if there are no casts
+  if (!casts || casts.length === 0) {
+    return (
+      <div>
+        <SpellIcon spell={spell} /> <strong>No {spell.name} casts recorded.</strong>
+        <br />
+        <small>
+          Make sure you are using this spell if it is available to you and you are specced into it.
+        </small>
+      </div>
+    );
+  }
+
   // If breakdown is enabled, convert to BoxRowEntry format for backward compatibility
   if (showBreakdown) {
     const castEntries: BoxRowEntry[] = casts.map((cast) => ({

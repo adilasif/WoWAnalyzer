@@ -4,6 +4,8 @@ import Spell from 'common/SPELLS/Spell';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { qualitativePerformanceToColor } from 'interface/guide';
 import styled from '@emotion/styled';
+import { useFight } from 'interface/report/context/FightContext';
+import { formatDuration } from 'common/format';
 
 const CastDetailsContainer = styled.div<{ performance: QualitativePerformance }>`
   display: flex;
@@ -18,7 +20,6 @@ const CastDetailsContainer = styled.div<{ performance: QualitativePerformance }>
 
   &:hover {
     background: rgba(0, 0, 0, 0.4);
-    transform: translateX(2px);
   }
 `;
 
@@ -268,7 +269,6 @@ export interface CastEntry {
 
 export interface CastDetailsProps {
   casts: CastEntry[];
-  formatTimestamp: (timestamp: number) => string;
   title?: string;
   showViewToggle?: boolean;
   showPerformanceFilter?: boolean;
@@ -278,7 +278,6 @@ export interface CastDetailsProps {
 /**
  * Displays detailed cast information with navigation and filtering controls.
  * @param casts - Array of cast entries to display
- * @param formatTimestamp - Function to format timestamps
  * @param title - Optional title for the section
  * @param showViewToggle - Show toggle between single/list view (default: true)
  * @param showPerformanceFilter - Show performance quality filter (default: true)
@@ -286,17 +285,19 @@ export interface CastDetailsProps {
  */
 export default function CastDetails({
   casts,
-  formatTimestamp,
   title,
   showViewToggle = true,
   showPerformanceFilter = true,
   defaultShowFailuresOnly = false,
 }: CastDetailsProps) {
+  const { fight } = useFight();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAllCasts, setShowAllCasts] = useState(false);
   const [filterPerformance, setFilterPerformance] = useState<Set<QualitativePerformance>>(
     () => new Set(defaultShowFailuresOnly ? [QualitativePerformance.Fail] : []),
   );
+
+  const formatTimestamp = (timestamp: number) => formatDuration(timestamp - fight.start_time);
 
   if (!casts || casts.length === 0) {
     return <div style={{ color: '#999' }}>No casts to display</div>;

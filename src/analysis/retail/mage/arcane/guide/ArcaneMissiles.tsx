@@ -18,7 +18,7 @@ const MISSILE_EARLY_CLIP_DELAY = 200;
 
 class ArcaneMissilesGuide extends Analyzer {
   static dependencies = {
-    arcaneMissiles: ArcaneMissiles
+    arcaneMissiles: ArcaneMissiles,
   };
 
   protected arcaneMissiles!: ArcaneMissiles;
@@ -174,7 +174,6 @@ class ArcaneMissilesGuide extends Analyzer {
         <CastSummary
           spell={TALENTS.ARCANE_MISSILES_TALENT}
           casts={this.arcaneMissiles.missileData.map((cast) => this.evaluateMissilesCast(cast))}
-          formatTimestamp={this.owner.formatTimestamp.bind(this.owner)}
           showBreakdown
         />
       </MageGuideSection>

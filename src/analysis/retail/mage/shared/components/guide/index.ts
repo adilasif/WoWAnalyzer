@@ -19,4 +19,3 @@ export { default as BuffUptimeBar } from './BuffUptimeBar';
 export { default as ExpandableBreakdown, createExpandableConfig } from './ExpandableBreakdown';
 export { default as InlineStatistic } from './InlineStatistic';
 export { default as CooldownTimeline } from './CooldownTimeline';
-export { NoCastsMessage } from './NoCastsMessage';

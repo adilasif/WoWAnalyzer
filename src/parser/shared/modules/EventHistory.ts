@@ -19,6 +19,7 @@ class EventHistory extends Module {
     initialFilter: (event: E) => boolean,
     maxTime?: number,
     filterDef?: EventFilter<ET>,
+    eventTypes?: ET[],
   ) {
     let filter = initialFilter;
 
@@ -68,6 +69,15 @@ class EventHistory extends Module {
           return prevFilter(event);
         };
       }
+    } else if (eventTypes && eventTypes.length > 0) {
+      // When multiple event types are provided without a filter def, check against all types
+      const prevFilter = filter;
+      filter = (event) => {
+        if (!eventTypes.includes(event.type as ET)) {
+          return false;
+        }
+        return prevFilter(event);
+      };
     }
 
     return filter;
@@ -78,6 +88,7 @@ class EventHistory extends Module {
    * @param maxTime the maximum number of milliseconds to look back, or null for no limit
    * @param filterDef an optional EventFilter to apply to all events
    * @param fromTimestamp an optional timestamp to start searching from
+   * @param eventTypes an optional array of event types to filter by (only used when filterDef is not provided)
    * @returns the last `count` events that match the given filters, with the oldest events first
    */
   public last<ET extends EventType, E extends AnyEvent<ET>>(
@@ -85,6 +96,7 @@ class EventHistory extends Module {
     maxTime?: number,
     filterDef?: EventFilter<ET>,
     fromTimestamp?: number,
+    eventTypes?: ET[],
   ): E[] {
     let filter = (event: AnyEvent) => true;
 
@@ -111,7 +123,7 @@ class EventHistory extends Module {
       };
     }
 
-    filter = this.buildFilter(filter, maxTime, filterDef);
+    filter = this.buildFilter(filter, maxTime, filterDef, eventTypes);
 
     let history = this.owner.eventHistory.filter((event) => filter(event));
     if (count && count < history.length) {
@@ -125,6 +137,7 @@ class EventHistory extends Module {
     maxTime?: number,
     filterDef?: EventFilter<ET>,
     fromTimestamp?: number,
+    eventTypes?: ET[],
   ): E[] {
     let filter = (event: AnyEvent) => true;
 
@@ -151,7 +164,7 @@ class EventHistory extends Module {
       };
     }
 
-    filter = this.buildFilter(filter, maxTime, filterDef);
+    filter = this.buildFilter(filter, maxTime, filterDef, eventTypes);
 
     let history = this.owner.eventHistory.filter((event) => filter(event));
     if (count && count < history.length) {
@@ -161,8 +174,8 @@ class EventHistory extends Module {
   }
 
   /**
+   * @param eventType the event type (or array of event types) to get (i.e. 'cast', 'begincast', EventType.Cast, EventType.BeginCast). Use EventType.Event for all events.
    * @param searchBackwards specify whether you want to search for events forwards or backwards from a particular timestamp (true for backwards, false for forwards. Default is backwards).
-   * @param eventType the event type to get (i.e. 'cast', 'begincast', EventType.Cast, EventType.BeginCast). Use EventType.Event for all events.
    * @param spell the specific spell (or an array of spells) you are searching for. Leave undefined for all spells.
    * @param count the number of events to get. Leave undefined for no limit.
    * @param startTimestamp the timestamp to start searching from. Searches search backwards from the startTimestamp. Leave undefined for the end of the fight
@@ -170,7 +183,7 @@ class EventHistory extends Module {
    * @returns an array of events that meet the provided criteria
    */
   getEvents<ET extends EventType>(
-    eventType: ET,
+    eventType: ET | ET[],
     {
       searchBackwards = true,
       spell,
@@ -181,16 +194,37 @@ class EventHistory extends Module {
     }: EventSearchOptions = {},
   ): AnyEvent<ET>[] {
     const source = includePets ? SELECTED_PLAYER | SELECTED_PLAYER_PET : SELECTED_PLAYER;
-    const eventFilter = spell
-      ? new EventFilter(eventType).by(source).spell(spell)
-      : new EventFilter(eventType).by(source);
-    const events = searchBackwards
-      ? this.last(count, duration, eventFilter, startTimestamp)
-      : this.next(count, duration, eventFilter, startTimestamp);
+    const eventTypes = Array.isArray(eventType) ? eventType : [eventType];
 
-    const filteredEvents = events.filter((e) =>
-      HasAbility(e) ? !CASTS_THAT_ARENT_CASTS.includes(e.ability.guid) : true,
-    );
+    // For single event type, use EventFilter (existing optimized path)
+    if (eventTypes.length === 1) {
+      const eventFilter = spell
+        ? new EventFilter(eventTypes[0]).by(source).spell(spell)
+        : new EventFilter(eventTypes[0]).by(source);
+      const events = searchBackwards
+        ? this.last(count, duration, eventFilter, startTimestamp)
+        : this.next(count, duration, eventFilter, startTimestamp);
+
+      const filteredEvents = events.filter((e) =>
+        HasAbility(e) ? !CASTS_THAT_ARENT_CASTS.includes(e.ability.guid) : true,
+      );
+      return filteredEvents;
+    }
+
+    // For multiple event types, build custom filter
+    const ee: EventEmitter = this.owner.getModule(EventEmitter);
+    const byFilter = ee.createByCheck(source);
+    const spellFilter = spell ? ee.createSpellCheck(spell) : null;
+
+    const events = searchBackwards
+      ? this.last(count, duration, undefined, startTimestamp, eventTypes)
+      : this.next(count, duration, undefined, startTimestamp, eventTypes);
+
+    const filteredEvents = events
+      .filter((e) => (byFilter ? byFilter(e) : true))
+      .filter((e) => (spellFilter ? spellFilter(e) : true))
+      .filter((e) => (HasAbility(e) ? !CASTS_THAT_ARENT_CASTS.includes(e.ability.guid) : true));
+
     return filteredEvents;
   }
 
@@ -228,43 +262,6 @@ class EventHistory extends Module {
       (e) => !this.selectedCombatant.hasBuff(buff.id, e.timestamp - 1),
     );
     return filteredEvents;
-  }
-
-  /**
-   * Get all events of specified type(s) within a time window around a specific timestamp.
-   *
-   * @param eventTypes the event type(s) to get (single EventType or array of EventTypes)
-   * @param timestamp the center point of the time window
-   * @param beforeMs how many milliseconds before the timestamp to search (default: 0)
-   * @param afterMs how many milliseconds after the timestamp to search (default: 0)
-   * @param spell optional spell filter(s)
-   * @returns array of events matching the criteria within the time window
-   */
-  getEventsInTimeWindow<ET extends EventType>(
-    eventTypes: ET | ET[],
-    timestamp: number,
-    beforeMs = 0,
-    afterMs = 0,
-    spell?: SpellInfo | SpellInfo[],
-  ): AnyEvent<ET>[] {
-    const windowStart = timestamp - beforeMs;
-    const windowEnd = timestamp + afterMs;
-    const types = Array.isArray(eventTypes) ? eventTypes : [eventTypes];
-
-    const allEvents: AnyEvent<ET>[] = [];
-    
-    types.forEach((eventType) => {
-      const events = this.getEvents(eventType, {
-        searchBackwards: false,
-        startTimestamp: windowStart,
-        duration: windowEnd - windowStart,
-        spell: spell,
-      });
-      allEvents.push(...events);
-    });
-
-    // Sort by timestamp to maintain chronological order when multiple event types are requested
-    return allEvents.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
   }
 }
 

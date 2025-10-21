@@ -7,8 +7,8 @@ import { MageGuideSection, CastSummary, type CastEvaluation } from '../../shared
 import Clearcasting, { ClearcastingData } from '../analyzers/Clearcasting';
 
 class ClearcastingGuide extends Analyzer {
-  static dependencies = { 
-    clearcasting: Clearcasting 
+  static dependencies = {
+    clearcasting: Clearcasting,
   };
 
   protected clearcasting!: Clearcasting;
@@ -69,7 +69,6 @@ class ClearcastingGuide extends Analyzer {
           casts={this.clearcasting.clearcastingProcs.map((proc) =>
             this.evaluateClearcastingProc(proc),
           )}
-          formatTimestamp={this.owner.formatTimestamp.bind(this.owner)}
           showBreakdown
         />
       </MageGuideSection>

@@ -1,10 +1,12 @@
 import { ReactNode, useState } from 'react';
-import { SpellIcon, TooltipElement } from 'interface';
+import { SpellIcon, Tooltip } from 'interface';
 import Spell from 'common/SPELLS/Spell';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { qualitativePerformanceToColor } from 'interface/guide';
 import { PerformanceBoxRow, BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
 import styled from '@emotion/styled';
+import { useFight } from 'interface/report/context/FightContext';
+import { formatDuration } from 'common/format';
 import GuideTooltip from './GuideTooltip';
 
 // Reusable flex containers
@@ -190,7 +192,6 @@ export interface CastOverviewProps {
   spell: Spell;
   stats: OverviewStat[];
   casts: CastOverviewEntry[];
-  formatTimestamp: (timestamp: number) => string;
   title?: string;
 }
 
@@ -206,16 +207,11 @@ const performanceLabels = {
  * @param spell - The spell being analyzed
  * @param stats - Overall statistics to display in summary card
  * @param casts - Individual cast entries with performance and details
- * @param formatTimestamp - Function to format timestamps
  * @param title - Optional title override (default: spell name)
  */
-export default function CastOverview({
-  spell,
-  stats,
-  casts,
-  formatTimestamp,
-  title,
-}: CastOverviewProps) {
+export default function CastOverview({ spell, stats, casts, title }: CastOverviewProps) {
+  const { fight } = useFight();
+  const formatTimestamp = (timestamp: number) => formatDuration(timestamp - fight.start_time);
   const [selectedCastIndex, setSelectedCastIndex] = useState<number | null>(null);
 
   if (!casts || casts.length === 0) {
@@ -265,9 +261,9 @@ export default function CastOverview({
             );
 
             return stat.tooltip ? (
-              <TooltipElement key={index} content={stat.tooltip}>
+              <Tooltip key={index} content={stat.tooltip}>
                 {content}
-              </TooltipElement>
+              </Tooltip>
             ) : (
               content
             );
@@ -309,9 +305,9 @@ export default function CastOverview({
               );
 
               return detail.tooltip ? (
-                <TooltipElement key={index} content={detail.tooltip}>
+                <Tooltip key={index} content={detail.tooltip}>
                   {content}
-                </TooltipElement>
+                </Tooltip>
               ) : (
                 content
               );

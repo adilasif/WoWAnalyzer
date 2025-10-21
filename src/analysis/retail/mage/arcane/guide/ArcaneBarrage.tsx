@@ -267,7 +267,6 @@ class ArcaneBarrageGuide extends Analyzer {
         <CastDetails
           title="Individual Cast Breakdown"
           casts={this.arcaneBarrage.barrageData.map((cast) => this.evaluateBarrageCast(cast))}
-          formatTimestamp={this.owner.formatTimestamp.bind(this.owner)}
           showViewToggle={true}
           showPerformanceFilter={true}
           defaultShowFailuresOnly={false}

@@ -4,9 +4,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellSeq } from 'parser/ui/SpellSeq';
-import { AnyEvent } from 'parser/core/Events';
+import { EventType } from 'parser/core/Events';
 import Analyzer from 'parser/core/Analyzer';
-import { isApplicableEvent } from 'interface/report/Results/Timeline/Casts';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
 
@@ -20,6 +19,7 @@ import {
   InlineStatistic,
   createExpandableConfig,
 } from '../../shared/components';
+import EventHistory from 'parser/shared/modules/EventHistory';
 
 const MAX_ARCANE_CHARGES = 4;
 const TOUCH_WINDOW_BUFFER_MS = 7500; // 7.5 seconds before and after
@@ -27,9 +27,11 @@ const TOUCH_WINDOW_BUFFER_MS = 7500; // 7.5 seconds before and after
 class TouchOfTheMagiGuide extends Analyzer {
   static dependencies = {
     touchOfTheMagi: TouchOfTheMagi,
+    eventHistory: EventHistory,
   };
 
   protected touchOfTheMagi!: TouchOfTheMagi;
+  protected eventHistory!: EventHistory;
 
   activeTimeUtil(activePercent: number) {
     const thresholds = this.touchOfTheMagi.touchMagiActiveTimeThresholds.isLessThan;
@@ -219,16 +221,19 @@ class TouchOfTheMagiGuide extends Analyzer {
     const activeTimePerf = this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime);
 
     // Get all applicable events for each Touch of the Magi window
-    const playerFilter = isApplicableEvent(this.selectedCombatant.id);
     const touchTimelineEvents: CastTimelineEntry<TouchOfTheMagiData>[] =
       this.touchOfTheMagi.touchData.map((cast) => {
         const windowStart = cast.applied - TOUCH_WINDOW_BUFFER_MS;
         const windowEnd = cast.applied + TOUCH_WINDOW_BUFFER_MS;
 
         // Filter owner.eventHistory for all applicable timeline events (Cast, BeginChannel, EndChannel, GlobalCooldown, etc.)
-        const events = this.owner.eventHistory.filter(
-          (event: AnyEvent) =>
-            event.timestamp >= windowStart && event.timestamp <= windowEnd && playerFilter(event),
+        const events = this.eventHistory.getEvents(
+          [EventType.Cast, EventType.BeginChannel, EventType.EndChannel, EventType.GlobalCooldown],
+          {
+            searchBackwards: false,
+            startTimestamp: windowStart,
+            duration: windowEnd - windowStart,
+          },
         );
 
         return {

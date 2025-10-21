@@ -179,7 +179,7 @@ MageStatistic.Defensive = function Defensive<Apply extends EventType, Remove ext
 /**
  * Displays custom content.
  */
-MageStatistic.Value = function Value({ children }: { children: ReactNode }) {
+MageStatistic.Custom = function Custom({ children }: { children: ReactNode }) {
   return <div>{children}</div>;
 };
 

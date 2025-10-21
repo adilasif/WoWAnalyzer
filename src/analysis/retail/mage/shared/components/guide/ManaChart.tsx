@@ -4,6 +4,7 @@ import { VisualizationSpec } from 'react-vega';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import BaseChart, { formatTime } from 'parser/ui/BaseChart';
 import styled from '@emotion/styled';
+import fetchWcl from 'common/fetchWclApi';
 
 const LegendContainer = styled.div`
   display: flex;
@@ -414,7 +415,6 @@ export default function ManaChart({
         setLoading(true);
       }
       try {
-        const fetchWcl = (await import('common/fetchWclApi')).default;
         const json = await fetchWcl(`report/graph/resources/${reportCode}`, {
           start: startTime,
           end: endTime,

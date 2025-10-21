@@ -3,12 +3,7 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
-import {
-  MageGuideSection,
-  CastSummary,
-  NoCastsMessage,
-  type CastEvaluation,
-} from '../../shared/components';
+import { MageGuideSection, CastSummary, type CastEvaluation } from '../../shared/components';
 
 import PresenceOfMind, { PresenceOfMindData } from '../analyzers/PresenceOfMind';
 
@@ -16,8 +11,8 @@ const AOE_TARGET_THRESHOLD = 4;
 const CAST_DELAY_THRESHOLD = 500; // 500ms
 
 class PresenceOfMindGuide extends Analyzer {
-  static dependencies = { 
-    presenceOfMind: PresenceOfMind 
+  static dependencies = {
+    presenceOfMind: PresenceOfMind,
   };
 
   protected presenceOfMind!: PresenceOfMind;
@@ -30,14 +25,14 @@ class PresenceOfMindGuide extends Analyzer {
     const hasDelayIssue = cast.touchCancelDelay && cast.touchCancelDelay > CAST_DELAY_THRESHOLD;
 
     // Fail conditions
-    if (Boolean(ST) && !touchAtEnd) {
+    if (ST && !touchAtEnd) {
       return {
         timestamp: cast.cast.timestamp,
         performance: QualitativePerformance.Fail,
         reason: 'Not used at Touch end - should squeeze extra casts into Touch of the Magi window',
       };
     }
-    if (Boolean(AOE) && !aoeCharges) {
+    if (AOE && !aoeCharges) {
       return {
         timestamp: cast.cast.timestamp,
         performance: QualitativePerformance.Fail,
@@ -56,8 +51,8 @@ class PresenceOfMindGuide extends Analyzer {
 
     // Perfect conditions
     if (
-      Boolean(ST) &&
-      Boolean(touchAtEnd) &&
+      ST &&
+      touchAtEnd &&
       (!cast.touchCancelDelay || cast.touchCancelDelay <= CAST_DELAY_THRESHOLD)
     ) {
       return {
@@ -66,7 +61,7 @@ class PresenceOfMindGuide extends Analyzer {
         reason: 'Perfect - used at Touch end with proper timing',
       };
     }
-    if (Boolean(AOE) && aoeCharges) {
+    if (AOE && aoeCharges) {
       return {
         timestamp: cast.cast.timestamp,
         performance: QualitativePerformance.Perfect,
@@ -75,14 +70,14 @@ class PresenceOfMindGuide extends Analyzer {
     }
 
     // Good conditions
-    if (Boolean(ST) && Boolean(touchAtEnd)) {
+    if (ST && touchAtEnd) {
       return {
         timestamp: cast.cast.timestamp,
         performance: QualitativePerformance.Good,
         reason: 'Good - used at Touch end to squeeze extra casts',
       };
     }
-    if (Boolean(AOE) && aoeCharges) {
+    if (AOE && aoeCharges) {
       return {
         timestamp: cast.cast.timestamp,
         performance: QualitativePerformance.Good,
@@ -139,16 +134,11 @@ class PresenceOfMindGuide extends Analyzer {
 
     return (
       <MageGuideSection spell={TALENTS.PRESENCE_OF_MIND_TALENT} explanation={explanation}>
-        {this.presenceOfMind.pomData.length === 0 ? (
-          <NoCastsMessage spell={TALENTS.PRESENCE_OF_MIND_TALENT} />
-        ) : (
-          <CastSummary
-            spell={TALENTS.PRESENCE_OF_MIND_TALENT}
-            casts={this.presenceOfMind.pomData.map((cast) => this.evaluatePresenceOfMindCast(cast))}
-            formatTimestamp={this.owner.formatTimestamp.bind(this.owner)}
-            showBreakdown
-          />
-        )}
+        <CastSummary
+          spell={TALENTS.PRESENCE_OF_MIND_TALENT}
+          casts={this.presenceOfMind.pomData.map((cast) => this.evaluatePresenceOfMindCast(cast))}
+          showBreakdown
+        />
       </MageGuideSection>
     );
   }
