@@ -74,11 +74,6 @@ const spells = {
     name: 'Invisibility',
     icon: 'ability_mage_invisibility',
   },
-  SHIFTING_POWER_TICK: {
-    id: 382445,
-    name: 'Shifting Power',
-    icon: 'ability_ardenweald_mage',
-  },
   POLYMORPH_SHEEP: {
     id: 118,
     name: 'Polymorph',
@@ -154,16 +149,6 @@ const spells = {
     name: 'Polymorph',
     icon: 'inv_duckbaby_mallard',
   },
-  DIVERTED_ENERGY_HEAL: {
-    id: 382272,
-    name: 'Diverted Energy',
-    icon: 'inv_soulbarrier',
-  },
-  TEMPEST_BARRIER_ABSORB: {
-    id: 382290,
-    name: 'Tempest Barrier',
-    icon: 'inv_shield_1h_artifactstormfist_d_04',
-  },
   ICE_COLD: {
     id: 414658,
     name: 'Ice Cold',
@@ -180,16 +165,6 @@ const spells = {
     id: 431039,
     name: 'Frost Mastery',
     icon: 'spell_fire_blueimmolation',
-  },
-  EXCESS_FROST_BUFF: {
-    id: 438611,
-    name: 'Excess Frost',
-    icon: 'spell_deathknight_iceboundfortitude',
-  },
-  EXCESS_FIRE_BUFF: {
-    id: 438624,
-    name: 'Excess Fire',
-    icon: 'ability_mage_fierypayback',
   },
   MANA_ADDICTION_BUFF_FIRE: {
     id: 449314,

@@ -87,20 +87,10 @@ const spells = {
     name: 'Arcane Surge',
     icon: 'ability_mage_arcanesurge',
   },
-  ARCANE_HARMONY_BUFF: {
-    id: 384455,
-    name: 'Arcane Harmony',
-    icon: 'ability_creature_cursed_04',
-  },
   SIPHON_STORM_BUFF: {
     id: 384267,
     name: 'Siphon Storm',
     icon: 'ability_monk_forcesphere_arcane',
-  },
-  NETHER_PRECISION_BUFF: {
-    id: 383783,
-    name: 'Nether Precision',
-    icon: 'spell_arcane_blast_nightborne',
   },
   ARCANE_TEMPO_BUFF: {
     id: 383997,
@@ -126,16 +116,6 @@ const spells = {
     id: 451038,
     name: 'Arcane Soul',
     icon: 'inv_soulbarrier',
-  },
-  INTUITION_BUFF: {
-    id: 1223797,
-    name: 'Intuition',
-    icon: 'spell_shadow_brainwash',
-  },
-  AETHERVISION_BUFF: {
-    id: 467634,
-    name: 'Aethervision',
-    icon: 'sha_ability_rogue_bloodyeye_nightborne',
   },
 } satisfies Record<string, Spell>;
 

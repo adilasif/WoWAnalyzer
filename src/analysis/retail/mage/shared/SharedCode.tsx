@@ -1,22 +1,14 @@
 import SPELLS from 'common/SPELLS';
 import Analyzer from 'parser/core/Analyzer';
+import EventHistory from 'parser/shared/modules/EventHistory';
 import { SpellInfo } from 'parser/core/EventFilter';
 import { HasTarget, HasHitpoints, EventType, CastEvent, AnyEvent } from 'parser/core/Events';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import Enemies, { encodeTargetString } from 'parser/shared/modules/Enemies';
-import EventHistory from 'parser/shared/modules/EventHistory';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
+import { encodeTargetString } from 'parser/shared/modules/Enemies';
 
 class SharedCode extends Analyzer {
   static dependencies = {
-    abilityTracker: AbilityTracker,
-    spellUsable: SpellUsable,
-    enemies: Enemies,
     eventHistory: EventHistory,
   };
-  protected abilityTracker!: AbilityTracker;
-  protected spellUsable!: SpellUsable;
-  protected enemies!: Enemies;
   protected eventHistory!: EventHistory;
 
   /**

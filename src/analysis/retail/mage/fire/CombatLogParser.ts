@@ -1,17 +1,12 @@
 import {
   ArcaneIntellect,
   CancelledCasts,
-  DivertedEnergy,
   ElementalBarrier,
   QuickWitted,
-  MirrorImage,
-  ShiftingPower,
-  TempestBarrier,
   MasterOfTime,
   SharedCode,
   IceBlock,
   IceCold,
-  GreaterInvisibility,
 } from 'analysis/retail/mage/shared';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
@@ -27,7 +22,6 @@ import HotStreak from './core/HotStreak';
 
 //Talents
 import PhoenixFlames from './talents/PhoenixFlames';
-import ShiftingPowerUsage from './talents/ShiftingPowerUsage';
 import FeveredIncantation from './talents/FeveredIncantation';
 import Hyperthermia from './talents/Hyperthermia';
 import FeelTheBurn from './talents/FeelTheBurn';
@@ -40,10 +34,8 @@ import Meteor from './talents/Meteor';
 import ImprovedScorch from './talents/ImprovedScorch';
 
 //Hero Talents
-import ExcessFire from '../shared/ExcessFire';
-import ExcessFrost from '../shared/ExcessFrost';
-import FlameAndFrost from '../shared/FlameAndFrost';
-import GloriousIncandescence from '../shared/GloriousIncandescense';
+import FlameAndFrost from '../shared/analyzers/FlameAndFrost';
+import GloriousIncandescence from '../shared/analyzers/GloriousIncandescense';
 
 //Guide
 import Guide from './Guide';
@@ -99,14 +91,11 @@ class CombatLogParser extends CoreCombatLogParser {
     feveredIncantation: FeveredIncantation,
     hyperthermia: Hyperthermia,
     sunKingsBlessing: SunKingsBlessing,
-    shiftingPowerUsage: ShiftingPowerUsage,
     feelTheBurn: FeelTheBurn,
     meteor: Meteor,
     improvedScorch: ImprovedScorch,
 
     //Hero Talents
-    excessFire: ExcessFire,
-    excessFrost: ExcessFrost,
     flameAndFrost: FlameAndFrost,
     gloriousIncandescence: GloriousIncandescence,
 
@@ -114,17 +103,12 @@ class CombatLogParser extends CoreCombatLogParser {
 
     //Talents - Shared
     elementalBarrier: ElementalBarrier,
-    shiftingPower: ShiftingPower,
-    divertedEnergy: DivertedEnergy,
     quickWitted: QuickWitted,
-    tempestBarrier: TempestBarrier,
     masterOfTime: MasterOfTime,
 
     // Defensives - Shared
-    mirrorImage: MirrorImage,
     IceBlock: IceBlock,
     iceCold: IceCold,
-    greterInvisibility: GreaterInvisibility,
 
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,

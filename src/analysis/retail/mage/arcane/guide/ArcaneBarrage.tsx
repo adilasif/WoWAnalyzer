@@ -1,23 +1,17 @@
-import { formatPercentage } from 'common/format';
+import { ReactNode } from 'react';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
+import { formatPercentage, formatDuration } from 'common/format';
+import {
+  MageGuideSection,
+  CastDetails,
+  type CastEntry,
+  type CastDetail,
+} from '../../shared/components';
 import Analyzer from 'parser/core/Analyzer';
+import ArcaneBarrage, { ArcaneBarrageData } from '../analyzers/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import ArcaneBarrage from '../core/ArcaneBarrage';
-import { ARCANE_CHARGE_MAX_STACKS } from '../../shared';
-import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { PerformanceMark } from 'interface/guide';
-import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBreakdown';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from '../Guide';
-
-const TEMPO_REMAINING_THRESHOLD = 5000;
-const TOUCH_CD_THRESHOLD = 6000;
-const NO_MANA_THRESHOLD = 0.1;
-const LOW_MANA_THRESHOLD = 0.7;
-const EXECUTE_HEALTH_PERCENT = 0.35;
-const AETHERVISION_STACK_THRESHOLD = 2;
 
 class ArcaneBarrageGuide extends Analyzer {
   static dependencies = {
@@ -29,248 +23,255 @@ class ArcaneBarrageGuide extends Analyzer {
   isSunfury: boolean = this.selectedCombatant.hasTalent(TALENTS.MEMORY_OF_ALAR_TALENT);
   isSpellslinger: boolean = this.selectedCombatant.hasTalent(TALENTS.SPLINTERSTORM_TALENT);
 
-  generateGuideTooltip(
-    performance: QualitativePerformance,
-    tooltipItems: { perf: QualitativePerformance; detail: string }[],
-    timestamp: number,
-  ) {
-    const tooltip = (
-      <>
-        <div>
-          <b>@ {this.owner.formatTimestamp(timestamp)}</b>
-        </div>
-        <div>
-          <PerformanceMark perf={performance} /> {performance}
-        </div>
-        <div>
-          {tooltipItems.map((t, i) => (
-            <div key={i}>
-              <PerformanceMark perf={t.perf} /> {t.detail}
-              <br />
-            </div>
-          ))}
-        </div>
-      </>
-    );
-    return tooltip;
-  }
+  private readonly MAX_ARCANE_CHARGES = 4;
+  private readonly LOW_MANA_THRESHOLD = 0.3;
+  private readonly LOW_HEALTH_THRESHOLD = 0.35;
+  private readonly TEMPO_THRESHOLD = 5000;
+  private readonly AOE_THRESHOLD = 3;
 
-  get arcaneBarrageData() {
-    const data: BoxRowEntry[] = [];
-    this.arcaneBarrage.barrageCasts.forEach((ab) => {
-      const tooltipItems: { perf: QualitativePerformance; detail: string }[] = [];
+  /**
+   * Evaluates a single Arcane Barrage cast for CastDetails.
+   * Returns complete cast information including performance, details array, and notes.
+   *
+   * This is more comprehensive than CastSummary evaluation because CastDetails
+   * needs structured detail items and rich explanatory notes.
+   */
+  private evaluateBarrageCast(cast: ArcaneBarrageData): CastEntry {
+    // Calculate conditions (same as CastSummary version)
+    const hasMaxCharges = cast.charges >= this.MAX_ARCANE_CHARGES;
+    const isAOE = cast.targetsHit >= this.AOE_THRESHOLD;
+    const hasLowMana = cast.mana !== undefined && cast.mana <= this.LOW_MANA_THRESHOLD;
+    const hasLowHealth = cast.health !== undefined && cast.health < this.LOW_HEALTH_THRESHOLD;
+    const hasPrecastSurge = cast.precast?.ability.guid === TALENTS.ARCANE_SURGE_TALENT.id;
+    const tempoExpiring =
+      cast.tempoRemaining !== undefined && cast.tempoRemaining < this.TEMPO_THRESHOLD;
+    const hasSunfuryProc = cast.gloriousIncandescence || (cast.arcaneSoul && !cast.clearcasting);
+    const hasSpellslingerProc = cast.arcaneOrbAvail;
 
-      const lowCharges = ab.charges < ARCANE_CHARGE_MAX_STACKS;
-      if (lowCharges) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Fail,
-          detail: `Low Arcane Charges (${ab.charges})`,
-        });
-      }
+    // Determine overall performance (same logic as CastSummary)
+    let performance: QualitativePerformance;
+    let notes: ReactNode;
 
-      if (ab.arcaneSoul) {
-        tooltipItems.push({ perf: QualitativePerformance.Good, detail: `Had Arcane Soul` });
-      }
+    // Fail conditions
+    if (!hasMaxCharges) {
+      performance = QualitativePerformance.Fail;
+      notes = `Insufficient Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES}) - should wait for maximum charges`;
+    }
+    // Perfect conditions
+    else if (hasMaxCharges && hasPrecastSurge) {
+      performance = QualitativePerformance.Perfect;
+      notes = (
+        <>
+          Perfect combo - <SpellLink spell={TALENTS.ARCANE_SURGE_TALENT} /> + 4 charges for maximum
+          damage!
+        </>
+      );
+    } else if (this.isSunfury && hasMaxCharges && hasSunfuryProc) {
+      performance = QualitativePerformance.Perfect;
+      notes = (
+        <>
+          Perfect Sunfury proc usage with max charges - converting{' '}
+          {cast.gloriousIncandescence ? (
+            <SpellLink spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />
+          ) : (
+            <SpellLink spell={SPELLS.ARCANE_SOUL_BUFF} />
+          )}{' '}
+          into AoE damage
+        </>
+      );
+    } else if (this.isSpellslinger && hasMaxCharges && hasSpellslingerProc) {
+      performance = QualitativePerformance.Perfect;
+      notes = 'Perfect Spellslinger proc usage with max charges';
+    } else if (isAOE && hasMaxCharges) {
+      performance = QualitativePerformance.Perfect;
+      notes = `Excellent AOE usage - hit ${cast.targetsHit} targets with max charges`;
+    } else if (this.isSpellslinger && isAOE && tempoExpiring) {
+      performance = QualitativePerformance.Perfect;
+      notes = `Perfect AOE + Tempo management - hit ${cast.targetsHit} targets before Tempo expires`;
+    }
+    // Good conditions
+    else if (hasMaxCharges && hasLowMana) {
+      performance = QualitativePerformance.Good;
+      notes = `Good emergency usage - low mana (${formatPercentage(cast.mana!, 1)}) necessitated charge spending`;
+    } else if (this.isSpellslinger && hasMaxCharges && tempoExpiring) {
+      performance = QualitativePerformance.Good;
+      notes = (
+        <>
+          Good timing - avoiding <SpellLink spell={SPELLS.ARCANE_TEMPO_BUFF} /> expiration
+        </>
+      );
+    }
+    // Ok conditions
+    else if (hasMaxCharges && hasLowHealth) {
+      performance = QualitativePerformance.Ok;
+      notes = `Target execute - ${formatPercentage(cast.health!, 1)}% health remaining`;
+    } else if (isAOE) {
+      performance = QualitativePerformance.Ok;
+      notes = `AOE usage - hit ${cast.targetsHit} targets (could optimize with procs/buffs)`;
+    }
+    // Default
+    else {
+      performance = QualitativePerformance.Fail;
+      notes = 'Wasted Arcane Charges - no clear benefit to casting Barrage';
+    }
 
-      if (ab.gloriousIncandescence) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Good,
-          detail: `Had Glorious Incandescence`,
-        });
-      }
+    // Build details array (CastDetails-specific)
+    const details: CastDetail[] = [];
 
-      if (ab.intuition) {
-        tooltipItems.push({ perf: QualitativePerformance.Good, detail: `Had Intuition` });
-      }
+    // Arcane Charges - provide performance, component handles color
+    const chargePerformance =
+      cast.charges >= this.MAX_ARCANE_CHARGES
+        ? QualitativePerformance.Perfect
+        : cast.charges >= 3
+          ? QualitativePerformance.Good
+          : QualitativePerformance.Fail;
 
-      const aethervisionStacks =
-        ab.aethervision && ab.aethervision.stacks >= AETHERVISION_STACK_THRESHOLD;
-      if (aethervisionStacks) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Good,
-          detail: `Had ${AETHERVISION_STACK_THRESHOLD} Stacks of Aethervision`,
-        });
-      }
-
-      const noMana = ab.mana && ab.mana < NO_MANA_THRESHOLD;
-      if (ab.mana && noMana) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Good,
-          detail: `Barrage with No Mana (${formatPercentage(ab.mana, 2)}%)`,
-        });
-      }
-
-      const lowMana = ab.mana && ab.mana < LOW_MANA_THRESHOLD;
-      if (this.isSpellslinger && (ab.intuition || aethervisionStacks) && lowMana) {
-        tooltipItems.push({ perf: QualitativePerformance.Good, detail: `Below 70% Mana` });
-      }
-
-      const lowHealth = ab.health && ab.health < EXECUTE_HEALTH_PERCENT;
-      if (this.isSpellslinger && (ab.intuition || aethervisionStacks) && lowHealth) {
-        tooltipItems.push({ perf: QualitativePerformance.Good, detail: `Target Below 35% Health` });
-      }
-
-      const touchSoon = ab.touchCD < TOUCH_CD_THRESHOLD;
-      if (touchSoon) {
-        tooltipItems.push({
-          perf: QualitativePerformance.Good,
-          detail: `Touch of the Magi Almost Available`,
-        });
-      }
-
-      const tempoExpiring = ab.tempoRemaining && ab.tempoRemaining <= TEMPO_REMAINING_THRESHOLD;
-      if (this.isSpellslinger && tempoExpiring) {
-        tooltipItems.push({ perf: QualitativePerformance.Good, detail: `Arcane Tempo Expiring` });
-      }
-
-      const hasOrbWithCharges = ab.arcaneOrb && !lowCharges;
-      if (this.isSpellslinger) {
-        if ((ab.intuition || aethervisionStacks) && ab.netherPrecisionStacks) {
-          tooltipItems.push({ perf: QualitativePerformance.Good, detail: `Had Nether Precision` });
-        } else if ((ab.intuition || aethervisionStacks) && !ab.clearcasting) {
-          tooltipItems.push({
-            perf: QualitativePerformance.Good,
-            detail: `Didn't Have Clearcasting`,
-          });
-        } else if (!ab.netherPrecisionStacks && !ab.clearcasting && hasOrbWithCharges) {
-          tooltipItems.push({
-            perf: QualitativePerformance.Good,
-            detail: `Had Arcane Orb without Nether Precision or Clearcasting`,
-          });
-        }
-      } else if (this.isSunfury && ab.netherPrecisionStacks) {
-        if (ab.gloriousIncandescence) {
-          tooltipItems.push({ perf: QualitativePerformance.Good, detail: `Had Nether Precision` });
-        } else if ((ab.intuition || aethervisionStacks) && lowHealth) {
-          tooltipItems.push({
-            perf: QualitativePerformance.Good,
-            detail: `Target had ${ab.health && formatPercentage(ab.health, 2)}% Health`,
-          });
-        } else if ((ab.intuition || aethervisionStacks) && lowMana) {
-          tooltipItems.push({
-            perf: QualitativePerformance.Good,
-            detail: `Had ${ab.mana && formatPercentage(ab.mana, 2)}% Mana`,
-          });
-        }
-      }
-
-      let overallPerf = QualitativePerformance.Fail;
-      if (
-        this.isSunfury &&
-        (ab.netherPrecisionStacks || !ab.clearcasting) &&
-        (ab.gloriousIncandescence ||
-          ((ab.intuition || aethervisionStacks) && (lowHealth || lowMana)))
-      ) {
-        overallPerf = QualitativePerformance.Perfect;
-      } else if (
-        this.isSpellslinger &&
-        (tempoExpiring ||
-          ((ab.intuition || aethervisionStacks) &&
-            (ab.netherPrecisionStacks || !ab.clearcasting)) ||
-          (!ab.netherPrecisionStacks && !ab.clearcasting && ab.arcaneOrb && !lowCharges))
-      ) {
-        overallPerf = QualitativePerformance.Perfect;
-      } else if (touchSoon || noMana) {
-        overallPerf = QualitativePerformance.Good;
-      } else if (
-        this.isSunfury &&
-        (ab.arcaneSoul || ab.gloriousIncandescence || ab.intuition || aethervisionStacks)
-      ) {
-        overallPerf = QualitativePerformance.Good;
-      } else if (this.isSpellslinger && (ab.intuition || aethervisionStacks)) {
-        overallPerf = QualitativePerformance.Good;
-      }
-
-      if (tooltipItems) {
-        const tooltip = this.generateGuideTooltip(overallPerf, tooltipItems, ab.cast.timestamp);
-        data.push({ value: overallPerf, tooltip });
-      }
+    details.push({
+      label: 'Arcane Charges',
+      value: `${cast.charges} / ${this.MAX_ARCANE_CHARGES}`,
+      performance: chargePerformance,
+      tooltip:
+        cast.charges >= this.MAX_ARCANE_CHARGES
+          ? 'Maximum charges'
+          : `Only ${cast.charges} charges`,
     });
-    return data;
+
+    // Targets Hit
+    if (cast.targetsHit > 0) {
+      details.push({
+        label: 'Targets Hit',
+        value: cast.targetsHit,
+        performance:
+          cast.targetsHit >= this.AOE_THRESHOLD ? QualitativePerformance.Good : undefined,
+        tooltip: cast.targetsHit >= this.AOE_THRESHOLD ? 'Good AOE opportunity' : undefined,
+      });
+    }
+
+    // Mana
+    if (cast.mana !== undefined) {
+      details.push({
+        label: 'Mana',
+        value: formatPercentage(cast.mana, 0),
+        performance: cast.mana <= this.LOW_MANA_THRESHOLD ? QualitativePerformance.Ok : undefined,
+        tooltip:
+          cast.mana <= this.LOW_MANA_THRESHOLD ? 'Low mana - emergency cast acceptable' : undefined,
+      });
+    }
+
+    // Active Buffs
+    const activeBuffs: JSX.Element[] = [];
+    if (cast.clearcasting) {
+      activeBuffs.push(<SpellLink key="cc" spell={SPELLS.CLEARCASTING_ARCANE} />);
+    }
+    if (cast.arcaneSoul) {
+      activeBuffs.push(<SpellLink key="as" spell={SPELLS.ARCANE_SOUL_BUFF} />);
+    }
+    if (cast.gloriousIncandescence) {
+      activeBuffs.push(<SpellLink key="gi" spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />);
+    }
+    if (cast.burdenOfPower) {
+      activeBuffs.push(<SpellLink key="bp" spell={SPELLS.BURDEN_OF_POWER_BUFF} />);
+    }
+
+    if (activeBuffs.length > 0) {
+      details.push({
+        label: 'Active Buffs',
+        value: activeBuffs.length,
+        performance: QualitativePerformance.Good,
+        tooltip: (
+          <>
+            {activeBuffs.map((buff, i) => (
+              <div key={i}>{buff}</div>
+            ))}
+          </>
+        ),
+      });
+    }
+
+    // Tempo Remaining (Spellslinger)
+    if (this.isSpellslinger && cast.tempoRemaining !== undefined) {
+      const tempoSeconds = cast.tempoRemaining / 1000;
+      details.push({
+        label: 'Tempo Remaining',
+        value: `${tempoSeconds.toFixed(1)}s`,
+        performance: tempoSeconds < 5 ? QualitativePerformance.Ok : undefined,
+        tooltip:
+          tempoSeconds < 5 ? (
+            <>
+              Good timing - avoiding <SpellLink spell={SPELLS.ARCANE_TEMPO_BUFF} /> expiration
+            </>
+          ) : undefined,
+      });
+    }
+
+    // Touch CD
+    if (cast.touchCD > 0) {
+      details.push({
+        label: 'Touch CD',
+        value: formatDuration(cast.touchCD),
+        performance: cast.touchCD <= 5000 ? QualitativePerformance.Good : undefined,
+        tooltip:
+          cast.touchCD <= 5000 ? (
+            <>
+              <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} /> almost available
+            </>
+          ) : undefined,
+      });
+    }
+
+    // Return complete CastEntry object
+    return {
+      spell: SPELLS.ARCANE_BARRAGE,
+      timestamp: cast.cast.timestamp,
+      performance,
+      details,
+      notes,
+    };
   }
 
   get guideSubsection(): JSX.Element {
-    const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
     const arcaneCharge = <SpellLink spell={SPELLS.ARCANE_CHARGE} />;
     const touchOfTheMagi = <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />;
     const arcaneSoul = <SpellLink spell={SPELLS.ARCANE_SOUL_BUFF} />;
-    const arcaneTempo = <SpellLink spell={TALENTS.ARCANE_TEMPO_TALENT} />;
-    const netherPrecision = <SpellLink spell={TALENTS.NETHER_PRECISION_TALENT} />;
     const arcaneBarrage = <SpellLink spell={SPELLS.ARCANE_BARRAGE} />;
     const arcaneOrb = <SpellLink spell={SPELLS.ARCANE_ORB} />;
     const gloriousIncandescence = <SpellLink spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />;
-    const aethervision = <SpellLink spell={SPELLS.AETHERVISION_BUFF} />;
-    const intuition = <SpellLink spell={SPELLS.INTUITION_BUFF} />;
+    const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
 
     const explanation = (
       <>
-        <div>
-          <b>{arcaneBarrage}</b> is your {arcaneCharge} spender, removing the associated increased
-          mana costs and damage. Only cast {arcaneBarrage} under one of the below conditions to
-          maintain the damage increase for as long as possible.
-        </div>
-        <div>
-          <ul>
-            <li>{touchOfTheMagi} is almost available or you are out of mana.</li>
-            {this.isSunfury && (
-              <li>
-                You have {arcaneSoul}, {gloriousIncandescence}, {intuition}, or two stacks of{' '}
-                {aethervision}.
-              </li>
-            )}
-            {this.isSpellslinger && (
-              <li>
-                You have {intuition} or two stacks of {aethervision}.
-              </li>
-            )}
-          </ul>
-        </div>
-        {this.isSunfury && (
-          <div>
-            Additionally if you have {netherPrecision} or don't have {clearcasting}, and one of the
-            below is also true, then you can include these more advanced conditions for a small
-            damage boost:
-            <ul>
-              <li>
-                You have {intuition} or two stacks of {aethervision}, and the target is below 35%
-                health or you are below 70% mana.
-              </li>
+        <b>{arcaneBarrage}</b> is your {arcaneCharge} spender, removing the associated increased
+        mana costs and damage. Only cast {arcaneBarrage} under one of the below conditions to
+        maintain the damage increase for as long as possible.
+        <ul>
+          <li>{touchOfTheMagi} is almost available or you are out of mana.</li>
+          {this.isSunfury && (
+            <>
               <li>You have {gloriousIncandescence}.</li>
-            </ul>
-          </div>
-        )}
-        {this.isSpellslinger && (
-          <div>
-            Additionally, you can include these more advanced conditions for a small damage boost:
-            <ul>
-              <li>{arcaneTempo} is about to expire.</li>
               <li>
-                You have {intuition} or two stacks of {aethervision}, and also have{' '}
-                {netherPrecision} or don't have {clearcasting}.
+                You have {arcaneSoul} and either or don't have {clearcasting}
               </li>
-              <li>
-                You don't have {netherPrecision} or {clearcasting}, but do have {arcaneOrb} and four{' '}
-                {arcaneCharge}s.
-              </li>
-            </ul>
-          </div>
-        )}
+            </>
+          )}
+          {this.isSpellslinger && <li>You have or {arcaneOrb}.</li>}
+        </ul>
       </>
     );
-    const data = (
-      <div>
-        <CastSummaryAndBreakdown
-          spell={SPELLS.ARCANE_BARRAGE}
-          castEntries={this.arcaneBarrageData}
-        />
-      </div>
-    );
 
-    return explanationAndDataSubsection(
-      explanation,
-      data,
-      GUIDE_CORE_EXPLANATION_PERCENT,
-      'Arcane Barrage',
+    return (
+      <MageGuideSection
+        spell={SPELLS.ARCANE_BARRAGE}
+        explanation={explanation}
+        title="Arcane Barrage (Detailed View)"
+      >
+        <CastDetails
+          title="Individual Cast Breakdown"
+          casts={this.arcaneBarrage.barrageData.map((cast) => this.evaluateBarrageCast(cast))}
+          showViewToggle={true}
+          showPerformanceFilter={true}
+          defaultShowFailuresOnly={false}
+        />
+      </MageGuideSection>
     );
   }
 }

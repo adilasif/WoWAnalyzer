@@ -9,7 +9,6 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import PreparationSection from 'interface/guide/components/Preparation/PreparationSection';
 
-import ManaLevelGraph from './ManaChart/TabComponent/ManaLevelGraph';
 import { GapHighlight } from 'parser/ui/CooldownBar';
 import CastEfficiencyBar from 'parser/ui/CastEfficiencyBar';
 import MajorDefensives from 'src/analysis/retail/mage/shared/defensives/DefensivesGuide';
@@ -55,30 +54,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
     </SubSection>
   );
 
-  const manaLevelSubsection = (
-    <SubSection title="Mana">
-      <Explanation>
-        <>
-          Unlike most other DPS specs, Arcane Mage revolves around and rewards managing your mana
-          properly. This becomes especially important considering your other resource,{' '}
-          <SpellLink spell={SPELLS.ARCANE_CHARGE} />, causes your spells to do more damage at the
-          expense of an increased mana cost This makes it very easy to accidentally run out of mana
-          without many options for easily recovering. While{' '}
-          <SpellLink spell={TALENTS.EVOCATION_TALENT} /> will get you back up to max mana, it has a
-          longer cooldown and needs to be used for your burn phases, so it could be quite a while
-          before you can dig yourself out of that hole.
-        </>
-      </Explanation>
-      <ManaLevelGraph
-        reportCode={info.reportCode}
-        actorId={info.playerId}
-        start={info.fightStart}
-        end={info.fightEnd}
-        offsetTime={info.combatant.owner.fight.offset_time}
-        manaUpdates={modules.manaValues.manaUpdates}
-      />
-    </SubSection>
-  );
+  const manaLevelSubsection = modules.manaChart.guideSubsection;
 
   return (
     <>
@@ -140,10 +116,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
         {modules.arcaneOrbGuide.guideSubsection}
         {info.combatant.hasTalent(TALENTS.PRESENCE_OF_MIND_TALENT) &&
           modules.presenceOfMindGuide.guideSubsection}
-        {info.combatant.hasTalent(TALENTS.SHIFTING_POWER_TALENT) &&
-          modules.shiftingPowerGuide.guideSubsection}
-        {info.combatant.hasTalent(TALENTS.SUPERNOVA_TALENT) &&
-          modules.supernovaGuide.guideSubsection}
         <AplGuideSubsection info={info} />
       </Section>
 
@@ -157,8 +129,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           overall and burst damage.
         </>
         {modules.clearcastingGuide.guideSubsection}
-        {info.combatant.hasTalent(TALENTS.NETHER_PRECISION_TALENT) &&
-          modules.netherPrecisionGuide.guideSubsection}
         {info.combatant.hasTalent(TALENTS.ARCANE_TEMPO_TALENT) &&
           modules.arcaneTempoGuide.guideSubsection}
       </Section>
@@ -192,10 +162,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
             useThresholds
           />
         )}
-        <CastEfficiencyBar
-          spellId={TALENTS.SHIFTING_POWER_TALENT.id}
-          gapHighlightMode={GapHighlight.FullCooldown}
-        />
       </Section>
       <MajorDefensives />
       <PreparationSection />

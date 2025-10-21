@@ -63,8 +63,6 @@ class Checklist extends BaseChecklist {
           iceLanceNotShattered: this.iceLance.nonShatteredIceLanceThresholds,
           wintersChillShatter: this.wintersChill.wintersChillShatterThresholds,
           wintersChillHardCasts: this.wintersChill.wintersChillPreCastThresholds,
-          arcaneIntellectUptime: this.arcaneIntellect.suggestionThresholds,
-          cancelledCasts: this.cancelledCasts.suggestionThresholds,
           waterElementalUptime: this.waterElemental.waterElementalUptimeThresholds,
         }}
       />

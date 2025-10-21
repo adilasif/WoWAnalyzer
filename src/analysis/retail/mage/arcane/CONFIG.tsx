@@ -50,8 +50,8 @@ const config: Config = {
       frontmatterType: 'guide',
       notes: (
         <AlertWarning>
-          This is now updated for 11.0.5. If you notice any issues or if something is missing, ping
-          me in the Altered Time Mage Discord <code>@Sharrq</code>
+          This spec is not being updated for The War Within or Midnight Prepatch. All analysis is in
+          preparation of Midnight's full release.
         </AlertWarning>
       ),
     },

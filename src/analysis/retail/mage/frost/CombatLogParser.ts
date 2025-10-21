@@ -1,17 +1,12 @@
 import {
   ArcaneIntellect,
   CancelledCasts,
-  DivertedEnergy,
   ElementalBarrier,
   QuickWitted,
-  MirrorImage,
-  ShiftingPower,
-  TempestBarrier,
   MasterOfTime,
   SharedCode,
   IceBlock,
   IceCold,
-  GreaterInvisibility,
 } from 'analysis/retail/mage/shared';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
@@ -95,17 +90,12 @@ class CombatLogParser extends CoreCombatLogParser {
 
     //Talents - Shared
     elementalBarrier: ElementalBarrier,
-    divertedEnergy: DivertedEnergy,
     quickWitted: QuickWitted,
-    tempestBarrier: TempestBarrier,
-    shiftingPower: ShiftingPower,
     masterOfTime: MasterOfTime,
 
     // Defensives - Shared
-    mirrorImage: MirrorImage,
     iceBlock: IceBlock,
     iceCold: IceCold,
-    greterInvisibility: GreaterInvisibility,
 
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,
