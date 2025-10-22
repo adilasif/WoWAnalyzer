@@ -4,12 +4,9 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { formatDurationMillisMinSec } from 'common/format';
 import Analyzer from 'parser/core/Analyzer';
-import {
-  MageGuideSection,
-  InlineStatistic,
-  CastSummary,
-  type CastEvaluation,
-} from '../../shared/components';
+import CastSummary, { type CastEvaluation } from 'interface/guide/components/CastSummary';
+import GuideSection from 'interface/guide/components/GuideSection';
+import InlineStatistic from 'interface/guide/components/StatisticCard';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 
 import ArcaneMissiles, { ArcaneMissilesData } from '../analyzers/ArcaneMissiles';
@@ -163,20 +160,90 @@ class ArcaneMissilesGuide extends Analyzer {
 
     const averageDelayPerf = this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay);
 
+    const totalCasts = this.arcaneMissiles.missileData.length;
+    const totalCastsTooltip = <>Total number of Arcane Missiles casts during the encounter.</>;
+
+    const castsWithoutNextCast = this.arcaneMissiles.castsWithoutNextCast;
+    const castsWithoutNextCastTooltip = (
+      <>
+        Number of Arcane Missiles casts where no follow-up cast was detected (typically at end of
+        fight).
+      </>
+    );
+
+    const clippedCasts = this.arcaneMissiles.missileData.filter((m) => m.clipped).length;
+    const clippedCastsTooltip = (
+      <>Number of Arcane Missiles casts that were clipped (didn't reach full channel duration).</>
+    );
+
+    const cappedCasts = this.arcaneMissiles.missileData.filter((m) => m.clearcastingCapped).length;
+    const cappedCastsTooltip = (
+      <>
+        Number of Arcane Missiles casts made while at maximum Clearcasting stacks (avoiding munched
+        procs).
+      </>
+    );
+
+    const aetherAttunementCasts = this.arcaneMissiles.missileData.filter(
+      (m) => m.aetherAttunement,
+    ).length;
+    const aetherAttunementTooltip = (
+      <>Number of Arcane Missiles casts made with the Aether Attunement buff active.</>
+    );
+
+    const averageTicks =
+      this.arcaneMissiles.missileData.reduce((sum, m) => sum + m.ticks, 0) / totalCasts;
+    const averageTicksTooltip = <>Average number of damage ticks per Arcane Missiles cast.</>;
+
     return (
-      <MageGuideSection spell={TALENTS.ARCANE_MISSILES_TALENT} explanation={explanation}>
+      <GuideSection spell={TALENTS.ARCANE_MISSILES_TALENT} explanation={explanation}>
         <InlineStatistic
-          value={formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3)}
-          label="Average Delay from Channel End to Next Cast"
-          tooltip={averageDelayTooltip}
-          performance={averageDelayPerf}
+          title="Arcane Missiles Statistics"
+          stats={[
+            {
+              value: formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
+              label: 'Avg Delay from Channel End',
+              tooltip: averageDelayTooltip,
+              performance: averageDelayPerf,
+            },
+            {
+              value: `${totalCasts}`,
+              label: 'Total Casts',
+              tooltip: totalCastsTooltip,
+            },
+            {
+              value: `${castsWithoutNextCast}`,
+              label: 'Casts Without Follow-up',
+              tooltip: castsWithoutNextCastTooltip,
+            },
+            {
+              value: `${clippedCasts}`,
+              label: 'Clipped Casts',
+              tooltip: clippedCastsTooltip,
+            },
+            {
+              value: `${cappedCasts}`,
+              label: 'Casts While Capped',
+              tooltip: cappedCastsTooltip,
+            },
+            {
+              value: `${aetherAttunementCasts}`,
+              label: 'Aether Attunement Casts',
+              tooltip: aetherAttunementTooltip,
+            },
+            {
+              value: averageTicks.toFixed(1),
+              label: 'Average Ticks',
+              tooltip: averageTicksTooltip,
+            },
+          ]}
         />
         <CastSummary
           spell={TALENTS.ARCANE_MISSILES_TALENT}
           casts={this.arcaneMissiles.missileData.map((cast) => this.evaluateMissilesCast(cast))}
           showBreakdown
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }

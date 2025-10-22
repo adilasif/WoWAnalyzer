@@ -1,5 +1,5 @@
-import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { PerformanceMark } from 'interface/guide';
+import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 
 interface GuideTooltipProps {
   formatTimestamp: (timestamp: number) => string;
@@ -10,10 +10,6 @@ interface GuideTooltipProps {
 
 /**
  * Formatted tooltip for cast performance displays.
- * @param formatTimestamp - Function to format the timestamp
- * @param performance - Overall performance rating
- * @param tooltipItems - Array of detail items with individual performance ratings
- * @param timestamp - Event timestamp in ms
  */
 export default function GuideTooltip({
   formatTimestamp,

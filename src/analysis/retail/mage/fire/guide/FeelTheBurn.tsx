@@ -1,15 +1,12 @@
-import { formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
-import { SpellIcon, SpellLink, TooltipElement } from 'interface';
+import { SpellLink } from 'interface';
 import Analyzer from 'parser/core/Analyzer';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { GUIDE_CORE_EXPLANATION_PERCENT } from 'analysis/retail/mage/arcane/Guide';
+import BuffUptimeBar from 'interface/guide/components/BuffUptimeBar';
 
-import { getUptimesFromBuffHistory } from 'parser/ui/UptimeBar';
-import UptimeStackBar, { getStackUptimesFromBuffHistory } from 'parser/ui/UptimeStackBar';
 import { FEEL_THE_BURN_MAX_STACKS } from '../../shared';
 import FeelTheBurn from '../talents/FeelTheBurn';
 
@@ -53,45 +50,17 @@ class FeelTheBurnGuide extends Analyzer {
       </>
     );
     const buffHistory = this.selectedCombatant.getBuffHistory(SPELLS.FEEL_THE_BURN_BUFF.id);
-    const overallUptimes = getUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
-    const stackUptimes = getStackUptimesFromBuffHistory(buffHistory, this.owner.currentTimestamp);
 
     const data = (
-      <div>
-        <RoundedPanel>
-          <strong>Feel the Burn Uptime</strong>
-          <div className="flex-main multi-uptime-bar">
-            <div className="flex main-bar-big">
-              <div className="flex-sub bar-label">
-                <SpellIcon spell={TALENTS.FEEL_THE_BURN_TALENT} />{' '}
-                <span style={{ color: BURN_BG_COLOR }}>
-                  {formatPercentage(this.feelTheBurn.buffUptimePercent, 0)}% <small>active</small>
-                </span>
-                <br />
-                <TooltipElement
-                  content={`This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`}
-                >
-                  <span style={{ color: BURN_COLOR }}>
-                    {this.feelTheBurn.averageStacks.toFixed(1)} <small>avg stacks</small>
-                  </span>
-                </TooltipElement>
-              </div>
-              <div className="flex-main chart">
-                <UptimeStackBar
-                  stackUptimeHistory={stackUptimes}
-                  start={this.owner.fight.start_time}
-                  end={this.owner.fight.end_time}
-                  maxStacks={FEEL_THE_BURN_MAX_STACKS}
-                  barColor={BURN_COLOR}
-                  backgroundHistory={overallUptimes}
-                  backgroundBarColor={BURN_BG_COLOR}
-                  timeTooltip
-                />
-              </div>
-            </div>
-          </div>
-        </RoundedPanel>
-      </div>
+      <BuffUptimeBar
+        spell={TALENTS.FEEL_THE_BURN_TALENT}
+        buffHistory={buffHistory}
+        startTime={this.owner.fight.start_time}
+        endTime={this.owner.fight.end_time}
+        maxStacks={FEEL_THE_BURN_MAX_STACKS}
+        barColor={BURN_COLOR}
+        backgroundBarColor={BURN_BG_COLOR}
+      />
     );
 
     return explanationAndDataSubsection(

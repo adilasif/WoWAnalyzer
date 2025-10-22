@@ -3,7 +3,8 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Analyzer from 'parser/core/Analyzer';
-import { MageGuideSection, ManaChart as ManaChartComponent } from '../../shared/components';
+import GuideSection from 'interface/guide/components/GuideSection';
+import { ManaChart as ManaChartComponent } from '../../shared/components';
 import ManaValues from 'parser/shared/modules/ManaValues';
 import ArcaneSurge from '../analyzers/ArcaneSurge';
 import TouchOfTheMagi from '../analyzers/TouchOfTheMagi';
@@ -106,7 +107,7 @@ class ManaChart extends Analyzer {
     }));
 
     return (
-      <MageGuideSection
+      <GuideSection
         spell={TALENTS.EVOCATION_TALENT}
         title="Mana Management"
         explanation={explanation}
@@ -124,7 +125,7 @@ class ManaChart extends Analyzer {
           showBossHealth
           reportCode={this.owner.report.code}
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }

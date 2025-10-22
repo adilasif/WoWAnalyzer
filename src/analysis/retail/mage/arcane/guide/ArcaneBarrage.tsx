@@ -3,12 +3,11 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { formatPercentage, formatDuration } from 'common/format';
-import {
-  MageGuideSection,
-  CastDetails,
-  type CastEntry,
-  type CastDetail,
-} from '../../shared/components';
+import GuideSection from 'interface/guide/components/GuideSection';
+import CastDetail, {
+  type PerCastData,
+  type PerCastStat,
+} from 'interface/guide/components/CastDetail';
 import Analyzer from 'parser/core/Analyzer';
 import ArcaneBarrage, { ArcaneBarrageData } from '../analyzers/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
@@ -30,13 +29,10 @@ class ArcaneBarrageGuide extends Analyzer {
   private readonly AOE_THRESHOLD = 3;
 
   /**
-   * Evaluates a single Arcane Barrage cast for CastDetails.
-   * Returns complete cast information including performance, details array, and notes.
-   *
-   * This is more comprehensive than CastSummary evaluation because CastDetails
-   * needs structured detail items and rich explanatory notes.
+   * Evaluates a single Arcane Barrage cast for CastDetail.
+   * Returns complete cast information including performance and stats.
    */
-  private evaluateBarrageCast(cast: ArcaneBarrageData): CastEntry {
+  private evaluateBarrageCast(cast: ArcaneBarrageData): PerCastData {
     // Calculate conditions (same as CastSummary version)
     const hasMaxCharges = cast.charges >= this.MAX_ARCANE_CHARGES;
     const isAOE = cast.targetsHit >= this.AOE_THRESHOLD;
@@ -115,21 +111,13 @@ class ArcaneBarrageGuide extends Analyzer {
       notes = 'Wasted Arcane Charges - no clear benefit to casting Barrage';
     }
 
-    // Build details array (CastDetails-specific)
-    const details: CastDetail[] = [];
+    // Build stats array for CastDetail
+    const stats: PerCastStat[] = [];
 
-    // Arcane Charges - provide performance, component handles color
-    const chargePerformance =
-      cast.charges >= this.MAX_ARCANE_CHARGES
-        ? QualitativePerformance.Perfect
-        : cast.charges >= 3
-          ? QualitativePerformance.Good
-          : QualitativePerformance.Fail;
-
-    details.push({
+    // Arcane Charges
+    stats.push({
       label: 'Arcane Charges',
       value: `${cast.charges} / ${this.MAX_ARCANE_CHARGES}`,
-      performance: chargePerformance,
       tooltip:
         cast.charges >= this.MAX_ARCANE_CHARGES
           ? 'Maximum charges'
@@ -138,21 +126,18 @@ class ArcaneBarrageGuide extends Analyzer {
 
     // Targets Hit
     if (cast.targetsHit > 0) {
-      details.push({
+      stats.push({
         label: 'Targets Hit',
-        value: cast.targetsHit,
-        performance:
-          cast.targetsHit >= this.AOE_THRESHOLD ? QualitativePerformance.Good : undefined,
+        value: `${cast.targetsHit}`,
         tooltip: cast.targetsHit >= this.AOE_THRESHOLD ? 'Good AOE opportunity' : undefined,
       });
     }
 
     // Mana
     if (cast.mana !== undefined) {
-      details.push({
+      stats.push({
         label: 'Mana',
         value: formatPercentage(cast.mana, 0),
-        performance: cast.mana <= this.LOW_MANA_THRESHOLD ? QualitativePerformance.Ok : undefined,
         tooltip:
           cast.mana <= this.LOW_MANA_THRESHOLD ? 'Low mana - emergency cast acceptable' : undefined,
       });
@@ -174,10 +159,9 @@ class ArcaneBarrageGuide extends Analyzer {
     }
 
     if (activeBuffs.length > 0) {
-      details.push({
+      stats.push({
         label: 'Active Buffs',
-        value: activeBuffs.length,
-        performance: QualitativePerformance.Good,
+        value: `${activeBuffs.length}`,
         tooltip: (
           <>
             {activeBuffs.map((buff, i) => (
@@ -191,10 +175,9 @@ class ArcaneBarrageGuide extends Analyzer {
     // Tempo Remaining (Spellslinger)
     if (this.isSpellslinger && cast.tempoRemaining !== undefined) {
       const tempoSeconds = cast.tempoRemaining / 1000;
-      details.push({
+      stats.push({
         label: 'Tempo Remaining',
         value: `${tempoSeconds.toFixed(1)}s`,
-        performance: tempoSeconds < 5 ? QualitativePerformance.Ok : undefined,
         tooltip:
           tempoSeconds < 5 ? (
             <>
@@ -206,10 +189,9 @@ class ArcaneBarrageGuide extends Analyzer {
 
     // Touch CD
     if (cast.touchCD > 0) {
-      details.push({
+      stats.push({
         label: 'Touch CD',
         value: formatDuration(cast.touchCD),
-        performance: cast.touchCD <= 5000 ? QualitativePerformance.Good : undefined,
         tooltip:
           cast.touchCD <= 5000 ? (
             <>
@@ -219,13 +201,11 @@ class ArcaneBarrageGuide extends Analyzer {
       });
     }
 
-    // Return complete CastEntry object
+    // Return complete PerCastData object
     return {
-      spell: SPELLS.ARCANE_BARRAGE,
-      timestamp: cast.cast.timestamp,
       performance,
-      details,
-      notes,
+      stats,
+      tooltip: notes,
     };
   }
 
@@ -259,19 +239,12 @@ class ArcaneBarrageGuide extends Analyzer {
     );
 
     return (
-      <MageGuideSection
-        spell={SPELLS.ARCANE_BARRAGE}
-        explanation={explanation}
-        title="Arcane Barrage (Detailed View)"
-      >
-        <CastDetails
-          title="Individual Cast Breakdown"
+      <GuideSection spell={SPELLS.ARCANE_BARRAGE} explanation={explanation} title="Arcane Barrage">
+        <CastDetail
+          title="Arcane Barrage Casts"
           casts={this.arcaneBarrage.barrageData.map((cast) => this.evaluateBarrageCast(cast))}
-          showViewToggle={true}
-          showPerformanceFilter={true}
-          defaultShowFailuresOnly={false}
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }

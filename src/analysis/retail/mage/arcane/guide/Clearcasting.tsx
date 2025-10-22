@@ -2,7 +2,8 @@ import SPELLS from 'common/SPELLS';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
-import { MageGuideSection, CastSummary, type CastEvaluation } from '../../shared/components';
+import CastSummary, { type CastEvaluation } from 'interface/guide/components/CastSummary';
+import GuideSection from 'interface/guide/components/GuideSection';
 
 import Clearcasting, { ClearcastingData } from '../analyzers/Clearcasting';
 
@@ -63,7 +64,7 @@ class ClearcastingGuide extends Analyzer {
     );
 
     return (
-      <MageGuideSection spell={SPELLS.CLEARCASTING_ARCANE} explanation={explanation}>
+      <GuideSection spell={SPELLS.CLEARCASTING_ARCANE} explanation={explanation}>
         <CastSummary
           spell={SPELLS.CLEARCASTING_ARCANE}
           casts={this.clearcasting.clearcastingProcs.map((proc) =>
@@ -71,7 +72,7 @@ class ClearcastingGuide extends Analyzer {
           )}
           showBreakdown
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }

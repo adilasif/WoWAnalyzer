@@ -2,7 +2,8 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import Analyzer from 'parser/core/Analyzer';
-import { MageGuideSection, BuffUptimeBar } from '../../shared/components';
+import GuideSection from 'interface/guide/components/GuideSection';
+import BuffUptimeBar from 'interface/guide/components/BuffUptimeBar';
 import { ARCANE_TEMPO_MAX_STACKS } from '../../shared/constants';
 
 import ArcaneTempo from '../analyzers/ArcaneTempo';
@@ -31,7 +32,7 @@ class ArcaneTempoGuide extends Analyzer {
 
     const buffHistory = this.selectedCombatant.getBuffHistory(SPELLS.ARCANE_TEMPO_BUFF.id);
     return (
-      <MageGuideSection spell={TALENTS.ARCANE_TEMPO_TALENT} explanation={explanation}>
+      <GuideSection spell={TALENTS.ARCANE_TEMPO_TALENT} explanation={explanation}>
         <BuffUptimeBar
           spell={TALENTS.ARCANE_TEMPO_TALENT}
           buffHistory={buffHistory}
@@ -41,7 +42,7 @@ class ArcaneTempoGuide extends Analyzer {
           barColor={TEMPO_COLOR}
           backgroundBarColor={TEMPO_BG_COLOR}
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }
