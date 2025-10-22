@@ -41,7 +41,7 @@ class StrikeoftheWindlord extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_MONK.STRIKE_OF_THE_WINDLORD_TALENT.id}
+        spell={TALENTS_MONK.STRIKE_OF_THE_WINDLORD_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

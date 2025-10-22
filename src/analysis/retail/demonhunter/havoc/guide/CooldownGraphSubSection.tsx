@@ -54,14 +54,14 @@ const CooldownGraphSubsection = () => {
         have fit a whole extra use of the cooldown.
       </p>
       <CastEfficiencyBar
-        spellId={SPELLS.METAMORPHOSIS_HAVOC.id}
+        spell={SPELLS.METAMORPHOSIS_HAVOC}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons={hasTooManyCasts}
       />
       {cooldowns.map((cooldownCheck) => (
         <CastEfficiencyBar
           key={cooldownCheck.talent.id}
-          spellId={cooldownCheck.talent.id}
+          spell={cooldownCheck.talent}
           gapHighlightMode={GapHighlight.FullCooldown}
           minimizeIcons={hasTooManyCasts}
         />

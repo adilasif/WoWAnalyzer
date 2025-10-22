@@ -198,7 +198,7 @@ export class BlessingOfTheSeasons extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.BLESSING_OF_SUMMER_TALENT.id}
+        spell={TALENTS.BLESSING_OF_SUMMER_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

@@ -656,7 +656,7 @@ class UnleashLife extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.UNLEASH_LIFE_TALENT.id}
+        spell={TALENTS.UNLEASH_LIFE_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
         minimizeIcons

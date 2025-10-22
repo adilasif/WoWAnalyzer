@@ -166,7 +166,7 @@ class NaturesSwiftness extends Analyzer {
           </strong>
           <div className="flex-main chart" style={{ padding: 15 }}>
             <CastEfficiencyBar
-              spellId={TALENTS_SHAMAN.NATURES_SWIFTNESS_TALENT.id}
+              spell={TALENTS_SHAMAN.NATURES_SWIFTNESS_TALENT}
               useThresholds
               gapHighlightMode={GapHighlight.FullCooldown}
             />{' '}

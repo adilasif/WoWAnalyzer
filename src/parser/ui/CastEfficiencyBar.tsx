@@ -4,13 +4,13 @@ import { CooldownBar, CooldownWindow, GapHighlight } from 'parser/ui/CooldownBar
 import { SpellIcon, SpellLink, TooltipElement } from 'interface';
 import { BadColor, GoodColor, MediocreColor, OkColor, useAnalyzer } from 'interface/guide';
 import CastEfficiency from 'parser/shared/modules/CastEfficiency';
+import Abilities from 'parser/core/modules/Abilities';
 import { formatPercentage } from 'common/format';
 import Spell from 'common/SPELLS/Spell';
 
 interface Props {
-  /** The spellId to show cooldown bars for - this must match the ID of the spell's cast event */
-  spellId?: number;
-  spell?: Spell;
+  /** The spell to show cooldown bars for - this must match the ID of the spell's cast event */
+  spell: Spell | number;
   /** Gap highlight mode - see {@link GapHighlight} */
   gapHighlightMode: GapHighlight;
   /** If true, spell uses will be represented by a minimal white line instead of the spell icon.
@@ -24,32 +24,46 @@ interface Props {
    * If not specified, defaults to the whole fight.
    */
   activeWindows?: CooldownWindow[];
+  /** If true, hides the cast efficiency percentage and icon on the left side.
+   *  Useful when you want just the timeline visualization in a guide section. */
+  hideEfficiency?: boolean;
+  /** If provided, shows explanatory text above the cooldown bar.
+   *  Text is automatically generated based on whether the spell has charges. */
+  showExplanation?: boolean;
 }
 
 /**
  * Displays a spell's cast efficiency on the left,
  * and then that spell's {@link CooldownBar} on the right.
- * @param spellId the spell ID to show cast effic and cooldowns for
+ * @param spell the spell or spell ID to show cast effic and cooldowns for
  * @param gapHighlightMode see {@link CooldownBar} props
  * @param minimizeIcons see {@link CooldownBar} props
  * @param useThresholds iff true, the cast efficiency percentage will be color coded by performance
  *    using the abilities efficiency requirements.
  * @param slimLines iff true, then cast lines will be skinnier. Very useful for high CPM abilities!
+ * @param hideEfficiency iff true, hides the left side efficiency display (useful for guide sections)
+ * @param showExplanation iff true, shows explanatory text above the timeline
  */
 export default function CastEfficiencyBar({
-  spellId,
   spell,
   gapHighlightMode,
   minimizeIcons,
   useThresholds,
   slimLines,
   activeWindows,
+  hideEfficiency,
+  showExplanation,
 }: Props & {
   useThresholds?: boolean;
 }): JSX.Element {
-  const rawSpellId = spell ? spell.id : spellId!;
-  const spellObj = spell ? spell : spellId!;
+  const rawSpellId = typeof spell === 'number' ? spell : spell.id;
+  const spellObj = typeof spell === 'number' ? spell : spell;
   const castEffic = useAnalyzer(CastEfficiency)?.getCastEfficiencyForSpellId(rawSpellId);
+  const abilities = useAnalyzer(Abilities);
+
+  // Determine if spell has charges for explanation text
+  const ability = abilities?.getAbility(rawSpellId);
+  const hasCharges = ability && ability.charges > 1;
   let tooltip: ReactNode = `Couldn't get cast efficiency info!`;
   let utilDisplay = `N/A`;
   let textColor: string | undefined;
@@ -87,21 +101,51 @@ export default function CastEfficiencyBar({
   }
 
   return (
-    <CooldownUtilBarContainer>
-      <div style={{ color: textColor }}>
-        <SpellIcon spell={spellObj} style={{ height: '28px' }} />{' '}
-        <TooltipElement content={tooltip}>
-          {utilDisplay} <small>effic</small>
-        </TooltipElement>
-      </div>
-      <CooldownBar
-        activeWindows={activeWindows}
-        spellId={rawSpellId}
-        gapHighlightMode={gapHighlightMode}
-        minimizeIcons={minimizeIcons}
-        slimLines={slimLines}
-      />
-    </CooldownUtilBarContainer>
+    <div>
+      {showExplanation && (
+        <ExplanationText>
+          <strong>Cooldown Timeline</strong>
+          <small>
+            {hasCharges ? (
+              <>
+                {' '}
+                - yellow when cooling down, red when all charges available, white lines show casts.
+              </>
+            ) : (
+              <>
+                {' '}
+                - red gaps are times the spell was available but not cast, white lines show casts.
+              </>
+            )}
+          </small>
+        </ExplanationText>
+      )}
+      {hideEfficiency ? (
+        <CooldownBar
+          activeWindows={activeWindows}
+          spellId={rawSpellId}
+          gapHighlightMode={gapHighlightMode}
+          minimizeIcons={minimizeIcons}
+          slimLines={slimLines}
+        />
+      ) : (
+        <CooldownUtilBarContainer>
+          <div style={{ color: textColor }}>
+            <SpellIcon spell={spellObj} style={{ height: '28px' }} />{' '}
+            <TooltipElement content={tooltip}>
+              {utilDisplay} <small>effic</small>
+            </TooltipElement>
+          </div>
+          <CooldownBar
+            activeWindows={activeWindows}
+            spellId={rawSpellId}
+            gapHighlightMode={gapHighlightMode}
+            minimizeIcons={minimizeIcons}
+            slimLines={slimLines}
+          />
+        </CooldownUtilBarContainer>
+      )}
+    </div>
   );
 }
 
@@ -112,4 +156,16 @@ const CooldownUtilBarContainer = styled.div`
   grid-column-gap: 1em;
   grid-template-columns: 120px 1fr;
   align-items: center;
+`;
+
+const ExplanationText = styled.div`
+  margin-bottom: 8px;
+
+  strong {
+    display: block;
+  }
+
+  small {
+    color: #999;
+  }
 `;

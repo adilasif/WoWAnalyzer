@@ -191,7 +191,7 @@ class EmeraldCommunion extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_EVOKER.EMERALD_COMMUNION_TALENT.id}
+        spell={TALENTS_EVOKER.EMERALD_COMMUNION_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

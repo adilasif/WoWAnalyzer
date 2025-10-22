@@ -167,7 +167,7 @@ class CloudburstTotem extends Analyzer {
   guideCastEfficiency() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.CLOUDBURST_TOTEM_TALENT.id}
+        spell={TALENTS.CLOUDBURST_TOTEM_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
         minimizeIcons

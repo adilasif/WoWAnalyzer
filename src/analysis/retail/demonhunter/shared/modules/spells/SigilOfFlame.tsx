@@ -59,7 +59,7 @@ export default class SigilOfFlame extends Analyzer {
               <SpellLink spell={this.spell} /> cast efficiency
             </strong>
             <CastEfficiencyBar
-              spellId={this.spell.id}
+              spell={this.spell}
               gapHighlightMode={GapHighlight.FullCooldown}
               minimizeIcons
               useThresholds

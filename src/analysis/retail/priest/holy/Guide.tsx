@@ -44,21 +44,21 @@ function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof Co
       whole extra use of the cooldown.
       {info.combatant.hasTalent(TALENTS_PRIEST.DIVINE_HYMN_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_PRIEST.DIVINE_HYMN_TALENT.id}
+          spell={TALENTS_PRIEST.DIVINE_HYMN_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_PRIEST.APOTHEOSIS_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_PRIEST.APOTHEOSIS_TALENT.id}
+          spell={TALENTS_PRIEST.APOTHEOSIS_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_PRIEST.HALO_SHARED_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_PRIEST.HALO_SHARED_TALENT.id}
+          spell={TALENTS_PRIEST.HALO_SHARED_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />

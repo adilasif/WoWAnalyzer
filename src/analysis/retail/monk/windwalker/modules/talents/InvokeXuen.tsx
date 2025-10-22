@@ -44,7 +44,7 @@ class InvokeXuen extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_MONK.INVOKE_XUEN_THE_WHITE_TIGER_TALENT.id}
+        spell={TALENTS_MONK.INVOKE_XUEN_THE_WHITE_TIGER_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

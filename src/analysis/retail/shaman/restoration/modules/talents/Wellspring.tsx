@@ -267,7 +267,7 @@ class Wellspring extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.WELLSPRING_TALENT.id}
+        spell={TALENTS.WELLSPRING_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
         minimizeIcons

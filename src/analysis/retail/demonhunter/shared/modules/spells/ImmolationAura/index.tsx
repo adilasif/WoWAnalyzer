@@ -106,7 +106,7 @@ class ImmolationAura extends Analyzer {
               <SpellLink spell={SPELLS.IMMOLATION_AURA} /> cast efficiency
             </strong>
             <CastEfficiencyBar
-              spellId={SPELLS.IMMOLATION_AURA.id}
+              spell={SPELLS.IMMOLATION_AURA}
               gapHighlightMode={GapHighlight.FullCooldown}
               minimizeIcons
               useThresholds

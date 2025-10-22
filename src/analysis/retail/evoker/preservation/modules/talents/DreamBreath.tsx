@@ -165,10 +165,10 @@ class DreamBreath extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={
+        spell={
           this.selectedCombatant.hasTalent(TALENTS_EVOKER.FONT_OF_MAGIC_PRESERVATION_TALENT)
-            ? SPELLS.DREAM_BREATH_FONT.id
-            : TALENTS_EVOKER.DREAM_BREATH_TALENT.id
+            ? SPELLS.DREAM_BREATH_FONT
+            : TALENTS_EVOKER.DREAM_BREATH_TALENT
         }
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons

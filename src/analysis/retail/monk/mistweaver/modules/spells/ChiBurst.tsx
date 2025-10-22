@@ -88,7 +88,7 @@ class ChiBurst extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_MONK.CHI_BURST_SHARED_TALENT.id}
+        spell={TALENTS_MONK.CHI_BURST_SHARED_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         useThresholds

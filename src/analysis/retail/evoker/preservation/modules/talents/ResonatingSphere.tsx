@@ -58,7 +58,7 @@ class ResonatingSphere extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_EVOKER.TEMPORAL_ANOMALY_TALENT.id}
+        spell={TALENTS_EVOKER.TEMPORAL_ANOMALY_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         useThresholds

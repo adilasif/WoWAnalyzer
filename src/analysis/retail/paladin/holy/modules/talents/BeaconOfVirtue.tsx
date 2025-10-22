@@ -69,7 +69,7 @@ class BeaconOfVirtue extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.BEACON_OF_VIRTUE_TALENT.id}
+        spell={TALENTS.BEACON_OF_VIRTUE_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

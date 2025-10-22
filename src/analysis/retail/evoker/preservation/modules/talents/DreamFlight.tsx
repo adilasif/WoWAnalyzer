@@ -167,7 +167,7 @@ class DreamFlight extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_EVOKER.DREAM_FLIGHT_TALENT.id}
+        spell={TALENTS_EVOKER.DREAM_FLIGHT_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

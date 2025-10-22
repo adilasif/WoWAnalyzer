@@ -248,7 +248,7 @@ class HolyPrismTargetsHit extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.HOLY_PRISM_TALENT.id}
+        spell={TALENTS.HOLY_PRISM_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

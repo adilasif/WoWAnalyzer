@@ -224,7 +224,7 @@ class FistsofFury extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_MONK.FISTS_OF_FURY_TALENT.id}
+        spell={TALENTS_MONK.FISTS_OF_FURY_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

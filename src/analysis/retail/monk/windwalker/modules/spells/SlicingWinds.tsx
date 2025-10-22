@@ -41,7 +41,7 @@ class SlicingWinds extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_MONK.SLICING_WINDS_TALENT.id}
+        spell={TALENTS_MONK.SLICING_WINDS_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

@@ -208,7 +208,7 @@ class RayOfFrost extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.RAY_OF_FROST_TALENT.id}
+        spell={TALENTS.RAY_OF_FROST_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines
