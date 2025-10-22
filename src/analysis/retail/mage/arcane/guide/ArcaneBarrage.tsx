@@ -234,6 +234,7 @@ class ArcaneBarrageGuide extends Analyzer {
       performance,
       stats,
       tooltip: notes,
+      timestamp: this.owner.formatTimestamp(cast.cast.timestamp),
     };
   }
 

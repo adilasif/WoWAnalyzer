@@ -33,14 +33,12 @@ interface CastSequenceProps<T = unknown> {
  * Navigable cast sequence visualization showing spell icons in a filmstrip layout.
  * @param spell - The spell/ability being analyzed
  * @param sequences - Array of cast sequence entries containing cast data
- * @param windowDescription - Optional description of the time window (e.g., "3s window")
  * @param castTimestamp - Function to format timestamp from cast data
  * @param iconSize - Size in pixels for spell icons (default: 40)
  */
 export default function CastSequence<T>({
   spell,
   sequences,
-  windowDescription,
   castTimestamp,
   iconSize = 40,
 }: CastSequenceProps<T>) {
@@ -78,7 +76,9 @@ export default function CastSequence<T>({
       <TopSection>
         <LeftColumn>
           <HeaderTitle>{spell.name} Cast Sequences</HeaderTitle>
-          <SequenceLabel>Cast Sequence</SequenceLabel>
+          <SequenceLabel>
+            Cast Sequence {windowStart !== undefined && `at ${castTimestamp(currentSequence.data)}`}
+          </SequenceLabel>
         </LeftColumn>
         <NavigationButtons>
           <NavButton type="button" onClick={handlePrevious} aria-label="Previous sequence">
@@ -256,16 +256,7 @@ const SpellIcon = styled.div<{ size: number; color: string }>`
   border-radius: 6px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.5);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-
-  &:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    z-index: 10;
-  }
 
   img {
     width: 100%;

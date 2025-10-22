@@ -177,9 +177,6 @@ const StatCard = styled.div<{ color: string }>`
   min-width: 70px;
   border-left: 3px solid ${(props) => props.color};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
 `;
 
 const StatValue = styled.div`

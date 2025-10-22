@@ -116,6 +116,7 @@ class ArcaneOrbGuide extends Analyzer {
 
     return {
       performance,
+      timestamp: this.owner.formatTimestamp(cast.timestamp),
       stats,
       tooltip: notes,
     };

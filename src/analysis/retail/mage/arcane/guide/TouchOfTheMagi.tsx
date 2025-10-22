@@ -220,6 +220,7 @@ class TouchOfTheMagiGuide extends Analyzer {
 
       return {
         performance: evaluation.performance,
+        timestamp: this.owner.formatTimestamp(cast.applied),
         stats: [
           {
             value: `${cast.charges}`,

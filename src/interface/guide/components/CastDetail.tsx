@@ -15,6 +15,7 @@ export interface PerCastData {
   performance: QualitativePerformance;
   stats: PerCastStat[];
   tooltip?: React.ReactNode;
+  timestamp: string;
 }
 
 interface CastDetailProps {
@@ -84,27 +85,12 @@ export default function CastDetail({ title, casts, fontSize = '16px' }: CastDeta
     });
   };
 
-  if (filteredCount === 0) {
-    return (
-      <Container>
-        <TopSection>
-          <LeftColumn>
-            <HeaderTitle>{title}</HeaderTitle>
-            <PerformanceLabel>Per-Cast Breakdown</PerformanceLabel>
-          </LeftColumn>
-        </TopSection>
-        <NoResultsMessage>
-          <NoResultsTitle>No casts match the current filter</NoResultsTitle>
-          <NoResultsHint>Try adjusting your performance filters</NoResultsHint>
-        </NoResultsMessage>
-      </Container>
-    );
-  }
-
   // Ensure current index is valid
   const validIndex = Math.min(currentIndex, filteredCount - 1);
-  const currentCast = filteredCasts[validIndex];
-  const currentCastColor = qualitativePerformanceToColor(currentCast.performance);
+  const currentCast = filteredCount > 0 ? filteredCasts[validIndex] : null;
+  const currentCastColor = currentCast
+    ? qualitativePerformanceToColor(currentCast.performance)
+    : 'rgba(255, 255, 255, 0.3)';
 
   return (
     <Container>
@@ -172,46 +158,54 @@ export default function CastDetail({ title, casts, fontSize = '16px' }: CastDeta
         </StatsColumn>
       </TopSection>
       <HelperTextRow>
-        <PerformanceLabel>Per-Cast Breakdown</PerformanceLabel>
+        <PerformanceLabel>Cast Details</PerformanceLabel>
         <HelperText>Click performance boxes to filter casts</HelperText>
       </HelperTextRow>
 
-      <PerformanceContainer color={currentCastColor}>
-        <CastHeader>
-          <CastInfo>
-            <CastTitle>
-              Cast #{casts.indexOf(currentCast) + 1} - {currentCast.performance}
-            </CastTitle>
-          </CastInfo>
-          <NavigationButtons>
-            <NavButton onClick={handlePrevious} disabled={filteredCount <= 1}>
-              ‹
-            </NavButton>
-            <CastCounter>
-              {validIndex + 1} / {filteredCount}
-            </CastCounter>
-            <NavButton onClick={handleNext} disabled={filteredCount <= 1}>
-              ›
-            </NavButton>
-          </NavigationButtons>
-        </CastHeader>
+      {filteredCount === 0 ? (
+        <NoResultsMessage>
+          <NoResultsTitle>No casts match the current filter</NoResultsTitle>
+          <NoResultsHint>Click the performance boxes above to toggle filters</NoResultsHint>
+        </NoResultsMessage>
+      ) : (
+        <PerformanceContainer color={currentCastColor}>
+          <CastHeader>
+            <CastInfo>
+              <CastTitle>
+                Cast #{casts.indexOf(currentCast!) + 1} ({currentCast!.timestamp}) -{' '}
+                {currentCast!.performance}
+              </CastTitle>
+            </CastInfo>
+            <NavigationButtons>
+              <NavButton onClick={handlePrevious} disabled={filteredCount <= 1}>
+                ‹
+              </NavButton>
+              <CastCounter>
+                {validIndex + 1} / {filteredCount}
+              </CastCounter>
+              <NavButton onClick={handleNext} disabled={filteredCount <= 1}>
+                ›
+              </NavButton>
+            </NavigationButtons>
+          </CastHeader>
 
-        <StatsGrid>
-          {currentCast.stats.map((stat, statIdx) => {
-            const borderColor = stat.performance
-              ? qualitativePerformanceToColor(stat.performance)
-              : 'rgba(255, 255, 255, 0.3)';
-            return (
-              <Tooltip key={statIdx} content={stat.tooltip}>
-                <StatItem borderColor={borderColor}>
-                  <StatItemValue fontSize={fontSize}>{stat.value}</StatItemValue>
-                  <StatItemLabel>{stat.label}</StatItemLabel>
-                </StatItem>
-              </Tooltip>
-            );
-          })}
-        </StatsGrid>
-      </PerformanceContainer>
+          <StatsGrid>
+            {currentCast!.stats.map((stat, statIdx) => {
+              const borderColor = stat.performance
+                ? qualitativePerformanceToColor(stat.performance)
+                : 'rgba(255, 255, 255, 0.3)';
+              return (
+                <Tooltip key={statIdx} content={stat.tooltip}>
+                  <StatItem borderColor={borderColor}>
+                    <StatItemValue fontSize={fontSize}>{stat.value}</StatItemValue>
+                    <StatItemLabel>{stat.label}</StatItemLabel>
+                  </StatItem>
+                </Tooltip>
+              );
+            })}
+          </StatsGrid>
+        </PerformanceContainer>
+      )}
     </Container>
   );
 }
@@ -243,7 +237,8 @@ const HeaderTitle = styled.h3`
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 `;
 
-const PerformanceLabel = styled.div`
+const PerformanceLabel = styled.h4`
+  margin: 0;
   font-size: 11px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
@@ -255,7 +250,6 @@ const HelperText = styled.div`
   font-size: 10px;
   color: rgba(255, 255, 255, 0.5);
   font-style: italic;
-  margin-top: 2px;
 `;
 
 const HelperTextRow = styled.div`
@@ -423,14 +417,6 @@ const StatItem = styled.div<{ borderColor: string }>`
   border-radius: 6px;
   border-left: 3px solid ${(props) => props.borderColor};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  }
 `;
 
 const StatItemValue = styled.div<{ fontSize: string }>`

@@ -69,14 +69,6 @@ const StatItem = styled.div<{ color: string }>`
   border-radius: 6px;
   border-left: 3px solid ${(props) => props.color};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  }
 `;
 
 const StatItemValue = styled.div<{ fontSize: string }>`
