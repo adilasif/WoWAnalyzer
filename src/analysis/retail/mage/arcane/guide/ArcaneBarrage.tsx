@@ -115,6 +115,13 @@ class ArcaneBarrageGuide extends Analyzer {
     const stats: PerCastStat[] = [];
 
     // Arcane Charges
+    const chargePerformance =
+      cast.charges >= this.MAX_ARCANE_CHARGES
+        ? QualitativePerformance.Perfect
+        : cast.charges >= 3
+          ? QualitativePerformance.Good
+          : QualitativePerformance.Fail;
+
     stats.push({
       label: 'Arcane Charges',
       value: `${cast.charges} / ${this.MAX_ARCANE_CHARGES}`,
@@ -122,24 +129,39 @@ class ArcaneBarrageGuide extends Analyzer {
         cast.charges >= this.MAX_ARCANE_CHARGES
           ? 'Maximum charges'
           : `Only ${cast.charges} charges`,
+      performance: chargePerformance,
     });
 
     // Targets Hit
     if (cast.targetsHit > 0) {
+      const targetsPerformance =
+        cast.targetsHit >= this.AOE_THRESHOLD
+          ? QualitativePerformance.Good
+          : QualitativePerformance.Ok;
+
       stats.push({
         label: 'Targets Hit',
         value: `${cast.targetsHit}`,
         tooltip: cast.targetsHit >= this.AOE_THRESHOLD ? 'Good AOE opportunity' : undefined,
+        performance: targetsPerformance,
       });
     }
 
     // Mana
     if (cast.mana !== undefined) {
+      const manaPerformance =
+        cast.mana <= this.LOW_MANA_THRESHOLD
+          ? QualitativePerformance.Ok
+          : cast.mana <= 0.5
+            ? QualitativePerformance.Good
+            : undefined;
+
       stats.push({
         label: 'Mana',
         value: formatPercentage(cast.mana, 0),
         tooltip:
           cast.mana <= this.LOW_MANA_THRESHOLD ? 'Low mana - emergency cast acceptable' : undefined,
+        performance: manaPerformance,
       });
     }
 
@@ -175,6 +197,8 @@ class ArcaneBarrageGuide extends Analyzer {
     // Tempo Remaining (Spellslinger)
     if (this.isSpellslinger && cast.tempoRemaining !== undefined) {
       const tempoSeconds = cast.tempoRemaining / 1000;
+      const tempoPerformance = tempoSeconds < 5 ? QualitativePerformance.Ok : undefined;
+
       stats.push({
         label: 'Tempo Remaining',
         value: `${tempoSeconds.toFixed(1)}s`,
@@ -184,11 +208,14 @@ class ArcaneBarrageGuide extends Analyzer {
               Good timing - avoiding <SpellLink spell={SPELLS.ARCANE_TEMPO_BUFF} /> expiration
             </>
           ) : undefined,
+        performance: tempoPerformance,
       });
     }
 
     // Touch CD
     if (cast.touchCD > 0) {
+      const touchPerformance = cast.touchCD <= 5000 ? QualitativePerformance.Good : undefined;
+
       stats.push({
         label: 'Touch CD',
         value: formatDuration(cast.touchCD),
@@ -198,6 +225,7 @@ class ArcaneBarrageGuide extends Analyzer {
               <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} /> almost available
             </>
           ) : undefined,
+        performance: touchPerformance,
       });
     }
 

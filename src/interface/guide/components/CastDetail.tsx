@@ -8,6 +8,7 @@ export interface PerCastStat {
   value: string;
   label: string;
   tooltip: React.ReactNode;
+  performance?: QualitativePerformance;
 }
 
 export interface PerCastData {
@@ -110,8 +111,6 @@ export default function CastDetail({ title, casts, fontSize = '16px' }: CastDeta
       <TopSection>
         <LeftColumn>
           <HeaderTitle>{title}</HeaderTitle>
-          <PerformanceLabel>Per-Cast Breakdown</PerformanceLabel>
-          <HelperText>Click performance boxes to filter casts</HelperText>
         </LeftColumn>
         <StatsColumn>
           {performanceCounts[QualitativePerformance.Perfect] > 0 && (
@@ -172,6 +171,10 @@ export default function CastDetail({ title, casts, fontSize = '16px' }: CastDeta
           )}
         </StatsColumn>
       </TopSection>
+      <HelperTextRow>
+        <PerformanceLabel>Per-Cast Breakdown</PerformanceLabel>
+        <HelperText>Click performance boxes to filter casts</HelperText>
+      </HelperTextRow>
 
       <PerformanceContainer color={currentCastColor}>
         <CastHeader>
@@ -194,14 +197,19 @@ export default function CastDetail({ title, casts, fontSize = '16px' }: CastDeta
         </CastHeader>
 
         <StatsGrid>
-          {currentCast.stats.map((stat, statIdx) => (
-            <Tooltip key={statIdx} content={stat.tooltip}>
-              <StatItem>
-                <StatItemValue fontSize={fontSize}>{stat.value}</StatItemValue>
-                <StatItemLabel>{stat.label}</StatItemLabel>
-              </StatItem>
-            </Tooltip>
-          ))}
+          {currentCast.stats.map((stat, statIdx) => {
+            const borderColor = stat.performance
+              ? qualitativePerformanceToColor(stat.performance)
+              : 'rgba(255, 255, 255, 0.3)';
+            return (
+              <Tooltip key={statIdx} content={stat.tooltip}>
+                <StatItem borderColor={borderColor}>
+                  <StatItemValue fontSize={fontSize}>{stat.value}</StatItemValue>
+                  <StatItemLabel>{stat.label}</StatItemLabel>
+                </StatItem>
+              </Tooltip>
+            );
+          })}
         </StatsGrid>
       </PerformanceContainer>
     </Container>
@@ -248,6 +256,14 @@ const HelperText = styled.div`
   color: rgba(255, 255, 255, 0.5);
   font-style: italic;
   margin-top: 2px;
+`;
+
+const HelperTextRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 16px;
 `;
 
 const StatsColumn = styled.div`
@@ -397,7 +413,7 @@ const StatsGrid = styled.div`
   margin-bottom: 8px;
 `;
 
-const StatItem = styled.div`
+const StatItem = styled.div<{ borderColor: string }>`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -405,7 +421,7 @@ const StatItem = styled.div`
   padding: 8px 12px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
-  border-left: 3px solid rgba(255, 255, 255, 0.3);
+  border-left: 3px solid ${(props) => props.borderColor};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition:
     transform 0.2s ease,
