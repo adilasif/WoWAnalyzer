@@ -22,6 +22,7 @@ import {
   Putro,
   Rzial,
   Seriousnes,
+  Sharrq,
   Sref,
   Taevis,
   Tialyss,
@@ -44,6 +45,8 @@ import SpellLink from 'interface/SpellLink';
 
 // prettier-ignore
 export default [
+  change(date(2025, 10,  14), 'Update CastEfficiencyBar to accept a spell object.', Sharrq),  
+  change(date(2025, 10,  22), 'Add and Update Guide Components for CastSummary, CastDetail, CastSequence, StatisticCard, and BuffUptimeBar.', Sharrq),
   change(date(2025, 10,  14), 'Replace Babel with oxc and swc.', ToppleTheNun),
   change(date(2025, 10, 1), <>Fix crash in Protectors of the Endless analysis if the Foundation timeline is shown. Also fix a zoom bug on the phase header.</>, emallson),
   change(date(2025, 9, 25), <>Add <SpellLink spell={SPELLS.PHASE_BLINK.id} /> to the ignored spells.</>, Arlie),
