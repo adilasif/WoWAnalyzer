@@ -3,8 +3,122 @@ import styled from '@emotion/styled';
 import Spell from 'common/SPELLS/Spell';
 import { Tooltip } from 'interface';
 import { formatPercentage } from 'common/format';
-import UptimeStackBar from 'parser/ui/UptimeStackBar';
 import { TrackedBuffEvent } from 'parser/core/Entity';
+
+// Unified uptime graph - handles both simple buffs and stacked buffs
+function UptimeGraph({
+  buffHistory,
+  stackUptimeHistory,
+  startTime,
+  endTime,
+  maxStacks,
+  barColor,
+  backgroundBarColor,
+}: {
+  buffHistory?: TrackedBuffEvent[];
+  stackUptimeHistory?: { start: number; end: number; stacks: number }[];
+  startTime: number;
+  endTime: number;
+  maxStacks?: number;
+  barColor: string;
+  backgroundBarColor: string;
+}) {
+  const fightDuration = endTime - startTime;
+  const height = 24;
+  const width = 100;
+
+  const timeToX = (time: number) => ((time - startTime) / fightDuration) * width;
+
+  // Handle stacked buffs
+  if (stackUptimeHistory && stackUptimeHistory.length > 0 && maxStacks) {
+    const stacksToY = (stacks: number) => height - (stacks / maxStacks) * height;
+
+    let linePath = `M 0 ${height}`;
+    let fillPath = `M 0 ${height}`;
+    let lastX = 0;
+    let lastY = height;
+
+    stackUptimeHistory.forEach((stack) => {
+      const currentX = timeToX(stack.start);
+      const currentY = stacksToY(stack.stacks);
+      const endX = timeToX(stack.end);
+
+      if (currentX > lastX) {
+        linePath += ` L ${currentX} ${lastY}`;
+        fillPath += ` L ${currentX} ${lastY}`;
+      }
+
+      if (currentY !== lastY) {
+        linePath += ` L ${currentX} ${currentY}`;
+        fillPath += ` L ${currentX} ${currentY}`;
+      }
+
+      linePath += ` L ${endX} ${currentY}`;
+      fillPath += ` L ${endX} ${currentY}`;
+
+      lastX = endX;
+      lastY = currentY;
+    });
+
+    linePath += ` L ${width} ${lastY}`;
+    fillPath += ` L ${width} ${lastY} L ${width} ${height} L 0 ${height} Z`;
+
+    return (
+      <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+        <path d={fillPath} fill={backgroundBarColor} fillOpacity="0.4" />
+        <path
+          d={linePath}
+          fill="none"
+          stroke={barColor}
+          strokeWidth="0.15"
+          strokeLinejoin="miter"
+          shapeRendering="crispEdges"
+        />
+      </svg>
+    );
+  }
+
+  // Handle simple buffs (on/off)
+  if (buffHistory && buffHistory.length > 0) {
+    let linePath = `M 0 ${height}`;
+    let fillPath = '';
+
+    buffHistory.forEach((buff) => {
+      const buffStart = timeToX(buff.start);
+      const buffEnd = timeToX(buff.end === null ? endTime : buff.end);
+
+      linePath += ` L ${buffStart} ${height}`;
+      linePath += ` L ${buffStart} 0`;
+      linePath += ` L ${buffEnd} 0`;
+      linePath += ` L ${buffEnd} ${height}`;
+
+      fillPath += `M ${buffStart} 0 L ${buffEnd} 0 L ${buffEnd} ${height} L ${buffStart} ${height} Z `;
+    });
+
+    linePath += ` L ${width} ${height}`;
+
+    return (
+      <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+        <path d={fillPath} fill={backgroundBarColor} fillOpacity="0.4" />
+        <path
+          d={linePath}
+          fill="none"
+          stroke={barColor}
+          strokeWidth="0.15"
+          strokeLinejoin="miter"
+          shapeRendering="crispEdges"
+        />
+      </svg>
+    );
+  }
+
+  // Empty state
+  return (
+    <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+      <line x1="0" y1={height} x2={width} y2={height} stroke="#555" strokeWidth="1" />
+    </svg>
+  );
+}
 
 interface BuffUptimeBarProps {
   spell: Spell;
@@ -45,6 +159,7 @@ export default function BuffUptimeBar({
   );
   let averageStacks: number | undefined = undefined;
   let stackUptimeHistory: { start: number; end: number; stacks: number }[] | undefined = undefined;
+
   if (hasStacks && maxStacks !== undefined) {
     let totalWeightedStacks = 0;
     stackUptimeHistory = [];
@@ -69,12 +184,6 @@ export default function BuffUptimeBar({
 
     averageStacks = fightDuration > 0 ? totalWeightedStacks / fightDuration : 0;
   }
-
-  // For background bar, just use periods when buff was active
-  const backgroundHistory = buffHistory.map((buff) => ({
-    start: buff.start,
-    end: buff.end === null ? endTime : buff.end,
-  }));
 
   const defaultTooltip = `This is the average number of stacks you had over the course of the fight, counting periods where you didn't have the buff as zero stacks.`;
 
@@ -108,22 +217,17 @@ export default function BuffUptimeBar({
       </TopSection>
 
       <TimelineContainer>
-        <div style={{ height: '100%', position: 'relative' }}>
-          {hasStacks && stackUptimeHistory && maxStacks !== undefined ? (
-            <UptimeStackBar
-              stackUptimeHistory={stackUptimeHistory}
-              start={startTime}
-              end={endTime}
-              maxStacks={maxStacks}
-              barColor={barColor}
-              backgroundHistory={backgroundHistory}
-              backgroundBarColor={backgroundBarColor}
-              timeTooltip
-            />
-          ) : (
-            <SimpleUptimeBar style={{ background: backgroundBarColor }} />
-          )}
-        </div>
+        <UptimeGraphContainer>
+          <UptimeGraph
+            buffHistory={hasStacks ? undefined : buffHistory}
+            stackUptimeHistory={hasStacks ? stackUptimeHistory : undefined}
+            startTime={startTime}
+            endTime={endTime}
+            maxStacks={maxStacks}
+            barColor={barColor}
+            backgroundBarColor={backgroundBarColor}
+          />
+        </UptimeGraphContainer>
       </TimelineContainer>
     </Container>
   );
@@ -205,8 +309,8 @@ const TimelineContainer = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.05);
 `;
 
-const SimpleUptimeBar = styled.div`
+const UptimeGraphContainer = styled.div`
   height: 24px;
-  border-radius: 4px;
   width: 100%;
+  position: relative;
 `;
