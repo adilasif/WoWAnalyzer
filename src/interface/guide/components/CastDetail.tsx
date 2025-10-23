@@ -237,8 +237,7 @@ const HeaderTitle = styled.h3`
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 `;
 
-const PerformanceLabel = styled.h4`
-  margin: 0;
+const PerformanceLabel = styled.div`
   font-size: 11px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
