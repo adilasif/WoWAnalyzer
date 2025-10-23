@@ -6,7 +6,7 @@ import { formatDurationMillisMinSec } from 'common/format';
 import Analyzer from 'parser/core/Analyzer';
 import CastSummary, { type CastEvaluation } from 'interface/guide/components/CastSummary';
 import GuideSection from 'interface/guide/components/GuideSection';
-import InlineStatistic from 'interface/guide/components/StatisticCard';
+import CastOverview from 'interface/guide/components/CastOverview';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 
 import ArcaneMissiles, { ArcaneMissilesData } from '../analyzers/ArcaneMissiles';
@@ -197,8 +197,8 @@ class ArcaneMissilesGuide extends Analyzer {
 
     return (
       <GuideSection spell={TALENTS.ARCANE_MISSILES_TALENT} explanation={explanation}>
-        <InlineStatistic
-          title="Arcane Missiles Statistics"
+        <CastOverview
+          spell={TALENTS.ARCANE_MISSILES_TALENT}
           stats={[
             {
               value: formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),

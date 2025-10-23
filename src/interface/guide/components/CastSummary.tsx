@@ -8,6 +8,18 @@ import { useState } from 'react';
 import GradiatedPerformanceBar from './GradiatedPerformanceBar';
 import GuideTooltip from './GuideTooltip';
 import { BoxRowEntry, PerformanceBoxRow } from './PerformanceBoxRow';
+import {
+  SectionContainer,
+  SectionHeader,
+  TitleColumn,
+  SectionTitle,
+  Label,
+  StatsRow,
+  StatCard,
+  StatValue,
+  StatLabel,
+  HelperText,
+} from './GuideDivs';
 
 export interface CastEvaluation {
   timestamp: number;
@@ -73,13 +85,13 @@ export default function CastSummary({
     : [];
 
   return (
-    <Container>
-      <TopSection>
-        <LeftColumn>
-          <HeaderTitle>{spell.name} Casts</HeaderTitle>
-          <PerformanceLabel>Performance</PerformanceLabel>
-        </LeftColumn>
-        <StatsColumn>
+    <SectionContainer>
+      <SectionHeader>
+        <TitleColumn>
+          <SectionTitle>{spell.name} Casts</SectionTitle>
+          <Label>Performance</Label>
+        </TitleColumn>
+        <StatsRow>
           {perfect > 0 && (
             <Tooltip content={`Perfect casts - ${perfect} / ${total}`}>
               <StatCard color="#4ec9a2">
@@ -112,8 +124,8 @@ export default function CastSummary({
               </StatCard>
             </Tooltip>
           )}
-        </StatsColumn>
-      </TopSection>
+        </StatsRow>
+      </SectionHeader>
 
       {showBreakdown ? (
         <>
@@ -149,83 +161,9 @@ export default function CastSummary({
           />
         </BarContainer>
       )}
-    </Container>
+    </SectionContainer>
   );
 }
-
-const Container = styled.div`
-  margin-bottom: 16px;
-`;
-
-const TopSection = styled.div`
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-  margin-bottom: 8px;
-`;
-
-const LeftColumn = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  justify-content: space-between;
-`;
-
-const HeaderTitle = styled.h3`
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #fab700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-`;
-
-const PerformanceLabel = styled.div`
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-`;
-
-const StatsColumn = styled.div`
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-`;
-
-const StatCard = styled.div<{ color: string }>`
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-  padding: 6px 12px;
-  min-width: 70px;
-  border-left: 3px solid ${(props) => props.color};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-`;
-
-const StatValue = styled.div`
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1;
-  margin-bottom: 2px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-`;
-
-const StatLabel = styled.div`
-  font-size: 10px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-`;
-
-const HelperText = styled.div`
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 6px;
-  font-style: italic;
-`;
 
 const BarContainer = styled.div`
   background: rgba(0, 0, 0, 0.3);

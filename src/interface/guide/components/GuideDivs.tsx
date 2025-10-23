@@ -67,3 +67,252 @@ export const PanelHeader = styled.div`
     height: 24px;
   }
 `;
+
+// ==================
+// Shared Components for Guide Sections with Stats
+// ==================
+
+/** Container for entire component section */
+export const SectionContainer = styled.div`
+  margin-bottom: 16px;
+`;
+
+/** Header section containing title and stats */
+export const SectionHeader = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 8px;
+`;
+
+/** Column for title and labels */
+export const TitleColumn = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: space-between;
+`;
+
+/** Main title/header for guide sections */
+export const SectionTitle = styled.h3`
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fab700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+`;
+
+/** Small label text (e.g., "Timeline", "Performance") */
+export const Label = styled.div`
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`;
+
+/** Column container for stat cards and helper text */
+export const StatColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+`;
+
+/** Row for stat cards */
+export const StatsRow = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+`;
+
+/** Individual stat card with colored border */
+export const StatCard = styled.div<{ color: string }>`
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 6px 12px;
+  min-width: 70px;
+  border-left: 3px solid ${(props) => props.color};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+`;
+
+/** Stat value (large number/text) */
+export const StatValue = styled.div`
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+`;
+
+/** Stat label (small descriptive text) */
+export const StatLabel = styled.div`
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+// ==================
+// Stats Grid Components (for detail views)
+// ==================
+
+/** Grid layout for displaying multiple stat items */
+export const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+`;
+
+/** Individual stat item with colored border (for grid display) */
+export const StatItem = styled.div<{ color: string }>`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border-left: 3px solid ${(props) => props.color};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+`;
+
+/** Stat item value (customizable font size, left-aligned) */
+export const StatItemValue = styled.div<{ fontSize?: string }>`
+  font-size: ${(props) => props.fontSize || '20px'};
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  text-align: left;
+  margin-bottom: 4px;
+`;
+
+/** Stat item label (left-aligned) */
+export const StatItemLabel = styled.div`
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  margin-bottom: 4px;
+`;
+
+// ==================
+// Helper Text Components
+// ==================
+
+/** Helper text - small italicized text for additional context */
+export const HelperText = styled.div`
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 6px;
+  font-style: italic;
+`;
+
+/** Container row for helper text and labels */
+export const HelperTextRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+`;
+
+// ==================
+// Navigation Components
+// ==================
+
+/** Container for navigation buttons */
+export const NavigationButtons = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
+/** Navigation button (previous/next) */
+export const NavButton = styled.button<{ disabled?: boolean }>`
+  width: 32px;
+  height: 32px;
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: ${(props) => (props.disabled ? '#666' : '#fab700')};
+  font-size: 20px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  opacity: ${(props) => (props.disabled ? 0.4 : 1)};
+
+  &:hover:not(:disabled) {
+    background: rgba(250, 183, 0, 0.2);
+    border-color: #fab700;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+`;
+
+/** Counter/info display between navigation buttons */
+export const NavCounter = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 50px;
+  text-align: center;
+`;
+
+// ==================
+// Content Containers (for bars, timelines, etc.)
+// ==================
+
+/** Generic inset container for visualizations (bars, timelines, etc.) */
+export const InsetContainer = styled.div`
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+/** Content container with scrolling capability */
+export const ScrollableContainer = styled.div`
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  &::-webkit-scrollbar {
+    height: 12px;
+    cursor: default !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(104, 103, 100, 0.15);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+`;

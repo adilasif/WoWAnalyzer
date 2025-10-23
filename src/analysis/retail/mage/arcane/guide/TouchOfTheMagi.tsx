@@ -14,7 +14,7 @@ import CastSequence, {
   type CastSequenceEntry,
   type CastInSequence,
 } from 'interface/guide/components/CastSequence';
-import InlineStatistic from 'interface/guide/components/StatisticCard';
+import CastOverview from 'interface/guide/components/CastOverview';
 import CastDetail, { type PerCastData } from 'interface/guide/components/CastDetail';
 
 import EventHistory from 'parser/shared/modules/EventHistory';
@@ -243,8 +243,8 @@ class TouchOfTheMagiGuide extends Analyzer {
 
     return (
       <GuideSection spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} explanation={explanation}>
-        <InlineStatistic
-          title="Touch of the Magi Statistics"
+        <CastOverview
+          spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT}
           stats={[
             {
               value: `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,

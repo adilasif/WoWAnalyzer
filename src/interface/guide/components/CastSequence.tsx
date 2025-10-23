@@ -4,6 +4,19 @@ import styled from '@emotion/styled';
 import { Tooltip } from 'interface';
 import { qualitativePerformanceToColor } from 'interface/guide';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import {
+  SectionContainer,
+  SectionHeader,
+  TitleColumn,
+  SectionTitle,
+  Label,
+  NavigationButtons,
+  NavButton,
+  NavCounter,
+  HelperText,
+  HelperTextRow,
+  ScrollableContainer,
+} from './GuideDivs';
 
 export interface CastInSequence {
   timestamp: number;
@@ -74,57 +87,42 @@ export default function CastSequence<T>({
   };
 
   return (
-    <Container>
-      <TopSection>
-        <LeftColumn>
-          <HeaderTitle>{spell.name} Cast Sequences</HeaderTitle>
+    <SectionContainer>
+      <SectionHeader>
+        <TitleColumn>
+          <SectionTitle>{spell.name} Cast Sequences</SectionTitle>
           {description && (
             <HelperTextRow>
               <HelperText>{description}</HelperText>
             </HelperTextRow>
           )}
-          <SequenceLabel>
+          <Label>
             Cast Sequence {windowStart !== undefined && `at ${castTimestamp(currentSequence.data)}`}
-          </SequenceLabel>
-        </LeftColumn>
+          </Label>
+        </TitleColumn>
         <NavigationButtons>
           <NavButton type="button" onClick={handlePrevious} aria-label="Previous sequence">
             ‹
           </NavButton>
-          <SequenceInfo>
+          <NavCounter>
             {currentIndex + 1} / {sequences.length}
-          </SequenceInfo>
+          </NavCounter>
           <NavButton type="button" onClick={handleNext} aria-label="Next sequence">
             ›
           </NavButton>
         </NavigationButtons>
-      </TopSection>
+      </SectionHeader>
 
-      <FilmStripContainer>
-        <FilmStrip>
+      <ScrollableContainer>
+        <Sequence>
           {currentSequence.casts.map((cast, castIdx) => {
             const color = cast.performance
               ? qualitativePerformanceToColor(cast.performance)
               : 'rgba(255, 255, 255, 0.3)';
 
-            const relativeTime =
-              windowStart !== undefined
-                ? ((cast.timestamp - windowStart) / 1000).toFixed(2)
-                : '0.00';
-
             const defaultTooltip = (
               <div>
                 <strong>{cast.spellName}</strong>
-                <br />
-                <small>
-                  Cast at {relativeTime}s
-                  {cast.performance && (
-                    <>
-                      <br />
-                      Performance: {cast.performance}
-                    </>
-                  )}
-                </small>
               </div>
             );
 
@@ -139,116 +137,13 @@ export default function CastSequence<T>({
               </Tooltip>
             );
           })}
-        </FilmStrip>
-      </FilmStripContainer>
-    </Container>
+        </Sequence>
+      </ScrollableContainer>
+    </SectionContainer>
   );
 }
 
-const Container = styled.div`
-  margin-bottom: 16px;
-`;
-
-const TopSection = styled.div`
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-  margin-bottom: 8px;
-`;
-
-const LeftColumn = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  justify-content: space-between;
-`;
-
-const HeaderTitle = styled.h3`
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #fab700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-`;
-
-const SequenceLabel = styled.div`
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-`;
-
-const NavigationButtons = styled.div`
-  display: flex;
-  gap: 8px;
-  align-items: center;
-`;
-
-const NavButton = styled.button`
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  color: #fab700;
-  font-size: 20px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  line-height: 1;
-
-  &:hover {
-    background: rgba(250, 183, 0, 0.2);
-    border-color: #fab700;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-
-const SequenceInfo = styled.div`
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-  min-width: 50px;
-  text-align: center;
-`;
-
-const FilmStripContainer = styled.div`
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  &::-webkit-scrollbar {
-    height: 12px;
-    cursor: default !important;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(104, 103, 100, 0.15);
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background-color: #fab700;
-  }
-`;
-
-const FilmStrip = styled.div`
+const Sequence = styled.div`
   display: flex;
   gap: 6px;
   flex-wrap: nowrap;
@@ -271,18 +166,4 @@ const SpellIcon = styled.div<{ size: number; color: string }>`
     object-fit: cover;
     display: block;
   }
-`;
-
-const HelperText = styled.div`
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
-`;
-
-const HelperTextRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  gap: 16px;
 `;
