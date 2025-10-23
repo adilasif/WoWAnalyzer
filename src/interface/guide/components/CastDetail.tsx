@@ -1,8 +1,9 @@
 import styled from '@emotion/styled';
 import { Tooltip } from 'interface';
-import { qualitativePerformanceToColor } from 'interface/guide';
+import { qualitativePerformanceToColor, PerformanceMark } from 'interface/guide';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { useState, useMemo } from 'react';
+import { TipBox } from './TipBox';
 
 export interface PerCastStat {
   value: string;
@@ -16,11 +17,13 @@ export interface PerCastData {
   stats: PerCastStat[];
   tooltip?: React.ReactNode;
   timestamp: string;
+  details?: React.ReactNode;
 }
 
 interface CastDetailProps {
   title: string;
   casts: PerCastData[];
+  description?: string;
   fontSize?: string;
 }
 
@@ -29,7 +32,12 @@ interface CastDetailProps {
  * Each box represents one cast with its stats and overall performance.
  * Includes navigation controls and performance filtering.
  */
-export default function CastDetail({ title, casts, fontSize = '16px' }: CastDetailProps) {
+export default function CastDetail({
+  title,
+  casts,
+  description,
+  fontSize = '16px',
+}: CastDetailProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [performanceFilter, setPerformanceFilter] = useState<Set<QualitativePerformance>>(
     () =>
@@ -97,6 +105,11 @@ export default function CastDetail({ title, casts, fontSize = '16px' }: CastDeta
       <TopSection>
         <LeftColumn>
           <HeaderTitle>{title}</HeaderTitle>
+          {description && (
+            <HelperTextRow>
+              <HelperText>{description}</HelperText>
+            </HelperTextRow>
+          )}
         </LeftColumn>
         <StatsColumn>
           {performanceCounts[QualitativePerformance.Perfect] > 0 && (
@@ -204,6 +217,12 @@ export default function CastDetail({ title, casts, fontSize = '16px' }: CastDeta
               );
             })}
           </StatsGrid>
+
+          {currentCast!.details && (
+            <TipBox icon={<PerformanceMark perf={currentCast!.performance} />}>
+              {currentCast!.details}
+            </TipBox>
+          )}
         </PerformanceContainer>
       )}
     </Container>

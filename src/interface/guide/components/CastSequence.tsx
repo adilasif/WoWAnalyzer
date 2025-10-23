@@ -24,7 +24,7 @@ export interface CastSequenceEntry<T = unknown> {
 interface CastSequenceProps<T = unknown> {
   spell: Spell;
   sequences: CastSequenceEntry<T>[];
-  windowDescription?: string;
+  description?: string;
   castTimestamp: (data: T) => string;
   iconSize?: number;
 }
@@ -33,12 +33,14 @@ interface CastSequenceProps<T = unknown> {
  * Navigable cast sequence visualization showing spell icons in a filmstrip layout.
  * @param spell - The spell/ability being analyzed
  * @param sequences - Array of cast sequence entries containing cast data
+ * @param description - Optional description text displayed below the title
  * @param castTimestamp - Function to format timestamp from cast data
  * @param iconSize - Size in pixels for spell icons (default: 40)
  */
 export default function CastSequence<T>({
   spell,
   sequences,
+  description,
   castTimestamp,
   iconSize = 40,
 }: CastSequenceProps<T>) {
@@ -76,6 +78,11 @@ export default function CastSequence<T>({
       <TopSection>
         <LeftColumn>
           <HeaderTitle>{spell.name} Cast Sequences</HeaderTitle>
+          {description && (
+            <HelperTextRow>
+              <HelperText>{description}</HelperText>
+            </HelperTextRow>
+          )}
           <SequenceLabel>
             Cast Sequence {windowStart !== undefined && `at ${castTimestamp(currentSequence.data)}`}
           </SequenceLabel>
@@ -264,4 +271,18 @@ const SpellIcon = styled.div<{ size: number; color: string }>`
     object-fit: cover;
     display: block;
   }
+`;
+
+const HelperText = styled.div`
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+`;
+
+const HelperTextRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 16px;
 `;

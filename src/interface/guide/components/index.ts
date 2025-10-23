@@ -8,3 +8,4 @@ export {
   type CastSequenceEntry,
   type CastInSequence,
 } from './CastSequence';
+export { TipBox, TipBoxWithTimestamps } from './TipBox';

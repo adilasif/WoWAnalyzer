@@ -216,7 +216,6 @@ class TouchOfTheMagiGuide extends Analyzer {
     // Prepare per-cast data for CastDetail
     const perCastData: PerCastData[] = this.touchOfTheMagi.touchData.map((cast) => {
       const evaluation = this.evaluateTouchCast(cast);
-      const duration = (cast.removed || this.owner.fight.end_time) - cast.applied;
 
       return {
         performance: evaluation.performance,
@@ -238,17 +237,7 @@ class TouchOfTheMagiGuide extends Analyzer {
             tooltip: <>Total damage accumulated during this Touch of the Magi</>,
           },
         ],
-        tooltip: (
-          <div>
-            <strong>Touch #{this.touchOfTheMagi.touchData.indexOf(cast) + 1}</strong>
-            <br />
-            <br />
-            {evaluation.reason}
-            <br />
-            <br />
-            Duration: {(duration / 1000).toFixed(1)}s
-          </div>
-        ),
+        details: evaluation.reason,
       };
     });
 
@@ -279,7 +268,6 @@ class TouchOfTheMagiGuide extends Analyzer {
         <CastSequence
           spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT}
           sequences={touchSequenceEvents}
-          windowDescription="Touch of the Magi window"
           castTimestamp={(data) => formatDuration(data.applied - this.owner.fight.start_time)}
         />
       </GuideSection>
