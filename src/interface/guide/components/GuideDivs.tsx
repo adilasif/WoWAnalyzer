@@ -68,10 +68,6 @@ export const PanelHeader = styled.div`
   }
 `;
 
-// ==================
-// Shared Components for Guide Sections with Stats
-// ==================
-
 /** Container for entire component section */
 export const SectionContainer = styled.div`
   margin-bottom: 16px;
@@ -96,8 +92,8 @@ export const TitleColumn = styled.div`
 
 /** Main title/header for guide sections */
 export const SectionTitle = styled.h3`
-  margin: 0;
-  font-size: 18px;
+  margin: 0 0 12px 0;
+  font-size: 1.8rem;
   font-weight: 600;
   color: #fab700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -105,7 +101,7 @@ export const SectionTitle = styled.h3`
 
 /** Small label text (e.g., "Timeline", "Performance") */
 export const Label = styled.div`
-  font-size: 11px;
+  font-size: 1.2rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
@@ -139,7 +135,7 @@ export const StatCard = styled.div<{ color: string }>`
 
 /** Stat value (large number/text) */
 export const StatValue = styled.div`
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #fff;
   line-height: 1;
@@ -149,16 +145,12 @@ export const StatValue = styled.div`
 
 /** Stat label (small descriptive text) */
 export const StatLabel = styled.div`
-  font-size: 10px;
+  font-size: 1.2rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
-
-// ==================
-// Stats Grid Components (for detail views)
-// ==================
 
 /** Grid layout for displaying multiple stat items */
 export const StatsGrid = styled.div`
@@ -174,7 +166,7 @@ export const StatItem = styled.div<{ color: string }>`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 8px 12px;
+  padding: 12px 12px 8px 12px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
   border-left: 3px solid ${(props) => props.color};
@@ -183,7 +175,7 @@ export const StatItem = styled.div<{ color: string }>`
 
 /** Stat item value (customizable font size, left-aligned) */
 export const StatItemValue = styled.div<{ fontSize?: string }>`
-  font-size: ${(props) => props.fontSize || '20px'};
+  font-size: ${(props) => props.fontSize || '2rem'};
   font-weight: 700;
   color: #fff;
   line-height: 1;
@@ -194,7 +186,7 @@ export const StatItemValue = styled.div<{ fontSize?: string }>`
 
 /** Stat item label (left-aligned) */
 export const StatItemLabel = styled.div`
-  font-size: 11px;
+  font-size: 1.2rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
@@ -203,13 +195,9 @@ export const StatItemLabel = styled.div`
   margin-bottom: 4px;
 `;
 
-// ==================
-// Helper Text Components
-// ==================
-
 /** Helper text - small italicized text for additional context */
 export const HelperText = styled.div`
-  font-size: 11px;
+  font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.5);
   margin-top: 6px;
   font-style: italic;
@@ -222,10 +210,6 @@ export const HelperTextRow = styled.div`
   gap: 8px;
   margin-top: 4px;
 `;
-
-// ==================
-// Navigation Components
-// ==================
 
 /** Container for navigation buttons */
 export const NavigationButtons = styled.div`
@@ -243,7 +227,7 @@ export const NavButton = styled.button<{ disabled?: boolean }>`
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 4px;
   color: ${(props) => (props.disabled ? '#666' : '#fab700')};
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: 600;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -267,38 +251,27 @@ export const NavButton = styled.button<{ disabled?: boolean }>`
 
 /** Counter/info display between navigation buttons */
 export const NavCounter = styled.div`
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
   min-width: 50px;
   text-align: center;
 `;
 
-// ==================
-// Content Containers (for bars, timelines, etc.)
-// ==================
-
-/** Generic inset container for visualizations (bars, timelines, etc.) */
-export const InsetContainer = styled.div`
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  padding: 4px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-`;
+/** Generic inset container for visualizations (bars, timelines, etc.)
 
 /** Content container with scrolling capability */
 export const ScrollableContainer = styled.div`
   background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
-  padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 6px 12px 6px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
   overflow-x: auto;
   overflow-y: hidden;
 
   &::-webkit-scrollbar {
-    height: 12px;
+    height: 10px;
     cursor: default !important;
   }
 
@@ -308,11 +281,7 @@ export const ScrollableContainer = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
+    background-color: #fab700;
   }
 `;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type Spell from 'common/SPELLS/Spell';
 import styled from '@emotion/styled';
 import { Tooltip } from 'interface';
@@ -59,6 +59,13 @@ export default function CastSequence<T>({
 }: CastSequenceProps<T>) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : sequences.length - 1));
+  }, [sequences.length]);
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev < sequences.length - 1 ? prev + 1 : 0));
+  }, [sequences.length]);
+
   if (!sequences || sequences.length === 0) {
     return <div>No cast sequences to display</div>;
   }
@@ -77,14 +84,6 @@ export default function CastSequence<T>({
       windowEnd = Math.max(...timestamps);
     }
   }
-
-  const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : sequences.length - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev < sequences.length - 1 ? prev + 1 : 0));
-  };
 
   return (
     <SectionContainer>

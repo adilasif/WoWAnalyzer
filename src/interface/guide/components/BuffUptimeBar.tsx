@@ -14,7 +14,6 @@ import {
   StatCard,
   StatValue,
   StatLabel,
-  InsetContainer,
 } from './GuideDivs';
 
 // Unified uptime graph - handles both simple buffs and stacked buffs
@@ -244,6 +243,14 @@ export default function BuffUptimeBar({
     </SectionContainer>
   );
 }
+
+export const InsetContainer = styled.div`
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`;
 
 const TimelineContainer = styled(InsetContainer)`
   height: 32px;

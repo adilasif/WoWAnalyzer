@@ -10,7 +10,7 @@ import Spell from 'common/SPELLS/Spell';
 
 interface Props {
   /** The spell to show cooldown bars for - this must match the ID of the spell's cast event */
-  spell: Spell | number;
+  spell: Spell;
   /** Gap highlight mode - see {@link GapHighlight} */
   gapHighlightMode: GapHighlight;
   /** If true, spell uses will be represented by a minimal white line instead of the spell icon.
@@ -24,9 +24,6 @@ interface Props {
    * If not specified, defaults to the whole fight.
    */
   activeWindows?: CooldownWindow[];
-  /** If true, hides the cast efficiency percentage and icon on the left side.
-   *  Useful when you want just the timeline visualization in a guide section. */
-  hideEfficiency?: boolean;
   /** If provided, shows explanatory text above the cooldown bar.
    *  Text is automatically generated based on whether the spell has charges. */
   showExplanation?: boolean;
@@ -41,7 +38,6 @@ interface Props {
  * @param useThresholds iff true, the cast efficiency percentage will be color coded by performance
  *    using the abilities efficiency requirements.
  * @param slimLines iff true, then cast lines will be skinnier. Very useful for high CPM abilities!
- * @param hideEfficiency iff true, hides the left side efficiency display (useful for guide sections)
  * @param showExplanation iff true, shows explanatory text above the timeline
  */
 export default function CastEfficiencyBar({
@@ -51,18 +47,15 @@ export default function CastEfficiencyBar({
   useThresholds,
   slimLines,
   activeWindows,
-  hideEfficiency,
   showExplanation,
 }: Props & {
   useThresholds?: boolean;
 }): JSX.Element {
-  const rawSpellId = typeof spell === 'number' ? spell : spell.id;
-  const spellObj = typeof spell === 'number' ? spell : spell;
-  const castEffic = useAnalyzer(CastEfficiency)?.getCastEfficiencyForSpellId(rawSpellId);
+  const castEffic = useAnalyzer(CastEfficiency)?.getCastEfficiencyForSpellId(spell.id);
   const abilities = useAnalyzer(Abilities);
 
   // Determine if spell has charges for explanation text
-  const ability = abilities?.getAbility(rawSpellId);
+  const ability = abilities?.getAbility(spell.id);
   const hasCharges = ability && ability.charges > 1;
   let tooltip: ReactNode = `Couldn't get cast efficiency info!`;
   let utilDisplay = `N/A`;
@@ -89,7 +82,7 @@ export default function CastEfficiencyBar({
     utilDisplay = formatPercentage(effectiveUtil, 0) + '%';
     tooltip = (
       <>
-        You cast <SpellLink spell={spellObj} /> <strong>{castEffic.casts}</strong> out of{' '}
+        You cast <SpellLink spell={spell} /> <strong>{castEffic.casts}</strong> out of{' '}
         <strong>{castEffic.maxCasts}</strong> possible times.
         <br />
         It was on cooldown for <strong>{formatPercentage(castEffic.efficiency, 0)}%</strong> of{' '}
@@ -120,31 +113,21 @@ export default function CastEfficiencyBar({
           </small>
         </ExplanationText>
       )}
-      {hideEfficiency ? (
+      <CooldownUtilBarContainer>
+        <div style={{ color: textColor }}>
+          <SpellIcon spell={spell} style={{ height: '28px' }} />{' '}
+          <TooltipElement content={tooltip}>
+            {utilDisplay} <small>effic</small>
+          </TooltipElement>
+        </div>
         <CooldownBar
           activeWindows={activeWindows}
-          spellId={rawSpellId}
+          spellId={spell.id}
           gapHighlightMode={gapHighlightMode}
           minimizeIcons={minimizeIcons}
           slimLines={slimLines}
         />
-      ) : (
-        <CooldownUtilBarContainer>
-          <div style={{ color: textColor }}>
-            <SpellIcon spell={spellObj} style={{ height: '28px' }} />{' '}
-            <TooltipElement content={tooltip}>
-              {utilDisplay} <small>effic</small>
-            </TooltipElement>
-          </div>
-          <CooldownBar
-            activeWindows={activeWindows}
-            spellId={rawSpellId}
-            gapHighlightMode={gapHighlightMode}
-            minimizeIcons={minimizeIcons}
-            slimLines={slimLines}
-          />
-        </CooldownUtilBarContainer>
-      )}
+      </CooldownUtilBarContainer>
     </div>
   );
 }

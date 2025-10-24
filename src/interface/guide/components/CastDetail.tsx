@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Tooltip } from 'interface';
 import { qualitativePerformanceToColor, PerformanceMark } from 'interface/guide';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { TipBox } from './TipBox';
 import {
   SectionContainer,
@@ -89,13 +89,12 @@ export default function CastDetail({
   const totalCasts = casts.length;
   const filteredCount = filteredCasts.length;
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : filteredCasts.length - 1));
-  };
-
-  const handleNext = () => {
+  }, [filteredCasts.length]);
+  const handleNext = useCallback(() => {
     setCurrentIndex((prev) => (prev < filteredCasts.length - 1 ? prev + 1 : 0));
-  };
+  }, [filteredCasts.length]);
 
   const togglePerformanceFilter = (performance: QualitativePerformance) => {
     setPerformanceFilter((prev) => {
