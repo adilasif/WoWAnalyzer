@@ -258,8 +258,6 @@ export const NavCounter = styled.div`
   text-align: center;
 `;
 
-/** Generic inset container for visualizations (bars, timelines, etc.)
-
 /** Content container with scrolling capability */
 export const ScrollableContainer = styled.div`
   background: rgba(0, 0, 0, 0.3);
