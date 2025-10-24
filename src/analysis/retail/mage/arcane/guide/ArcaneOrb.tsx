@@ -169,7 +169,6 @@ class ArcaneOrbGuide extends Analyzer {
           spell={SPELLS.ARCANE_ORB}
           gapHighlightMode={GapHighlight.FullCooldown}
           minimizeIcons
-          hideEfficiency
           showExplanation
         />
       </GuideSection>

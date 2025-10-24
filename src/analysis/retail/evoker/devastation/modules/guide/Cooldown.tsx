@@ -37,11 +37,11 @@ export function CooldownSection({ modules, info }: GuideProps<typeof CombatLogPa
       </div>
       <CastEfficiencyBar spell={TALENTS.DRAGONRAGE_TALENT} gapHighlightMode={GapHighlight.All} />
       <CastEfficiencyBar
-        spell={hasFontTalent ? SPELLS.FIRE_BREATH_FONT.id : SPELLS.FIRE_BREATH}
+        spell={hasFontTalent ? SPELLS.FIRE_BREATH_FONT : SPELLS.FIRE_BREATH}
         gapHighlightMode={GapHighlight.FullCooldown}
       />
       <CastEfficiencyBar
-        spell={hasFontTalent ? SPELLS.ETERNITY_SURGE_FONT.id : SPELLS.ETERNITY_SURGE}
+        spell={hasFontTalent ? SPELLS.ETERNITY_SURGE_FONT : SPELLS.ETERNITY_SURGE}
         gapHighlightMode={GapHighlight.FullCooldown}
       />
       {info.combatant.hasTalent(TALENTS_EVOKER.SHATTERING_STAR_TALENT) && (
