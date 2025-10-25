@@ -56,8 +56,6 @@ class SuddenDoom extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

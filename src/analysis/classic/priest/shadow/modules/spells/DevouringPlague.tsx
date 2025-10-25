@@ -28,8 +28,6 @@ class DevouringPlague extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(SPELLS.DEVOURING_PLAGUE.id);
     return (

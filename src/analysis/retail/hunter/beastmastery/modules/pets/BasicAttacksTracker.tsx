@@ -92,8 +92,6 @@ class BasicAttacks extends Analyzer {
     return this.potentialExtraCasts(dreamScenario) * (this.damage / this.totalCasts) || 0;
   }
 
-  
-
   statistic() {
     if (debug) {
       console.log('Avg time between BAs', this.timeBetweenAttacks / this.chainCasts);

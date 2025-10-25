@@ -92,8 +92,6 @@ class DrainSoul extends Analyzer {
       this._subtractBossShards;
   }
 
-  
-
   statistic() {
     const damage = this.abilityTracker.getAbilityDamage(SPELLS.DRAIN_SOUL_DEBUFF.id);
     const dps = (damage / this.owner.fightDuration) * 1000;

@@ -121,8 +121,6 @@ class SearingTouch extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

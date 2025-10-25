@@ -104,7 +104,7 @@ class DirectBeaconHealing extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-  
+
   statistic() {
     return (
       <Statistic position={STATISTIC_ORDER.CORE(50)} size="small">

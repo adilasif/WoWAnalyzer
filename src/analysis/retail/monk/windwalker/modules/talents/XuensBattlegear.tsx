@@ -80,8 +80,6 @@ class XuensBattlegear extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

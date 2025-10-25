@@ -13,8 +13,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCastingHealing {
     SPELLS.STONESKIN_TOTEM.id,
     SPELLS.WATER_SHIELD.id,
   ];
-
-  
 }
 
 export default AlwaysBeCasting;

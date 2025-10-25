@@ -94,8 +94,6 @@ class ChainHeal extends Analyzer {
     this.buffer = [];
   }
 
-  
-
   get avgHits() {
     const chainHeals: number[] = [SPELLS.CHAIN_HEAL.id];
     const chStats = chainHeals.reduce(

@@ -99,8 +99,6 @@ class DesperatePrayer extends Analyzer {
       </Statistic>
     );
   }
-
-  
 }
 
 export default DesperatePrayer;

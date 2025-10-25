@@ -104,8 +104,6 @@ class RenewingMistDuringManaTea extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     return (
       <TooltipElement

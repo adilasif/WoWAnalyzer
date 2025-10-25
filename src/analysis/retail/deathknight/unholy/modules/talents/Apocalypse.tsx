@@ -47,8 +47,6 @@ class Apocalypse extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     const averageWoundsPopped = (this.apocalypseWoundsPopped / this.totalApocalypseCasts).toFixed(
       1,

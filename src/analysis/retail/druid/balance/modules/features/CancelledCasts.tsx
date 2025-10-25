@@ -13,8 +13,6 @@ class CancelledCasts extends CoreCancelledCasts {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default CancelledCasts;

@@ -31,8 +31,6 @@ class StellarFlareUptime extends Analyzer {
     this.active = this.selectedCombatant.hasTalent(TALENTS_DRUID.STELLAR_FLARE_TALENT);
   }
 
-  
-
   get uptimeHistory() {
     return this.enemies.getDebuffHistory(TALENTS_DRUID.STELLAR_FLARE_TALENT.id);
   }

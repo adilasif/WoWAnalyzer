@@ -58,8 +58,6 @@ export default class BurningHatred extends Analyzer {
     this.damage += event.amount;
   }
 
-  
-
   statistic() {
     const effectiveFuryGain = this.furyGain - this.furyWaste;
     return (

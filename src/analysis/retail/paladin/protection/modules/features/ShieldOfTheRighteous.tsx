@@ -53,8 +53,6 @@ class ShieldOfTheRighteous extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <StatisticBox

@@ -50,8 +50,6 @@ class FelEruption extends Analyzer {
     this.stuns += 1;
   }
 
-  
-
   statistic() {
     return (
       <Statistic

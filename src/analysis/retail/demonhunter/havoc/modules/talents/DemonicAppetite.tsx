@@ -43,8 +43,6 @@ class DemonicAppetite extends Analyzer {
     this.furyWaste += event.waste;
   }
 
-  
-
   statistic() {
     const effectiveFuryGain = this.furyGain - this.furyWaste;
     return (

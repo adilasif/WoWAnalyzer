@@ -98,8 +98,6 @@ class SurgingTotem extends Analyzer {
     return totalHits / this.healingRainTicks.length;
   }
 
-  
-
   get suggestionThreshold() {
     return {
       actual: this.averageHitsPerTick,

@@ -30,8 +30,6 @@ class SerpentStingUptime extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(SERPENT_STING_MOP_DEBUFF_ID);
     return (

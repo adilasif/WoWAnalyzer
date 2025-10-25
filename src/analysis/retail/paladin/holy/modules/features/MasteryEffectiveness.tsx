@@ -366,8 +366,6 @@ class MasteryEffectiveness extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default MasteryEffectiveness;

@@ -32,8 +32,6 @@ class SoulShardDetails extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

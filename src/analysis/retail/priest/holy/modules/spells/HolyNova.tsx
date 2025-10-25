@@ -78,8 +78,6 @@ class HolyNova extends Analyzer {
       style: ThresholdStyle.NUMBER,
     };
   }
-
-  
 }
 
 export default HolyNova;

@@ -82,8 +82,6 @@ class BlackoutCombo extends Analyzer {
     this.lastBlackoutComboCast = 0;
   }
 
-  
-
   statistic() {
     const wastedPerc =
       (this.blackoutComboBuffs - this.blackoutComboConsumed) / this.blackoutComboBuffs;

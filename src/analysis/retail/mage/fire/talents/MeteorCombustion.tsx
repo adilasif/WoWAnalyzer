@@ -67,8 +67,6 @@ class MeteorCombustion extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default MeteorCombustion;

@@ -24,8 +24,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
 
   position = STATISTIC_ORDER.CORE(1);
 
-  
-
   get guideSubsection(): JSX.Element {
     const explanation = (
       <>

@@ -216,8 +216,6 @@ class Renew extends Analyzer {
     }
     return false;
   }
-
-  
 }
 
 export default Renew;

@@ -69,8 +69,6 @@ class FesteringStrikeEfficiency extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

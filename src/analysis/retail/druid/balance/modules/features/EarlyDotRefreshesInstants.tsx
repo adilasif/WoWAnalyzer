@@ -84,8 +84,6 @@ class EarlyDotRefreshesInstants extends CoreEarlyDotRefreshesInstants {
     statTracker: StatTracker,
   };
   static dots = DOTS;
-
-  
 }
 
 export default EarlyDotRefreshesInstants;

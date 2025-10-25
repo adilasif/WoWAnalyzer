@@ -149,8 +149,6 @@ class KillingMachineEfficiency extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

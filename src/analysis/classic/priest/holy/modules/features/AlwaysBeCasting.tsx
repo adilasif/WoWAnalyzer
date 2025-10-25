@@ -16,8 +16,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCastingHealing {
     SPELLS.HOLY_WORD_SERENITY.id,
     SPELLS.LIGHTWELL.id,
   ];
-
-  
 }
 
 export default AlwaysBeCasting;

@@ -89,8 +89,6 @@ class AoWProcTracker extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     return (
       <Statistic

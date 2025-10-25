@@ -16,8 +16,6 @@ class ComboPoints extends Analyzer {
       </>
     );
   }
-
-  
 }
 
 export default ComboPoints;

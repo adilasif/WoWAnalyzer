@@ -19,8 +19,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
     };
   }
 
-  
-
   position = STATISTIC_ORDER.CORE(10);
 }
 

@@ -97,8 +97,6 @@ class TwinsOfTheSunPriestess extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

@@ -73,8 +73,6 @@ class Ossuary extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

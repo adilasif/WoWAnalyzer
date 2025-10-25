@@ -183,8 +183,6 @@ class BarbedShot extends Analyzer {
     return avgStacks;
   }
 
-  
-
   statistic() {
     return (
       <Statistic

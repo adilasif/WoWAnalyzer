@@ -67,8 +67,6 @@ class Overhealing extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default Overhealing;

@@ -34,8 +34,6 @@ export default class PainbringerBuff extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

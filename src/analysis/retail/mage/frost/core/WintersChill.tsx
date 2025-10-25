@@ -184,8 +184,6 @@ class WintersChill extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

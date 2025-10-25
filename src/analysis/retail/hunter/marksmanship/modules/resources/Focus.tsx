@@ -7,8 +7,6 @@ class Focus extends Analyzer {
   };
 
   protected focusTracker!: FocusTracker;
-
-  
 }
 
 export default Focus;

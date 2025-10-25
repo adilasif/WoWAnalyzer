@@ -95,8 +95,6 @@ class ComboBreaker extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     const averageCBProcs =
       this.abilityTracker.getAbility(SPELLS.TIGER_PALM.id).casts * COMBO_BREAKER_PROC_CHANCE;

@@ -35,8 +35,6 @@ class CancelledCasts extends CoreCancelledCasts {
     };
   }
 
-  
-
   statistic() {
     const tooltipText = Object.values(this.cancelledSpellList).map((cancelledSpell) => (
       <li key={cancelledSpell.spellName}>

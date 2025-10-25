@@ -107,8 +107,6 @@ class DancingRuneWeapon extends Analyzer {
       </div>
     );
   }
-
-  
 }
 
 export default DancingRuneWeapon;

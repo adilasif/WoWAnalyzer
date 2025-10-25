@@ -79,8 +79,6 @@ class BladeDance extends Analyzer {
     this.checkIfLastCastIsBad();
   }
 
-  
-
   private checkIfLastCastIsBad() {
     if (!this.lastCastEvent) {
       return;

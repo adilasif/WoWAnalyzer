@@ -62,8 +62,6 @@ export default class FieryBrand extends HitBasedAnalyzer {
     return this.hits.filter(({ mitigated }) => !mitigated).length;
   }
 
-  
-
   private onFieryBrandApply(event: ApplyDebuffEvent) {
     const uptime: Uptime = {
       start: event.timestamp,

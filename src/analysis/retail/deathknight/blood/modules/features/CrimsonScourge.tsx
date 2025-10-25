@@ -92,8 +92,6 @@ class CrimsonScourge extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

@@ -51,8 +51,6 @@ class CastsInStealth extends CastsInStealthBase {
       .map((s) => this.stealthDamageTracker.getAbility(s).casts || 0)
       .reduce((p, c) => p + c);
   }
-
-  
 }
 
 export default CastsInStealth;

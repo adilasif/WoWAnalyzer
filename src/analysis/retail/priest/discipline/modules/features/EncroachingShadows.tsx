@@ -23,7 +23,6 @@ import { THROES_OF_PAIN_INCREASE, PAIN_AND_SUFFERING_INCREASE } from '../../cons
 import uptimeBarSubStatistic from 'parser/ui/UptimeBarSubStatistic';
 import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../Guide';
 
-
 type DotInformation =
   | {
       throesOfPain: number;
@@ -160,8 +159,6 @@ class EncroachingShadows extends Analyzer {
       this.ptwCleaveDamage += event.amount + (event.absorbed || 0);
     }
   }
-
-  
 
   statistic() {
     const uptime = this.uptime || 0;

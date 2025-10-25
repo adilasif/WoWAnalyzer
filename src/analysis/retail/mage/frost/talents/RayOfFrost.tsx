@@ -105,8 +105,6 @@ class RayOfFrost extends Analyzer {
     };
   }
 
-  
-
   get guideSubsection(): JSX.Element {
     const rayOfFrost = <SpellLink spell={TALENTS.RAY_OF_FROST_TALENT} />;
 

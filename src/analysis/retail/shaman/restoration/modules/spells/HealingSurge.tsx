@@ -27,8 +27,6 @@ class HealingSurge extends Analyzer {
       style: 'percentage',
     };
   }
-
-  
 }
 
 export default HealingSurge;

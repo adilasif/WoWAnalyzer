@@ -144,8 +144,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCastingHealing {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default AlwaysBeCasting;

@@ -174,8 +174,6 @@ class ShadowEmbrace extends Analyzer {
     return (this.damage / this.owner.fightDuration) * 1000;
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(this.SHADOW_EMBRACE_DEBUFF.id);
     return (

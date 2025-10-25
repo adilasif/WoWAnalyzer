@@ -67,8 +67,6 @@ class Audacity extends Analyzer {
   get wastedProcs() {
     return this.procs - this.consumedProcs;
   }
-
-  
 }
 
 export default Audacity;

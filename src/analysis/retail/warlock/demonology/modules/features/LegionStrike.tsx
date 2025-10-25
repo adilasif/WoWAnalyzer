@@ -55,8 +55,6 @@ class LegionStrike extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     return (
       <Statistic

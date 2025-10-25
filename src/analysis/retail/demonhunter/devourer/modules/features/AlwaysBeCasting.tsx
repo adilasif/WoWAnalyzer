@@ -13,6 +13,4 @@ export class AlwaysBeCasting extends CoreAlwaysBeCasting {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }

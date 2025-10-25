@@ -14,8 +14,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
     };
   }
   showStatistic = true;
-
-  
 }
 
 export default AlwaysBeCasting;

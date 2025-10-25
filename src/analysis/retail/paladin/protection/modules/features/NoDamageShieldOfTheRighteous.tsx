@@ -69,8 +69,6 @@ class NoDamageShieldOfTheRighteous extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic position={STATISTIC_ORDER.DEFAULT} size="flexible">

@@ -89,8 +89,6 @@ class Exergy extends Analyzer {
     return <ExplanationAndDataSubSection explanation={explanation} data={data} title="Exergy" />;
   }
 
-  
-
   statistic() {
     return (
       <Statistic

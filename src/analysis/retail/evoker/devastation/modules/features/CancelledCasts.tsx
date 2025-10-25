@@ -15,8 +15,6 @@ class CancelledCasts extends CoreCancelledCasts {
     };
   }
 
-  
-
   get Canceled() {
     return this.castsCancelled / this.totalCasts;
   }

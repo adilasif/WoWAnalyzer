@@ -215,8 +215,6 @@ class MongooseBite extends Analyzer {
       </Statistic>
     );
   }
-
-  
 }
 
 export default MongooseBite;

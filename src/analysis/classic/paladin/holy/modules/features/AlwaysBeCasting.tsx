@@ -47,8 +47,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCastingHealing {
     // FURY
     SPELLS.RIGHTEOUS_FURY.id,
   ];
-
-  
 }
 
 export default AlwaysBeCasting;

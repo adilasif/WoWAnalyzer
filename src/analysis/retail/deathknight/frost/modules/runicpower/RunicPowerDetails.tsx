@@ -52,8 +52,6 @@ class RunicPowerDetails extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

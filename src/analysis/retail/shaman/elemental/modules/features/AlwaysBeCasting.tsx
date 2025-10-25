@@ -74,8 +74,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
       </SubSection>
     );
   }
-
-  
 }
 
 export default AlwaysBeCasting;

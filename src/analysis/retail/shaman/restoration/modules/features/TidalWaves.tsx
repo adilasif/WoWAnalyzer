@@ -74,8 +74,6 @@ class TidalWaves extends Analyzer {
     }
   }
 
-  
-
   get suggestionThresholds() {
     const riptide = this.abilityTracker.getAbility(TALENTS.RIPTIDE_TALENT.id);
     const healingWave = this.abilityTracker.getAbility(SPELLS.HEALING_WAVE.id);

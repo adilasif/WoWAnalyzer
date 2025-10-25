@@ -72,8 +72,6 @@ class FillerUsage extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default FillerUsage;

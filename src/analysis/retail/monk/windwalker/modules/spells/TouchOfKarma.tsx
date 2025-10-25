@@ -54,8 +54,6 @@ class TouchOfKarma extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

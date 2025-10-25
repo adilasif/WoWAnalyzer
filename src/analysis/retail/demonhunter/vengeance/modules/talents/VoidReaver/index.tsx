@@ -59,8 +59,6 @@ export default class VoidReaver extends HitBasedAnalyzer {
     return this.hits.filter(({ mitigated }) => !mitigated).length;
   }
 
-  
-
   private onFrailtyApply(event: ApplyDebuffEvent) {
     const uptime: Uptime = {
       start: event.timestamp,

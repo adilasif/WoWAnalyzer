@@ -13,8 +13,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCastingHealing {
     SPELLS.TRANQUILITY.id,
     SPELLS.WILD_GROWTH.id,
   ];
-
-  
 }
 
 export default AlwaysBeCasting;

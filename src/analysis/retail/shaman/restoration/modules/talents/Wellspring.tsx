@@ -135,8 +135,6 @@ class Wellspring extends Analyzer {
     return this.wellspringCasts.reduce((total, hits) => (hits < 6 ? total + 1 : total), 0);
   }
 
-  
-
   get suggestionThreshold() {
     return {
       actual: this.wellspringEfficiency,

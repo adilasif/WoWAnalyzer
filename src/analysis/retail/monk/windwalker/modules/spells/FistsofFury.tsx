@@ -123,8 +123,6 @@ class FistsofFury extends Analyzer {
     });
   }
 
-  
-
   statistic() {
     return (
       <Statistic

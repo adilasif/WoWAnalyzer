@@ -94,8 +94,6 @@ class BreathOfFire extends Analyzer {
       this.hitsWithoutBoF += 1;
     }
   }
-
-  
 }
 
 export default BreathOfFire;

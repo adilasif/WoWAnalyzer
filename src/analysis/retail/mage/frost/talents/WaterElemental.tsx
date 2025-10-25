@@ -129,8 +129,6 @@ class WaterElemental extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

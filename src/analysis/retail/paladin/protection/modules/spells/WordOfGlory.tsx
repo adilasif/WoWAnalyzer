@@ -91,6 +91,4 @@ export default class WordOfGlory extends Analyzer {
       style: ThresholdStyle.NUMBER,
     };
   }
-
-  
 }

@@ -38,8 +38,6 @@ class Dispatch extends Analyzer {
 
   protected damageTracker!: DamageTracker;
   protected betweenTheEyesDamageTracker!: BetweenTheEyesDamageTracker;
-
-  
 }
 
 export default Dispatch;

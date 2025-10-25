@@ -40,8 +40,6 @@ class BoneShield extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

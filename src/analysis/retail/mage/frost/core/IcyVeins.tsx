@@ -223,8 +223,6 @@ class IcyVeins extends Analyzer {
     );
   }
 
-  
-
   statistic() {
     return (
       <Statistic

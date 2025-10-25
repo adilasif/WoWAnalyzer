@@ -95,8 +95,6 @@ class EssenceBreak extends MajorCooldown<EssenceBreakCooldownCast> {
     };
   }
 
-  
-
   statistic() {
     const totalDamage = this.extraDamage + this.talentDamage;
 

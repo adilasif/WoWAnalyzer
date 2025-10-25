@@ -36,8 +36,6 @@ export default class Initiative extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

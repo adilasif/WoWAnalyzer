@@ -32,8 +32,6 @@ class BloodPlagueUptime extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic size="small" position={STATISTIC_ORDER.CORE(2)}>

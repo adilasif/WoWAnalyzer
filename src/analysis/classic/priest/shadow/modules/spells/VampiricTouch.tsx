@@ -29,8 +29,6 @@ class VampiricTouch extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(SPELLS.VAMPIRIC_TOUCH.id);
     return (

@@ -81,8 +81,6 @@ class IceLance extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

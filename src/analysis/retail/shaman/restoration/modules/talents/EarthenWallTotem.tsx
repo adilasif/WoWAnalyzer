@@ -139,8 +139,6 @@ class EarthenWallTotem extends Analyzer {
     return this.totalEffectiveHealing / this.totalPotentialHealing;
   }
 
-  
-
   get suggestionThreshold() {
     return {
       actual: this.earthenWallEfficiency,

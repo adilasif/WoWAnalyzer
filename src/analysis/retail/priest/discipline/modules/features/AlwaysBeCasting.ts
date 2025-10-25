@@ -50,8 +50,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCastingHealing {
       }
     }
   }
-
-  
 }
 
 export default AlwaysBeCasting;

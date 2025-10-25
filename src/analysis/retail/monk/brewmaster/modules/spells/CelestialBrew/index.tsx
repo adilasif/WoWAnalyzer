@@ -160,8 +160,6 @@ class CelestialBrew extends MajorDefensiveBuff {
     );
   }
 
-  
-
   statistic() {
     const avgAbsorb =
       this.absorbs.length === 0

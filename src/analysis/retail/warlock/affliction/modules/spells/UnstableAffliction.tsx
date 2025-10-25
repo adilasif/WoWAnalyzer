@@ -28,8 +28,6 @@ class UnstableAfflictionUptime extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(SPELLS.UNSTABLE_AFFLICTION.id);
     return (

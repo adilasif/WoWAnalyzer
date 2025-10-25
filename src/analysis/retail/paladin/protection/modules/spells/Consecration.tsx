@@ -51,8 +51,6 @@ class Consecration extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic position={STATISTIC_ORDER.CORE(2)} size="flexible">

@@ -127,8 +127,6 @@ class PurifyingBrew extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     const spec = {
       mark: 'bar',

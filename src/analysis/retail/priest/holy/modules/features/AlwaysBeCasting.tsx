@@ -16,8 +16,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCastingHealing {
     TALENTS.APOTHEOSIS_TALENT.id,
     TALENTS.DIVINE_HYMN_TALENT.id,
   ];
-
-  
 }
 
 export default AlwaysBeCasting;

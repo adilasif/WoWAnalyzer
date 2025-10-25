@@ -27,8 +27,6 @@ class RuneForgeChecker extends Analyzer {
       style: ThresholdStyle.BOOLEAN,
     };
   }
-
-  
 }
 
 export default RuneForgeChecker;

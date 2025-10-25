@@ -190,8 +190,6 @@ class FingersOfFrost extends Analyzer {
     return performance;
   }
 
-  
-
   statistic() {
     return (
       <Statistic

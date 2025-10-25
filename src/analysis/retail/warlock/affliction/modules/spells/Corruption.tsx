@@ -35,8 +35,6 @@ class CorruptionUptime extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.selectedCombatant.hasTalent(TALENTS.WITHER_TALENT)
       ? this.enemies.getDebuffHistory(SPELLS.WITHER_DEBUFF.id)

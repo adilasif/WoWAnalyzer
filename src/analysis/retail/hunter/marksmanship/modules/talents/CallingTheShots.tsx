@@ -85,8 +85,6 @@ class CallingTheShots extends Analyzer {
     );
   }
 
-  
-
   statistic() {
     return (
       <Statistic

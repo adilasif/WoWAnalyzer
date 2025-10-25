@@ -28,8 +28,6 @@ class AgonyUptime extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(SPELLS.AGONY.id);
     return (

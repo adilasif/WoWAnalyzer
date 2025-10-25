@@ -72,8 +72,6 @@ class FlameShock extends EarlyDotRefreshesAnalyzer {
     }
   }
 
-  
-
   getDebuffStackHistory() {
     return this.enemies.getDebuffStackHistory(SPELLS.FLAME_SHOCK.id);
   }

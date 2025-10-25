@@ -57,8 +57,6 @@ class Opportunity extends Analyzer {
   get wastedProcs() {
     return this.procs - this.consumedProcs;
   }
-
-  
 }
 
 export default Opportunity;

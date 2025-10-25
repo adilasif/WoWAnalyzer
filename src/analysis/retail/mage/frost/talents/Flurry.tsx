@@ -92,8 +92,6 @@ class Flurry extends Analyzer {
     };
   }
 
-  
-
   _gainCharge() {
     if (this.spellUsable.isOnCooldown(TALENTS.FLURRY_TALENT.id)) {
       this.spellUsable.reduceCooldown(TALENTS.FLURRY_TALENT.id, REDUCTION_MS);

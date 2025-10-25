@@ -216,8 +216,6 @@ class TreeOfLife extends Analyzer {
     return explanationAndDataSubsection(explanation, data, GUIDE_CORE_EXPLANATION_PERCENT);
   }
 
-  
-
   statistic() {
     return (
       <Statistic

@@ -26,8 +26,6 @@ class MoonfireUptime extends Analyzer {
   };
   protected enemies!: Enemies;
 
-  
-
   get uptimeHistory() {
     return this.enemies.getDebuffHistory(SPELLS.MOONFIRE_DEBUFF.id);
   }

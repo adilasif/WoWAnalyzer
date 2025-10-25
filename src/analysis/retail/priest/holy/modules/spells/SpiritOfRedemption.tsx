@@ -66,8 +66,6 @@ class SpiritOfRedemption extends Analyzer {
   onRemoveBuff(event: RemoveBuffEvent) {
     this.timeSpentRedeeming += event.timestamp - this.sorStartTime;
   }
-
-  
 }
 
 export default SpiritOfRedemption;

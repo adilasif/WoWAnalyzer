@@ -18,8 +18,6 @@ class FrostFeverUptime extends Analyzer {
     return this.enemies.getBuffUptime(SPELLS.FROST_FEVER.id) / this.owner.fightDuration;
   }
 
-  
-
   statistic() {
     return (
       <Statistic position={STATISTIC_ORDER.CORE(20)} size="flexible">

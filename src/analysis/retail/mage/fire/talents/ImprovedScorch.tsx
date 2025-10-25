@@ -76,8 +76,6 @@ class ImprovedScorch extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic size="flexible" category={STATISTIC_CATEGORY.TALENTS}>

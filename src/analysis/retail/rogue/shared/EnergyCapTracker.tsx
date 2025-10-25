@@ -34,8 +34,6 @@ class EnergyCapTracker extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <StatisticBox

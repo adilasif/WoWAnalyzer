@@ -64,7 +64,5 @@ class PhoenixFlames extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 export default PhoenixFlames;

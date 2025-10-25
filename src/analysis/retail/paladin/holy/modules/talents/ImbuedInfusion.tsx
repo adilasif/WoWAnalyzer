@@ -96,8 +96,6 @@ class ImbuedInfusion extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

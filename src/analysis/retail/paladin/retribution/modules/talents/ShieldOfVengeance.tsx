@@ -63,8 +63,6 @@ class ShieldOfVengeance extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <StatisticBox

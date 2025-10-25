@@ -68,8 +68,6 @@ class RelishInBlood extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

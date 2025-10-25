@@ -58,8 +58,6 @@ class Felblade extends Analyzer {
     this.damage += event.amount + (event.absorbed || 0);
   }
 
-  
-
   statistic() {
     const effectiveFuryGain = this.furyGain - this.furyWaste;
     return (

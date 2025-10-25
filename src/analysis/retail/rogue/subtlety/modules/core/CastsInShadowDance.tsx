@@ -63,8 +63,6 @@ class CastsInShadowDance extends CastsInStealthBase {
       .reduce((p, c) => p + c);
   }
 
-  
-
   statistic() {
     const shadowDanceUptime =
       this.selectedCombatant.getBuffUptime(SPELLS.SHADOW_DANCE_BUFF.id) / this.owner.fightDuration;

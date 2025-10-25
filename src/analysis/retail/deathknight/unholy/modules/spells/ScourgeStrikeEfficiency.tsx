@@ -71,8 +71,6 @@ class ScourgeStrikeEfficiency extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

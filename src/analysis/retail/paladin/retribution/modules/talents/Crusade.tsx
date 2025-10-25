@@ -76,8 +76,6 @@ class Crusade extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default Crusade;

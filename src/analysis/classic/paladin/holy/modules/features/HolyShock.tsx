@@ -7,8 +7,6 @@ class HolyShock extends CoreAlwaysBeCastingHealing {
     SPELLS.FLASH_OF_LIGHT.id,
     SPELLS.HOLY_LIGHT.id,
   ];
-
-  
 }
 
 export default HolyShock;

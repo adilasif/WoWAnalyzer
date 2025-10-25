@@ -178,8 +178,6 @@ class Sundering extends Analyzer.withDependencies({
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default Sundering;

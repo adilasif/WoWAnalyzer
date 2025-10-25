@@ -74,8 +74,6 @@ class Frostscythe extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

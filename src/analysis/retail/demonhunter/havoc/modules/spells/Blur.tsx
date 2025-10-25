@@ -25,8 +25,6 @@ export default class Blur extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

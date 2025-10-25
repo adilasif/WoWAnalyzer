@@ -131,8 +131,6 @@ class ShadowWordPain extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(SPELLS.SHADOW_WORD_PAIN.id);
     return (

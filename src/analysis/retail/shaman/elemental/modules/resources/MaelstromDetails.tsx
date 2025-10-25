@@ -102,8 +102,6 @@ class MaelstromDetails extends Analyzer {
     );
   }
 
-  
-
   statistic() {
     return [
       <StatisticBox

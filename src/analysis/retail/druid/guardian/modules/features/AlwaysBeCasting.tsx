@@ -18,8 +18,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
     };
   }
 
-  
-
   get DowntimePerformance(): QualitativePerformance {
     const downtime = this.downtimePercentage;
     if (downtime <= 0.1) {

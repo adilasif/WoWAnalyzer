@@ -107,6 +107,4 @@ export default class Shuffle extends Analyzer {
       mitigated,
     });
   }
-
-  
 }

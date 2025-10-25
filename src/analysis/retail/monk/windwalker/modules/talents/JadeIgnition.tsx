@@ -101,8 +101,6 @@ class JadeIgnition extends Analyzer {
       </Statistic>
     );
   }
-
-  
 }
 
 export default JadeIgnition;

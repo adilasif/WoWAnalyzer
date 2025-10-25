@@ -34,8 +34,6 @@ class DivineHymn extends Analyzer {
   onCast(event: CastEvent) {
     this.casts += 1;
   }
-
-  
 }
 
 export default DivineHymn;

@@ -112,8 +112,6 @@ class Tombstone extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

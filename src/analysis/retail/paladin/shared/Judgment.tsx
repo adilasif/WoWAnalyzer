@@ -126,8 +126,6 @@ class Judgment extends Analyzer {
     };
   }
 
-  
-
   statistic(): React.ReactNode {
     return (
       <Statistic

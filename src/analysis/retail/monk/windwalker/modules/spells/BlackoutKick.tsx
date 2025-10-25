@@ -127,8 +127,6 @@ class BlackoutKick extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic position={STATISTIC_ORDER.CORE(3)} size="flexible">

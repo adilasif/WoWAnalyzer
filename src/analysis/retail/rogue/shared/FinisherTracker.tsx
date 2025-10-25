@@ -83,8 +83,6 @@ class FinisherTracker extends Analyzer {
       this.inefficientFinisherCount += 1;
     }
   }
-
-  
 }
 
 export default FinisherTracker;

@@ -119,8 +119,6 @@ class BestialWrath extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     return (
       <Statistic

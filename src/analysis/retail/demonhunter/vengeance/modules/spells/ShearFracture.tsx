@@ -66,6 +66,4 @@ export default class ShearFracture extends Analyzer {
     this.badCasts += 1;
     addInefficientCastReason(this.lastCast, 'Fracture cast that overcapped souls');
   }
-
-  
 }

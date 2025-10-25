@@ -84,8 +84,6 @@ class KillerCobra extends Analyzer {
       </Statistic>
     );
   }
-
-  
 }
 
 export default KillerCobra;

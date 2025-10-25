@@ -22,8 +22,6 @@ class Energy extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default Energy;

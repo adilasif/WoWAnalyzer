@@ -79,8 +79,6 @@ class Butchery extends Analyzer {
     this.mercilessDamage += event.amount + (event.absorbed || 0);
   }
 
-  
-
   statistic() {
     return (
       <Statistic

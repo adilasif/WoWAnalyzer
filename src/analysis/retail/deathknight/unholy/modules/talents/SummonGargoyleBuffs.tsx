@@ -72,8 +72,6 @@ class SummonGargoyleBuffs extends Analyzer {
     this.gargoyleEnd = event.timestamp + 25000;
   }
 
-  
-
   statistic() {
     return (
       <Statistic

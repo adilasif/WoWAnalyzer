@@ -98,8 +98,6 @@ class VanishFindWeakness extends Analyzer {
     };
   }
 
-  
-
   statistic(): React.ReactNode {
     const tableEntries: React.ReactNode[] = [];
     const keys: CastEvent[] = Array.from(this.badVanishCasts.keys());

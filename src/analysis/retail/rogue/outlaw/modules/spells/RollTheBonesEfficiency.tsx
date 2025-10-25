@@ -136,8 +136,6 @@ class RollTheBonesEfficiency extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default RollTheBonesEfficiency;

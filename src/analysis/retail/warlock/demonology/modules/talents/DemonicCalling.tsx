@@ -71,8 +71,6 @@ class DemonicCalling extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     return (
       <Statistic category={STATISTIC_CATEGORY.TALENTS} size="flexible">

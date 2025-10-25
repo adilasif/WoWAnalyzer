@@ -68,8 +68,6 @@ class FocusCapTracker extends RegenResourceCapTracker {
     this.bySecond[secondsIntoFight] = this.bySecond[secondsIntoFight] || this.current;
   }
 
-  
-
   statistic() {
     const data = Object.entries(this.bySecond).map(([sec, val]) => ({ time: sec, val: val }));
     return (

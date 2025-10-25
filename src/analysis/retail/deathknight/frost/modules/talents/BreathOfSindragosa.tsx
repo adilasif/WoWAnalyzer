@@ -79,8 +79,6 @@ class BreathOfSindragosa extends Analyzer {
     }
   }
 
-  
-
   get tickingOnFinishedString() {
     return this.breathActive
       ? 'Your final cast was not counted in the average since it was still ticking when the fight ended'

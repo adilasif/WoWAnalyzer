@@ -21,8 +21,6 @@ class FortitudeRaidBuff extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default FortitudeRaidBuff;

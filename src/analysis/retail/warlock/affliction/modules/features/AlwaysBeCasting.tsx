@@ -20,8 +20,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

@@ -61,8 +61,6 @@ class Felstorm extends Analyzer {
       this.mainPetFelstormCount += 1;
     }
   }
-
-  
 }
 
 export default Felstorm;

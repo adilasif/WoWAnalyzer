@@ -99,8 +99,6 @@ class FillerFlashOfLight extends Analyzer {
       style: ThresholdStyle.NUMBER,
     };
   }
-
-  
 }
 
 export default FillerFlashOfLight;

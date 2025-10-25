@@ -41,8 +41,6 @@ class InitialMarrowrendCast extends Analyzer {
       style: ThresholdStyle.BOOLEAN,
     };
   }
-
-  
 }
 
 export default InitialMarrowrendCast;

@@ -37,8 +37,6 @@ class RollTheBonesBuffs extends Analyzer {
     return this.selectedCombatant.getBuffUptime(spellid) / this.owner.fightDuration;
   }
 
-  
-
   get guideSubsection() {
     const explanation = (
       <>

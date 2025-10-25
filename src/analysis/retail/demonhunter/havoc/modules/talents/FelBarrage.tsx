@@ -64,8 +64,6 @@ class FelBarrage extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     return (
       <Statistic

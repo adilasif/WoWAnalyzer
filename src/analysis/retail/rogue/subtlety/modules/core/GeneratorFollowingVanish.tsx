@@ -52,8 +52,6 @@ class GeneratorFollowingVanish extends Analyzer {
     };
   }
 
-  
-
   statistic(): React.ReactNode {
     const tableEntries: React.ReactNode[] = this.badFollowingVanishCasts.map((castPair, idx) => (
       <tr key={idx}>

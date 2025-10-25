@@ -27,7 +27,6 @@ import './ReportRaidBuffList.scss';
 import { useLingui } from '@lingui/react';
 import GameBranch from 'game/GameBranch';
 
- 
 const RETAIL_RAID_BUFFS = new Map<Spell | Talent, Array<Class | object>>([
   // Buffs
   //  Stamina
@@ -62,7 +61,6 @@ const RETAIL_RAID_BUFFS = new Map<Spell | Talent, Array<Class | object>>([
   [TALENTS_DRUID.TRANQUILITY_TALENT, [SPECS.RESTORATION_DRUID]],
 ]);
 
- 
 const CLASSIC_RAID_BUFFS = new Map<Spell, Array<Class | object>>([
   // BUFFS
   // Stamina

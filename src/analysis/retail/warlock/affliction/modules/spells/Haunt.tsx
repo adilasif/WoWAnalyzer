@@ -62,8 +62,6 @@ class Haunt extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     return (
       <Statistic

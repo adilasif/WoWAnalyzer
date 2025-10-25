@@ -38,8 +38,6 @@ class MarkOfBlood extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

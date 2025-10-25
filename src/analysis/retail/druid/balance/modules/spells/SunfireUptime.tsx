@@ -25,8 +25,6 @@ class SunfireUptime extends Analyzer {
   };
   protected enemies!: Enemies;
 
-  
-
   get uptimeHistory() {
     return this.enemies.getDebuffHistory(SPELLS.SUNFIRE.id);
   }

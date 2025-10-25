@@ -79,8 +79,6 @@ class SoulBarrier extends Analyzer {
     this.totalBuffLength += this.buffLength;
   }
 
-  
-
   statistic() {
     const avgBuffLength = this.totalBuffLength / this.casts / 1000;
     return (

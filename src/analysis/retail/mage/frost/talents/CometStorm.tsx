@@ -117,8 +117,6 @@ class CometStorm extends Analyzer {
     };
   }
 
-  
-
   get guideSubsection(): JSX.Element {
     const coldestSnapKnown = this.selectedCombatant.hasTalent(TALENTS.COLDEST_SNAP_TALENT);
 

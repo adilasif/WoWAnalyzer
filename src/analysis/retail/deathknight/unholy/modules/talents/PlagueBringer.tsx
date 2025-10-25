@@ -27,8 +27,6 @@ class PlagueBringer extends Analyzer {
     return Math.round(this.selectedCombatant.getBuffUptime(SPELLS.PLAGUEBRINGER_BUFF.id) / 1000);
   }
 
-  
-
   statistic() {
     return (
       <Statistic

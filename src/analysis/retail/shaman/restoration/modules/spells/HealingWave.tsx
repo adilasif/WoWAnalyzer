@@ -95,8 +95,6 @@ class HealingWave extends Analyzer {
       style: 'percentage',
     };
   }
-
-  
 }
 
 export default HealingWave;

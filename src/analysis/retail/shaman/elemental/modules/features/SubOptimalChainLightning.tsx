@@ -66,8 +66,6 @@ class SubOptimalChainLightning extends Analyzer {
   onFightEnd() {
     this.checkCast();
   }
-
-  
 }
 
 export default SubOptimalChainLightning;

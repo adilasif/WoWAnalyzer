@@ -89,8 +89,6 @@ class BlackOxBrew extends Analyzer {
     this._resetPB();
     this._resetCB();
   }
-
-  
 }
 
 export default BlackOxBrew;

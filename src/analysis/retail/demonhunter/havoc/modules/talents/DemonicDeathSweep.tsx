@@ -85,8 +85,6 @@ export default class DemonicDeathSweep extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     return (
       <Statistic category={STATISTIC_CATEGORY.GENERAL} size="flexible">

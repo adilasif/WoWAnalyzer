@@ -91,8 +91,6 @@ class CrusadersMight extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

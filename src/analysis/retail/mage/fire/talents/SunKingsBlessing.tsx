@@ -122,8 +122,6 @@ class SunKingsBlessing extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

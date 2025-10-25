@@ -64,8 +64,6 @@ class InstantPoison extends Analyzer {
       </Statistic>
     );
   }
-
-  
 }
 
 export default InstantPoison;

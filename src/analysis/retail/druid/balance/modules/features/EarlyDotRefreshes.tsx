@@ -51,8 +51,6 @@ class EarlyDotRefreshes extends EarlyDotRefreshesCore {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS_DRUID.STELLAR_FLARE_TALENT);
   }
-
-  
 }
 
 export default EarlyDotRefreshes;

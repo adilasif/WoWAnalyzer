@@ -330,8 +330,6 @@ class RuneTracker extends ResourceTracker {
     };
   }
 
-  
-
   statistic() {
     const timeSpentAtRuneCount = this.timeSpentAtRuneCount;
     const badThreshold = 4;

@@ -15,8 +15,6 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
     };
   }
 
-  
-
   static icons = {
     activeTime: '/img/wheelchair.png',
     downtime: '/img/afk.png',

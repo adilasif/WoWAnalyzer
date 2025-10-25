@@ -77,8 +77,6 @@ class ComboStrikes extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

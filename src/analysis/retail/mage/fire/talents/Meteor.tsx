@@ -48,8 +48,6 @@ class Meteor extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

@@ -63,8 +63,6 @@ class HitCombo extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

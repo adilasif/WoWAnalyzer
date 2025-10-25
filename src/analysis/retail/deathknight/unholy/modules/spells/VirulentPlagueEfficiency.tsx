@@ -77,8 +77,6 @@ class VirulentPlagueEfficiency extends Analyzer {
     //Removing 3.15 seconds when buff is only applied. This is for cases when the target does not benefit from the epidemic effect (Dots spreading to adds not staying by target for instance.)
   }
 
-  
-
   statistic() {
     return (
       <Statistic position={STATISTIC_ORDER.CORE(7)} size="flexible">

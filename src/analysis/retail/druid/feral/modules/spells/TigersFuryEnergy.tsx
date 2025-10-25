@@ -53,8 +53,6 @@ class TigersFuryEnergy extends Analyzer {
       style: ThresholdStyle.PERCENTAGE,
     };
   }
-
-  
 }
 
 export default TigersFuryEnergy;

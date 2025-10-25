@@ -101,8 +101,6 @@ class ChainHeal extends Analyzer {
     this.buffer = [];
   }
 
-  
-
   get avgHits() {
     const chainHeal = this.abilityTracker.getAbility(TALENTS.CHAIN_HEAL_TALENT.id);
     const casts = chainHeal.casts;

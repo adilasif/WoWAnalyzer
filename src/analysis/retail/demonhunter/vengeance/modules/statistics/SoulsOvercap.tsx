@@ -42,8 +42,6 @@ class SoulsOvercap extends Analyzer {
     return this.soulFragmentsTracker.overcap / this.soulFragmentsTracker.soulsGenerated;
   }
 
-  
-
   statistic() {
     return (
       <Statistic

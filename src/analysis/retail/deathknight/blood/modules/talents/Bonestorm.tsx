@@ -86,8 +86,6 @@ class Bonestorm extends Analyzer {
     };
   }
 
-  
-
   get bonestormTooltip() {
     return this.bsCasts.map((cast, index) => {
       const avgDamage = formatNumber(cast.hits.reduce((a, b) => a + b, 0) / cast.hits.length || 0);

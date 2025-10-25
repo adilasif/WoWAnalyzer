@@ -6,8 +6,6 @@ class Energy extends Analyzer {
     energyTracker: EnergyTracker,
   };
   protected energyTracker!: EnergyTracker;
-
-  
 }
 
 export default Energy;

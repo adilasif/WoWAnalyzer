@@ -58,8 +58,6 @@ class VipersVenom extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

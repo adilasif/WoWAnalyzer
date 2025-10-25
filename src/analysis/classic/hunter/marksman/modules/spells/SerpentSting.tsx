@@ -28,8 +28,6 @@ class SerpentStingUptime extends Analyzer {
     };
   }
 
-  
-
   subStatistic() {
     const history = this.enemies.getDebuffHistory(SPELLS.SERPENT_STING.id);
     return (

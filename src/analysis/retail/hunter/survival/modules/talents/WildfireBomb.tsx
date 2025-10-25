@@ -252,8 +252,6 @@ class WildfireBomb extends Analyzer {
     // }
   }
 
-  
-
   get guideSubsection(): JSX.Element {
     const explanation = (
       <p>

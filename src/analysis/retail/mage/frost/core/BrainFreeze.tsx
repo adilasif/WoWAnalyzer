@@ -163,8 +163,6 @@ class BrainFreeze extends Analyzer {
     return performance;
   }
 
-  
-
   statistic() {
     return (
       <Statistic

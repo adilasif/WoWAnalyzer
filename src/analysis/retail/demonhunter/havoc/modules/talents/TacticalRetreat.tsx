@@ -37,8 +37,6 @@ export default class TacticalRetreat extends Analyzer {
     };
   }
 
-  
-
   statistic() {
     return (
       <Statistic

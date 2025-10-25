@@ -112,8 +112,6 @@ class BeastCleave extends Analyzer {
     }
   }
 
-  
-
   statistic() {
     if (this.damage > 0) {
       return (
