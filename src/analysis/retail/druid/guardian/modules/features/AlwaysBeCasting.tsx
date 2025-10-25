@@ -1,6 +1,4 @@
-import { defineMessage } from '@lingui/core/macro';
-import { formatPercentage } from 'common/format';
-import { ThresholdStyle, When } from 'parser/core/ParseResults';
+import { ThresholdStyle } from 'parser/core/ParseResults';
 import CoreAlwaysBeCasting from 'parser/shared/modules/AlwaysBeCasting';
 import { STATISTIC_ORDER } from 'parser/ui/StatisticBox';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
@@ -20,19 +18,7 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
     };
   }
 
-  suggestions(when: When) {
-    when(this.suggestionThresholds).addSuggestion((suggest, actual, recommended) =>
-      suggest(<span> Your downtime can be improved. Try to Always Be Casting (ABC)..</span>)
-        .icon('spell_mage_altertime')
-        .actual(
-          defineMessage({
-            id: 'druid.guardian.suggestions.alwaysBeCasting.downtime',
-            message: `${formatPercentage(actual)}% downtime`,
-          }),
-        )
-        .recommended(`<${formatPercentage(recommended)}% is recommended`),
-    );
-  }
+  
 
   get DowntimePerformance(): QualitativePerformance {
     const downtime = this.downtimePercentage;

@@ -1,11 +1,9 @@
-import { Trans } from '@lingui/react/macro';
 import { formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/monk';
-import { SpellLink } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events from 'parser/core/Events';
-import { ThresholdStyle, When } from 'parser/core/ParseResults';
+import { ThresholdStyle } from 'parser/core/ParseResults';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
@@ -104,20 +102,7 @@ class JadeIgnition extends Analyzer {
     );
   }
 
-  suggestions(when: When) {
-    when(this.suggestionThresholds).addSuggestion((suggest, actual, recommended) =>
-      suggest(
-        <Trans id="monk.windwalker.suggestions.jadeIgnitionWastedStacks">
-          {' '}
-          You wasted your <SpellLink spell={SPELLS.JADE_IGNITION_BUFF} /> stacks by using Fists of
-          Fury at full stacks
-        </Trans>,
-      )
-        .icon(TALENTS.JADE_IGNITION_TALENT.icon)
-        .actual(`${formatPercentage(actual, 0)}% Stacks used`)
-        .recommended(`${formatPercentage(recommended, 0)}% Stacks used is recommended`),
-    );
-  }
+  
 }
 
 export default JadeIgnition;

@@ -2,9 +2,8 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import DH_SPELLS from 'common/SPELLS/demonhunter';
 import Events, { DamageEvent, ResourceChangeEvent } from 'parser/core/Events';
 import { TALENTS_DEMON_HUNTER } from 'common/TALENTS';
-import { ThresholdStyle, When } from 'parser/core/ParseResults';
-import SpellLink from 'interface/SpellLink';
-import { formatPercentage, formatThousands } from 'common/format';
+import { ThresholdStyle } from 'parser/core/ParseResults';
+import { formatThousands } from 'common/format';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import TalentSpellText from 'parser/ui/TalentSpellText';
@@ -59,19 +58,7 @@ export default class BurningHatred extends Analyzer {
     this.damage += event.amount;
   }
 
-  suggestions(when: When) {
-    when(this.suggestionThresholds).addSuggestion((suggest, actual, recommended) =>
-      suggest(
-        <>
-          {' '}
-          Avoid casting <SpellLink spell={DH_SPELLS.IMMOLATION_AURA} /> when close to max Fury.
-        </>,
-      )
-        .icon(DH_SPELLS.IMMOLATION_AURA.icon)
-        .actual(`${formatPercentage(actual)}% Fury wasted`)
-        .recommended(`${formatPercentage(recommended)}% is recommended.`),
-    );
-  }
+  
 
   statistic() {
     const effectiveFuryGain = this.furyGain - this.furyWaste;

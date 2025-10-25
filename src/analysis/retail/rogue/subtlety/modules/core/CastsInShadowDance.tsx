@@ -4,7 +4,6 @@ import TALENTS from 'common/TALENTS/rogue';
 import Spell from 'common/SPELLS/Spell';
 import { SpellIcon } from 'interface';
 import { Options } from 'parser/core/Analyzer';
-import { When } from 'parser/core/ParseResults';
 import DamageTracker from 'parser/shared/modules/AbilityTracker';
 import BoringValueText from 'parser/ui/BoringValueText';
 import Statistic from 'parser/ui/Statistic';
@@ -64,10 +63,7 @@ class CastsInShadowDance extends CastsInStealthBase {
       .reduce((p, c) => p + c);
   }
 
-  suggestions(when: When) {
-    this.suggestWrongCast(when, this.backstabSpell, this.danceShadowstrikeThresholds);
-    this.suggestAvgCasts(when, SPELLS.SHADOW_DANCE);
-  }
+  
 
   statistic() {
     const shadowDanceUptime =

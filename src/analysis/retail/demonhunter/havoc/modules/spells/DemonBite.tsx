@@ -1,10 +1,9 @@
-import { formatPercentage, formatThousands } from 'common/format';
+import { formatThousands } from 'common/format';
 import SPELLS from 'common/SPELLS/demonhunter';
 import { TALENTS_DEMON_HUNTER } from 'common/TALENTS/demonhunter';
-import { SpellLink } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { DamageEvent, ResourceChangeEvent } from 'parser/core/Events';
-import { ThresholdStyle, When } from 'parser/core/ParseResults';
+import { ThresholdStyle } from 'parser/core/ParseResults';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
@@ -60,19 +59,7 @@ class DemonBite extends Analyzer {
     this.damage += event.amount;
   }
 
-  suggestions(when: When) {
-    when(this.suggestionThresholds).addSuggestion((suggest, actual, recommended) =>
-      suggest(
-        <>
-          {' '}
-          Try not to cast <SpellLink spell={SPELLS.DEMONS_BITE} /> when close to max Fury.
-        </>,
-      )
-        .icon(SPELLS.DEMONS_BITE.icon)
-        .actual(`${formatPercentage(actual)}% Fury wasted`)
-        .recommended(`${formatPercentage(recommended)}% is recommended.`),
-    );
-  }
+  
 
   statistic() {
     const effectiveFuryGain = this.furyGain - this.furyWaste;

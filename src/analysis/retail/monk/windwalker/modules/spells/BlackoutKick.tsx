@@ -1,9 +1,8 @@
-import { defineMessage } from '@lingui/core/macro';
 import SPELLS from 'common/SPELLS';
 import { SpellIcon, SpellLink } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent } from 'parser/core/Events';
-import { ThresholdStyle, When } from 'parser/core/ParseResults';
+import { ThresholdStyle } from 'parser/core/ParseResults';
 import SpellUsable from 'analysis/retail/monk/windwalker/modules/core/SpellUsable';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
@@ -128,28 +127,7 @@ class BlackoutKick extends Analyzer {
     };
   }
 
-  suggestions(when: When) {
-    const linkList = this.IMPORTANT_SPELLS.map((spellId) => (
-      <SpellLink key={spellId} spell={spellId} />
-    ));
-
-    when(this.suggestionThresholds).addSuggestion((suggest, actual, recommended) =>
-      suggest(
-        <>
-          You are wasting cooldown reduction by casting {<SpellLink spell={SPELLS.BLACKOUT_KICK} />}{' '}
-          while having important casts, such as {oxfordCommaJoin(linkList, 'or')} available
-        </>,
-      )
-        .icon(SPELLS.BLACKOUT_KICK.icon)
-        .actual(
-          defineMessage({
-            id: 'monk.windwalker.suggestions.blackoutKick.cdrWasted',
-            message: `${actual.toFixed(2)} seconds of wasted cooldown reduction per minute`,
-          }),
-        )
-        .recommended(`${recommended} is recommended`),
-    );
-  }
+  
 
   statistic() {
     return (
