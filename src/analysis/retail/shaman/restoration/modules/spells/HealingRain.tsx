@@ -199,7 +199,7 @@ class HealingRain extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_SHAMAN.HEALING_RAIN_TALENT.id}
+        spell={TALENTS_SHAMAN.HEALING_RAIN_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         useThresholds

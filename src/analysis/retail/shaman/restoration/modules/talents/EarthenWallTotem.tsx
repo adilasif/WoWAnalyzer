@@ -271,7 +271,7 @@ class EarthenWallTotem extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.EARTHEN_WALL_TOTEM_TALENT.id}
+        spell={TALENTS.EARTHEN_WALL_TOTEM_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
       />

@@ -53,21 +53,21 @@ function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof Co
       whole extra use of the cooldown.
       {info.combatant.hasTalent(talents.SPIRIT_LINK_TOTEM_TALENT) && (
         <CastEfficiencyBar
-          spellId={talents.SPIRIT_LINK_TOTEM_TALENT.id}
+          spell={talents.SPIRIT_LINK_TOTEM_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(talents.HEALING_TIDE_TOTEM_TALENT) && (
         <CastEfficiencyBar
-          spellId={talents.HEALING_TIDE_TOTEM_TALENT.id}
+          spell={talents.HEALING_TIDE_TOTEM_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(talents.ASCENDANCE_RESTORATION_TALENT) && (
         <CastEfficiencyBar
-          spellId={talents.ASCENDANCE_RESTORATION_TALENT.id}
+          spell={talents.ASCENDANCE_RESTORATION_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />

@@ -71,7 +71,7 @@ class FrozenOrb extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.FROZEN_ORB_TALENT.id}
+        spell={TALENTS.FROZEN_ORB_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

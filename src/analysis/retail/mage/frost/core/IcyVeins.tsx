@@ -214,7 +214,7 @@ class IcyVeins extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.ICY_VEINS_TALENT.id}
+        spell={TALENTS.ICY_VEINS_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

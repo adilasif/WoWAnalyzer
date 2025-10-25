@@ -236,7 +236,7 @@ class CometStorm extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.COMET_STORM_TALENT.id}
+        spell={TALENTS.COMET_STORM_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

@@ -51,17 +51,17 @@ function CooldownGraphSubsection() {
       show when the spell was cooling down, and red segments highlight times when you could have fit
       a whole extra use of the cooldown.
       <CastEfficiencyBar
-        spellId={SPELLS.METAMORPHOSIS.id}
+        spell={SPELLS.METAMORPHOSIS}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
       />
       <CastEfficiencyBar
-        spellId={SPELLS.DARK_SOUL.id}
+        spell={SPELLS.DARK_SOUL}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
       />
       <CastEfficiencyBar
-        spellId={SPELLS.SUMMON_DOOMGUARD.id}
+        spell={SPELLS.SUMMON_DOOMGUARD}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
       />

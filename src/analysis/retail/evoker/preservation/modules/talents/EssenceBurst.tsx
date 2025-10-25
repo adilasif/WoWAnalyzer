@@ -285,7 +285,7 @@ class EssenceBurst extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_EVOKER.DREAM_BREATH_TALENT.id}
+        spell={TALENTS_EVOKER.DREAM_BREATH_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

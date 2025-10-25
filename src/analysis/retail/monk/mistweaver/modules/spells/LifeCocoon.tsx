@@ -78,7 +78,7 @@ class LifeCocoon extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_MONK.LIFE_COCOON_TALENT.id}
+        spell={TALENTS_MONK.LIFE_COCOON_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
       />

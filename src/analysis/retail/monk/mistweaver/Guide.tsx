@@ -187,9 +187,9 @@ function SheilunsGraph({ modules, events, info }: GuideProps<typeof CombatLogPar
 }
 
 function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof CombatLogParser>) {
-  const invokeId = info.combatant.hasTalent(TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT)
-    ? TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT.id
-    : TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT.id;
+  const invokeSpell = info.combatant.hasTalent(TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT)
+    ? TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT
+    : TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT;
   return (
     <SubSection>
       <strong>Cooldown Graph</strong> - this graph shows when you used your cooldowns and how long
@@ -197,15 +197,15 @@ function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof Co
       show when the spell was cooling down. Red segments highlight times when you could have fit a
       whole extra use of the cooldown.
       <CastEfficiencyBar
-        spellId={invokeId}
+        spell={invokeSpell}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
       />
       <CastEfficiencyBar
-        spellId={
+        spell={
           info.combatant.hasTalent(TALENTS_MONK.RESTORAL_TALENT)
-            ? TALENTS_MONK.RESTORAL_TALENT.id
-            : TALENTS_MONK.REVIVAL_TALENT.id
+            ? TALENTS_MONK.RESTORAL_TALENT
+            : TALENTS_MONK.REVIVAL_TALENT
         }
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds

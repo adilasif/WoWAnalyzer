@@ -314,7 +314,7 @@ const CooldownGraphSubsection = (cooldownsToCheck: Cooldown[], message: JSX.Elem
       {cooldowns.map((cooldownCheck) => (
         <CastEfficiencyBar
           key={cooldownCheck.talent.id}
-          spellId={cooldownCheck.talent.id}
+          spell={cooldownCheck.talent}
           gapHighlightMode={GapHighlight.FullCooldown}
           minimizeIcons={hasTooManyCasts}
           useThresholds
@@ -344,7 +344,7 @@ const CoreCooldownGraphSubsection = (cooldownsToCheck: SpellCooldown[], message:
       {cooldowns.map((cooldownCheck) => (
         <CastEfficiencyBar
           key={cooldownCheck.spell.id}
-          spellId={cooldownCheck.spell.id}
+          spell={cooldownCheck.spell}
           gapHighlightMode={GapHighlight.None}
           minimizeIcons={hasTooManyCasts}
           useThresholds

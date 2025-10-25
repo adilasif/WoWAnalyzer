@@ -142,35 +142,35 @@ function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof Co
       whole extra use of the cooldown.
       {info.combatant.hasTalent(TALENTS_DRUID.CELESTIAL_ALIGNMENT_TALENT) && (
         <CastEfficiencyBar
-          spellId={cdSpell(info.combatant).id}
+          spell={cdSpell(info.combatant)}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.CONVOKE_THE_SPIRITS_TALENT) && (
         <CastEfficiencyBar
-          spellId={SPELLS.CONVOKE_SPIRITS.id}
+          spell={SPELLS.CONVOKE_SPIRITS}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.FURY_OF_ELUNE_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_DRUID.FURY_OF_ELUNE_TALENT.id}
+          spell={TALENTS_DRUID.FURY_OF_ELUNE_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.FORCE_OF_NATURE_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_DRUID.FORCE_OF_NATURE_TALENT.id}
+          spell={TALENTS_DRUID.FORCE_OF_NATURE_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.WARRIOR_OF_ELUNE_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_DRUID.WARRIOR_OF_ELUNE_TALENT.id}
+          spell={TALENTS_DRUID.WARRIOR_OF_ELUNE_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />

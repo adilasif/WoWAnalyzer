@@ -66,21 +66,21 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           </Explanation>
           {info.combatant.hasTalent(talents.WEAPONS_OF_ORDER_TALENT) && (
             <CastEfficiencyBar
-              spellId={talents.WEAPONS_OF_ORDER_TALENT.id}
+              spell={talents.WEAPONS_OF_ORDER_TALENT}
               gapHighlightMode={GapHighlight.FullCooldown}
               useThresholds
             />
           )}
           {info.combatant.hasTalent(talents.EXPLODING_KEG_TALENT) && (
             <CastEfficiencyBar
-              spellId={talents.EXPLODING_KEG_TALENT.id}
+              spell={talents.EXPLODING_KEG_TALENT}
               gapHighlightMode={GapHighlight.FullCooldown}
               useThresholds
             />
           )}
           {info.combatant.hasTalent(talents.INVOKE_NIUZAO_THE_BLACK_OX_TALENT) && (
             <CastEfficiencyBar
-              spellId={talents.INVOKE_NIUZAO_THE_BLACK_OX_TALENT.id}
+              spell={talents.INVOKE_NIUZAO_THE_BLACK_OX_TALENT}
               gapHighlightMode={GapHighlight.FullCooldown}
               useThresholds
             />

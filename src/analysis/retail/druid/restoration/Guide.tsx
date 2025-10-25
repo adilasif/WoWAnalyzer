@@ -72,35 +72,35 @@ function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof Co
       whole extra use of the cooldown.
       {info.combatant.hasTalent(TALENTS_DRUID.CONVOKE_THE_SPIRITS_TALENT) && (
         <CastEfficiencyBar
-          spellId={SPELLS.CONVOKE_SPIRITS.id}
+          spell={SPELLS.CONVOKE_SPIRITS}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.FLOURISH_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_DRUID.FLOURISH_TALENT.id}
+          spell={TALENTS_DRUID.FLOURISH_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.INCARNATION_TREE_OF_LIFE_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_DRUID.INCARNATION_TREE_OF_LIFE_TALENT.id}
+          spell={TALENTS_DRUID.INCARNATION_TREE_OF_LIFE_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.TRANQUILITY_TALENT) && (
         <CastEfficiencyBar
-          spellId={SPELLS.TRANQUILITY_CAST.id}
+          spell={SPELLS.TRANQUILITY_CAST}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS_DRUID.INNERVATE_TALENT) && (
         <CastEfficiencyBar
-          spellId={SPELLS.INNERVATE.id}
+          spell={SPELLS.INNERVATE}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />

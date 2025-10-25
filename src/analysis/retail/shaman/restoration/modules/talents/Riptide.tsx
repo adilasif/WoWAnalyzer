@@ -60,7 +60,7 @@ class Riptide extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={talents.RIPTIDE_TALENT.id}
+        spell={talents.RIPTIDE_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

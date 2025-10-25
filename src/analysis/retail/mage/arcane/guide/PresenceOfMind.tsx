@@ -3,7 +3,8 @@ import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
-import { MageGuideSection, CastSummary, type CastEvaluation } from '../../shared/components';
+import CastSummary, { type CastEvaluation } from 'interface/guide/components/CastSummary';
+import GuideSection from 'interface/guide/components/GuideSection';
 
 import PresenceOfMind, { PresenceOfMindData } from '../analyzers/PresenceOfMind';
 
@@ -133,13 +134,13 @@ class PresenceOfMindGuide extends Analyzer {
     );
 
     return (
-      <MageGuideSection spell={TALENTS.PRESENCE_OF_MIND_TALENT} explanation={explanation}>
+      <GuideSection spell={TALENTS.PRESENCE_OF_MIND_TALENT} explanation={explanation}>
         <CastSummary
           spell={TALENTS.PRESENCE_OF_MIND_TALENT}
           casts={this.presenceOfMind.pomData.map((cast) => this.evaluatePresenceOfMindCast(cast))}
           showBreakdown
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }

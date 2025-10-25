@@ -106,7 +106,7 @@ class RenewingMist extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_MONK.RENEWING_MIST_TALENT.id}
+        spell={TALENTS_MONK.RENEWING_MIST_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

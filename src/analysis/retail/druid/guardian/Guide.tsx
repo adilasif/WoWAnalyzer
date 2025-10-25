@@ -130,20 +130,20 @@ function OffensiveCooldownsSection({
       </Explanation>
       <SubSection>
         <CastEfficiencyBar
-          spellId={cdSpell(info.combatant).id}
+          spell={cdSpell(info.combatant)}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
         {info.combatant.hasTalent(TALENTS_DRUID.RAGE_OF_THE_SLEEPER_TALENT) && (
           <CastEfficiencyBar
-            spellId={TALENTS_DRUID.RAGE_OF_THE_SLEEPER_TALENT.id}
+            spell={TALENTS_DRUID.RAGE_OF_THE_SLEEPER_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             useThresholds
           />
         )}
         {info.combatant.hasTalent(TALENTS_DRUID.LUNAR_BEAM_TALENT) && (
           <CastEfficiencyBar
-            spellId={TALENTS_DRUID.LUNAR_BEAM_TALENT.id}
+            spell={TALENTS_DRUID.LUNAR_BEAM_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             useThresholds
           />

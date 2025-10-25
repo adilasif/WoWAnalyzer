@@ -4,10 +4,10 @@ import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
+import GuideSection from 'interface/guide/components/GuideSection';
+import { type CastEvaluation } from 'interface/guide/components/CastSummary';
 import {
   type ExpandableConfig,
-  type CastEvaluation,
-  MageGuideSection,
   ExpandableBreakdown,
   createExpandableConfig,
 } from '../../shared/components';
@@ -176,7 +176,7 @@ class ArcaneSurgeGuide extends Analyzer {
     );
 
     return (
-      <MageGuideSection spell={TALENTS.ARCANE_SURGE_TALENT} explanation={explanation}>
+      <GuideSection spell={TALENTS.ARCANE_SURGE_TALENT} explanation={explanation}>
         <ExpandableBreakdown
           castData={this.arcaneSurge.surgeData}
           evaluatedData={this.arcaneSurge.surgeData.map((cast) => {
@@ -188,7 +188,7 @@ class ArcaneSurgeGuide extends Analyzer {
           })}
           expandableConfig={this.expandableConfig}
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }

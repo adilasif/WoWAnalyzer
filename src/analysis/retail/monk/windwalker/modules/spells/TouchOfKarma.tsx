@@ -120,7 +120,7 @@ class TouchOfKarma extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={SPELLS.TOUCH_OF_KARMA_CAST.id}
+        spell={SPELLS.TOUCH_OF_KARMA_CAST}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

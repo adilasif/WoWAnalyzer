@@ -74,7 +74,7 @@ function CooldownsSubsection({ modules, events, info }: GuideProps<typeof Combat
       {info.combatant.hasTalent(talents.PILLAR_OF_FROST_TALENT) && (
         <div className="flex-main chart" style={{ padding: 5 }}>
           <CastEfficiencyBar
-            spellId={talents.PILLAR_OF_FROST_TALENT.id}
+            spell={talents.PILLAR_OF_FROST_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
           />
         </div>
@@ -83,14 +83,14 @@ function CooldownsSubsection({ modules, events, info }: GuideProps<typeof Combat
       {info.combatant.hasTalent(talents.REAPERS_MARK_TALENT) && (
         <div className="flex-main chart" style={{ padding: 5 }}>
           <CastEfficiencyBar
-            spellId={talents.REAPERS_MARK_TALENT.id}
+            spell={talents.REAPERS_MARK_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
           />
         </div>
       )}
       <div className="flex-main chart" style={{ padding: 5 }}>
         <CastEfficiencyBar
-          spellId={SPELLS.REMORSELESS_WINTER.id}
+          spell={SPELLS.REMORSELESS_WINTER}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
@@ -98,7 +98,7 @@ function CooldownsSubsection({ modules, events, info }: GuideProps<typeof Combat
       {info.combatant.hasTalent(talents.BREATH_OF_SINDRAGOSA_TALENT) && (
         <div className="flex-main chart" style={{ padding: 5 }}>
           <CastEfficiencyBar
-            spellId={talents.BREATH_OF_SINDRAGOSA_TALENT.id}
+            spell={talents.BREATH_OF_SINDRAGOSA_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             useThresholds
           />
@@ -107,7 +107,7 @@ function CooldownsSubsection({ modules, events, info }: GuideProps<typeof Combat
       {info.combatant.hasTalent(talents.FROSTWYRMS_FURY_TALENT) && (
         <div className="flex-main chart" style={{ padding: 5 }}>
           <CastEfficiencyBar
-            spellId={talents.FROSTWYRMS_FURY_TALENT.id}
+            spell={talents.FROSTWYRMS_FURY_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             useThresholds
           />
@@ -116,7 +116,7 @@ function CooldownsSubsection({ modules, events, info }: GuideProps<typeof Combat
       {info.combatant.hasTalent(talents.EMPOWER_RUNE_WEAPON_TALENT) && (
         <div className="flex-main chart" style={{ padding: 5 }}>
           <CastEfficiencyBar
-            spellId={talents.EMPOWER_RUNE_WEAPON_TALENT.id}
+            spell={talents.EMPOWER_RUNE_WEAPON_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             useThresholds
           />

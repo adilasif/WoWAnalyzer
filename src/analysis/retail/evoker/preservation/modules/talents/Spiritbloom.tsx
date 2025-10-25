@@ -186,10 +186,10 @@ class Spiritbloom extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={
+        spell={
           this.selectedCombatant.hasTalent(TALENTS_EVOKER.FONT_OF_MAGIC_PRESERVATION_TALENT)
-            ? SPELLS.SPIRITBLOOM_FONT.id
-            : TALENTS_EVOKER.SPIRITBLOOM_TALENT.id
+            ? SPELLS.SPIRITBLOOM_FONT
+            : TALENTS_EVOKER.SPIRITBLOOM_TALENT
         }
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons

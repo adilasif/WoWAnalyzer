@@ -123,7 +123,7 @@ class ShiftingPowerFrost extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.SHIFTING_POWER_TALENT.id}
+        spell={TALENTS.SHIFTING_POWER_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

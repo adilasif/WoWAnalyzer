@@ -208,7 +208,7 @@ function CooldownSection({ info }: GuideProps<typeof CombatLogParser>) {
       {cooldowns.map((cooldownCheck) => (
         <CastEfficiencyBar
           key={cooldownCheck.spell.id}
-          spellId={cooldownCheck.spell.id}
+          spell={cooldownCheck.spell}
           gapHighlightMode={GapHighlight.FullCooldown}
           minimizeIcons={hasTooManyCasts}
           useThresholds

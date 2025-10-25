@@ -281,7 +281,7 @@ class SurgingTotem extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={SPELLS.HEALING_RAIN_TOTEMIC.id}
+        spell={SPELLS.HEALING_RAIN_TOTEMIC}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         useThresholds

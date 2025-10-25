@@ -113,14 +113,14 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
       <SubSection title="Cast Efficiency"></SubSection>
       {info.combatant.hasTalent(TALENTS.COMBUSTION_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS.COMBUSTION_TALENT.id}
+          spell={TALENTS.COMBUSTION_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {info.combatant.hasTalent(TALENTS.PHOENIX_FLAMES_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS.PHOENIX_FLAMES_TALENT.id}
+          spell={TALENTS.PHOENIX_FLAMES_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
           minimizeIcons
@@ -128,7 +128,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
       )}
       {info.combatant.hasTalent(TALENTS.METEOR_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS.METEOR_TALENT.id}
+          spell={TALENTS.METEOR_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />

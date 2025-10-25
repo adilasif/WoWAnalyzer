@@ -130,7 +130,7 @@ class RisingSunKick extends Analyzer {
   guideSubStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={this.currentRskTalent.id}
+        spell={this.currentRskTalent}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

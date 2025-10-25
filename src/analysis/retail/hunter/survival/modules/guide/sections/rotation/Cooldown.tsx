@@ -36,14 +36,14 @@ export default function CooldownSection({ modules, info }: GuideProps<typeof Com
         </ul>
       </div>
       <CastEfficiencyBar
-        spellId={TALENTS.COORDINATED_ASSAULT_TALENT.id}
+        spell={TALENTS.COORDINATED_ASSAULT_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         slimLines
         useThresholds
       />
       {info.combatant.hasTalent(TALENTS.SPEARHEAD_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS.SPEARHEAD_TALENT.id}
+          spell={TALENTS.SPEARHEAD_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
         />
       )}
@@ -60,7 +60,7 @@ export default function CooldownSection({ modules, info }: GuideProps<typeof Com
               are available, but do not delay one for the other if it will cost you casts later.
             </p>
             <CastEfficiencyBar
-              spellId={SPELLS.SPEED_OF_THOUGHT.id}
+              spell={SPELLS.SPEED_OF_THOUGHT}
               gapHighlightMode={GapHighlight.FullCooldown}
             />
           </>
@@ -73,7 +73,7 @@ export default function CooldownSection({ modules, info }: GuideProps<typeof Com
               occur as late as possible to maximise the execute damage.
             </p>
             <CastEfficiencyBar
-              spellId={SPELLS.ABYSSAL_GLUTTONY.id}
+              spell={SPELLS.ABYSSAL_GLUTTONY}
               gapHighlightMode={GapHighlight.FullCooldown}
             />
           </>

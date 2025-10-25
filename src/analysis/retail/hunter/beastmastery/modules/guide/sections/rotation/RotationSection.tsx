@@ -40,21 +40,21 @@ export default function RotationSection({ modules, info }: GuideProps<typeof Com
         </Trans>
         {info.combatant.hasTalent(TALENTS.CALL_OF_THE_WILD_TALENT) && (
           <CastEfficiencyBar
-            spellId={TALENTS.CALL_OF_THE_WILD_TALENT.id}
+            spell={TALENTS.CALL_OF_THE_WILD_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             minimizeIcons
           />
         )}
         {info.combatant.hasTalent(TALENTS.BESTIAL_WRATH_TALENT) && (
           <CastEfficiencyBar
-            spellId={TALENTS.BESTIAL_WRATH_TALENT.id}
+            spell={TALENTS.BESTIAL_WRATH_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             minimizeIcons
           />
         )}
         {info.combatant.hasTalent(TALENTS.BLOODSHED_TALENT) && (
           <CastEfficiencyBar
-            spellId={TALENTS.BLOODSHED_TALENT.id}
+            spell={TALENTS.BLOODSHED_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             minimizeIcons
           />

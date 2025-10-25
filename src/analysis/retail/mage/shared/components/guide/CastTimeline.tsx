@@ -14,27 +14,6 @@ export interface CastTimelineEntry<T = unknown> {
   end?: number;
 }
 
-const TimelineScrollContainer = styled.div`
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 8px;
-
-  &::-webkit-scrollbar {
-    height: 12px;
-    cursor: default !important;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(104, 103, 100, 0.15);
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background-color: #fab700;
-  }
-`;
-
 interface CastTimelineProps<T = unknown> {
   spell: Spell;
   events: CastTimelineEntry<T>[];
@@ -91,73 +70,33 @@ export default function CastTimeline<T>({
   const timestampText = ` @ ${timestamp}`;
 
   return (
-    <div style={{ marginTop: '10px' }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>
-        Per-Cast Timeline
-        {windowDescription && (
-          <span
-            style={{ fontSize: '12px', color: '#999', fontWeight: 'normal', marginLeft: '8px' }}
-          >
-            {windowDescription}
-          </span>
-        )}
-      </div>
+    <Container>
+      <HeaderSection>
+        <HeaderTitle>Per-Cast Timeline</HeaderTitle>
+        {windowDescription && <WindowDescription>{windowDescription}</WindowDescription>}
+      </HeaderSection>
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          marginBottom: '8px',
-          gap: '10px',
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 'bold', fontSize: '13px' }}>
+      <ControlsSection>
+        <CastInfo>
+          <CastTitle>
             {spell.name} #{currentIndex + 1}
             {timestampText}
-          </div>
-          <div style={{ fontSize: '12px', color: '#999', marginTop: '2px' }}>
+          </CastTitle>
+          <CastCount>
             {currentIndex + 1} of {events.length}
-          </div>
-        </div>
+          </CastCount>
+        </CastInfo>
 
-        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-          <button
-            type="button"
-            onClick={handlePrevious}
-            style={{
-              padding: '4px 12px',
-              cursor: 'pointer',
-              background: '#1a1a1a',
-              border: '1px solid #444',
-              borderRadius: '3px',
-              color: '#fff',
-              fontSize: '14px',
-            }}
-            aria-label="Previous cast"
-          >
+        <NavigationButtons>
+          <NavButton type="button" onClick={handlePrevious} aria-label="Previous cast">
             ← Prev
-          </button>
+          </NavButton>
 
-          <button
-            type="button"
-            onClick={handleNext}
-            style={{
-              padding: '4px 12px',
-              cursor: 'pointer',
-              background: '#1a1a1a',
-              border: '1px solid #444',
-              borderRadius: '3px',
-              color: '#fff',
-              fontSize: '14px',
-            }}
-            aria-label="Next cast"
-          >
+          <NavButton type="button" onClick={handleNext} aria-label="Next cast">
             Next →
-          </button>
-        </div>
-      </div>
+          </NavButton>
+        </NavigationButtons>
+      </ControlsSection>
 
       <TimelineScrollContainer>
         <EmbeddedTimelineContainer secondWidth={secondWidth} secondsShown={duration}>
@@ -166,6 +105,107 @@ export default function CastTimeline<T>({
           </SpellTimeline>
         </EmbeddedTimelineContainer>
       </TimelineScrollContainer>
-    </div>
+    </Container>
   );
 }
+
+const Container = styled.div`
+  margin-bottom: 16px;
+`;
+
+const HeaderSection = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+`;
+
+const HeaderTitle = styled.h3`
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fab700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+`;
+
+const WindowDescription = styled.span`
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+`;
+
+const ControlsSection = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 10px;
+`;
+
+const CastInfo = styled.div`
+  flex: 1;
+`;
+
+const CastTitle = styled.div`
+  font-weight: 600;
+  font-size: 13px;
+  color: #fff;
+  margin-bottom: 4px;
+`;
+
+const CastCount = styled.div`
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+`;
+
+const NavigationButtons = styled.div`
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+`;
+
+const NavButton = styled.button`
+  padding: 6px 14px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background: rgba(250, 183, 0, 0.15);
+    border-color: #fab700;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const TimelineScrollContainer = styled.div`
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+
+  &::-webkit-scrollbar {
+    height: 12px;
+    cursor: default !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(104, 103, 100, 0.15);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #fab700;
+  }
+`;

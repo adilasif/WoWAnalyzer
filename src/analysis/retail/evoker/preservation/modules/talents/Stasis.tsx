@@ -702,7 +702,7 @@ class Stasis extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS_EVOKER.STASIS_TALENT.id}
+        spell={TALENTS_EVOKER.STASIS_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

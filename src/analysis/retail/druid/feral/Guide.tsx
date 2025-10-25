@@ -134,34 +134,34 @@ function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof Co
       show when the spell was cooling down. Red segments highlight times when you could have fit a
       whole extra use of the cooldown.
       <CastEfficiencyBar
-        spellId={SPELLS.TIGERS_FURY.id}
+        spell={SPELLS.TIGERS_FURY}
         gapHighlightMode={GapHighlight.FullCooldown}
         useThresholds
       />
       {hasBerserk && !hasIncarn && (
         <CastEfficiencyBar
-          spellId={SPELLS.BERSERK_CAT.id}
+          spell={SPELLS.BERSERK_CAT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {hasIncarn && (
         <CastEfficiencyBar
-          spellId={TALENTS_DRUID.INCARNATION_AVATAR_OF_ASHAMANE_TALENT.id}
+          spell={TALENTS_DRUID.INCARNATION_AVATAR_OF_ASHAMANE_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {hasConvoke && (
         <CastEfficiencyBar
-          spellId={SPELLS.CONVOKE_SPIRITS.id}
+          spell={SPELLS.CONVOKE_SPIRITS}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
       )}
       {hasFeralFrenzy && (
         <CastEfficiencyBar
-          spellId={TALENTS_DRUID.FERAL_FRENZY_TALENT.id}
+          spell={TALENTS_DRUID.FERAL_FRENZY_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />

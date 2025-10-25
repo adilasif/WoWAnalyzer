@@ -51,7 +51,7 @@ class HolyShock extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={TALENTS.HOLY_SHOCK_TALENT.id}
+        spell={TALENTS.HOLY_SHOCK_TALENT}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines

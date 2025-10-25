@@ -35,27 +35,24 @@ export function CooldownSection({ modules, info }: GuideProps<typeof CombatLogPa
           <li>Red - Spell was available and potentially affected your effieciency</li>
         </ul>
       </div>
+      <CastEfficiencyBar spell={TALENTS.DRAGONRAGE_TALENT} gapHighlightMode={GapHighlight.All} />
       <CastEfficiencyBar
-        spellId={TALENTS.DRAGONRAGE_TALENT.id}
-        gapHighlightMode={GapHighlight.All}
-      />
-      <CastEfficiencyBar
-        spellId={hasFontTalent ? SPELLS.FIRE_BREATH_FONT.id : SPELLS.FIRE_BREATH.id}
+        spell={hasFontTalent ? SPELLS.FIRE_BREATH_FONT : SPELLS.FIRE_BREATH}
         gapHighlightMode={GapHighlight.FullCooldown}
       />
       <CastEfficiencyBar
-        spellId={hasFontTalent ? SPELLS.ETERNITY_SURGE_FONT.id : SPELLS.ETERNITY_SURGE.id}
+        spell={hasFontTalent ? SPELLS.ETERNITY_SURGE_FONT : SPELLS.ETERNITY_SURGE}
         gapHighlightMode={GapHighlight.FullCooldown}
       />
       {info.combatant.hasTalent(TALENTS_EVOKER.SHATTERING_STAR_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_EVOKER.SHATTERING_STAR_TALENT.id}
+          spell={TALENTS_EVOKER.SHATTERING_STAR_TALENT}
           gapHighlightMode={GapHighlight.All}
         />
       )}
       {info.combatant.hasTalent(TALENTS_EVOKER.FIRESTORM_TALENT) && (
         <CastEfficiencyBar
-          spellId={TALENTS_EVOKER.FIRESTORM_TALENT.id}
+          spell={TALENTS_EVOKER.FIRESTORM_TALENT}
           gapHighlightMode={GapHighlight.All}
         />
       )}

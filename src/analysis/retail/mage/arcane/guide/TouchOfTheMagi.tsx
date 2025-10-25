@@ -1,4 +1,4 @@
-import { formatPercentage, formatDuration } from 'common/format';
+import { formatPercentage, formatDuration, formatNumber } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
@@ -8,17 +8,15 @@ import { EventType } from 'parser/core/Events';
 import Analyzer from 'parser/core/Analyzer';
 import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 import TouchOfTheMagi, { TouchOfTheMagiData } from '../analyzers/TouchOfTheMagi';
+import GuideSection from 'interface/guide/components/GuideSection';
+import { type CastEvaluation } from 'interface/guide/components/CastSummary';
+import CastSequence, {
+  type CastSequenceEntry,
+  type CastInSequence,
+} from 'interface/guide/components/CastSequence';
+import CastOverview from 'interface/guide/components/CastOverview';
+import CastDetail, { type PerCastData } from 'interface/guide/components/CastDetail';
 
-import {
-  type ExpandableConfig,
-  type CastEvaluation,
-  type CastTimelineEntry,
-  MageGuideSection,
-  CastTimeline,
-  ExpandableBreakdown,
-  InlineStatistic,
-  createExpandableConfig,
-} from '../../shared/components';
 import EventHistory from 'parser/shared/modules/EventHistory';
 
 const MAX_ARCANE_CHARGES = 4;
@@ -46,52 +44,8 @@ class TouchOfTheMagiGuide extends Analyzer {
     });
   }
 
-  get expandableConfig(): ExpandableConfig {
-    return createExpandableConfig({
-      spell: TALENTS.TOUCH_OF_THE_MAGI_TALENT,
-      formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
-      getTimestamp: (cast: unknown) => (cast as TouchOfTheMagiData).applied,
-      checklistItems: [
-        {
-          label: (
-            <>
-              <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Touch
-            </>
-          ),
-          getResult: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiData;
-            const noCharges = touchCast.charges === 0;
-            const maxCharges = touchCast.charges === MAX_ARCANE_CHARGES;
-            return noCharges || (maxCharges && touchCast.refundBuff);
-          },
-          getDetails: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiData;
-            return `${touchCast.charges} charges ${touchCast.refundBuff ? '(Refund)' : ''}`;
-          },
-        },
-        {
-          label: (
-            <>
-              Active Time during <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />
-            </>
-          ),
-          getResult: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiData;
-            const activeTime = touchCast.activeTime || 0;
-            const activeTimePerf = this.activeTimeUtil(activeTime) as QualitativePerformance;
-            return activeTimePerf !== QualitativePerformance.Fail;
-          },
-          getDetails: (cast: unknown) => {
-            const touchCast = cast as TouchOfTheMagiData;
-            return `${formatPercentage(touchCast.activeTime || 0, 1)}% active time`;
-          },
-        },
-      ],
-    });
-  }
-
   /**
-   * Evaluates a single Touch of the Magi cast for ExpandableBreakdown.
+   * Evaluates a single Touch of the Magi cast.
    * Returns performance and reason for tooltip display.
    *
    * Evaluation priority: fail → perfect → good → ok → default
@@ -220,56 +174,103 @@ class TouchOfTheMagiGuide extends Analyzer {
 
     const activeTimePerf = this.activeTimeUtil(this.touchOfTheMagi.averageActiveTime);
 
-    // Get all applicable events for each Touch of the Magi window
-    const touchTimelineEvents: CastTimelineEntry<TouchOfTheMagiData>[] =
+    const averageDamageTooltip = (
+      <>
+        {formatNumber(this.touchOfTheMagi.averageDamage)} average damage per Touch of the Magi cast.
+      </>
+    );
+
+    const totalCasts = this.touchOfTheMagi.touchData.length;
+    const totalCastsTooltip = <>Total number of Touch of the Magi casts during the encounter.</>;
+
+    // Get cast sequences for each Touch of the Magi window
+    const touchSequenceEvents: CastSequenceEntry<TouchOfTheMagiData>[] =
       this.touchOfTheMagi.touchData.map((cast) => {
         const windowStart = cast.applied - TOUCH_WINDOW_BUFFER_MS;
         const windowEnd = cast.applied + TOUCH_WINDOW_BUFFER_MS;
 
-        // Filter owner.eventHistory for all applicable timeline events (Cast, BeginChannel, EndChannel, GlobalCooldown, etc.)
-        const events = this.eventHistory.getEvents(
-          [EventType.Cast, EventType.BeginChannel, EventType.EndChannel, EventType.GlobalCooldown],
-          {
-            searchBackwards: false,
-            startTimestamp: windowStart,
-            duration: windowEnd - windowStart,
-          },
-        );
+        // Filter for cast events during the Touch window
+        const castEvents = this.eventHistory.getEvents([EventType.Cast], {
+          searchBackwards: false,
+          startTimestamp: windowStart,
+          duration: windowEnd - windowStart,
+        });
+
+        // Convert to CastInSequence format
+        const casts: CastInSequence[] = castEvents.map((event) => ({
+          timestamp: event.timestamp,
+          spellId: event.ability.guid,
+          spellName: event.ability.name,
+          icon: event.ability.abilityIcon.replace('.jpg', ''),
+          performance: undefined, // Could add performance evaluation per cast if desired
+        }));
 
         return {
           data: cast,
           start: windowStart,
           end: windowEnd,
-          casts: events,
+          casts,
         };
       });
 
+    // Prepare per-cast data for CastDetail
+    const perCastData: PerCastData[] = this.touchOfTheMagi.touchData.map((cast) => {
+      const evaluation = this.evaluateTouchCast(cast);
+
+      return {
+        performance: evaluation.performance,
+        timestamp: this.owner.formatTimestamp(cast.applied),
+        stats: [
+          {
+            value: `${cast.charges}`,
+            label: 'Charges',
+            tooltip: <>Arcane Charges before Touch of the Magi cast</>,
+          },
+          {
+            value: `${formatPercentage(cast.activeTime || 0, 0)}%`,
+            label: 'Active',
+            tooltip: <>Percentage of time spent actively casting during the window</>,
+          },
+          {
+            value: formatNumber(cast.totalDamage),
+            label: 'Damage',
+            tooltip: <>Total damage accumulated during this Touch of the Magi</>,
+          },
+        ],
+        details: evaluation.reason,
+      };
+    });
+
     return (
-      <MageGuideSection spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} explanation={explanation}>
-        <InlineStatistic
-          value={`${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`}
-          label="Average Active Time"
-          tooltip={activeTimeTooltip}
-          performance={activeTimePerf}
-        />
-        <ExpandableBreakdown
-          castData={this.touchOfTheMagi.touchData}
-          evaluatedData={this.touchOfTheMagi.touchData.map((cast) => {
-            const evaluation = this.evaluateTouchCast(cast);
-            return {
-              value: evaluation.performance,
-              tooltip: evaluation.reason,
-            };
-          })}
-          expandableConfig={this.expandableConfig}
-        />
-        <CastTimeline
+      <GuideSection spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} explanation={explanation}>
+        <CastOverview
           spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT}
-          events={touchTimelineEvents}
-          windowDescription="Casts 5 seconds before and after Touch of the Magi"
+          stats={[
+            {
+              value: `${formatPercentage(this.touchOfTheMagi.averageActiveTime)}%`,
+              label: 'Average Active Time',
+              tooltip: activeTimeTooltip,
+              performance: activeTimePerf,
+            },
+            {
+              value: formatNumber(this.touchOfTheMagi.averageDamage),
+              label: 'Average Damage',
+              tooltip: averageDamageTooltip,
+            },
+            {
+              value: `${totalCasts}`,
+              label: 'Total Casts',
+              tooltip: totalCastsTooltip,
+            },
+          ]}
+        />
+        <CastDetail title="Touch of the Magi Casts" casts={perCastData} />
+        <CastSequence
+          spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT}
+          sequences={touchSequenceEvents}
           castTimestamp={(data) => formatDuration(data.applied - this.owner.fight.start_time)}
         />
-      </MageGuideSection>
+      </GuideSection>
     );
   }
 }

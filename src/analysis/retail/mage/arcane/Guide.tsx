@@ -139,25 +139,25 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           <SpellLink spell={TALENTS.ARCANE_SURGE_TALENT} />.
         </>
         <CastEfficiencyBar
-          spellId={TALENTS.ARCANE_SURGE_TALENT.id}
+          spell={TALENTS.ARCANE_SURGE_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
         <CastEfficiencyBar
-          spellId={TALENTS.TOUCH_OF_THE_MAGI_TALENT.id}
+          spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />
         {info.combatant.hasTalent(TALENTS.PRESENCE_OF_MIND_TALENT) && (
           <CastEfficiencyBar
-            spellId={TALENTS.PRESENCE_OF_MIND_TALENT.id}
+            spell={TALENTS.PRESENCE_OF_MIND_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             useThresholds
           />
         )}
         {info.combatant.hasTalent(TALENTS.EVOCATION_TALENT) && (
           <CastEfficiencyBar
-            spellId={TALENTS.EVOCATION_TALENT.id}
+            spell={TALENTS.EVOCATION_TALENT}
             gapHighlightMode={GapHighlight.FullCooldown}
             useThresholds
           />

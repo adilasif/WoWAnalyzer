@@ -44,7 +44,7 @@ class Judgment extends Analyzer {
   subStatistic() {
     return (
       <CastEfficiencyBar
-        spellId={SPELLS.JUDGMENT_CAST_HOLY.id}
+        spell={SPELLS.JUDGMENT_CAST_HOLY}
         gapHighlightMode={GapHighlight.FullCooldown}
         minimizeIcons
         slimLines
