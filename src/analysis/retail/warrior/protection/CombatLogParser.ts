@@ -4,7 +4,6 @@ import Abilities from './modules/Abilities';
 import Haste from './modules/core/Haste';
 import RageDetails from './modules/core/RageDetails';
 import RageTracker from './modules/core/RageTracker';
-import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
 import Avatar from './modules/spells/Avatar';
 import BigHitGraph from './modules/features/BigHitGraph';
 import BlockCheck from './modules/features/BlockCheck';
@@ -46,7 +45,6 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Features
     abilities: Abilities,
-    alwaysBeCasting: AlwaysBeCasting,
     shieldBlock: ShieldBlock,
     blockCheck: BlockCheck,
     spellUsable: SpellUsable,

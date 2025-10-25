@@ -10,6 +10,7 @@ import { STATISTIC_ORDER } from 'parser/ui/StatisticBox';
 import TALENTS from 'common/TALENTS/warrior';
 
 import ShieldBlock from '../spells/ShieldBlock';
+import SpellIcon from 'interface/SpellIcon';
 
 const debug = false;
 

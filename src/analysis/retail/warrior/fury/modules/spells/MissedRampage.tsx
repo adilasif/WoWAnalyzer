@@ -4,6 +4,7 @@ import { addInefficientCastReason } from 'parser/core/EventMetaLib';
 import Events, { CastEvent, GetRelatedEvent, ResourceChangeEvent } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import { RAGE_GENERATING_CAST } from '../normalizers/RageGenerationEventLinkNormalizer';
+import talents from 'common/TALENTS/warrior';
 
 /*  Example log:
  *  https://www.warcraftlogs.com/reports/KhynM7v96cZkTBdg#fight=6&type=damage-done&source=78

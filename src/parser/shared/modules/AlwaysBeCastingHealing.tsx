@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/react/macro';
 import { formatPercentage } from 'common/format';
 import { EndChannelEvent, GlobalCooldownEvent } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';

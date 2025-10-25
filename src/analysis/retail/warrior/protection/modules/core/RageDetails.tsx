@@ -9,6 +9,7 @@ import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { STATISTIC_ORDER } from 'parser/ui/StatisticBox';
 
 import RageTracker from './RageTracker';
+import { formatNumber } from 'common/format';
 
 class RageDetails extends Analyzer {
   static dependencies = {

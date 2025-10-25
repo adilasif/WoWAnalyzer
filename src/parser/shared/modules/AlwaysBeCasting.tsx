@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { Tooltip } from 'interface';
+import { Icon, Tooltip } from 'interface';
 import Analyzer, { Options } from 'parser/core/Analyzer';
 import Events, { EndChannelEvent, GlobalCooldownEvent } from 'parser/core/Events';
 import { NumberThreshold, ThresholdStyle } from 'parser/core/ParseResults';
@@ -10,6 +10,7 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 
 import Abilities from '../../core/modules/Abilities';
 import GlobalCooldown from './GlobalCooldown';
+import { formatPercentage } from 'common/format';
 
 const DEBUG = false;
 
