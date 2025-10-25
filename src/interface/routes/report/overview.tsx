@@ -13,5 +13,5 @@ export function Component() {
     return <ResultsLoadingIndicator />;
   }
 
-  return <Overview guide={parser.buildGuide()} issues={results.issues} />;
+  return <Overview guide={parser.buildGuide()} />;
 }
