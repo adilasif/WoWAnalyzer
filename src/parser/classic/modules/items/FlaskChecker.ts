@@ -2,7 +2,6 @@ import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { ApplyBuffEvent } from 'parser/core/Events';
 import SUGGESTION_IMPORTANCE from 'parser/core/ISSUE_IMPORTANCE';
 import { SuggestionFactory, ThresholdStyle, When } from 'parser/core/ParseResults';
-import { RequirementThresholds } from 'parser/shared/modules/features/Checklist/Requirement';
 import BaseFlaskChecker from 'parser/shared/modules/items/FlaskChecker';
 
 const MAX_FLASK_IDS = [
@@ -55,7 +54,7 @@ class FlaskChecker extends BaseFlaskChecker {
     }
   }
 
-  get FlaskSuggestionThresholds(): RequirementThresholds {
+  get FlaskSuggestionThresholds() {
     return {
       actual: Boolean(this.flaskBuffId) || Boolean(this.guardianElixirId && this.battleElixirId),
       isEqual: false,
@@ -63,7 +62,7 @@ class FlaskChecker extends BaseFlaskChecker {
     };
   }
 
-  get GuardianElixirSuggestionThresholds(): RequirementThresholds {
+  get GuardianElixirSuggestionThresholds() {
     return {
       actual: !this.flaskBuffId && !this.guardianElixirId,
       isEqual: true,
@@ -71,7 +70,7 @@ class FlaskChecker extends BaseFlaskChecker {
     };
   }
 
-  get BattleElixirSuggestionThresholds(): RequirementThresholds {
+  get BattleElixirSuggestionThresholds() {
     return {
       actual: !this.flaskBuffId && !this.battleElixirId,
       isEqual: true,

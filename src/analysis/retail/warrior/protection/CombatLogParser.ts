@@ -9,7 +9,6 @@ import Avatar from './modules/spells/Avatar';
 import BigHitGraph from './modules/features/BigHitGraph';
 import BlockCheck from './modules/features/BlockCheck';
 import Buffs from './modules/features/Buffs';
-import Checklist from './modules/features/Checklist/Module';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import MitigationCheck from './modules/features/MitigationCheck';
 import SpellUsable from './modules/features/SpellUsable';
@@ -52,7 +51,6 @@ class CombatLogParser extends CoreCombatLogParser {
     blockCheck: BlockCheck,
     spellUsable: SpellUsable,
     cooldownThroughputTracker: CooldownThroughputTracker,
-    checklist: Checklist,
     bigHitGraph: BigHitGraph,
 
     rageTracker: RageTracker,

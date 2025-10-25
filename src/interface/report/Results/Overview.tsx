@@ -4,11 +4,9 @@ import { ReactNode } from 'react';
 import * as React from 'react';
 
 import { useConfig } from '../ConfigContext';
-import Checklist from './ChecklistPanel';
 import Suggestions from './Suggestions';
 
 interface Props {
-  checklist?: React.ReactNode;
   issues: (Issue | Suggestion)[];
   guide?: React.FC;
 }
@@ -33,7 +31,7 @@ const PrototypeSwitcher = ({
   </a>
 );
 
-const Overview = ({ guide: GuideComponent, checklist, issues }: Props) => {
+const Overview = ({ guide: GuideComponent, issues }: Props) => {
   const config = useConfig();
 
   const sessionGuideSetting = window.sessionStorage?.getItem('guideMode');
@@ -65,13 +63,6 @@ const Overview = ({ guide: GuideComponent, checklist, issues }: Props) => {
 
   return guideMode && GuideComponent ? (
     <div className="container" style={{ display: 'grid', gridTemplateColumns: '100%' }}>
-      {checklist && (
-        <PrototypeSwitcher
-          defaultGuide={configDefaultFrontmatter === 'guide'}
-          guideMode={guideMode}
-          setGuideMode={setMode}
-        />
-      )}
       {alert}
       <GuideComponent />
     </div>
@@ -85,9 +76,6 @@ const Overview = ({ guide: GuideComponent, checklist, issues }: Props) => {
         />
       )}
       {alert}
-
-      {checklist && <Checklist>{checklist}</Checklist>}
-
       <Suggestions style={{ marginBottom: 0 }}>{issues}</Suggestions>
     </div>
   );

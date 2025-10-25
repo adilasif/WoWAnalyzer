@@ -11,7 +11,6 @@ import {
   HasTarget,
 } from 'parser/core/Events';
 import ModuleError from 'parser/core/ModuleError';
-import PreparationRuleAnalyzer from 'parser/retail/modules/features/Checklist/PreparationRuleAnalyzer';
 import PotionChecker from 'parser/retail/modules/items/PotionChecker';
 import WeaponEnhancementChecker from 'parser/retail/modules/items/WeaponEnhancementChecker';
 import DeathRecapTracker from 'parser/shared/modules/DeathRecapTracker';
@@ -220,7 +219,6 @@ class CombatLogParser {
     healthPotion: HealthPotion,
     combatPotion: CombatPotion,
     weaponEnhancementChecker: WeaponEnhancementChecker,
-    preparationRuleAnalyzer: PreparationRuleAnalyzer,
 
     // Racials
     arcaneTorrent: ArcaneTorrent,
