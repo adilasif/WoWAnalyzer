@@ -199,26 +199,6 @@ function buildFunctionalAnalyzer<Deps extends Dependencies, Result = any>(
         );
       }
     }
-
-    suggestions(_when: When): Suggestion[] | void {
-      if (functionType === FunctionType.Suggestion) {
-        const result = analyzer.run(
-          this.eventList,
-          this.owner.info,
-          this as unknown as InjectedDependencies<Deps>,
-        );
-
-        if (result === undefined) {
-          return [];
-        }
-
-        if (Array.isArray(result)) {
-          return result as Suggestion[];
-        } else {
-          return [result as unknown] as Suggestion[];
-        }
-      }
-    }
   };
 
   Object.defineProperty(analyzer, 'name', { value: metric.name, writable: false });
