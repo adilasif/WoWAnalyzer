@@ -23,7 +23,6 @@ import { Link } from 'react-router-dom';
 import { isHiddenParsesResponse, WCLParse, WCLParsesResponse } from 'common/WCL_TYPES';
 import { isSupportedRegion } from 'common/regions';
 
-import './report/Results/Header.scss';
 import './CharacterParses.scss';
 import ParsesList, { Parse } from './CharacterParsesList';
 import { appendReportHistory } from './reducers/reportHistory';
