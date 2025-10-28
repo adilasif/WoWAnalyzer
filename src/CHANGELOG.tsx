@@ -45,6 +45,7 @@ import SpellLink from 'interface/SpellLink';
 
 // prettier-ignore
 export default [
+  change(date(2025, 10,  28), 'Add MID1 tier set ids.', Vollmer),  
   change(date(2025, 10,  14), 'Update CastEfficiencyBar to accept a spell object.', Sharrq),  
   change(date(2025, 10,  22), 'Add and Update Guide Components for CastSummary, CastDetail, CastSequence, StatisticCard, and BuffUptimeBar.', Sharrq),
   change(date(2025, 10,  14), 'Replace Babel with oxc and swc.', ToppleTheNun),
