@@ -11,6 +11,7 @@ import {
   StatisticsIcon,
   TimelineIcon,
   MoreIcon as OtherIcon,
+  DamageIcon,
 } from 'interface/icons';
 import { isMessageDescriptor } from 'localization/isMessageDescriptor';
 import type Config from 'parser/Config';
@@ -22,8 +23,14 @@ import { ComponentType, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import HeaderBackground from './HeaderBackground';
 import { currentExpansion } from 'game/GameBranch';
-import { formatDuration } from 'common/format';
+import { formatDuration, formatNumber } from 'common/format';
 import * as difficulty from 'game/DIFFICULTIES';
+import { ByRole, Role } from 'interface/guide/foundation/ByRole';
+import ROLES from 'game/ROLES';
+import { useResults } from './ResultsContext';
+import { useCombatLogParser } from '../CombatLogParserContext';
+import HealingDone from 'parser/shared/modules/throughput/HealingDone';
+import DamageDone from 'parser/shared/modules/throughput/DamageDone';
 
 const colors = {
   bodyText: '#f3eded',
@@ -79,6 +86,7 @@ interface HeaderProps {
   tabs: ParseResultsTab[];
   selectedTab: string;
   makeTabUrl: (url: string) => string;
+  isLoading: boolean;
 }
 
 interface InternalTab extends ParseResultsTab {
@@ -160,6 +168,7 @@ export default function Header({
   makeTabUrl,
   boss,
   fight,
+  isLoading,
 }: HeaderProps): JSX.Element | null {
   const tabList = useMemo(
     () =>
@@ -196,7 +205,7 @@ export default function Header({
                   </TabButton>
                 ))}
             </TabStrip>
-            <StatBox />
+            {!isLoading && <StatBox />}
           </HeaderContainer>
         </Section>
       </div>
@@ -268,6 +277,7 @@ const MiniBoxContainer = styled.div`
       'subtext image';
 
     justify-items: end;
+    justify-content: end;
     text-align: right;
   }
 `;
@@ -338,10 +348,23 @@ function BossMiniBox({ boss, fight }: Pick<HeaderProps, 'boss' | 'fight'>): JSX.
 const StatBoxContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: center;
+  width: max-content;
+  justify-self: end;
+
+  // visual alignment with the character box.
+  // annoyingly specific.
+  margin-right: -0.75rem;
 
   text-align: center;
   font-size: 1.5rem;
+
+  border: 1px solid ${level1.border};
+  background: ${level0.background};
+  box-shadow: inset 1px 3px ${level1.shadow};
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
 
   & > * {
     border-right: 1px solid ${level2.border};
@@ -362,23 +385,89 @@ const StatBoxStat = styled.dl`
     font-weight: normal;
     color: ${colors.unfocusedText};
     font-size: 75%;
+
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    align-content: baseline;
+    justify-content: center;
+  }
+  & img {
+    max-height: 0.75em;
   }
 
-  margin-bottom: 0.5rem;
+  min-width: 5em;
+
   padding: 0 1rem;
+  margin: 0;
 `;
 
 function StatBox(): JSX.Element | null {
   return (
-    <StatBoxContainer>
-      <StatBoxStat>
-        <dt>Boss DPS</dt>
-        <dd>1.01m DPS</dd>
-      </StatBoxStat>
-      <StatBoxStat>
-        <dt>Add DPS</dt>
-        <dd>0.24m DPS</dd>
-      </StatBoxStat>
-    </StatBoxContainer>
+    <ByRole>
+      <StatBoxContainer>
+        <Role.Healer>
+          <HealingStat />
+        </Role.Healer>
+        <DamageStat />
+        <Role roles={[ROLES.TANK, ROLES.DPS.MELEE, ROLES.DPS.RANGED]}>
+          <BossDamageStat />
+        </Role>
+      </StatBoxContainer>
+    </ByRole>
+  );
+}
+
+function HealingStat() {
+  const { combatLogParser } = useCombatLogParser();
+  if (!combatLogParser) {
+    return null;
+  }
+
+  const duration = combatLogParser.fightDuration / 1000;
+
+  return (
+    <StatBoxStat>
+      <dt>
+        <img src="/img/healing.png" /> HPS
+      </dt>
+      <dd>{formatNumber(combatLogParser.getModule(HealingDone).total.effective / duration)}</dd>
+    </StatBoxStat>
+  );
+}
+
+function DamageStat() {
+  const { combatLogParser } = useCombatLogParser();
+  if (!combatLogParser) {
+    return null;
+  }
+
+  const duration = combatLogParser.fightDuration / 1000;
+
+  return (
+    <StatBoxStat>
+      <dt>
+        <DamageIcon /> DPS
+      </dt>
+      <dd>{formatNumber(combatLogParser.getModule(DamageDone).total.effective / duration)}</dd>
+    </StatBoxStat>
+  );
+}
+
+function BossDamageStat() {
+  const { combatLogParser } = useCombatLogParser();
+  if (!combatLogParser) {
+    return null;
+  }
+
+  const duration = combatLogParser.fightDuration / 1000;
+
+  return (
+    <StatBoxStat>
+      <dt>
+        <DamageIcon /> Boss DPS
+      </dt>
+      <dd>{formatNumber(combatLogParser.getModule(DamageDone).totalBoss.effective / duration)}</dd>
+    </StatBoxStat>
   );
 }

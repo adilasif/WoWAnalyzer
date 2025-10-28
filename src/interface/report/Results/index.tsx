@@ -191,134 +191,134 @@ const Results = (props: PassedProps) => {
 
   return (
     <ResultsContext.Provider value={providerValue}>
-      <div className={`results boss-${props.fight.boss}`}>
-        <Header
-          config={props.config}
-          player={props.player}
-          characterProfile={props.characterProfile}
-          boss={boss}
-          fight={props.fight}
-          tabs={results ? results.tabs : []}
-          makeTabUrl={props.makeTabUrl}
-          selectedTab={selectedTab}
-          selectedPhase={props.selectedPhase}
-          selectedInstance={props.selectedInstance}
-          selectedDungeonPull={props.selectedDungeonPull}
-          phases={props.phases}
-          handlePhaseSelection={props.handlePhaseSelection}
-          handleDungeonPullSelection={props.handleDungeonPullSelection}
-          applyFilter={props.applyFilter}
-          isLoading={isLoading}
-        />
+      <CombatLogParserProvider combatLogParser={props.parser}>
+        <div className={`results boss-${props.fight.boss}`}>
+          <Header
+            config={props.config}
+            player={props.player}
+            characterProfile={props.characterProfile}
+            boss={boss}
+            fight={props.fight}
+            tabs={results ? results.tabs : []}
+            makeTabUrl={props.makeTabUrl}
+            selectedTab={selectedTab}
+            selectedPhase={props.selectedPhase}
+            selectedInstance={props.selectedInstance}
+            selectedDungeonPull={props.selectedDungeonPull}
+            phases={props.phases}
+            handlePhaseSelection={props.handlePhaseSelection}
+            handleDungeonPullSelection={props.handleDungeonPullSelection}
+            applyFilter={props.applyFilter}
+            isLoading={isLoading}
+          />
 
-        {props.fight.end_time > MAX_REPORT_DURATION && (
-          <ReportDurationWarning duration={reportDuration} />
-        )}
+          {props.fight.end_time > MAX_REPORT_DURATION && (
+            <ReportDurationWarning duration={reportDuration} />
+          )}
 
-        {props.parser && props.parser.disabledModules && (
-          <DegradedExperience disabledModules={props.parser.disabledModules} />
-        )}
-        {boss && boss.fight.resultsWarning && (
-          <div className="container">
-            <AlertWarning style={{ marginBottom: 30 }}>{boss.fight.resultsWarning}</AlertWarning>
-          </div>
-        )}
-        {props.parser && props.parser.selectedCombatant.gear && (
-          <ItemWarning gear={props.parser.selectedCombatant.gear} />
-        )}
-        {props.timeFilter && (
-          <div className="container">
-            <AlertWarning style={{ marginBottom: 30 }}>
-              <Trans id="interface.report.results.warning.timeFilter">
-                These results are filtered to the selected time period. Time filtered results are
-                under development and may not be entirely accurate. <br /> Please report any issues
-                you may find on our GitHub or Discord.
-              </Trans>
-            </AlertWarning>
-          </div>
-        )}
-        {props.build && props.build !== 'default' && (
-          <div className="container">
-            <AlertWarning style={{ marginBottom: 30 }}>
-              <Trans id="interface.report.results.warning.build">
-                These results are analyzed under build different from the standard build. While this
-                will make some modules more accurate, some may also not provide the information you
-                expect them to. <br /> Please report any issues you may find on our GitHub or
-                Discord.
-              </Trans>
-            </AlertWarning>
-          </div>
-        )}
-        <CombatLogParserProvider combatLogParser={props.parser}>
+          {props.parser && props.parser.disabledModules && (
+            <DegradedExperience disabledModules={props.parser.disabledModules} />
+          )}
+          {boss && boss.fight.resultsWarning && (
+            <div className="container">
+              <AlertWarning style={{ marginBottom: 30 }}>{boss.fight.resultsWarning}</AlertWarning>
+            </div>
+          )}
+          {props.parser && props.parser.selectedCombatant.gear && (
+            <ItemWarning gear={props.parser.selectedCombatant.gear} />
+          )}
+          {props.timeFilter && (
+            <div className="container">
+              <AlertWarning style={{ marginBottom: 30 }}>
+                <Trans id="interface.report.results.warning.timeFilter">
+                  These results are filtered to the selected time period. Time filtered results are
+                  under development and may not be entirely accurate. <br /> Please report any
+                  issues you may find on our GitHub or Discord.
+                </Trans>
+              </AlertWarning>
+            </div>
+          )}
+          {props.build && props.build !== 'default' && (
+            <div className="container">
+              <AlertWarning style={{ marginBottom: 30 }}>
+                <Trans id="interface.report.results.warning.build">
+                  These results are analyzed under build different from the standard build. While
+                  this will make some modules more accurate, some may also not provide the
+                  information you expect them to. <br /> Please report any issues you may find on
+                  our GitHub or Discord.
+                </Trans>
+              </AlertWarning>
+            </div>
+          )}
           <Outlet />
-        </CombatLogParserProvider>
 
-        <div className="container" style={{ marginTop: 40 }}>
-          <div className="row">
-            <div className="col-md-8">
-              <SupportProvidedBy config={props.config} aboutUrl={props.makeTabUrl('about')} />
-            </div>
-            <div className="col-md-3">
-              <small>
-                <Trans id="interface.report.results.viewOn">View on</Trans>
-              </small>
-              <br />
-              <Tooltip
-                content={t({
-                  id: 'interface.report.results.tooltip.newTab.originalReport',
-                  message: `Opens in a new tab. View the original report.`,
-                })}
-              >
-                <a
-                  href={makeWclUrl(
-                    props.report.code,
-                    {
-                      fight: props.fight.id,
-                      source: props.parser ? props.parser.playerId : undefined,
-                    },
-                    wclGameVersionToExpansion(props.report.gameVersion),
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn"
-                  style={{ fontSize: 20, padding: '6px 0' }}
+          <div className="container" style={{ marginTop: 40 }}>
+            <div className="row">
+              <div className="col-md-8">
+                <SupportProvidedBy config={props.config} aboutUrl={props.makeTabUrl('about')} />
+              </div>
+              <div className="col-md-3">
+                <small>
+                  <Trans id="interface.report.results.viewOn">View on</Trans>
+                </small>
+                <br />
+                <Tooltip
+                  content={t({
+                    id: 'interface.report.results.tooltip.newTab.originalReport',
+                    message: `Opens in a new tab. View the original report.`,
+                  })}
                 >
-                  <WarcraftLogsIcon style={{ height: '1.2em', marginTop: '-0.1em' }} /> Warcraft
-                  Logs
-                </a>
-              </Tooltip>
-              <br />
-              <Tooltip
-                content={t({
-                  id: 'interface.report.results.tooltip.newTab.insightsAndTimelines',
-                  message: `Opens in a new tab. View insights and timelines for raid encounters.`,
-                })}
-              >
-                <a
-                  href={`https://www.wipefest.net/report/${props.report.code}/fight/${props.fight.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn"
-                  style={{ fontSize: 20, padding: '6px 0' }}
+                  <a
+                    href={makeWclUrl(
+                      props.report.code,
+                      {
+                        fight: props.fight.id,
+                        source: props.parser ? props.parser.playerId : undefined,
+                      },
+                      wclGameVersionToExpansion(props.report.gameVersion),
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn"
+                    style={{ fontSize: 20, padding: '6px 0' }}
+                  >
+                    <WarcraftLogsIcon style={{ height: '1.2em', marginTop: '-0.1em' }} /> Warcraft
+                    Logs
+                  </a>
+                </Tooltip>
+                <br />
+                <Tooltip
+                  content={t({
+                    id: 'interface.report.results.tooltip.newTab.insightsAndTimelines',
+                    message: `Opens in a new tab. View insights and timelines for raid encounters.`,
+                  })}
                 >
-                  <WipefestIcon style={{ height: '1.2em', marginTop: '-0.1em' }} /> Wipefest
-                </a>
-              </Tooltip>
-            </div>
-            <div className="col-md-1">
-              <Tooltip
-                content={
-                  <Trans id="interface.report.results.tooltip.backToTop">
-                    Scroll back to the top.
-                  </Trans>
-                }
-              >
-                <ScrollToTop />
-              </Tooltip>
+                  <a
+                    href={`https://www.wipefest.net/report/${props.report.code}/fight/${props.fight.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn"
+                    style={{ fontSize: 20, padding: '6px 0' }}
+                  >
+                    <WipefestIcon style={{ height: '1.2em', marginTop: '-0.1em' }} /> Wipefest
+                  </a>
+                </Tooltip>
+              </div>
+              <div className="col-md-1">
+                <Tooltip
+                  content={
+                    <Trans id="interface.report.results.tooltip.backToTop">
+                      Scroll back to the top.
+                    </Trans>
+                  }
+                >
+                  <ScrollToTop />
+                </Tooltip>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </CombatLogParserProvider>
     </ResultsContext.Provider>
   );
 };
