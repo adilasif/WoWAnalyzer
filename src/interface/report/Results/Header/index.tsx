@@ -26,6 +26,7 @@ import * as difficulty from 'game/DIFFICULTIES';
 import HeaderStatBox from './HeaderStatBox';
 import { level1, level2, colors } from 'interface/design-system';
 import { formatDuration } from 'common/format';
+import FilterButton from './FilterButton';
 
 const Section = styled.section`
   border: 1px solid ${level1.border};
@@ -36,16 +37,17 @@ const Section = styled.section`
 
 const HeaderContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   grid-template-rows: auto auto;
 
   grid-template-areas:
-    'boss character'
-    'tabs stats';
+    'boss filter character'
+    'tabs tabs stats';
 
-  gap: 1rem 0;
+  gap: 1rem;
 
   align-items: end;
+  justify-items: start;
 `;
 
 interface HeaderProps {
@@ -161,6 +163,7 @@ export default function Header({
         <Section style={{ paddingBottom: 0 }}>
           <HeaderContainer>
             <BossMiniBox boss={boss} fight={fight} />
+            <FilterButton />
             <CharacterMiniBox player={player} characterProfile={characterProfile} config={config} />
             <TabStrip>
               {tabList

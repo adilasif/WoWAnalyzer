@@ -6,17 +6,13 @@ import { DamageIcon } from 'interface/icons';
 import { useCombatLogParser } from 'interface/report/CombatLogParserContext';
 import DamageDone from 'parser/shared/modules/throughput/DamageDone';
 import HealingDone from 'parser/shared/modules/throughput/HealingDone';
+import { level1, colors, level0 } from 'interface/design-system';
 
 const StatBoxContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  width: max-content;
-  justify-self: end;
-
-  // visual alignment with the character box.
-  // annoyingly specific.
-  margin-right: -0.75rem;
+  justify-self: stretch;
 
   text-align: center;
   font-size: 1.5rem;
@@ -24,12 +20,12 @@ const StatBoxContainer = styled.div`
   border: 1px solid ${level1.border};
   background: ${level0.background};
   box-shadow: inset 1px 3px ${level1.shadow};
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   margin-bottom: 0.5rem;
 
   & > * {
-    border-right: 1px solid ${level2.border};
+    border-right: 1px solid ${level1.border};
   }
 
   & > *:first-child {
