@@ -44,7 +44,7 @@ const HeaderContainer = styled.div`
     'boss filter character'
     'tabs tabs stats';
 
-  gap: 1rem;
+  gap: 0.5rem 1rem;
 
   align-items: end;
   justify-items: start;

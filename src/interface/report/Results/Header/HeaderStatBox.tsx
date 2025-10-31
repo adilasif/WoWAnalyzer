@@ -6,13 +6,13 @@ import { DamageIcon } from 'interface/icons';
 import { useCombatLogParser } from 'interface/report/CombatLogParserContext';
 import DamageDone from 'parser/shared/modules/throughput/DamageDone';
 import HealingDone from 'parser/shared/modules/throughput/HealingDone';
-import { level1, colors, level0 } from 'interface/design-system';
+import { level1, colors, level0, level2 } from 'interface/design-system';
 
 const StatBoxContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  justify-self: stretch;
+  justify-self: end;
 
   text-align: center;
   font-size: 1.5rem;
@@ -23,6 +23,7 @@ const StatBoxContainer = styled.div`
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   margin-bottom: 0.5rem;
+  margin-right: -0.5rem;
 
   & > * {
     border-right: 1px solid ${level1.border};
