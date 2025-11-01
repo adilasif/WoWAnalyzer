@@ -27,6 +27,7 @@ import HeaderStatBox from './HeaderStatBox';
 import { level1, level2, colors } from 'interface/design-system';
 import { formatDuration } from 'common/format';
 import FilterButton from './FilterButton';
+import { Filter } from 'interface/report/hooks/useTimeEventFilter';
 
 const Section = styled.section`
   border: 1px solid ${level1.border};
@@ -60,6 +61,10 @@ interface HeaderProps {
   selectedTab: string;
   makeTabUrl: (url: string) => string;
   isLoading: boolean;
+  selectedPhaseIndex: number;
+  handlePhaseSelection: (phaseIndex: number) => void;
+  handleTimeSelection: (startTimestamp: number, endTimestamp: number) => void;
+  timeFilter: Filter | undefined;
 }
 
 interface InternalTab extends ParseResultsTab {
@@ -142,6 +147,10 @@ export default function Header({
   boss,
   fight,
   isLoading,
+  handlePhaseSelection,
+  handleTimeSelection,
+  selectedPhaseIndex,
+  timeFilter,
 }: HeaderProps): JSX.Element | null {
   const tabList = useMemo(
     () =>
@@ -163,7 +172,13 @@ export default function Header({
         <Section style={{ paddingBottom: 0 }}>
           <HeaderContainer>
             <BossMiniBox boss={boss} fight={fight} />
-            <FilterButton />
+            <FilterButton
+              fight={fight}
+              handlePhaseSelection={handlePhaseSelection}
+              handleTimeSelection={handleTimeSelection}
+              selectedPhaseIndex={selectedPhaseIndex}
+              timeFilter={timeFilter}
+            />
             <CharacterMiniBox player={player} characterProfile={characterProfile} config={config} />
             <TabStrip>
               {tabList

@@ -257,7 +257,6 @@ class CombatLogParser {
   static specModules: DependenciesDefinition = {};
 
   applyTimeFilter = (start: number, end: number) => null; //dummy function gets filled in by event parser
-  applyPhaseFilter = (phase: string, instance: number) => null; //dummy function gets filled in by event parser
 
   config: Config;
   report: Report;

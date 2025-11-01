@@ -44,12 +44,8 @@ interface PassedProps {
   parser: CombatLogParser;
   characterProfile: CharacterProfile;
   makeTabUrl: (tab: string, build?: string) => string;
-  phases: Record<string, Phase> | null;
-  selectedPhase: string;
-  selectedInstance: number;
-  handlePhaseSelection: (phase: string, instance: number) => void;
-  selectedDungeonPull: string;
-  handleDungeonPullSelection: (pull: string) => void;
+  selectedPhaseIndex: number;
+  handlePhaseSelection: (phaseIndex: number) => void;
   applyFilter: (start: number, end: number) => void;
   timeFilter?: Filter;
   build?: string;
@@ -202,14 +198,11 @@ const Results = (props: PassedProps) => {
             tabs={results ? results.tabs : []}
             makeTabUrl={props.makeTabUrl}
             selectedTab={selectedTab}
-            selectedPhase={props.selectedPhase}
-            selectedInstance={props.selectedInstance}
-            selectedDungeonPull={props.selectedDungeonPull}
-            phases={props.phases}
+            selectedPhaseIndex={props.selectedPhaseIndex}
             handlePhaseSelection={props.handlePhaseSelection}
-            handleDungeonPullSelection={props.handleDungeonPullSelection}
-            applyFilter={props.applyFilter}
+            handleTimeSelection={props.applyFilter}
             isLoading={isLoading}
+            timeFilter={props.timeFilter}
           />
 
           {props.fight.end_time > MAX_REPORT_DURATION && (

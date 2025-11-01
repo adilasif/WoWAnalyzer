@@ -72,4 +72,6 @@ export const level2 = {
   background: '#202020',
   border: '#303030',
   shadow: '0 1px 6px #101010',
+
+  background_active: '#252525',
 };

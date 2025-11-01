@@ -205,8 +205,7 @@ interface Config {
   bossPhaseEventsLoaded: boolean;
   fight: WCLFight;
   filter: Filter;
-  phase: string;
-  phaseinstance: number;
+  phase: number;
   bossPhaseEvents: PhaseEvent[] | null;
   events: AnyEvent[] | null;
 }
@@ -216,7 +215,6 @@ const useTimeEventFilter = ({
   fight,
   filter,
   phase,
-  phaseinstance,
   bossPhaseEvents,
   events,
 }: Config) => {
@@ -262,10 +260,6 @@ const useTimeEventFilter = ({
           offset_time: eventFilter.start - fight.start_time, //time between time filter start and fight start (for e.g. timeline)
           original_end_time: fight.end_time,
           filtered: eventFilter.start !== fight.start_time || eventFilter.end !== fight.end_time,
-          ...(phase !== SELECTION_ALL_PHASES && {
-            phase: phase,
-            phaseinstance: phaseinstance || 0,
-          }), //if phase is selected, add it to the fight object
         });
         setIsLoading(false);
       } catch (err) {
@@ -276,7 +270,7 @@ const useTimeEventFilter = ({
 
     setIsLoading(true);
     parse();
-  }, [bossPhaseEventsLoaded, bossPhaseEvents, fight, filter, events, phase, phaseinstance]);
+  }, [bossPhaseEventsLoaded, bossPhaseEvents, fight, filter, events]);
 
   return {
     isLoading,
