@@ -5,7 +5,7 @@
   margin-bottom: 20px;
 }
 
-.statistics > div {
+.statistics>div {
   padding: 0 15px;
 }
 
@@ -13,11 +13,39 @@
   .ok {
     background: rgba(29, 156, 7, 0.5);
   }
+
   .loading {
     background: color.adjust(Theme.$primaryColor, $alpha: -0.5);
   }
+
   .waiting,
   .skipped {
     background: rgba(102, 102, 102, 0.5);
+  }
+}
+
+.results {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1rem;
+
+  &::before,
+  &::after {
+    display: none;
+  }
+
+  // FIXME: stupid hack to not find and fix every .container nesting
+  & .container {
+    margin: 0;
+    padding: 0;
+  }
+
+  &.no-ad {
+    grid-template-columns: 1fr;
+  }
+
+  & .no-expand {
+    // prevent the grid from stretching to contain this. fixes timeline taking approximately infinite space
+    min-width: 0;
   }
 }

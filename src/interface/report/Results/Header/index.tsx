@@ -169,7 +169,7 @@ export default function Header({
   return (
     <>
       <HeaderBackground boss={boss} raid={raid} expansion={expansion} />
-      <div className="container">
+      <div>
         <Section style={{ paddingBottom: 0 }}>
           <HeaderContainer>
             <BossMiniBox boss={boss} fight={fight} />

@@ -12,7 +12,7 @@ $npc-content-offset: 8em;
   .enemy-casts-controls {
     position: absolute;
     /* this is a trick that makes the controls show in the left gutter on wide screens, but never move off the edge of the screen on smaller ones. */
-    left: calc(50% - min(50%, 1300px / 2) + 1em);
+    left: calc(50% - min(50%, 1300px / 2) + 2em);
 
     &__visible {
       margin-top: -$npc-content-offset;
@@ -43,7 +43,7 @@ $npc-content-offset: 8em;
       border-radius: 10px;
     }
 
-    > * {
+    >* {
       position: absolute;
       height: 22px;
     }
@@ -69,10 +69,12 @@ $npc-content-offset: 8em;
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
 
-        @if $direction == 'up' {
+        @if $direction =='up' {
           border-top: 5px solid var(--color);
           bottom: 0;
-        } @else if $direction == 'down' {
+        }
+
+        @else if $direction =='down' {
           border-bottom: 5px solid var(--color);
           top: 0px;
         }
