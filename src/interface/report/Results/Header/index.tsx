@@ -34,6 +34,7 @@ const Section = styled.section`
   padding: 1rem;
   background: ${level1.background};
   box-shadow: ${level1.shadow};
+  margin-bottom: 2.5rem;
 `;
 
 const HeaderContainer = styled.div`
