@@ -65,6 +65,7 @@ const Ad = ({ style, location }: Props) => {
         showBackground ? styles.show_background : ''
       } text-center`}
     >
+      <div className={styles.ad_label}>Advertisement</div>
       <div ref={initObserver} id={selectorId} data-pw-desk={adType} data-pw-mobi={adType} />
     </Link>
   );
