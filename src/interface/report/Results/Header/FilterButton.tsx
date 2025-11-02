@@ -10,6 +10,8 @@ import Fight from 'parser/core/Fight';
 import { SELECTION_ALL_PHASES, SELECTION_CUSTOM_PHASE } from 'interface/report/hooks/usePhases';
 import { Filter } from 'interface/report/hooks/useTimeEventFilter';
 import { useFight } from 'interface/report/context/FightContext';
+import Select from 'interface/controls/Select';
+import useClickOutsideHandler from 'interface/hooks/useClickOutsideHandler';
 
 const Btn = styled.button`
   appearance: none;
@@ -19,6 +21,7 @@ const Btn = styled.button`
   border: 1px solid ${design.level2.border};
   border-radius: 0.5rem;
   padding: 0 1rem;
+  grid-area: filter;
 
   align-self: start;
   margin-top: 0.6rem;
@@ -143,16 +146,6 @@ const FilterRadioGroup = styled.div`
   display: flex;
 `;
 
-const PhaseSelect = styled.select`
-  background: ${design.level2.background};
-  border: 1px solid ${design.level2.border};
-  box-shadow: ${design.level2.shadow};
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-
-  color: ${design.colors.bodyText};
-`;
-
 // TODO: better/custom ui for dungeon pulls?
 type FilterMode = 'phase' | 'time';
 
@@ -237,7 +230,7 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
         )}
         {selectedMode === 'phase' && (
           <div>
-            <PhaseSelect onChange={(e) => handlePhaseSelection(Number(e.target.value))}>
+            <Select onChange={(e) => handlePhaseSelection(Number(e.target.value))}>
               {selectedPhase === SELECTION_CUSTOM_PHASE && (
                 <option key="custom" value={SELECTION_CUSTOM_PHASE} selected>
                   Custom
@@ -259,7 +252,7 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
                   {phase.label}
                 </option>
               ))}
-            </PhaseSelect>
+            </Select>
           </div>
         )}
         {selectedMode === 'time' && (
@@ -271,45 +264,6 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
     );
   },
 );
-
-/**
- * Run `handler` when a click occurs on an element outside the trees contained by `ignoredContainers`.
- *
- * `ignoredContainers` is treated like a stable ref, even if it isn't one. Changes to it will not be reflected.
- */
-function useClickOutsideHandler(
-  ignoredContainers: React.MutableRefObject<HTMLElement | null>[],
-  handler: () => void,
-): void {
-  useEffect(() => {
-    const clickHandler = (event: MouseEvent) => {
-      if (!event.target) {
-        return;
-      }
-
-      const target = event.target as Node;
-      if (
-        document.contains(target) &&
-        !ignoredContainers.some(
-          (ref) => ref.current === target || ref.current?.contains(target.parentNode),
-        )
-      ) {
-        handler();
-      }
-    };
-    const escHandler = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handler();
-      }
-    };
-    document.addEventListener('click', clickHandler);
-    document.addEventListener('keyup', escHandler);
-    return () => {
-      document.removeEventListener('click', clickHandler);
-      document.removeEventListener('keyup', escHandler);
-    };
-  }, [handler]); // eslint-disable-line react-hooks/exhaustive-deps
-}
 
 function usePhases() {
   const { report } = useReport();

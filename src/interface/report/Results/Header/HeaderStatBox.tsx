@@ -8,7 +8,8 @@ import DamageDone from 'parser/shared/modules/throughput/DamageDone';
 import HealingDone from 'parser/shared/modules/throughput/HealingDone';
 import { level1, colors, level0, level2 } from 'interface/design-system';
 
-const StatBoxContainer = styled.div`
+/** @internal */
+export const StatBoxContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;

@@ -42,6 +42,7 @@ import FoundationSupportBadge from 'interface/guide/foundation/FoundationSupport
 import Ad, { Location } from 'interface/Ad';
 import { PremiumIcon } from 'interface/icons';
 import usePremium from 'interface/usePremium';
+import useMediaQueryMatch from 'interface/hooks/useMediaQueryMatch';
 
 interface PassedProps {
   parser: CombatLogParser;
@@ -186,30 +187,17 @@ const Results = (props: PassedProps) => {
     window.scrollTo(0, 0);
   }, []);
 
-  const [showSideAd, setShowSideAd] = useState(false);
-  useEffect(() => {
-    const watcher = window.matchMedia('(min-width: 1300px)');
-
-    function update() {
-      setShowSideAd(watcher.matches);
-    }
-
-    update();
-    watcher.addEventListener('change', update);
-
-    return () => watcher.removeEventListener('change', update);
-  }, []);
-
+  // we use this instead of css media query because we also need to disable the component
+  const sideAdMinWidthMatch = useMediaQueryMatch('(min-width: 1150px)');
   const premium = usePremium();
+  const showSideAd = sideAdMinWidthMatch && !premium;
 
   const reportDuration = props.report.end - props.report.start;
 
   return (
     <ResultsContext.Provider value={providerValue}>
       <CombatLogParserProvider combatLogParser={props.parser}>
-        <div
-          className={`container results boss-${props.fight.boss} ${!showSideAd || premium ? 'no-ad' : ''}`}
-        >
+        <div className={`container results boss-${props.fight.boss} ${!showSideAd ? 'no-ad' : ''}`}>
           <div className={'no-expand'}>
             <Header
               config={props.config}

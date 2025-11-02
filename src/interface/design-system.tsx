@@ -75,3 +75,8 @@ export const level2 = {
 
   background_active: '#252525',
 };
+
+export const gaps = {
+  small: '0.5rem',
+  medium: '1rem',
+};

@@ -18,16 +18,18 @@ import { ParseResultsTab } from 'parser/core/Analyzer';
 import type CharacterProfile from 'parser/core/CharacterProfile';
 import type Fight from 'parser/core/Fight';
 import { type PlayerInfo } from 'parser/core/Player';
-import { ComponentType, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { ComponentType, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import HeaderBackground from './HeaderBackground';
 import { currentExpansion } from 'game/GameBranch';
 import * as difficulty from 'game/DIFFICULTIES';
-import HeaderStatBox from './HeaderStatBox';
-import { level1, level2, colors } from 'interface/design-system';
+import HeaderStatBox, { StatBoxContainer } from './HeaderStatBox';
+import { level1, level2, colors, gaps } from 'interface/design-system';
 import { formatDuration } from 'common/format';
 import FilterButton from './FilterButton';
 import { Filter } from 'interface/report/hooks/useTimeEventFilter';
+import Select from 'interface/controls/Select';
+import useMediaQueryMatch from 'interface/hooks/useMediaQueryMatch';
 
 const Section = styled.section`
   border: 1px solid ${level1.border};
@@ -37,19 +39,54 @@ const Section = styled.section`
   margin-bottom: 2.5rem;
 `;
 
+const TabStrip = styled.nav`
+  grid-area: tabs;
+`;
+
+const TabSelect = styled(Select)`
+  grid-area: tabs;
+`;
+
 const HeaderContainer = styled.div`
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-rows: auto auto;
-
-  grid-template-areas:
-    'boss filter character'
-    'tabs tabs stats';
-
   gap: 0.5rem 1rem;
+  grid-template-rows: auto auto auto;
+  grid-template-columns: repeat(2, calc(50% - ${gaps.small} / 2));
+  grid-template-areas:
+    'boss character'
+    'filter filter'
+    'tabs tabs';
 
-  align-items: end;
-  justify-items: start;
+  ${StatBoxContainer} {
+    display: none;
+  }
+
+  ${TabStrip} {
+    display: none;
+  }
+
+  @media (min-width: 750px) {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+
+    grid-template-areas:
+      'boss filter character'
+      'tabs tabs stats';
+
+    align-items: end;
+    justify-items: start;
+
+    ${StatBoxContainer} {
+      display: flex;
+    }
+
+    ${TabStrip} {
+      display: block;
+    }
+    ${TabSelect} {
+      display: none;
+    }
+  }
 `;
 
 interface HeaderProps {
@@ -162,6 +199,7 @@ export default function Header({
       ] as InternalTab[],
     [tabs],
   );
+  const navigate = useNavigate();
 
   const expansion = currentExpansion(config.branch);
   const raid = boss ? findZoneByBossId(boss.id) : undefined;
@@ -195,6 +233,15 @@ export default function Header({
                   </TabButton>
                 ))}
             </TabStrip>
+            <TabSelect onChange={(event) => navigate(makeTabUrl(event.target.value))}>
+              {tabList
+                .filter((tab: InternalTab) => !tab.hidden || tab.url === selectedTab)
+                .map((tab) => (
+                  <option key={tab.url} value={tab.url} selected={tab.url === selectedTab}>
+                    {isMessageDescriptor(tab.title) ? i18n._(tab.title) : tab.title}
+                  </option>
+                ))}
+            </TabSelect>
             {!isLoading && <HeaderStatBox />}
           </HeaderContainer>
         </Section>
@@ -203,9 +250,6 @@ export default function Header({
   );
 }
 
-const TabStrip = styled.nav`
-  grid-area: tabs;
-`;
 const TabButton = styled(Link)`
   appearance: none;
   border: none;
@@ -247,13 +291,11 @@ const TabButton = styled(Link)`
 
 const MiniBoxContainer = styled.div`
   display: grid;
-  gap: 0.5rem 1rem;
+  gap: 0 ${gaps.medium};
 
-  max-height: 5rem;
+  grid-template-columns: 5rem 1fr;
+  grid-template-rows: max-content max-content;
   height: 5rem;
-
-  grid-template-columns: min-content 1fr;
-  grid-template-rows: 2rem auto;
 
   grid-template-areas:
     'image name'
@@ -273,21 +315,27 @@ const MiniBoxContainer = styled.div`
 `;
 
 const MiniBoxName = styled.div`
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: bold;
+  white-space: break-spaces;
+  overflow: hidden;
+  max-height: 1lh;
 `;
 
-const MiniBoxSubtext = styled.span`
-  font-size: 1.4rem;
+const MiniBoxSubtext = styled.div`
+  font-size: 1.3rem;
   color: ${colors.unfocusedText};
+  white-space: nowrap;
+  overflow-x: hidden;
 `;
 
 const MiniBoxImage = styled.img`
   grid-area: image;
-  width: 5rem;
-  height: 5rem;
+  aspect-ratio: 1 / 1;
   border: 1px solid ${level2.border};
   border-radius: 0.5rem;
+  height: 5rem;
+  max-height: 5rem;
 `;
 
 function CharacterMiniBox({
@@ -295,15 +343,18 @@ function CharacterMiniBox({
   characterProfile,
   config,
 }: Pick<HeaderProps, 'characterProfile' | 'player' | 'config'>): JSX.Element | null {
+  // intentionally smaller than the layout switch
+  const showClassName = useMediaQueryMatch('(min-width: 600px)');
   return (
-    <MiniBoxContainer className={'flipped'}>
+    <MiniBoxContainer className={'flipped'} style={{ gridArea: 'character' }}>
       <MiniBoxImage
         src={characterProfile?.thumbnail ?? `/specs/${player.icon}.jpg`.replaceAll(/ /g, '')}
         alt={player.icon}
       />
       <MiniBoxName className={player.type}>{player.name}</MiniBoxName>
       <MiniBoxSubtext>
-        {config.spec.specName ? i18n._(config.spec.specName) : null} {i18n._(config.spec.className)}
+        {config.spec.specName ? i18n._(config.spec.specName) : null}{' '}
+        {showClassName ? i18n._(config.spec.className) : null}
       </MiniBoxSubtext>
     </MiniBoxContainer>
   );
