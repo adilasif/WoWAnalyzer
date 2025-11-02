@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import { formatDurationMinSec } from 'common/format';
 import { useEvents } from 'interface/guide';
-import { useFight } from 'interface/report/context/FightContext';
 import { EventType } from 'parser/core/Events';
 import { Info } from 'parser/core/metric';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';

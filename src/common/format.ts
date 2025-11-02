@@ -52,7 +52,7 @@ export function formatDuration(duration: number, precision = 0): string {
 /**
  * Like `formatDuration`, but formats it as "Xm Ys".
  */
-export function formatDurationMinSec(duration: number, omitSeconds: boolean = false): string {
+export function formatDurationMinSec(duration: number, omitSeconds = false): string {
   const minutes = Math.floor(duration / 60);
   const seconds = Number.isInteger(duration) ? duration % 60 : (duration % 60).toFixed(1);
 

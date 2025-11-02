@@ -82,16 +82,21 @@ const ResultsLoader = () => {
   const applyPhaseFilter = useCallback(
     (phaseIndex: number) => {
       setSelectedPhase(phaseIndex);
-      setTimeFilter(
-        phaseIndex === SELECTION_ALL_PHASES
-          ? null
-          : fight.phases
-            ? {
-                start: fight.phases[phaseIndex].startTime,
-                end: fight.phases[phaseIndex + 1]?.startTime ?? fight.end_time,
-              }
-            : null,
-      );
+      if (phaseIndex === SELECTION_ALL_PHASES) {
+        setTimeFilter(null);
+      } else if (fight.dungeonPulls?.[phaseIndex]) {
+        setTimeFilter({
+          start: fight.dungeonPulls[phaseIndex].start_time,
+          end: fight.dungeonPulls[phaseIndex].end_time,
+        });
+      } else if (fight.phases?.[phaseIndex]) {
+        setTimeFilter({
+          start: fight.phases[phaseIndex].startTime,
+          end: fight.phases[phaseIndex + 1]?.startTime ?? fight.end_time,
+        });
+      } else {
+        setTimeFilter(null);
+      }
       return null;
     },
     [fight],

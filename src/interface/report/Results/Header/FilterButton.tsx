@@ -191,21 +191,23 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
     const [selectedMode, setSelectedMode] = useState<FilterMode>('phase');
 
     const phaseLabel = fight?.dungeonPulls ? 'By Pull' : 'By Phase';
+    const allPhasesLabel = fight?.dungeonPulls ? 'Entire Dungeon' : 'All Phases';
 
     // FIXME: dungeon pulls
     const phases = usePhases();
 
+    const hasPhases = phases.length > 0 || (fight.dungeonPulls && fight.dungeonPulls.length > 0);
     useEffect(() => {
       // don't allow staying on the phase option if there are no phases
-      if (phases.length === 0) {
+      if (!hasPhases) {
         // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
         setSelectedMode('time');
       }
-    }, [phases.length]);
+    }, [hasPhases]);
 
     return (
       <FilterDialogContainer ref={ref} style={position} open>
-        {phases?.length > 0 && (
+        {hasPhases && (
           <FilterRadioGroup>
             <FilterRadioButton>
               <input
@@ -242,7 +244,7 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
                 value={SELECTION_ALL_PHASES}
                 selected={selectedPhase === SELECTION_ALL_PHASES}
               >
-                All Phases
+                {allPhasesLabel}
               </option>
               {phases?.map((phase) => (
                 <option
@@ -270,6 +272,15 @@ function usePhases() {
   const { report } = useReport();
   const { fight } = useFight();
   const phases = useMemo(() => {
+    if (fight.dungeonPulls) {
+      let bossIndex = 0;
+      let pullIndex = 0;
+      return fight.dungeonPulls.map((pull, index) => ({
+        value: index,
+        label: `${pull.boss > 0 ? `Boss ${++bossIndex}` : `Pull ${++pullIndex}`}: ${pull.name} (${formatDuration(pull.start_time - fight.start_time)} to ${formatDuration(pull.end_time - fight.start_time)})`,
+      }));
+    }
+
     const bossPhases = report?.phases.find((phases) => phases.boss === fight?.boss);
 
     return (
@@ -278,7 +289,7 @@ function usePhases() {
         label: `${bossPhases?.phases[phase.id - 1]} ${phase.startTime > fight.start_time ? `(${formatDuration(phase.startTime - fight.start_time)})` : ''}`,
       })) ?? []
     );
-  }, [report?.phases, fight?.phases, fight?.start_time, fight?.boss]);
+  }, [report?.phases, fight]);
 
   return phases;
 }
