@@ -20,7 +20,6 @@ import { COMBAT_POTIONS } from 'parser/retail/modules/items/PotionChecker';
 import { useEffect, useState } from 'react';
 
 import { EventsParseError } from './useEventParser';
-import { SELECTION_ALL_PHASES } from './usePhases';
 
 const bench = (id: string) => console.time(id);
 const benchEnd = (id: string) => console.timeEnd(id);
@@ -146,16 +145,6 @@ function findRelevantPreFilterEvents(events: AnyEvent[]) {
  *
  * Pre-filter casts get assigned a new event type in order to not count as casts in the cast efficiency module while still being able to be tracked in the cooldowns module.
  * Pre-filter (de)buffs / (de)buff stacks (that persist into the filtered timestamp) get assigned to the starting timestamp of the filter
- *
- * @param {Array} events
- *  Array of events to filter
- * @param {number} start
- *  start timestamp to filter events by
- * @param {number} end
- *  end timestamp to filter events by
- *
- * @return {Array}
- *  List of filtered events
  */
 function filterEvents(events: AnyEvent[], start: number, end: number) {
   function createFilterBuffInfoEvent(e: BuffEvent | StackEvent): FilterBuffInfoEvent {
@@ -214,7 +203,6 @@ const useTimeEventFilter = ({
   bossPhaseEventsLoaded = false,
   fight,
   filter,
-  phase,
   bossPhaseEvents,
   events,
 }: Config) => {
@@ -268,6 +256,8 @@ const useTimeEventFilter = ({
       }
     };
 
+    // flip back to loading when these values change. eslint is unhappy about this.
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
     setIsLoading(true);
     parse();
   }, [bossPhaseEventsLoaded, bossPhaseEvents, fight, filter, events]);

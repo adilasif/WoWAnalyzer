@@ -74,6 +74,8 @@ export default Ad;
 
 declare global {
   interface Window {
+    // ad script stuff that we don't control. don't try to type it
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tyche?: any;
     refreshAds?: () => void;
     adScriptFailed?: boolean;

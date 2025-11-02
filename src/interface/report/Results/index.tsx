@@ -1,7 +1,7 @@
 import { t, Trans } from '@lingui/macro';
 import getFightName from 'common/getFightName';
 import makeWclUrl from 'common/makeWclUrl';
-import { findByBossId, Phase } from 'game/raids';
+import { findByBossId } from 'game/raids';
 import { wclGameVersionToExpansion } from 'game/VERSIONS';
 import AlertWarning from 'interface/AlertWarning';
 import Contributor from 'interface/ContributorButton';
@@ -40,7 +40,7 @@ import { useLingui } from '@lingui/react';
 import { appendReportHistory } from 'interface/reducers/reportHistory';
 import FoundationSupportBadge from 'interface/guide/foundation/FoundationSupportBadge';
 import Ad, { Location } from 'interface/Ad';
-import { PremiumIcon } from 'interface/icons';
+
 import usePremium from 'interface/usePremium';
 import useMediaQueryMatch from 'interface/hooks/useMediaQueryMatch';
 

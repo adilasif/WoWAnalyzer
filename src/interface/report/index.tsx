@@ -13,7 +13,7 @@ import useCharacterProfile from './hooks/useCharacterProfile';
 import useEventParser from './hooks/useEventParser';
 import useEvents from './hooks/useEvents';
 import useParser from './hooks/useParser';
-import usePhases, { SELECTION_ALL_PHASES, SELECTION_CUSTOM_PHASE } from './hooks/usePhases';
+import { SELECTION_ALL_PHASES, SELECTION_CUSTOM_PHASE } from './hooks/usePhases';
 import useTimeEventFilter, { Filter } from './hooks/useTimeEventFilter';
 import PatchChecker from './PatchChecker';
 import PlayerLoader from './PlayerLoader';
@@ -63,7 +63,6 @@ const ResultsLoader = () => {
   const { fight } = useFight();
   const [timeFilter, setTimeFilter] = useState<Filter | null>(null);
   const [selectedPhase, setSelectedPhase] = useState<number>(SELECTION_ALL_PHASES);
-  const [selectedInstance, setSelectedInstance] = useState<number>(0);
 
   const parserClass = useParser(config);
   const isLoadingParser = !parserClass;
@@ -95,8 +94,6 @@ const ResultsLoader = () => {
       );
       return null;
     },
-    // TODO: I don't think we need to re-render whenever phases changes.. this callback should work the same.
-    // this is here because of react-hooks/exhaustive-deps
     [fight],
   );
   const applyTimeFilter = useCallback(
@@ -109,8 +106,6 @@ const ResultsLoader = () => {
       setSelectedPhase(isFullFight ? SELECTION_ALL_PHASES : SELECTION_CUSTOM_PHASE);
       return null;
     },
-    // TODO: I don't think we need to re-render whenever phases changes.. this callback should work the same.
-    // this is here because of react-hooks/exhaustive-deps
     [fight.end_time, fight.start_time],
   );
 

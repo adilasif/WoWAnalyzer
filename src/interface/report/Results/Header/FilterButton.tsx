@@ -67,7 +67,7 @@ export default function FilterButton(props: Props): JSX.Element | null {
     }
 
     return 'Filter';
-  }, [props.selectedPhaseIndex, props.timeFilter]);
+  }, [props.selectedPhaseIndex, props.timeFilter, phases, props.fight]);
 
   return (
     <>
@@ -198,6 +198,7 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
     useEffect(() => {
       // don't allow staying on the phase option if there are no phases
       if (phases.length === 0) {
+        // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
         setSelectedMode('time');
       }
     }, [phases.length]);
@@ -277,7 +278,7 @@ function usePhases() {
         label: `${bossPhases?.phases[phase.id - 1]} ${phase.startTime > fight.start_time ? `(${formatDuration(phase.startTime - fight.start_time)})` : ''}`,
       })) ?? []
     );
-  }, [report?.phases, fight?.phases]);
+  }, [report?.phases, fight?.phases, fight?.start_time, fight?.boss]);
 
   return phases;
 }

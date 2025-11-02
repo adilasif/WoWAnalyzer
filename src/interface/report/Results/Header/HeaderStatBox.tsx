@@ -6,7 +6,7 @@ import { DamageIcon } from 'interface/icons';
 import { useCombatLogParser } from 'interface/report/CombatLogParserContext';
 import DamageDone from 'parser/shared/modules/throughput/DamageDone';
 import HealingDone from 'parser/shared/modules/throughput/HealingDone';
-import { level1, colors, level0, level2 } from 'interface/design-system';
+import { level1, colors, level0 } from 'interface/design-system';
 
 /** @internal */
 export const StatBoxContainer = styled.div`

@@ -18,7 +18,7 @@ import { ParseResultsTab } from 'parser/core/Analyzer';
 import type CharacterProfile from 'parser/core/CharacterProfile';
 import type Fight from 'parser/core/Fight';
 import { type PlayerInfo } from 'parser/core/Player';
-import { ComponentType, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { ComponentType, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import HeaderBackground from './HeaderBackground';
 import { currentExpansion } from 'game/GameBranch';
