@@ -43,7 +43,7 @@ $npc-content-offset: 8em;
       border-radius: 10px;
     }
 
-    >* {
+    > * {
       position: absolute;
       height: 22px;
     }
@@ -69,12 +69,10 @@ $npc-content-offset: 8em;
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
 
-        @if $direction =='up' {
+        @if $direction == 'up' {
           border-top: 5px solid var(--color);
           bottom: 0;
-        }
-
-        @else if $direction =='down' {
+        } @else if $direction == 'down' {
           border-bottom: 5px solid var(--color);
           top: 0px;
         }

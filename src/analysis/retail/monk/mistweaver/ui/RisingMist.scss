@@ -5,7 +5,7 @@
 
   .panel {
     section {
-      &>.meta>header {
+      & > .meta > header {
         padding: 1rem 1rem;
       }
     }
@@ -15,7 +15,7 @@
     margin-top: 1rem;
     margin-left: -20px;
 
-    >header {
+    > header {
       font-size: 16px;
       font-weight: bold;
       padding: 1rem 0;
@@ -25,11 +25,10 @@
     .subsection {
       margin-top: 0;
 
-      >header {
+      > header {
         font-size: 16px;
         border-top: none;
       }
     }
   }
-
 }

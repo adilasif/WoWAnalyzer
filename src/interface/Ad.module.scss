@@ -12,7 +12,7 @@ $side-rail-width: 320px;
     background-image: url('../../public/img/ad-fallback.jpg');
   }
 
-  #leaderboard_atf>*,
+  #leaderboard_atf > *,
   iframe {
     max-width: 970px;
   }
@@ -36,8 +36,7 @@ $side-rail-width: 320px;
   box-sizing: border-box;
 
   background: #161616;
-  box-shadow:
-    0 1px 4px black;
+  box-shadow: 0 1px 4px black;
   position: sticky;
   align-self: start;
   top: 1rem;
@@ -47,5 +46,4 @@ $side-rail-width: 320px;
   text-transform: uppercase;
   font-size: 75%;
   color: rgb(243, 237, 237);
-
 }

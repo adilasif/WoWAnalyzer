@@ -33,7 +33,7 @@
   background: linear-gradient(to right, transparent 0px, rgb(22, 21, 19) 100px);
   padding-left: 115px;
 
-  >div {
+  > div {
     min-width: 300px;
     max-width: 550px;
     position: sticky;
@@ -41,7 +41,7 @@
   }
 }
 
-.spell-timeline>* {
+.spell-timeline > * {
   position: relative;
 }
 
@@ -50,7 +50,7 @@
   white-space: nowrap;
   height: calc(var(--cast-bars) * 22px);
 
-  >* {
+  > * {
     height: calc(100% + 10px);
     display: inline-block;
     border-left: 1px solid rgba(255, 255, 255, 0.3);
@@ -60,7 +60,7 @@
     position: relative;
   }
 
-  >*:before {
+  > *:before {
     content: attr(data-duration);
     position: absolute;
     left: 0;
@@ -69,7 +69,7 @@
     color: rgba(200, 200, 200, 0.8);
   }
 
-  >*:after {
+  > *:after {
     content: '';
     width: 1px;
     background: rgba(255, 255, 255, 0.2);
@@ -79,7 +79,7 @@
     left: 50%;
   }
 
-  >*:first-of-type {
+  > *:first-of-type {
     height: calc(100% - 14px);
     border-left: none;
 

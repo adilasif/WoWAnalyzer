@@ -24,17 +24,16 @@ $available-cd-color: #696864;
 .guide-container {
   section {
     margin: initial;
-
   }
 
-  &>section {
+  & > section {
     background-color: #161616;
 
-    &.expandable>.details>div {
+    &.expandable > .details > div {
       background: unset;
     }
 
-    &>.meta>header {
+    & > .meta > header {
       font-size: 24px;
       padding: 1rem 2rem;
       font-weight: bold;
@@ -45,7 +44,7 @@ $available-cd-color: #696864;
     & .subsection:first-child {
       margin-top: 0;
 
-      &>header {
+      & > header {
         border-top: none;
       }
     }
@@ -54,7 +53,7 @@ $available-cd-color: #696864;
   .subsection {
     margin-top: 1rem;
 
-    >header {
+    > header {
       font-size: 20px;
       font-weight: bold;
       padding: 1rem 0;
@@ -64,7 +63,7 @@ $available-cd-color: #696864;
     .subsection {
       margin-top: 0;
 
-      >header {
+      > header {
         font-size: 16px;
         border-top: none;
       }
@@ -92,7 +91,7 @@ $available-cd-color: #696864;
   display: inline-block;
   width: 10em;
 
-  &>div {
+  & > div {
     display: inline-block;
     height: 1em;
   }
@@ -116,17 +115,17 @@ $available-cd-color: #696864;
   display: inline-block;
   width: 100%;
 
-  &>div {
+  & > div {
     display: inline-block;
     height: 1.5em;
   }
 
-  &>div:first-child {
+  & > div:first-child {
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
   }
 
-  &>div:last-child {
+  & > div:last-child {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
   }

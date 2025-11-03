@@ -6,7 +6,7 @@
   margin-bottom: 20px;
 }
 
-.statistics>div {
+.statistics > div {
   padding: 0 15px;
 }
 
@@ -69,7 +69,9 @@
     // the scaling stops ~50-70px beyond the common 1920px screen width (around 1970px, not counting window borders), where the `min` kicks in and
     // keeps the content column from getting too wide
     $gap: 1rem;
-    grid-template-columns: min(calc(100% - Ad.$side-rail-width - $gap + (100vw - 100%) / 2 - 1rem), 100%) Ad.$side-rail-width;
+    grid-template-columns:
+      min(calc(100% - Ad.$side-rail-width - $gap + (100vw - 100%) / 2 - 1rem), 100%)
+      Ad.$side-rail-width;
     gap: $gap;
   }
 

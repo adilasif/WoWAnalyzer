@@ -30,7 +30,7 @@ const usePhases = ({
       if (!bossPhaseEvents) {
         return {};
       }
-      const distinct = <T,>(items: T[]) => Array.from(new Set<T>(items));
+      const distinct = <T>(items: T[]) => Array.from(new Set<T>(items));
 
       const phaseStarts = distinct(
         bossPhaseEvents
