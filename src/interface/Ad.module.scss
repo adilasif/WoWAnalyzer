@@ -1,5 +1,7 @@
 @use 'interface/Theme.scss';
 
+$side-rail-width: 320px;
+
 .outer_container {
   display: block;
   background-repeat: no-repeat;
@@ -28,10 +30,10 @@
 
 .side-rail {
   min-height: 600px;
-  min-width: 300px;
+  min-width: $side-rail-width;
   height: 600px;
   padding: 1rem;
-  box-sizing: content-box;
+  box-sizing: border-box;
 
   background: #161616;
   box-shadow:
