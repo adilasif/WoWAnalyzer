@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { formatDuration } from 'common/format';
 import * as design from 'interface/design-system';
 import { useReport } from 'interface/report/context/ReportContext';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import TimeFilter from '../TimeFilter';
@@ -75,7 +75,10 @@ export default function FilterButton(props: Props): JSX.Element | null {
         <span className="glyphicon glyphicon-filter" /> {filterLabel}
       </Btn>
       {showMenu &&
-        createPortal(<FilterMenu {...props} ref={dialogRef} triggerRef={ref} />, document.body)}
+        createPortal(
+          <FilterMenu {...props} ref={dialogRef} triggerRef={ref} closeMenu={closeMenu} />,
+          document.body,
+        )}
     </>
   );
 }
@@ -101,6 +104,7 @@ const FilterDialogContainer = styled.dialog`
 
 interface FilterMenuProps extends Props {
   triggerRef: React.MutableRefObject<HTMLElement | null>;
+  closeMenu: () => void;
 }
 
 const FilterRadioButton = styled.label`
@@ -174,6 +178,7 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
       selectedPhaseIndex: selectedPhase,
       handlePhaseSelection,
       handleTimeSelection,
+      closeMenu,
     },
     ref,
   ): JSX.Element => {
@@ -205,6 +210,22 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
       }
     }, [hasPhases]);
 
+    const selectPhase = useCallback(
+      (e: ChangeEvent<HTMLSelectElement>) => {
+        handlePhaseSelection(Number(e.target.value));
+        closeMenu();
+      },
+      [handlePhaseSelection, closeMenu],
+    );
+
+    const setTimeFilter = useCallback(
+      (start: number, end: number) => {
+        handleTimeSelection(start, end);
+        closeMenu();
+      },
+      [handleTimeSelection, closeMenu],
+    );
+
     return (
       <FilterDialogContainer ref={ref} style={position} open>
         {hasPhases && (
@@ -233,7 +254,7 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
         )}
         {selectedMode === 'phase' && (
           <div>
-            <Select onChange={(e) => handlePhaseSelection(Number(e.target.value))}>
+            <Select onChange={selectPhase}>
               {selectedPhase === SELECTION_CUSTOM_PHASE && (
                 <option key="custom" value={SELECTION_CUSTOM_PHASE} selected>
                   Custom
@@ -260,7 +281,7 @@ const FilterMenu = React.forwardRef<HTMLDialogElement, FilterMenuProps>(
         )}
         {selectedMode === 'time' && (
           <TimeFilterContainer>
-            <TimeFilter fight={fight} isLoading={false} applyFilter={handleTimeSelection} />
+            <TimeFilter fight={fight} isLoading={false} applyFilter={setTimeFilter} />
           </TimeFilterContainer>
         )}
       </FilterDialogContainer>
