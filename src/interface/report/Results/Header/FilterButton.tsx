@@ -117,6 +117,8 @@ const FilterRadioButton = styled.label`
   // z-index hack for shadows
   z-index: 0;
 
+  cursor: pointer;
+
   font-weight: normal;
 
   &:first-of-type {

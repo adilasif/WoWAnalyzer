@@ -29,8 +29,13 @@ const SubmitButton = styled.button`
 
   color: ${design.colors.bodyText};
 
-  &:hover {
+  &:hover:not(:disabled) {
     filter: brightness(115%);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: ${design.colors.unfocusedText};
   }
 `;
 

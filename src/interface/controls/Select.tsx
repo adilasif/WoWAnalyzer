@@ -9,6 +9,7 @@ const Select = styled.select`
   padding: ${design.gaps.small} ${design.gaps.medium};
 
   color: ${design.colors.bodyText};
+  cursor: pointer;
 `;
 
 export default Select;
