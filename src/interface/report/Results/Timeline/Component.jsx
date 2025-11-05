@@ -58,10 +58,8 @@ class Timeline extends PureComponent {
     super(props);
     this.state = {
       zoom: 2,
-      padding: 0,
       filteredEnemyCasts: [],
     };
-    this.setContainerRef = this.setContainerRef.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
   }
 
@@ -162,15 +160,6 @@ class Timeline extends PureComponent {
     return ability.primarySpell;
   }
 
-  setContainerRef(elem) {
-    if (!elem || !elem.getBoundingClientRect) {
-      return;
-    }
-    this.setState({
-      padding: elem.getBoundingClientRect().x + 15, // 15 for padding
-    });
-  }
-
   render() {
     const { parser, abilities, auras, movement } = this.props;
 
@@ -193,17 +182,11 @@ class Timeline extends PureComponent {
 
     return (
       <>
-        <div className="container" ref={this.setContainerRef} />
+        <div className="container" />
         <DragScroll className="spell-timeline-container">
           <div
             className="spell-timeline"
             style={{
-              width: this.totalWidth + this.state.padding * 2,
-              paddingTop: 0,
-              paddingBottom: 0,
-              paddingLeft: this.state.padding,
-              paddingRight: this.state.padding, // we also want the user to have the satisfying feeling of being able to get the right side to line up
-              margin: 'auto', //center horizontally if it's too small to take up the page
               '--cast-bars': castEvents.length,
             }}
           >
