@@ -10,6 +10,8 @@ $side-rail-width: 320px;
   &:empty,
   &.show_background {
     background-image: url('../../public/img/ad-fallback.jpg');
+    background-origin: content-box;
+    background-repeat: no-repeat;
   }
 
   #leaderboard_atf > *,
