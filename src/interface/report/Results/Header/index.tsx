@@ -373,7 +373,9 @@ function BossMiniBox({ boss, fight }: Pick<HeaderProps, 'boss' | 'fight'>): JSX.
     icon = `https://assets.rpglogs.com/img/warcraft/bosses/${boss.id % 50_000}-icon.jpg`;
   }
 
-  const duration = formatDuration((fight.original_end_time ?? fight.end_time) - fight.start_time);
+  const duration = formatDuration(
+    (fight.original_end_time ?? fight.end_time) - (fight.start_time - fight.offset_time),
+  );
   return (
     <MiniBoxContainer>
       <MiniBoxImage src={icon} alt={boss.name} />

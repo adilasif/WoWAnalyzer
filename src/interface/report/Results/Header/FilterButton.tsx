@@ -63,7 +63,8 @@ export default function FilterButton(props: Props): JSX.Element | null {
       }`;
     }
     if (props.timeFilter) {
-      return `Filter: ${formatDuration(props.timeFilter.start - props.fight.start_time)} to ${formatDuration(props.timeFilter.end - props.fight.start_time)}`;
+      const startTime = props.fight.start_time - props.fight.offset_time;
+      return `Filter: ${formatDuration(props.timeFilter.start - startTime, 2)} to ${formatDuration(props.timeFilter.end - startTime, 2)}`;
     }
 
     return 'Filter';
