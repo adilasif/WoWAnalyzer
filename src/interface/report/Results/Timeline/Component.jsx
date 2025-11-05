@@ -90,9 +90,6 @@ class Timeline extends PureComponent {
   get secondWidth() {
     return 120 / this.state.zoom;
   }
-  get totalWidth() {
-    return this.seconds * this.secondWidth;
-  }
 
   isApplicableEvent(event) {
     switch (event.type) {
