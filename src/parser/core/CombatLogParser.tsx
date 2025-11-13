@@ -257,7 +257,6 @@ class CombatLogParser {
   static specModules: DependenciesDefinition = {};
 
   applyTimeFilter = (start: number, end: number) => null; //dummy function gets filled in by event parser
-  applyPhaseFilter = (phase: string, instance: number) => null; //dummy function gets filled in by event parser
 
   config: Config;
   report: Report;
@@ -812,6 +811,7 @@ class CombatLogParser {
       defaultRange: this.getModule(Abilities).defaultRange,
       playerId: this.selectedCombatant.id,
       pets: this.playerPets.filter((pet) => pet.fights.some((fight) => fight.id === this.fight.id)),
+      originalFightStart: this.fight.start_time - this.fight.offset_time,
       fightStart: this.fight.start_time,
       fightEnd: this.fight.end_time,
       fightDuration: this.fight.end_time - this.fight.start_time,
