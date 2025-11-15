@@ -7,11 +7,13 @@ import { Options } from '../Analyzer';
 import { registerSpell as registerClassicSpell } from 'common/SPELLS/classic';
 import { registerSpell as registerRetailSpell } from 'common/SPELLS';
 import GameBranch from 'game/GameBranch';
+import { applyModifiers } from 'wow-dbc/dist/src/hydraters/effects';
 
 export type GenSpell = RetailSpell & { icon: string };
+export type GenTalent = GenSpell & { type: 'talent' };
 
 export interface GenAbilityConfig {
-  allSpells: GenSpell[];
+  allSpells: GenSpell[] | Record<string, GenSpell>;
   rotational: GenSpell[];
   cooldowns: GenSpell[];
   defensives: GenSpell[];
@@ -26,7 +28,7 @@ export interface GenAbilityConfig {
 }
 
 export default function genAbilities(config: GenAbilityConfig): typeof Abilities {
-  const allSpells = Object.fromEntries(config.allSpells.map((spell) => [spell.id, spell]));
+  const allSpells = toSpellIdMap(config.allSpells);
   return class extends Abilities {
     constructor(options: Options) {
       super(options);
@@ -35,7 +37,7 @@ export default function genAbilities(config: GenAbilityConfig): typeof Abilities
 
       const register = branch === GameBranch.Retail ? registerRetailSpell : registerClassicSpell;
 
-      for (const spell of config.allSpells) {
+      for (const spell of Object.values(allSpells)) {
         register(spell.id, spell.name, spell.icon);
       }
     }
@@ -61,7 +63,7 @@ export default function genAbilities(config: GenAbilityConfig): typeof Abilities
 
       const omitted = new Set(config.omit?.map((spell) => spell.id));
 
-      const others = config.allSpells
+      const others = Object.values(allSpells)
         .filter(
           (spell) =>
             !configuredSpells.has(spell.id) &&
@@ -94,13 +96,15 @@ function spellbookDefinition(
   category: SPELL_CATEGORY,
   allSpells: Record<number, GenSpell>,
 ): SpellbookAbility {
+  const isKnown = (id: number) =>
+    allSpells[id] && checkEnabled(allSpells[id], combatant, allSpells);
   return {
     spell: spell.id,
     name: spell.name,
     category: category,
-    gcd: spellGcd(spell),
-    cooldown: spellCooldown(spell),
-    charges: spellCharges(spell),
+    gcd: spellGcd(spell, isKnown),
+    cooldown: spellCooldown(spell, isKnown),
+    charges: spellCharges(spell, isKnown),
     castEfficiency: {},
     enabled: checkEnabled(spell, combatant, allSpells),
   };
@@ -113,6 +117,10 @@ function checkEnabled(
 ): boolean {
   if (spell.type === 'mists-talent') {
     return combatant.hasClassicTalent(spell.id);
+  }
+
+  if (spell.type === 'talent') {
+    return combatant.hasTalent(spell);
   }
 
   if (spell.type === 'temporary') {
@@ -132,41 +140,56 @@ function checkEnabled(
   return true;
 }
 
-function spellGcd(spell: GenSpell): SpellbookAbility['gcd'] {
+type KnownSpellCheck = (spellId: number) => boolean;
+
+function spellGcd(spell: GenSpell, isKnown: KnownSpellCheck): SpellbookAbility['gcd'] {
   if (!spell.gcd) {
     return null;
   }
 
-  if (spell.gcd.hasted) {
-    // TODO talent modifiers etc. more relevant for retail
+  const gcd = applyModifiers(spell.gcd, isKnown);
+
+  if (gcd.hasted) {
     return {
-      base: spell.gcd.duration,
+      base: gcd.duration,
     };
   }
 
   return {
-    static: spell.gcd.duration,
+    static: gcd.duration,
   };
 }
 
-function spellCooldown(spell: GenSpell): SpellbookAbility['cooldown'] {
+function spellCooldown(spell: GenSpell, isKnown: KnownSpellCheck): SpellbookAbility['cooldown'] {
   if (!spell.cooldown) {
     return undefined;
   }
 
-  const duration = spell.cooldown.duration / 1000;
+  const cooldown = applyModifiers(spell.cooldown, isKnown);
 
-  if (spell.cooldown.hasted) {
-    return (haste: number) => duration / haste;
+  const duration = cooldown.duration / 1000;
+
+  if (cooldown.hasted) {
+    return (haste: number) => duration / (1 + haste);
   }
 
   return duration;
 }
 
-function spellCharges(spell: GenSpell): SpellbookAbility['charges'] {
+function spellCharges(spell: GenSpell, isKnown: KnownSpellCheck): SpellbookAbility['charges'] {
   if (!spell.charges) {
     return undefined;
   }
 
-  return spell.charges.max;
+  const charges = applyModifiers(spell.charges, isKnown);
+
+  return charges.max;
+}
+
+function toSpellIdMap(spells: GenAbilityConfig['allSpells']): Record<number, GenSpell> {
+  if (!Array.isArray(spells)) {
+    spells = Object.values(spells);
+  }
+
+  return Object.fromEntries(spells.map((spell) => [spell.id, spell]));
 }
