@@ -5,6 +5,7 @@ import CombatLogParser from './CombatLogParser';
 import { GuideProps, Section, SubSection, useAnalyzer, useAnalyzers } from 'interface/guide';
 import { PurifySection } from './modules/problems/PurifyingBrew';
 import talents from 'common/TALENTS/monk';
+import spells from './spell-list_Monk_Brewmaster.retail';
 
 import MajorDefensivesSection from './modules/core/MajorDefensives';
 import AplChoiceDescription from './modules/core/AplCheck/AplChoiceDescription';
@@ -52,9 +53,9 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
         <SubSection title="Major Cooldowns">
           <Explanation>
             <p>
-              Major cooldowns like <SpellLink spell={talents.WEAPONS_OF_ORDER_TALENT} /> are a major
-              contributor to your overall damage. As a tank, they are also key to establishing
-              threat on pull and when new enemies spawn or are pulled.
+              Major cooldowns like <SpellLink spell={spells.INVOKE_NIUZAO_THE_BLACK_OX_TALENT} />{' '}
+              are a major contributor to your overall damage. As a tank, they are also key to
+              establishing threat on pull and when new enemies spawn or are pulled.
             </p>
             <p>
               It is generally correct to hold your cooldowns by a small amount in order to line up
@@ -64,9 +65,9 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
               <Highlight color="#834c4a">red</Highlight>).
             </p>
           </Explanation>
-          {info.combatant.hasTalent(talents.WEAPONS_OF_ORDER_TALENT) && (
+          {info.combatant.hasTalent(talents.INVOKE_NIUZAO_THE_BLACK_OX_TALENT) && (
             <CastEfficiencyBar
-              spell={talents.WEAPONS_OF_ORDER_TALENT}
+              spell={talents.INVOKE_NIUZAO_THE_BLACK_OX_TALENT}
               gapHighlightMode={GapHighlight.FullCooldown}
               useThresholds
             />
@@ -74,13 +75,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           {info.combatant.hasTalent(talents.EXPLODING_KEG_TALENT) && (
             <CastEfficiencyBar
               spell={talents.EXPLODING_KEG_TALENT}
-              gapHighlightMode={GapHighlight.FullCooldown}
-              useThresholds
-            />
-          )}
-          {info.combatant.hasTalent(talents.INVOKE_NIUZAO_THE_BLACK_OX_TALENT) && (
-            <CastEfficiencyBar
-              spell={talents.INVOKE_NIUZAO_THE_BLACK_OX_TALENT}
               gapHighlightMode={GapHighlight.FullCooldown}
               useThresholds
             />
