@@ -8,13 +8,10 @@ import Guide from './Guide';
 import AplCheck from './modules/core/AplCheck';
 import BrewCDR from './modules/core/BrewCDR';
 import DamageTaken from './modules/core/DamageTaken';
-import GlobalCooldown from './modules/core/GlobalCooldown';
 import HealingDone from './modules/core/HealingDone';
-import HealingReceived from './modules/core/HealingReceived';
 import SharedBrews from './modules/core/SharedBrews';
 import Stagger from './modules/core/Stagger';
 import StaggerFabricator from './modules/core/StaggerFabricator';
-import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
 import StaggerPoolGraph from './modules/features/StaggerPoolGraph';
 import PurifyingBrewProblems from './modules/problems/PurifyingBrew';
 import ScaldingBrew from './modules/talents/ScaldingBrew';
@@ -24,7 +21,6 @@ import BlackoutCombo from './modules/spells/BlackoutCombo';
 import BlackOxBrew from './modules/spells/BlackOxBrew';
 import BreathOfFire from './modules/spells/BreathOfFire';
 import CelestialBrew from './modules/spells/CelestialBrew';
-import CelestialFortune from './modules/spells/CelestialFortune';
 import GiftOfTheOxStat from './modules/spells/GiftOfTheOx';
 import HighTolerance from './modules/spells/HighTolerance';
 import KegSmash from './modules/spells/KegSmash';
@@ -32,7 +28,6 @@ import PurifyingBrew from './modules/spells/PurifyingBrew';
 import Shuffle from './modules/spells/Shuffle';
 import TigerPalm from './modules/spells/TigerPalm';
 import ExpelHarmNorm from './normalizers/ExpelHarm';
-import GiftOfTheOx from './normalizers/GiftOfTheOx';
 import StaggerLinkNormalizer from './modules/core/StaggerLinkNormalizer';
 import CelestialBrewNormalizer from './modules/spells/CelestialBrew/normalizer';
 import { FortifyingBrew } from './modules/core/MajorDefensives/FortifyingBrew';
@@ -47,12 +42,9 @@ import BreathOfFireDebuffTargetNormalizer from './modules/spells/BreathOfFire/no
 import SpinningCraneKickLinkNormalizer from './normalizers/SpinningCraneKick';
 import PressTheAdvantage from './modules/talents/PressTheAdvantage';
 import PressTheAdvantageNormalizer from './modules/talents/PressTheAdvantage/normalizer';
-import WarWithinS1TierSet from './modules/items/WarWithinS1TierSet';
 import VeteransEye from '../shared/hero/ShadoPan/VeteransEye';
-import WarWithinS2TierSet from './modules/items/WarWithinS2TierSet';
 import EnergyTracker from './modules/core/EnergyTracker';
 import EnergyGraph from './modules/core/EnergyGraph';
-import ShadowFlurryStrikes from './modules/talents/ShadowFlurryStrikes';
 import AspectOfHarmony, { AspectOfHarmonyLinkNormalizer } from './modules/talents/AspectOfHarmony';
 import { Abilities } from './gen';
 
@@ -60,14 +52,12 @@ class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Core
     healingDone: HealingDone,
-    healingReceived: HealingReceived,
     damageTaken: DamageTaken,
     stagger: Stagger,
     staggerFabricator: StaggerFabricator,
     brewCdr: BrewCDR,
     brews: SharedBrews,
     channeling: Channeling,
-    globalCooldown: GlobalCooldown,
     EnergyTracker,
     EnergyGraph,
     // There's no throughput benefit from casting Arcane Torrent on cooldown
@@ -75,7 +65,6 @@ class CombatLogParser extends CoreCombatLogParser {
     mysticTouch: MysticTouch,
 
     // Features
-    alwaysBeCasting: AlwaysBeCasting,
     abilities: Abilities,
     staggerPoolGraph: StaggerPoolGraph,
 
@@ -88,7 +77,6 @@ class CombatLogParser extends CoreCombatLogParser {
     bof: BreathOfFire,
     bob: BlackOxBrew,
     highTolerance: HighTolerance,
-    cf: CelestialFortune,
     gotox: GiftOfTheOxStat,
     shuffle: Shuffle,
     touchOfDeath: TouchOfDeath,
@@ -97,11 +85,8 @@ class CombatLogParser extends CoreCombatLogParser {
     defensiveLinks: DefensiveBuffLinkNormalizer,
 
     // Items
-    WarWithinS1TierSet,
-    WarWithinS2TierSet,
 
     // normalizers
-    gotoxNorm: GiftOfTheOx,
     ehNorm: ExpelHarmNorm,
     staggerLink: StaggerLinkNormalizer,
     cbNorm: CelestialBrewNormalizer,
@@ -121,7 +106,6 @@ class CombatLogParser extends CoreCombatLogParser {
     pta: PressTheAdvantage,
     stormstoutsLastKeg: StormtoutsLastKeg,
     veteransEye: VeteransEye,
-    ShadowFlurryStrikes,
     AspectOfHarmony,
 
     apl: AplCheck,
