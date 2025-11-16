@@ -1,10 +1,10 @@
-import { TouchOfDeath, MysticTouch, DampenHarm } from 'analysis/retail/monk/shared';
+import TouchOfDeath from 'analysis/retail/monk/shared/TouchOfDeath';
+import MysticTouch from 'analysis/retail/monk/shared/MysticTouch';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 import Channeling from 'parser/shared/normalizers/Channeling';
 
 import Guide from './Guide';
-import Abilities from './modules/Abilities';
 import AplCheck from './modules/core/AplCheck';
 import BrewCDR from './modules/core/BrewCDR';
 import DamageTaken from './modules/core/DamageTaken';
@@ -29,7 +29,6 @@ import GiftOfTheOxStat from './modules/spells/GiftOfTheOx';
 import HighTolerance from './modules/spells/HighTolerance';
 import KegSmash from './modules/spells/KegSmash';
 import PurifyingBrew from './modules/spells/PurifyingBrew';
-import WeaponsOfOrder from './modules/talents/WeaponsOfOrder';
 import Shuffle from './modules/spells/Shuffle';
 import TigerPalm from './modules/spells/TigerPalm';
 import ExpelHarmNorm from './normalizers/ExpelHarm';
@@ -37,7 +36,6 @@ import GiftOfTheOx from './normalizers/GiftOfTheOx';
 import StaggerLinkNormalizer from './modules/core/StaggerLinkNormalizer';
 import CelestialBrewNormalizer from './modules/spells/CelestialBrew/normalizer';
 import { FortifyingBrew } from './modules/core/MajorDefensives/FortifyingBrew';
-import { DiffuseMagic } from './modules/core/MajorDefensives/DiffuseMagic';
 import DefensiveBuffs from './modules/core/MajorDefensives/DefensiveBuffs';
 import DefensiveBuffLinkNormalizer from './modules/core/MajorDefensives/DefensiveBuffLinkNormalizer';
 import StaggeringStrikes from './modules/talents/StaggeringStrikes';
@@ -45,7 +43,6 @@ import QuickSip from './modules/talents/QuickSip';
 import TranquilSpirit from './modules/talents/TranquilSpirit';
 import Salsalabims from './modules/talents/Salsalabims';
 import AnvilStave from './modules/talents/AnvilStave';
-import ChiSurge from './modules/talents/ChiSurge';
 import BreathOfFireDebuffTargetNormalizer from './modules/spells/BreathOfFire/normalizer';
 import SpinningCraneKickLinkNormalizer from './normalizers/SpinningCraneKick';
 import PressTheAdvantage from './modules/talents/PressTheAdvantage';
@@ -53,11 +50,11 @@ import PressTheAdvantageNormalizer from './modules/talents/PressTheAdvantage/nor
 import WarWithinS1TierSet from './modules/items/WarWithinS1TierSet';
 import VeteransEye from '../shared/hero/ShadoPan/VeteransEye';
 import WarWithinS2TierSet from './modules/items/WarWithinS2TierSet';
-import EfficientTraining from '../shared/hero/ShadoPan/EfficientTraining';
 import EnergyTracker from './modules/core/EnergyTracker';
 import EnergyGraph from './modules/core/EnergyGraph';
 import ShadowFlurryStrikes from './modules/talents/ShadowFlurryStrikes';
 import AspectOfHarmony, { AspectOfHarmonyLinkNormalizer } from './modules/talents/AspectOfHarmony';
+import { Abilities } from './gen';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -76,7 +73,6 @@ class CombatLogParser extends CoreCombatLogParser {
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,
     mysticTouch: MysticTouch,
-    dampenHarm: DampenHarm,
 
     // Features
     alwaysBeCasting: AlwaysBeCasting,
@@ -97,7 +93,6 @@ class CombatLogParser extends CoreCombatLogParser {
     shuffle: Shuffle,
     touchOfDeath: TouchOfDeath,
     fortBrew: FortifyingBrew,
-    diffuseMagic: DiffuseMagic,
     defensiveBuffs: DefensiveBuffs,
     defensiveLinks: DefensiveBuffLinkNormalizer,
 
@@ -116,7 +111,6 @@ class CombatLogParser extends CoreCombatLogParser {
     aohNorm: AspectOfHarmonyLinkNormalizer,
 
     // Talents
-    weaponsOfOrder: WeaponsOfOrder,
     scaldingBrew: ScaldingBrew,
     walkWithTheOx: WalkWithTheOx,
     staggeringStrikes: StaggeringStrikes,
@@ -124,11 +118,9 @@ class CombatLogParser extends CoreCombatLogParser {
     tranquilSpirit: TranquilSpirit,
     salsalabims: Salsalabims,
     anvilStave: AnvilStave,
-    chiSurge: ChiSurge,
     pta: PressTheAdvantage,
     stormstoutsLastKeg: StormtoutsLastKeg,
     veteransEye: VeteransEye,
-    efficientTraining: EfficientTraining,
     ShadowFlurryStrikes,
     AspectOfHarmony,
 

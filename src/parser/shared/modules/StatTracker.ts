@@ -188,14 +188,14 @@ class StatTracker extends Analyzer {
   //Values taken from https://github.com/simulationcraft/simc/blob/thewarwithin/engine/dbc/generated/sc_scale_data.inc
   statBaselineRatingPerPercent = {
     /** Secondaries */
-    [STAT.CRITICAL_STRIKE]: 700,
-    [STAT.HASTE]: 660,
-    [STAT.MASTERY]: 700,
-    [STAT.VERSATILITY]: 780,
+    [STAT.CRITICAL_STRIKE]: 46,
+    [STAT.HASTE]: 44,
+    [STAT.MASTERY]: 46,
+    [STAT.VERSATILITY]: 54,
     /** Tertiaries */
-    [STAT.AVOIDANCE]: 544,
-    [STAT.LEECH]: 1020,
-    [STAT.SPEED]: 170,
+    [STAT.AVOIDANCE]: 36.8,
+    [STAT.LEECH]: 69,
+    [STAT.SPEED]: 11.5,
   };
 
   // Values taken from wago.tools combat rating per point casc file
