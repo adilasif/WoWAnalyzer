@@ -342,6 +342,11 @@ const spells = {
     name: 'Sigil of Flame',
     icon: 'ability_demonhunter_concentratedsigils',
   },
+  MID1_EXPLOSION_OF_THE_SOUL: {
+    id: 1276488,
+    name: 'Explosion of the Soul',
+    icon: 'ability_demonhunter_chaoticimprint_fire',
+  },
   //endregion
 
   //region Havoc
