@@ -94,6 +94,14 @@ const spells: number[] = [
 
   //region monk
   SPELLS.ESCAPE_FROM_REALITY_CAST.id,
+  SPELLS.GIFT_OF_THE_OX_1.id,
+  SPELLS.GIFT_OF_THE_OX_2.id,
+  SPELLS.GIFT_OF_THE_OX_3.id,
+  SPELLS.GIFT_OF_THE_OX_4.id,
+  SPELLS.GIFT_OF_THE_OX_5.id,
+  SPELLS.GIFT_OF_THE_OX_6.id,
+  SPELLS.GIFT_OF_THE_OX_7.id,
+  SPELLS.GIFT_OF_THE_OX_8.id,
   //endregion
 
   //region paladin
