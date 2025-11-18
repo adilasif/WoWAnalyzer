@@ -350,7 +350,7 @@ class RisingMist extends Analyzer {
           <li>HoT Extension Healing: {formatNumber(this.hotHealing)}</li>
           <li>Average HoT Extension Seconds per cast: {this.averageExtension.toFixed(2)}</li>
           <li>
-            <SpellLink spell={TALENTS_MONK.RENEWING_MIST_TALENT} /> HoTs Extended: {this.remCount}
+            <SpellLink spell={SPELLS.RENEWING_MIST_CAST} /> HoTs Extended: {this.remCount}
           </li>
           <li>
             <SpellLink spell={TALENTS_MONK.ENVELOPING_MIST_TALENT} /> HoTs Extended: {this.evmCount}

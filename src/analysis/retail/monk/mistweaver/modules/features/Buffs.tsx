@@ -25,11 +25,6 @@ class Buffs extends CoreAuras {
         enabled: combatant.hasTalent(TALENTS_MONK.SECRET_INFUSION_TALENT),
       },
       {
-        spellId: TALENTS_MONK.REFRESHING_JADE_WIND_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS_MONK.REFRESHING_JADE_WIND_TALENT),
-        timelineHighlight: true,
-      },
-      {
         spellId: SPELLS.INVOKE_CHIJI_THE_RED_CRANE_BUFF.id,
         enabled: combatant.hasTalent(TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT),
         triggeredBySpellId: TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT.id,
@@ -53,10 +48,6 @@ class Buffs extends CoreAuras {
       {
         spellId: TALENTS_MONK.DIFFUSE_MAGIC_TALENT.id,
         enabled: combatant.hasTalent(TALENTS_MONK.DIFFUSE_MAGIC_TALENT),
-      },
-      {
-        spellId: TALENTS_MONK.DAMPEN_HARM_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS_MONK.DAMPEN_HARM_TALENT),
       },
       {
         spellId: TALENTS_MONK.FORTIFYING_BREW_TALENT.id,

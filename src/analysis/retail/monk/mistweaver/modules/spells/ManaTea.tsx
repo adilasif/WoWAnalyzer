@@ -72,11 +72,6 @@ class ManaTea extends Analyzer {
     if (!this.active) {
       return;
     }
-    this.manaPerManaTeaGoal = this.selectedCombatant.hasTalent(
-      TALENTS_MONK.REFRESHING_JADE_WIND_TALENT,
-    )
-      ? 6700
-      : 7500;
 
     this.addEventListener(Events.cast.by(SELECTED_PLAYER), this.handleCast);
     this.addEventListener(Events.heal.by(SELECTED_PLAYER), this.heal);

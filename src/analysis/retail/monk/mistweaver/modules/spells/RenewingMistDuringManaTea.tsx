@@ -111,7 +111,7 @@ class RenewingMistDuringManaTea extends Analyzer {
       >
         {this.avgRemDuringMT.toFixed(2)}{' '}
         <small>
-          average <SpellLink spell={TALENTS_MONK.RENEWING_MIST_TALENT} />s
+          average <SpellLink spell={SPELLS.RENEWING_MIST_CAST} />s
         </small>
       </TooltipElement>
     );
