@@ -361,25 +361,17 @@ function CharacterMiniBox({
 }
 
 function BossMiniBox({ boss, fight }: Pick<HeaderProps, 'boss' | 'fight'>): JSX.Element | null {
-  if (!boss) {
-    return null;
-  }
-
-  // TODO: This should be happening at the boss config level.
-
-  let icon = boss.icon ?? '';
-
-  if (!icon.startsWith('https:')) {
-    icon = `https://assets.rpglogs.com/img/warcraft/bosses/${boss.id % 50_000}-icon.jpg`;
-  }
+  const normalizedBossId = (boss?.id ?? fight.boss) % 50_000;
+  const icon =
+    boss?.icon ?? `https://assets.rpglogs.com/img/warcraft/bosses/${normalizedBossId}-icon.jpg`;
 
   const duration = formatDuration(
     (fight.original_end_time ?? fight.end_time) - (fight.start_time - fight.offset_time),
   );
   return (
     <MiniBoxContainer>
-      <MiniBoxImage src={icon} alt={boss.name} />
-      <MiniBoxName>{boss.name}</MiniBoxName>
+      <MiniBoxImage src={icon} alt={boss?.name ?? fight.name} />
+      <MiniBoxName>{boss?.name ?? fight.name}</MiniBoxName>
       <MiniBoxSubtext>
         {difficulty.getLabel(fight.difficulty ?? 0)}{' '}
         {fight.kill ? `Kill - ${duration}` : `Wipe - ${duration}`}
