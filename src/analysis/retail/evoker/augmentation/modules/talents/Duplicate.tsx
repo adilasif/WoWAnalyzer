@@ -39,14 +39,16 @@ class Duplicate extends Analyzer {
     this.active = this.selectedCombatant.hasTalent(
       TALENTS_EVOKER.DUPLICATE_BASE_AUGMENTATION_TALENT,
     );
-
+    // Filtering to SELECTED_PLAYER_PET breaks this. Eruption and Fire Breath use separate IDs,
+    // so no filtering needed, but Upheaval uses the same ID as the player so must be distinguished.
+    // Additionally, the damage numbers are slightly inflated if there are multiple Augs,
+    // suggesting that some events from another Aug are being included.
     this.addEventListener(
-      //Filter doesn't work here?
-      Events.damage
-        .by(SELECTED_PLAYER_PET)
-        .spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH, SPELLS.UPHEAVAL_DAM]),
+      Events.damage.spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH]),
       this.onPetDamage,
     );
+
+    this.addEventListener(Events.damage.spell([SPELLS.UPHEAVAL_DAM]), this.onPetUpheavalDamage);
 
     if (this.duplicateBuffsEbonMight) {
       //If this is fixed to also buff Upheaval,
@@ -66,6 +68,11 @@ class Duplicate extends Analyzer {
   }
 
   onPetDamage(event: DamageEvent) {
+    this.petDamage += event.amount;
+  }
+
+  onPetUpheavalDamage(event: DamageEvent) {
+    if (event.sourceID === this.selectedCombatant.id) return;
     this.petDamage += event.amount;
   }
 
