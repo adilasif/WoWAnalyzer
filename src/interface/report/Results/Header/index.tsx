@@ -24,7 +24,7 @@ import HeaderBackground from './HeaderBackground';
 import { currentExpansion } from 'game/GameBranch';
 import * as difficulty from 'game/DIFFICULTIES';
 import HeaderStatBox, { StatBoxContainer } from './HeaderStatBox';
-import { level1, level2, colors, gaps } from 'interface/design-system';
+import { level1, level2, colors, gaps, fontSize } from 'interface/design-system';
 import { formatDuration } from 'common/format';
 import FilterButton from './FilterButton';
 import { Filter } from 'interface/report/hooks/useTimeEventFilter';
@@ -315,7 +315,7 @@ const MiniBoxContainer = styled.div`
 `;
 
 const MiniBoxName = styled.div`
-  font-size: 1.8rem;
+  font-size: ${fontSize.heading};
   font-weight: bold;
   white-space: break-spaces;
   overflow: hidden;

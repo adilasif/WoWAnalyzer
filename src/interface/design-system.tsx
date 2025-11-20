@@ -79,4 +79,11 @@ export const level2 = {
 export const gaps = {
   small: '0.5rem',
   medium: '1rem',
+  large: '2rem',
+};
+
+export const fontSize = {
+  bodyText: '1.4rem',
+  subHeading: '1.6rem',
+  heading: '1.8rem',
 };
