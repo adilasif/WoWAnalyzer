@@ -46,6 +46,7 @@ import EnergyTracker from './modules/core/EnergyTracker';
 import EnergyGraph from './modules/core/EnergyGraph';
 import AspectOfHarmony, { AspectOfHarmonyLinkNormalizer } from './modules/talents/AspectOfHarmony';
 import { Abilities } from './gen';
+import { ExpelOxOrbsNormalizer } from './normalizers/ExpelHarm';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -92,6 +93,7 @@ class CombatLogParser extends CoreCombatLogParser {
     sckNorm: SpinningCraneKickLinkNormalizer,
     ptaNorm: PressTheAdvantageNormalizer,
     aohNorm: AspectOfHarmonyLinkNormalizer,
+    expelOxOrbNorm: ExpelOxOrbsNormalizer,
 
     // Talents
     scaldingBrew: ScaldingBrew,

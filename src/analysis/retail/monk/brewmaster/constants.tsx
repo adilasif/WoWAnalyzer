@@ -3,7 +3,6 @@ import talents from 'common/TALENTS/monk';
 
 export const MAGIC_STAGGER_EFFECTIVENESS = 0.58;
 
-// Yes there are 7... The cake is a lie (8 really)
 export const GIFT_OF_THE_OX_SPELLS = [
   SPELLS.GIFT_OF_THE_OX_1,
   SPELLS.GIFT_OF_THE_OX_2,
