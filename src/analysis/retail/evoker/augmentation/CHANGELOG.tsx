@@ -5,7 +5,7 @@ import TALENTS from 'common/TALENTS/evoker';
 import SPELLS from 'common/SPELLS';
 
 export default [  
-  change(date(2025, 10, 16), <>More alpha build changes.</>, KYZ),
+  change(date(2025, 11, 20), <>Beta build changes.</>, KYZ),
   change(date(2025, 10, 11), <>Added/updated/removed several modules based on initial alpha builds.</>, KYZ),
   change(date(2025, 9, 20), <>Update filter for <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT}/> to remove a Dimensius mechanic.</>, KYZ),
   change(date(2025, 8, 29), <>Update <SpellLink spell={TALENTS.EBON_MIGHT_TALENT}/> module to be more lenient with pandemic duration.</>, KYZ),

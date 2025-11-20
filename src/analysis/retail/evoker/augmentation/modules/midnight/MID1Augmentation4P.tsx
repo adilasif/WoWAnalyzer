@@ -12,14 +12,14 @@ import Events, {
 } from 'parser/core/Events';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import {
-  T35_AUGMENTATION_4PC_DAMAGE_MULTIPLIER,
-  T35_AUGMENTATION_4PC_CDR_MULTIPLIER,
+  MID1_AUGMENTATION_4PC_DAMAGE_MULTIPLIER,
+  MID1_AUGMENTATION_4PC_CDR_MULTIPLIER,
 } from '../../constants';
 
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
-//import { TIERS } from 'game/TIERS';
+import { TIERS } from 'game/TIERS';
 import { formatNumber } from 'common/format';
 import { UPHEAVAL_REVERBERATION_DAM_LINK } from '../normalizers/CastLinkNormalizer';
 import SpellLink from 'interface/SpellLink';
@@ -28,7 +28,7 @@ import SpellUsable from 'parser/shared/modules/SpellUsable';
 /**
  * (4) Set Augmentation: While Ebon Might is active, empower spells deal 20% increased damage and cool down 20% faster.
  */
-class T35Augmentation2P extends Analyzer {
+class MID1Augmentation2P extends Analyzer {
   static dependencies = {
     spellUsable: SpellUsable,
   };
@@ -48,9 +48,7 @@ class T35Augmentation2P extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    this.active = false;
-    //this.active = this.selectedCombatant.has4PieceByTier(TIERS.MIDNIGHT1);
-    //Midnight tiers not implemented yet
+    this.active = this.selectedCombatant.has4PieceByTier(TIERS.MID1);
 
     this.addEventListener(
       Events.damage.by(SELECTED_PLAYER).spell([SPELLS.FIRE_BREATH_DOT, SPELLS.UPHEAVAL_DAM]),
@@ -76,7 +74,7 @@ class T35Augmentation2P extends Analyzer {
 
   onDamage(event: DamageEvent) {
     if (this.selectedCombatant.hasBuff(SPELLS.EBON_MIGHT_BUFF_PERSONAL)) {
-      this.extraDamage += calculateEffectiveDamage(event, T35_AUGMENTATION_4PC_DAMAGE_MULTIPLIER);
+      this.extraDamage += calculateEffectiveDamage(event, MID1_AUGMENTATION_4PC_DAMAGE_MULTIPLIER);
     }
   }
 
@@ -86,7 +84,7 @@ class T35Augmentation2P extends Analyzer {
       reverbEvents.forEach((reverbEvent) => {
         this.extraDamage += calculateEffectiveDamage(
           reverbEvent,
-          T35_AUGMENTATION_4PC_DAMAGE_MULTIPLIER,
+          MID1_AUGMENTATION_4PC_DAMAGE_MULTIPLIER,
         );
       });
     }
@@ -96,11 +94,11 @@ class T35Augmentation2P extends Analyzer {
     if (!this.isEbonMightActive) {
       this.spellUsable.applyCooldownRateChange(
         this.currentFireBreath.id,
-        T35_AUGMENTATION_4PC_CDR_MULTIPLIER,
+        MID1_AUGMENTATION_4PC_CDR_MULTIPLIER,
       );
       this.spellUsable.applyCooldownRateChange(
         this.currentUpheaval.id,
-        T35_AUGMENTATION_4PC_CDR_MULTIPLIER,
+        MID1_AUGMENTATION_4PC_CDR_MULTIPLIER,
       );
       this.isEbonMightActive = true;
     }
@@ -110,11 +108,11 @@ class T35Augmentation2P extends Analyzer {
     if (this.isEbonMightActive) {
       this.spellUsable.removeCooldownRateChange(
         this.currentFireBreath.id,
-        T35_AUGMENTATION_4PC_CDR_MULTIPLIER,
+        MID1_AUGMENTATION_4PC_CDR_MULTIPLIER,
       );
       this.spellUsable.removeCooldownRateChange(
         this.currentUpheaval.id,
-        T35_AUGMENTATION_4PC_CDR_MULTIPLIER,
+        MID1_AUGMENTATION_4PC_CDR_MULTIPLIER,
       );
       this.isEbonMightActive = false;
     }
@@ -144,4 +142,4 @@ class T35Augmentation2P extends Analyzer {
   }
 }
 
-export default T35Augmentation2P;
+export default MID1Augmentation2P;

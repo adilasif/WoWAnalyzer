@@ -48,7 +48,7 @@ interface UpheavalCast {
 }
 
 /**
- * Fire Breath causes enemies to take up to 40% increased damage from your Black spells, increased based on its empower level.
+ * Fire Breath causes enemies to take 25% increased damage from your Black spells.
  */
 class MoltenEmbers extends Analyzer {
   static dependencies = {
@@ -63,9 +63,8 @@ class MoltenEmbers extends Analyzer {
   totalMoltenEmbersDamage = 0;
   moltenEmbersDamageSources: DamageSources = {};
 
-  hasFontOfMagic = false;
   hasReverberations = false;
-  perfectFireBreathRank = 3;
+  perfectFireBreathRank = 1;
 
   moltenEmbersAmplifiers = MOLTEN_EMBERS_MULTIPLIER_NO_BLAST_FURNACE;
 
@@ -91,13 +90,6 @@ class MoltenEmbers extends Analyzer {
 
     for (const spell of BLACK_DAMAGE_SPELLS) {
       this.moltenEmbersDamageSources[spell.id] = { amount: 0, spell };
-    }
-
-    this.hasFontOfMagic = this.selectedCombatant.hasTalent(
-      TALENTS.FONT_OF_MAGIC_AUGMENTATION_TALENT,
-    );
-    if (this.hasFontOfMagic) {
-      this.perfectFireBreathRank = 4;
     }
     this.hasReverberations = this.selectedCombatant.hasTalent(TALENTS.REVERBERATIONS_TALENT);
 
@@ -202,7 +194,7 @@ class MoltenEmbers extends Analyzer {
   private getFireBreathRankPerformance(upheavalCast: UpheavalCast) {
     const summary = (
       <div>
-        <SpellLink spell={SPELLS.FIRE_BREATH} /> upranked
+        <SpellLink spell={SPELLS.FIRE_BREATH} /> downranked
       </div>
     );
     if (this.perfectFireBreathRank === upheavalCast.fireBreathRank) {
@@ -211,8 +203,7 @@ class MoltenEmbers extends Analyzer {
         summary: summary,
         details: (
           <div>
-            <SpellLink spell={SPELLS.FIRE_BREATH} /> cast at max rank ({upheavalCast.fireBreathRank}
-            ). Good job!
+            <SpellLink spell={SPELLS.FIRE_BREATH} /> cast at rank 1. Good job!
           </div>
         ),
       };
@@ -224,8 +215,8 @@ class MoltenEmbers extends Analyzer {
       details: (
         <div>
           <SpellLink spell={SPELLS.FIRE_BREATH} /> cast at rank {upheavalCast.fireBreathRank}. You
-          should try to uprank <SpellLink spell={SPELLS.FIRE_BREATH} /> as high as possible (
-          {this.perfectFireBreathRank}).
+          should usually cast <SpellLink spell={SPELLS.FIRE_BREATH} /> at rank 1 to maximise{' '}
+          <SpellLink spell={TALENTS.MOLTEN_EMBERS_TALENT} /> uptime.
         </div>
       ),
     };
@@ -254,8 +245,9 @@ class MoltenEmbers extends Analyzer {
       summary: summary,
       details: (
         <div>
-          <SpellLink spell={SPELLS.FIRE_BREATH} /> DoT wasn't active. You should try to line up{' '}
-          <SpellLink spell={SPELLS.UPHEAVAL} /> with <SpellLink spell={SPELLS.FIRE_BREATH} />.
+          <SpellLink spell={SPELLS.FIRE_BREATH} /> DoT wasn't active. You should try to have{' '}
+          <SpellLink spell={SPELLS.FIRE_BREATH} /> when you cast{' '}
+          <SpellLink spell={SPELLS.UPHEAVAL} />.
         </div>
       ),
     };
@@ -271,10 +263,10 @@ class MoltenEmbers extends Analyzer {
         <strong>
           <SpellLink spell={TALENTS.MOLTEN_EMBERS_TALENT} />
         </strong>{' '}
-        amplifies the damage of your Black Spells such as <SpellLink spell={SPELLS.UPHEAVAL} />,
-        based on the rank of <SpellLink spell={SPELLS.FIRE_BREATH} /> that is active on the target.
-        Ideally you should try to line up both these empowers, whilst making sure to use{' '}
-        <SpellLink spell={SPELLS.FIRE_BREATH} /> at as high rank as possible.
+        amplifies the damage of your Black Spells such as <SpellLink spell={SPELLS.UPHEAVAL} />{' '}
+        while <SpellLink spell={SPELLS.FIRE_BREATH} /> is active on the target. You should try to
+        use <SpellLink spell={SPELLS.FIRE_BREATH} /> at the lowest rank, and always ensure it is
+        active when you cast <SpellLink spell={SPELLS.UPHEAVAL} /> on a target.
       </section>
     );
 
