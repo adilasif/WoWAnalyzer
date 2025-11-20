@@ -397,7 +397,7 @@ const talents = {
     entryIds: [115546],
     definitionIds: [{ id: 120558, specId: 1468 }],
   },
-  DUPLICATE_1_AUGMENTATION_TALENT: {
+  DUPLICATE_EXTENSION_AUGMENTATION_TALENT: {
     id: 1259174,
     name: 'Duplicate',
     icon: 'ability_evoker_masterytimewalker',
@@ -405,7 +405,7 @@ const talents = {
     entryIds: [135727],
     definitionIds: [{ id: 140482, specId: 1473 }],
   },
-  DUPLICATE_2_AUGMENTATION_TALENT: {
+  DUPLICATE_BASE_AUGMENTATION_TALENT: {
     id: 1259173,
     name: 'Duplicate',
     icon: 'ability_evoker_recall',
@@ -413,7 +413,7 @@ const talents = {
     entryIds: [135729],
     definitionIds: [{ id: 140484, specId: 1473 }],
   },
-  DUPLICATE_3_AUGMENTATION_TALENT: {
+  DUPLICATE_AMP_AUGMENTATION_TALENT: {
     id: 1259175,
     name: 'Duplicate',
     icon: 'ability_evoker_ouroboros',

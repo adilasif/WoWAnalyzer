@@ -25,10 +25,10 @@ import { formatNumber } from 'common/format';
  */
 class Duplicate extends Analyzer {
   canExtendDuplicate = this.selectedCombatant.hasTalent(
-    TALENTS_EVOKER.DUPLICATE_3_AUGMENTATION_TALENT,
+    TALENTS_EVOKER.DUPLICATE_EXTENSION_AUGMENTATION_TALENT,
   );
   duplicateBuffsEbonMight = this.selectedCombatant.hasTalent(
-    TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT,
+    TALENTS_EVOKER.DUPLICATE_AMP_AUGMENTATION_TALENT,
   );
   petDamage = 0;
   personalDamage = 0;
@@ -36,9 +36,12 @@ class Duplicate extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT);
+    this.active = this.selectedCombatant.hasTalent(
+      TALENTS_EVOKER.DUPLICATE_BASE_AUGMENTATION_TALENT,
+    );
 
     this.addEventListener(
+      //Filter doesn't work here?
       Events.damage
         .by(SELECTED_PLAYER_PET)
         .spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH, SPELLS.UPHEAVAL_DAM]),
@@ -56,9 +59,6 @@ class Duplicate extends Analyzer {
       );
 
       this.addEventListener(
-        //Check how this interacts with Double-time.
-        //If it stacks additively, then don't include this with Double-time talented,
-        //as we cannot determine if an Ebon Might has crit.
         Events.damage.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_EXTERNAL),
         this.onExternalDamage,
       );
@@ -93,14 +93,14 @@ class Duplicate extends Analyzer {
       {
         color: 'rgb(255, 255, 0)',
         label: 'Future Self damage',
-        spellId: TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT.id,
+        spellId: TALENTS_EVOKER.DUPLICATE_BASE_AUGMENTATION_TALENT.id,
         valueTooltip: formatNumber(this.petDamage),
         value: this.petDamage,
       },
       {
         color: 'rgb(129, 52, 5)',
         label: 'Personal damage',
-        spellId: TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT.id,
+        spellId: TALENTS_EVOKER.DUPLICATE_AMP_AUGMENTATION_TALENT.id,
         valueTooltip: formatNumber(this.personalDamage),
         value: this.personalDamage,
       },
@@ -119,7 +119,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_BASE_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage + this.personalDamage + this.externalDamage} />
               <br />
@@ -139,7 +139,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_BASE_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage} />
               <br />
@@ -155,7 +155,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_BASE_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage} />
             </div>
