@@ -549,11 +549,6 @@ const spells = {
     name: 'Eye of the Tiger',
     icon: 'ability_druid_primalprecision',
   },
-  PURIFIED_CHI: {
-    id: 325092,
-    name: 'Purified Chi',
-    icon: 'inv_misc_beer_06',
-  },
   BREATH_OF_FIRE_DEBUFF: {
     id: 123725,
     name: 'Breath of Fire',
