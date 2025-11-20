@@ -27,7 +27,6 @@ import KegSmash from './modules/spells/KegSmash';
 import PurifyingBrew from './modules/spells/PurifyingBrew';
 import Shuffle from './modules/spells/Shuffle';
 import TigerPalm from './modules/spells/TigerPalm';
-import ExpelHarmNorm from './normalizers/ExpelHarm';
 import StaggerLinkNormalizer from './modules/core/StaggerLinkNormalizer';
 import CelestialBrewNormalizer from './modules/spells/CelestialBrew/normalizer';
 import { FortifyingBrew } from './modules/core/MajorDefensives/FortifyingBrew';
@@ -87,7 +86,6 @@ class CombatLogParser extends CoreCombatLogParser {
     // Items
 
     // normalizers
-    ehNorm: ExpelHarmNorm,
     staggerLink: StaggerLinkNormalizer,
     cbNorm: CelestialBrewNormalizer,
     bofNorm: BreathOfFireDebuffTargetNormalizer,
