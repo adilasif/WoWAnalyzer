@@ -16,7 +16,6 @@ export { default as ObsidianScales } from './modules/MajorDefensives/ObsidianSca
 export { default as DefensiveNormalizer } from './modules/normalizers/DefensiveNormalizer';
 export { default as DefensiveCastLinkNormalizer } from './modules/normalizers/DefensiveCastLinkNormalizer';
 export { default as MobilityCastLinkNormalizer } from './modules/normalizers/MobilityCastLinkNormalizer';
-export { default as RenewingBlaze } from './modules/MajorDefensives/RenewingBlaze';
 export { default as Engulf } from './modules/talents/hero/flameshaper/Engulf';
 export { default as ExpandedLungs } from './modules/talents/hero/flameshaper/ExpandedLungs';
 export { default as RedHot } from './modules/talents/hero/flameshaper/RedHot';
@@ -36,7 +35,6 @@ export { default as ThreadsOfFate } from './modules/talents/hero/chronowarden/Th
 export { default as Reverberations } from './modules/talents/hero/chronowarden/Reverberations';
 export { default as Primacy } from './modules/talents/hero/chronowarden/Primacy';
 export { default as TimeConvergence } from './modules/talents/hero/chronowarden/TimeConvergence';
-export { default as MasterOfDestiny } from './modules/talents/hero/chronowarden/MasterOfDestiny';
 export { default as GoldenOpportunity } from './modules/talents/hero/chronowarden/GoldenOpportunity';
 export { default as DoubleTime } from './modules/talents/hero/chronowarden/DoubleTime';
 export { default as MotesOfAcceleration } from './modules/talents/hero/chronowarden/MotesOfAcceleration';

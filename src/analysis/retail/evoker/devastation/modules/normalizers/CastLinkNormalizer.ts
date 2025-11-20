@@ -64,31 +64,11 @@ const EVENT_LINKS: EventLink[] = [
     },
   },
   {
-    linkRelation: SNAPFIRE_CONSUME,
-    reverseLinkRelation: SNAPFIRE_CONSUME,
-    linkingEventId: SPELLS.SNAPFIRE_BUFF.id,
-    linkingEventType: [EventType.RemoveBuff],
-    referencedEventId: [TALENTS.FIRESTORM_TALENT.id],
-    referencedEventType: EventType.Cast,
-    anyTarget: true,
-    forwardBufferMs: CAST_BUFFER_MS,
-    backwardBufferMs: 1000,
-    isActive(c) {
-      return c.hasTalent(TALENTS.FIRESTORM_TALENT);
-    },
-  },
-  {
     linkRelation: IRIDESCENCE_RED_CONSUME,
     reverseLinkRelation: IRIDESCENCE_RED_CONSUME,
     linkingEventId: [SPELLS.IRIDESCENCE_RED.id],
     linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    referencedEventId: [
-      SPELLS.PYRE.id,
-      SPELLS.PYRE_DENSE_TALENT.id,
-      SPELLS.LIVING_FLAME_CAST.id,
-      TALENTS.ENGULF_TALENT.id,
-      TALENTS.FIRESTORM_TALENT.id,
-    ],
+    referencedEventId: [SPELLS.PYRE.id, SPELLS.PYRE_DENSE_TALENT.id, SPELLS.LIVING_FLAME_CAST.id],
     referencedEventType: EventType.Cast,
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
@@ -285,7 +265,8 @@ const EVENT_LINKS: EventLink[] = [
     forwardBufferMs: CAST_BUFFER_MS,
     anyTarget: true,
   },
-  {
+  // TODO: Figure out what to do with these when Flameshaper gets worked on
+  /* {
     linkRelation: ENGULF_DAMAGE,
     reverseLinkRelation: ENGULF_DAMAGE,
     linkingEventId: TALENTS.ENGULF_TALENT.id,
@@ -312,7 +293,7 @@ const EVENT_LINKS: EventLink[] = [
     isActive(c) {
       return c.hasTalent(TALENTS.CONSUME_FLAME_TALENT);
     },
-  },
+  }, */
 ];
 
 class CastLinkNormalizer extends EventLinkNormalizer {
