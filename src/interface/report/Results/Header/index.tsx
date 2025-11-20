@@ -362,8 +362,13 @@ function CharacterMiniBox({
 
 function BossMiniBox({ boss, fight }: Pick<HeaderProps, 'boss' | 'fight'>): JSX.Element | null {
   const normalizedBossId = (boss?.id ?? fight.boss) % 50_000;
-  const icon =
+  let icon =
     boss?.icon ?? `https://assets.rpglogs.com/img/warcraft/bosses/${normalizedBossId}-icon.jpg`;
+
+  if (!icon.startsWith('https://')) {
+    // yes, it says abilities. WCL dumps WoW icons in this folder. the bosses/ folder is for images indexed by boss id, not WoW icon name
+    icon = `https://assets.rpglogs.com/img/warcraft/abilities/${icon}.jpg`;
+  }
 
   const duration = formatDuration(
     (fight.original_end_time ?? fight.end_time) - (fight.start_time - fight.offset_time),
