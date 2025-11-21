@@ -39,10 +39,8 @@ class MWSpellManaCost extends SpellManaCost {
       return 0;
     }
     let celestialMultiplier = 1;
-    if (spellID === TALENTS_MONK.ENVELOPING_MIST_TALENT.id) {
-      if (this.celestial.celestialActive) {
-        celestialMultiplier -= this.hasChiji ? CHIJI_REDUCTION : YULON_REDUCTION;
-      }
+    if (spellID === TALENTS_MONK.ENVELOPING_MIST_TALENT.id && this.celestial.celestialActive) {
+      celestialMultiplier -= this.hasChiji ? CHIJI_REDUCTION : YULON_REDUCTION;
     }
     return celestialMultiplier;
   }
