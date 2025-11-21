@@ -106,10 +106,12 @@ class ManaTea extends Analyzer {
   get avgChannelDuration() {
     let totalValid = 0;
     let totalDuration = 0;
-    this.castTrackers.forEach((tracker) => {
-      if (tracker !== undefined) {
+    this.castTrackers.map((tracker) => {
+      if (tracker !== undefined && tracker.channelTime !== undefined) {
         totalValid += 1;
-        totalDuration += tracker.channelTime!;
+        totalDuration += tracker.channelTime;
+      } else {
+        console.warn('Undefined tracker or channel time in Mana Tea analysis');
       }
     });
     return totalDuration / totalValid;
