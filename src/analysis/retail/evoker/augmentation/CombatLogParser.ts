@@ -79,6 +79,7 @@ import {
   TimeSpiral,
   RefinedEssence,
   CommandSquadron,
+  NozdormuAdept,
 } from 'analysis/retail/evoker/shared';
 
 class CombatLogParser extends MainCombatLogParser {
@@ -162,6 +163,7 @@ class CombatLogParser extends MainCombatLogParser {
     motesOfAcceleration: MotesOfAcceleration,
     refinedEssence: RefinedEssence,
     commandSquadron: CommandSquadron,
+    nozdormuAdept: NozdormuAdept,
 
     // Features
     buffTrackerGraph: BuffTrackerGraph,

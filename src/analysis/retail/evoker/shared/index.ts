@@ -41,4 +41,5 @@ export { default as MotesOfAcceleration } from './modules/talents/hero/chronowar
 export { default as FlameSiphon } from './modules/talents/hero/flameshaper/FlameSiphon';
 export { default as RefinedEssence } from './modules/talents/hero/scalecommander/RefinedEssence';
 export { default as CommandSquadron } from './modules/talents/hero/scalecommander/CommandSquadron';
+export { default as NozdormuAdept } from './modules/talents/hero/chronowarden/NozdormuAdept';
 export * from './constants';

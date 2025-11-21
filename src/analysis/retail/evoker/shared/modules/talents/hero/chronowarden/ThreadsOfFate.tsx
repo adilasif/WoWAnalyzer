@@ -15,8 +15,8 @@ class ThreadsOfFate extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    // TODO: Update for 12.0.0
-    this.active = false; //this.selectedCombatant.hasTalent(TALENTS_EVOKER.THREADS_OF_FATE_TALENT);
+    // Talent has been removed, but it still triggers anyway...
+    this.active = this.selectedCombatant.hasTalent(TALENTS_EVOKER.NOZDORMU_ADEPT_TALENT);
     this.addEventListener(
       Events.heal.by(SELECTED_PLAYER).spell(SPELLS.THREAD_OF_FATE_HEALING),
       this.onThreadHeal,
@@ -42,7 +42,7 @@ class ThreadsOfFate extends Analyzer {
         size="flexible"
         category={STATISTIC_CATEGORY.HERO_TALENTS}
       >
-        <TalentSpellText talent={TALENTS_EVOKER.ARCANE_INTENSITY_TALENT}>
+        <TalentSpellText talent={TALENTS_EVOKER.NOZDORMU_ADEPT_TALENT}>
           <div>
             <ItemDamageDone amount={this.threadDamage} />
             <br />
