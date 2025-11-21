@@ -5,6 +5,7 @@ import { ortemis, emallson, swirl, Trevor, Vetyst, Vohrr } from 'CONTRIBUTORS';
 import SpellLink from 'interface/SpellLink';
 
 export default [
+  change(date(2025, 11, 21), <>Update <SpellLink spell={TALENTS_MONK.MANA_TEA_TALENT}/> for Midnight.</>, Vohrr),
   change(date(2025, 11, 18), <>Initial commit for Midnight.</>, Vohrr),
   change(date(2025, 9, 12), <><SpellLink spell={TALENTS_MONK.COALESCENCE_TALENT}/> now correctly amps <SpellLink spell={SPELLS.ANCIENT_TEACHINGS}/> and Awakened Jadefire healing.</>, swirl),
   change(date(2025, 8, 19), <>Add haste buffs for 11.2 tier set</>, Trevor),
