@@ -44,7 +44,6 @@ import JadeSerpentStatue from './modules/spells/JadeSerpentStatue';
 import ManaTea from './modules/spells/ManaTea';
 import MistyPeaks from './modules/spells/MistyPeaks';
 import MistsOfLife from './modules/spells/MistsOfLife';
-import RenewingMistDuringManaTea from './modules/spells/RenewingMistDuringManaTea';
 import RisingMist from './modules/spells/RisingMist';
 import VivaciousVivification from './modules/spells/VivaciousVivify';
 import YulonsWhisper from './modules/spells/YulonsWhisper';
@@ -158,7 +157,6 @@ class CombatLogParser extends CoreCombatLogParser {
     mistsOfLife: MistsOfLife,
     mistyPeaks: MistyPeaks,
     renewingMist: RenewingMist,
-    renewingMistDuringManaTea: RenewingMistDuringManaTea,
     revival: Revival,
     risingMist: RisingMist,
     risingSunRevival: RisingSunRevival,

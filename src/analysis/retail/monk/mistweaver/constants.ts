@@ -78,7 +78,6 @@ export const LEGACY_OF_WISDOM_TARGETS = 2;
 export const SHEILUNS_GIFT_TARGETS = 3;
 export const MAX_CHIJI_STACKS = 3;
 export const MANA_TEA_MAX_STACKS = 20;
-export const MANA_TEA_REDUCTION = 0.3;
 export const JADE_BOND_INC = 0.2;
 export const JADE_BOND_SOOB_INC = 5;
 export const NOURISHING_CHI_INC = 0.2;
