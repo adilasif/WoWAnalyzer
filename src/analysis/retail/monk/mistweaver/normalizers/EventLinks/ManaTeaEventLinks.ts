@@ -10,6 +10,7 @@ import {
   MT_STACK_CHANGE,
   LIFECYCLES,
 } from './EventLinkConstants';
+import Mana from 'parser/shared/modules/features/RaidHealthTab/TabComponent';
 
 export const MANA_TEA_EVENT_LINKS: EventLink[] = [
   {
@@ -30,7 +31,7 @@ export const MANA_TEA_EVENT_LINKS: EventLink[] = [
     reverseLinkRelation: MANA_TEA_CAST_LINK,
     linkingEventId: SPELLS.MANA_TEA_CAST.id,
     linkingEventType: EventType.Cast,
-    referencedEventId: SPELLS.MANA_TEA_BUFF.id,
+    referencedEventId: SPELLS.MANA_TEA_CAST.id,
     referencedEventType: EventType.ApplyBuff,
     forwardBufferMs: MAX_MT_CHANNEL,
     maximumLinks: 1,
@@ -41,9 +42,9 @@ export const MANA_TEA_EVENT_LINKS: EventLink[] = [
   },
   {
     linkRelation: MT_BUFF_REMOVAL,
-    linkingEventId: SPELLS.MANA_TEA_BUFF.id,
+    linkingEventId: SPELLS.MANA_TEA_CAST.id,
     linkingEventType: EventType.ApplyBuff,
-    referencedEventId: SPELLS.MANA_TEA_BUFF.id,
+    referencedEventId: SPELLS.MANA_TEA_CAST.id,
     referencedEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
     forwardBufferMs: MAX_MT_CHANNEL,
     isActive(c) {
