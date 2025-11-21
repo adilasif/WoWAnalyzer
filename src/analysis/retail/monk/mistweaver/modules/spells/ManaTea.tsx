@@ -106,7 +106,7 @@ class ManaTea extends Analyzer {
   get avgChannelDuration() {
     let totalValid = 0;
     let totalDuration = 0;
-    this.castTrackers.map((tracker) => {
+    this.castTrackers.forEach((tracker) => {
       if (tracker !== undefined && tracker.channelTime !== undefined) {
         totalValid += 1;
         totalDuration += tracker.channelTime;
