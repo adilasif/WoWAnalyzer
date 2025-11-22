@@ -10,7 +10,6 @@ import process from 'node:process';
 async function lint(fix: boolean = false, patterns: string[]): Promise<boolean> {
   const patternsToLint = patterns.length === 0 ? ['src/'] : patterns;
 
-  console.log(`${fix ? 'Fixing' : 'Linting'} ${patternsToLint}`);
   const baseline = await loadBaseline();
   const linter = new ESLint({ fix, warnIgnored: false });
   const results = await linter.lintFiles(patternsToLint);
