@@ -29,12 +29,12 @@ class Buffs extends CoreAuras {
         enabled: combatant.hasTalent(TALENTS.COMBUSTION_TALENT),
         timelineHighlight: true,
       },
-      {
-        spellId: TALENTS.BLAZING_BARRIER_TALENT.id,
-        triggeredBySpellId: TALENTS.BLAZING_BARRIER_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.BLAZING_BARRIER_TALENT),
-        timelineHighlight: true,
-      },
+      // {
+      //   spellId: TALENTS.BLAZING_BARRIER_TALENT.id,
+      //   triggeredBySpellId: TALENTS.BLAZING_BARRIER_TALENT.id,
+      //   enabled: combatant.hasTalent(TALENTS.BLAZING_BARRIER_TALENT),
+      //   timelineHighlight: true,
+      // },
       {
         spellId: TALENTS.ICE_BLOCK_TALENT.id,
         triggeredBySpellId: TALENTS.ICE_BLOCK_TALENT.id,
