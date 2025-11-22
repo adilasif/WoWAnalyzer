@@ -52,6 +52,7 @@ import {
   JADE_BOND_ENVM,
   INSURANCE_FROM_REM,
   INSURANCE,
+  RUSHING_WIND_KICK,
 } from './EventLinks/EventLinkConstants';
 import { RENEWING_MIST_EVENT_LINKS } from './EventLinks/RenewingMistEventLinks';
 import { GUST_OF_MISTS_EVENT_LINKS } from './EventLinks/GustOfMistEventLinks';
@@ -60,6 +61,7 @@ import { VIVIFY_EVENT_LINKS } from './EventLinks/VivifyEventLinks';
 import { ENVELOPING_MIST_EVENT_LINKS } from './EventLinks/EnvelopingMistEventLinks';
 import { HERO_TALENT_EVENT_LINKS } from './EventLinks/HeroTalentEventLinks';
 import { TIER_EVENT_LINKS } from './EventLinks/TierEventLinks';
+import SPELLS from 'common/SPELLS';
 
 const FOUND_REMS = new Map<string, number | null>();
 
@@ -90,6 +92,20 @@ const EVENT_LINKS: EventLink[] = [
     },
     maximumLinks(c) {
       return c.hasTalent(TALENTS_MONK.LEGACY_OF_WISDOM_TALENT) ? 5 : 3;
+    },
+  },
+  {
+    linkRelation: RUSHING_WIND_KICK,
+    linkingEventId: TALENTS_MONK.RUSHING_WIND_KICK_MISTWEAVER_TALENT.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.RUSHING_WIND_KICK_HEAL.id,
+    referencedEventType: EventType.Heal,
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+    maximumLinks: 5,
+    isActive(c) {
+      return c.hasTalent(TALENTS_MONK.RUSHING_WIND_KICK_MISTWEAVER_TALENT);
     },
   },
 ];
@@ -276,6 +292,9 @@ export function getSheilunsGiftHits(event: CastEvent): HealEvent[] {
   return GetRelatedEvents<HealEvent>(event, SHEILUNS_GIFT);
 }
 
+export function getRWKHitsPerCast(event: CastEvent): HealEvent[] {
+  return GetRelatedEvents<HealEvent>(event, RUSHING_WIND_KICK);
+}
 //vivify
 export function getInvigHitsPerCast(event: HealEvent) {
   return GetRelatedEvents(event, VIVIFY);
