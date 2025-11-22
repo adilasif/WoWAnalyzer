@@ -5,6 +5,7 @@ import { ortemis, emallson, swirl, Trevor, Vetyst, Vohrr } from 'CONTRIBUTORS';
 import SpellLink from 'interface/SpellLink';
 
 export default [
+  change(date(2024, 11, 22), <>Update <SpellLink spell={TALENTS_MONK.RUSHING_WIND_KICK_MISTWEAVER_TALENT}/> and <SpellLink spell={TALENTS_MONK.VIVACIOUS_VIVIFICATION_TALENT}/> for Midnight.</>, Vohrr),
   change(date(2025, 11, 21), <>Update <SpellLink spell={TALENTS_MONK.MANA_TEA_TALENT}/> for Midnight.</>, Vohrr),
   change(date(2025, 11, 18), <>Initial commit for Midnight.</>, Vohrr),
   change(date(2025, 9, 12), <><SpellLink spell={TALENTS_MONK.COALESCENCE_TALENT}/> now correctly amps <SpellLink spell={SPELLS.ANCIENT_TEACHINGS}/> and Awakened Jadefire healing.</>, swirl),

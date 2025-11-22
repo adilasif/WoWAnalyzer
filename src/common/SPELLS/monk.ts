@@ -212,6 +212,11 @@ const spells = {
     name: 'Renewing Mist',
     icon: 'ability_monk_renewingmists',
   },
+  RUSHING_WIND_KICK_HEAL: {
+    id: 1269159,
+    name: 'Rushing Wind Kick',
+    icon: 'inv12_ability_monk_rushingwindkick',
+  },
   VIVIFY: {
     id: 116670,
     name: 'Vivify',
