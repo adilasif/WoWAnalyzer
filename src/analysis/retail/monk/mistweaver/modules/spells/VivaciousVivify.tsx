@@ -178,20 +178,6 @@ class VivaciousVivification extends Analyzer {
     );
     return explanationAndDataSubsection(explanation, data, GUIDE_CORE_EXPLANATION_PERCENT);
   }
-
-  statistic() {
-    return (
-      <Statistic
-        position={STATISTIC_ORDER.UNIMPORTANT(50)}
-        size="flexible"
-        category={STATISTIC_CATEGORY.TALENTS}
-      >
-        <TalentSpellText talent={TALENTS_MONK.VIVACIOUS_VIVIFICATION_TALENT}>
-          <ItemHealingDone amount={this.totalHealed} />
-        </TalentSpellText>
-      </Statistic>
-    );
-  }
 }
 
 export default VivaciousVivification;
