@@ -305,7 +305,8 @@ export function getManaTeaChannelDuration(event: ApplyBuffEvent) {
   if (castEvent === undefined) {
     return undefined;
   }
-  return GetRelatedEvent(castEvent, MANA_TEA_CHANNEL)!.timestamp - castEvent.timestamp;
+  const channelEvent = GetRelatedEvent(castEvent, MANA_TEA_CHANNEL);
+  return channelEvent!.timestamp - castEvent.timestamp;
 }
 
 export function isMTStackFromLifeCycles(

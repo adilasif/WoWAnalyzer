@@ -273,11 +273,6 @@ const spells = {
     name: 'Mana Tea',
     icon: 'monk_ability_cherrymanatea',
   },
-  MANA_TEA_BUFF: {
-    id: 197908,
-    name: 'Mana Tea',
-    icon: 'monk_ability_cherrymanatea',
-  },
   SOOTHING_BREATH: {
     id: 343737,
     name: 'Soothing Breath',
