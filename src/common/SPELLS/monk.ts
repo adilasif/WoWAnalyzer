@@ -467,6 +467,11 @@ const spells = {
     name: 'Faeline Stomp',
     icon: 'ability_ardenweald_monk',
   },
+  JADEFIRE_STOMP_DAMAGE: {
+    id: 1248815,
+    name: 'Jadefire Stomp',
+    icon: '',
+  },
   FAELINE_STOMP_PULSE_DAMAGE: {
     id: 327264,
     name: 'Faeline Stomp',
