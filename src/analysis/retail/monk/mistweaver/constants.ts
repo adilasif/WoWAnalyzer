@@ -62,6 +62,8 @@ export const ENV_BASE_DURATION = 6000;
 export const TFT_REM_EXTRA_DURATION = 10000;
 
 // Talent Constants
+export const JADE_EMPOWERMENT_DAMAGE_BOOST = 3.0;
+export const JADE_EMPOWERMENT_SECONDARY_TARGET_EFFECTIVENESS = 0.25;
 export const RJW_MAX_DURATION = 25000;
 export const POOL_OF_MISTS_CDR = 1000;
 export const MISTWRAP = 1000;
