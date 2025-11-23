@@ -292,13 +292,6 @@ export function isZenPulseConsumed(event: RemoveBuffEvent | RemoveBuffStackEvent
   return GetRelatedEvent(event, ZEN_PULSE_CONSUME);
 }
 
-// we use time to get stacks because it can be cast prepull
-export function getManaTeaStacksConsumed(event: ApplyBuffEvent) {
-  const diff = GetRelatedEvents(event, MT_BUFF_REMOVAL)[0]?.timestamp - event.timestamp || 0;
-  // 1s of mana reduction per stack
-  return Math.round(diff / 1000);
-}
-
 export function getManaTeaChannelDuration(event: ApplyBuffEvent) {
   const castEvent = GetRelatedEvent(event, MANA_TEA_CAST_LINK);
   if (castEvent === undefined) {
