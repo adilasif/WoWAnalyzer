@@ -284,9 +284,6 @@ class RisingMist extends Analyzer {
       Object.keys(this.hotTracker.hots[playerId]).forEach((spellIdString) => {
         const spellId = Number(spellIdString);
         const attribution = newRisingMist;
-        if (spellId === SPELLS.ENVELOPING_BREATH_HEAL.id) {
-          return;
-        }
 
         this.hotTracker.addExtension(
           attribution,

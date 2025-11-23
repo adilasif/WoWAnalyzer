@@ -184,12 +184,12 @@ const spells = {
   SECRET_INFUSION_CRIT_BUFF: {
     id: 388498,
     name: 'Secret Infusion',
-    icon: 'ability_monk_chibrew',
+    icon: 'inv_12_profession_cooking_tea_orange',
   },
   SECRET_INFUSION_HASTE_BUFF: {
     id: 388497,
     name: 'Secret Infusion',
-    icon: 'ability_monk_chibrew',
+    icon: 'inv_12_profession_cooking_tea_green',
   },
   SECRET_INFUSION_MASTERY_BUFF: {
     id: 388499,
@@ -262,11 +262,6 @@ const spells = {
     id: 396167,
     name: 'Fury of Xuen',
     icon: 'ability_monk_prideofthetiger',
-  },
-  ENVELOPING_BREATH_HEAL: {
-    id: 325209,
-    name: 'Enveloping Breath',
-    icon: 'ability_monk_jadeserpentbreath',
   },
   MANA_TEA_STACK: {
     id: 115867,
