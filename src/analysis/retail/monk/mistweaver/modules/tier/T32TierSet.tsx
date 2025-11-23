@@ -134,10 +134,6 @@ class T32TierSet extends Analyzer {
 
     Object.keys(this.hotTracker.hots[targetId]).forEach((spellIdString) => {
       const spellId = Number(spellIdString);
-      //skip enveloping breath
-      if (spellId === SPELLS.ENVELOPING_BREATH_HEAL.id) {
-        return;
-      }
 
       const hot = this.hotTracker.hots[targetId][spellId];
       //can only be extended once
