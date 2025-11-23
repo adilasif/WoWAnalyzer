@@ -1,7 +1,6 @@
 import { formatNumber, formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import { TALENTS_MONK } from 'common/TALENTS';
-import HIT_TYPES from 'game/HIT_TYPES';
 import { SpellLink, TooltipElement } from 'interface';
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { RoundedPanel } from 'interface/guide/components/GuideDivs';
@@ -20,7 +19,6 @@ import {
 } from '../../constants';
 import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../Guide';
 import { getInvigHitsPerCast, isFromVivify } from '../../normalizers/CastLinkNormalizer';
-import UpliftedSpirits from './UpliftedSpirits';
 
 const RAPID_DIFFUSION_SPELLS = [
   TALENTS_MONK.ENVELOPING_MIST_TALENT,
@@ -35,11 +33,8 @@ type InvigoratingMistHealPerPlayer = Record<number, Set<string>>;
 class Vivify extends Analyzer {
   static dependencies = {
     spellUsable: SpellUsable,
-    upliftedSpirits: UpliftedSpirits,
   };
-
   protected spellUsable!: SpellUsable;
-  protected upliftedSpirits!: UpliftedSpirits;
 
   casts = 0;
   healsPerPlayer: InvigoratingMistHealPerPlayer = {};
@@ -68,6 +63,7 @@ class Vivify extends Analyzer {
 
   constructor(options: Options) {
     super(options);
+    this.active = !this.selectedCombatant.hasTalent(TALENTS_MONK.SHEILUNS_GIFT_TALENT);
     this.risingMistActive = this.selectedCombatant.hasTalent(TALENTS_MONK.RISING_MIST_TALENT);
     this.dancingMistActive = this.selectedCombatant.hasTalent(TALENTS_MONK.DANCING_MISTS_TALENT);
     this.rapidDiffusionActive = this.selectedCombatant.hasTalent(
@@ -274,16 +270,6 @@ class Vivify extends Analyzer {
     );
   }
 
-  private _tallyUpliftedSpiritsCDR(event: HealEvent) {
-    if (this.upliftedSpirits.active && event.hitType === HIT_TYPES.CRIT) {
-      if (this.spellUsable.isOnCooldown(this.upliftedSpirits.activeTalent.id)) {
-        this.vivifyGoodCrits += 1;
-      } else {
-        this.vivifyWastedCrits += 1;
-      }
-    }
-  }
-
   private _makeHealId(event: HealEvent): string {
     return (
       event.targetID + '_' + event.timestamp + '_' + event.amount + '_' + (event.overheal || 0)
@@ -323,7 +309,6 @@ class Vivify extends Analyzer {
         healingPerCast += effective;
         overhealPerCast += invigHeal.overheal || 0;
 
-        this._tallyUpliftedSpiritsCDR(invigHeal);
         //add this heal to the processed heals per player
         this.healsPerPlayer[targetId]
           ? this.healsPerPlayer[targetId].add(heal_id)
@@ -337,7 +322,6 @@ class Vivify extends Analyzer {
 
     healingPerCast += vivifyHeal.amount + (vivifyHeal.absorbed || 0);
     overhealPerCast += vivifyHeal.overheal || 0;
-    this._tallyUpliftedSpiritsCDR(vivifyHeal);
 
     const percentOverheal = overhealPerCast / (healingPerCast + overhealPerCast);
 
@@ -363,14 +347,6 @@ class Vivify extends Analyzer {
           Healing: {formatNumber(healingPerCast)} ({formatPercentage(percentOverheal)}% overheal)
         </>
         <div></div>
-        {this.upliftedSpirits.active && (
-          <>
-            <SpellLink spell={this.upliftedSpirits.activeTalent} /> Cooldown Reduction:{' '}
-            {this.vivifyGoodCrits > 0 && <>{this.vivifyGoodCrits}s </>}
-            {this.vivifyWastedCrits > 0 && <>{this.vivifyWastedCrits}s wasted</>}
-            {this.vivifyGoodCrits + this.vivifyWastedCrits === 0 && <>0s</>}
-          </>
-        )}
       </>
     );
     this.castEntries.push({ value, tooltip });
