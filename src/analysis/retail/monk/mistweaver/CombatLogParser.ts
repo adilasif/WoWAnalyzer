@@ -29,7 +29,6 @@ import RisingSunRevival from './modules/spells/UpliftedSpirits';
 import JadefireStompHealing from './modules/spells/JadefireStompHealing';
 import JadefireTeachings from './modules/spells/JadefireTeachings';
 import EnvelopingMists from './modules/spells/EnvelopingMists';
-import ExpelHarm from './modules/spells/ExpelHarm';
 import InvokeYulon from './modules/spells/InvokeYulon';
 import RenewingMist from './modules/spells/RenewingMist';
 import Revival from './modules/spells/Revival';
@@ -144,7 +143,6 @@ class CombatLogParser extends CoreCombatLogParser {
     jadefireTeachings: JadefireTeachings,
     energizingBrew: EnergizingBrew,
     envelopingMists: EnvelopingMists,
-    expelHarm: ExpelHarm,
     jadefireStomp: JadefireStomp,
     jadefireStompHealing: JadefireStompHealing,
     invokeChiJi: InvokeChiJi,

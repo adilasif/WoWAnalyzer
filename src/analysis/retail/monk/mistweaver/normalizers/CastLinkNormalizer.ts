@@ -23,10 +23,7 @@ import {
   ENVELOPING_MIST_GOM,
   RENEWING_MIST_GOM,
   VIVIFY_GOM,
-  EXPEL_HARM_GOM,
-  SOOM_GOM,
   SHEILUNS_GIFT_GOM,
-  REVIVAL_GOM,
   VIVIFY,
   SHEILUNS_GIFT,
   MANA_TEA_CHANNEL,
@@ -41,7 +38,6 @@ import {
   BOUNCED,
   OVERHEAL_BOUNCE,
   FROM_MISTS_OF_LIFE,
-  JFS_GOM,
   CRANE_STYLE_RSK,
   CRANE_STYLE_BOK,
   CRANE_STYLE_SCK,
@@ -258,22 +254,6 @@ export function isFromVivify(event: HealEvent) {
 
 export function isFromSheilunsGift(event: HealEvent) {
   return HasRelatedEvent(event, SHEILUNS_GIFT_GOM);
-}
-
-export function isFromRevival(event: HealEvent) {
-  return HasRelatedEvent(event, REVIVAL_GOM);
-}
-
-export function isFromExpelHarm(event: HealEvent) {
-  return HasRelatedEvent(event, EXPEL_HARM_GOM);
-}
-
-export function isFromSoothingMist(event: HealEvent) {
-  return HasRelatedEvent(event, SOOM_GOM);
-}
-
-export function isFromJadefireStomp(event: HealEvent) {
-  return HasRelatedEvent(event, JFS_GOM);
 }
 
 export function isFromCraneStyleRSK(event: HealEvent) {
