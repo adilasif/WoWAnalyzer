@@ -6,7 +6,6 @@ import HealingEfficiencyTracker, {
 
 import JadefireStompHealing from '../spells/JadefireStompHealing';
 import EnvelopingMists from '../spells/EnvelopingMists';
-import ExpelHarm from '../spells/ExpelHarm';
 import RenewingMist from '../spells/RenewingMist';
 import SoothingMist from '../spells/SoothingMist';
 import Vivify from '../spells/Vivify';
@@ -28,7 +27,6 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
     soothingMist: SoothingMist,
     renewingMist: RenewingMist,
     vivify: Vivify,
-    expelHarm: ExpelHarm,
     jadefireStompHealing: JadefireStompHealing,
     jadefireTeachings: JadefireTeachings,
     rapidDiffusion: RapidDiffusion,
@@ -44,7 +42,6 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
   protected soothingMist!: SoothingMist;
   protected renewingMist!: RenewingMist;
   protected vivify!: Vivify;
-  protected expelHarm!: ExpelHarm;
   protected jadefireStompHealing!: JadefireStompHealing;
   protected jadefireTeachings!: JadefireTeachings;
   protected rapidDiffusion!: RapidDiffusion;
@@ -74,8 +71,6 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
       spellInfo = this.getYulonDetails(spellInfo);
     } else if (spellId === TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT.id) {
       spellInfo = this.getChijiDetails(spellInfo);
-    } else if (spellId === SPELLS.EXPEL_HARM.id) {
-      spellInfo = this.getExpelHarmDetails(spellInfo);
     } else if (spellId === TALENTS_MONK.JADEFIRE_STOMP_TALENT.id) {
       spellInfo = this.getJFSDetails(spellInfo);
     } else if (spellId === TALENTS_MONK.ZEN_PULSE_TALENT.id) {
@@ -171,12 +166,6 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
 
   getSheilunsGiftDetails(spellInfo: SpellInfoDetails) {
     spellInfo.healingDone = spellInfo.healingDone;
-    return spellInfo;
-  }
-
-  getExpelHarmDetails(spellInfo: SpellInfoDetails) {
-    spellInfo.healingDone = this.expelHarm.gustsHealing + this.expelHarm.selfHealing;
-    spellInfo.overhealingDone = spellInfo.overhealingDone + this.expelHarm.selfOverheal;
     return spellInfo;
   }
 

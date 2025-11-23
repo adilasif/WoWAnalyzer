@@ -10,7 +10,6 @@ import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 
 import { SPELL_COLORS } from '../../constants';
-import { isFromRevival } from '../../normalizers/CastLinkNormalizer';
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { getLowestPerf, QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import CooldownExpandable, {
@@ -71,11 +70,6 @@ class Revival extends Analyzer {
       this.handleRevivalDirect,
     );
 
-    this.addEventListener(
-      Events.heal.by(SELECTED_PLAYER).spell(SPELLS.GUSTS_OF_MISTS),
-      this.handleGustsOfMists,
-    );
-
     if (this.upliftedSpiritsActive) {
       this.addEventListener(
         Events.heal.by(SELECTED_PLAYER).spell(SPELLS.UPLIFTED_SPIRITS_HEAL),
@@ -106,13 +100,6 @@ class Revival extends Analyzer {
   handleRevivalDirect(event: HealEvent) {
     this.revivalDirectHealing += event.amount + (event.absorbed || 0);
     this.revivalDirectOverHealing += event.overheal || 0;
-  }
-
-  handleGustsOfMists(event: HealEvent) {
-    if (isFromRevival(event)) {
-      this.gustsHealing += event.amount + (event.absorbed || 0);
-      this.gustOverHealing += event.overheal || 0;
-    }
   }
 
   handleUsHeal(event: HealEvent) {
