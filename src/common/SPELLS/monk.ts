@@ -465,7 +465,7 @@ const spells = {
   JADEFIRE_STOMP_DAMAGE: {
     id: 1248815,
     name: 'Jadefire Stomp',
-    icon: '',
+    icon: 'inv_ability_monk_jadefirestomp',
   },
   FAELINE_STOMP_PULSE_DAMAGE: {
     id: 327264,

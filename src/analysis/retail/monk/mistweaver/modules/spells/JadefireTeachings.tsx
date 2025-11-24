@@ -2,24 +2,14 @@ import { formatNumber, formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import { TALENTS_MONK } from 'common/TALENTS';
 import { SpellLink } from 'interface';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
-import { RoundedPanel } from 'interface/guide/components/GuideDivs';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import Events, {
-  ApplyBuffEvent,
-  DamageEvent,
-  HealEvent,
-  RemoveBuffEvent,
-} from 'parser/core/Events';
-import { mergeTimePeriods, OpenTimePeriod } from 'parser/core/mergeTimePeriods';
+import Events, { DamageEvent, HealEvent } from 'parser/core/Events';
 import ItemHealingDone from 'parser/ui/ItemHealingDone';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import TalentAggregateBars from 'parser/ui/TalentAggregateStatistic';
 import TalentAggregateStatisticContainer from 'parser/ui/TalentAggregateStatisticContainer';
-import uptimeBarSubStatistic from 'parser/ui/UptimeBarSubStatistic';
 import { getCurrentRSKTalent, getCurrentRSKTalentDamage, SPELL_COLORS } from '../../constants';
-import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../Guide';
 import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
 import { Talent } from 'common/TALENTS/types';
 import Spell from 'common/SPELLS/Spell';
@@ -63,6 +53,7 @@ class JadefireTeachings extends Analyzer {
   }
 
   lastDamageEvent(event: DamageEvent) {
+    if (event.ability.guid === SPELLS.JADEFIRE_STOMP_DAMAGE.id) console.log('JFS Damage: ', event);
     this.lastDamageSpellID = event.ability.guid;
 
     if (!this.damageSpellToHealing.has(this.lastDamageSpellID)) {
@@ -114,7 +105,14 @@ class JadefireTeachings extends Analyzer {
     return this.damageSpellToHealing.get(SPELLS.JADEFIRE_STOMP_DAMAGE.id) || 0;
   }
   get totalHealing() {
-    return this.rskHealing + this.bokHealing + this.totmHealing + this.tpHealing + this.cjlHealing;
+    return (
+      this.rskHealing +
+      this.bokHealing +
+      this.totmHealing +
+      this.tpHealing +
+      this.cjlHealing +
+      this.jfsHealing
+    );
   }
 
   getJadefireTeachingsDataItems() {
@@ -124,6 +122,14 @@ class JadefireTeachings extends Analyzer {
         amount: this.rskHealing,
         color: SPELL_COLORS.RISING_SUN_KICK,
         tooltip: this.getTooltip(getCurrentRSKTalentDamage(this.selectedCombatant).id),
+        subSpecs: [
+          {
+            spell: SPELLS.JADEFIRE_STOMP_DAMAGE,
+            color: SPELL_COLORS.RENEWING_MIST,
+            amount: this.jfsHealing,
+            tooltip: this.getTooltip(SPELLS.JADEFIRE_STOMP_DAMAGE.id),
+          },
+        ],
       },
       {
         spell: SPELLS.BLACKOUT_KICK,
@@ -153,12 +159,6 @@ class JadefireTeachings extends Analyzer {
         color: SPELL_COLORS.DANCING_MIST,
         amount: this.cjlHealing,
         tooltip: this.getTooltip(SPELLS.CRACKLING_JADE_LIGHTNING.id),
-      },
-      {
-        spell: SPELLS.JADEFIRE_STOMP_DAMAGE,
-        color: SPELL_COLORS.RENEWING_MIST,
-        amount: this.jfsHealing,
-        tooltip: this.getTooltip(SPELLS.JADEFIRE_STOMP_DAMAGE.id),
       },
     ];
 
