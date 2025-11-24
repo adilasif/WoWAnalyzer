@@ -176,10 +176,11 @@ class Vivify extends Analyzer {
     };
     const explanation = (
       <p>
-        <SpellLink spell={SPELLS.VIVIFY} /> quickly becomes your best healing spell when you have
-        high counts of <SpellLink spell={SPELLS.RENEWING_MIST_CAST} /> out on the raid via{' '}
-        <SpellLink spell={TALENTS_MONK.INVIGORATING_MISTS_TALENT} />, and will be a major portion of
-        your healing when used correctly. <SpellLink spell={SPELLS.VIVIFY} />
+        <SpellLink spell={SPELLS.VIVIFY} /> can be one of your best healing spells when you have
+        high enough counts of <SpellLink spell={SPELLS.RENEWING_MIST_CAST} /> out on the raid via{' '}
+        <SpellLink spell={TALENTS_MONK.INVIGORATING_MISTS_TALENT} /> and{' '}
+        <SpellLink spell={TALENTS_MONK.ZEN_PULSE_TALENT} />, and will be a major portion of your
+        healing when used correctly. <SpellLink spell={SPELLS.VIVIFY} />
         's effectiveness goes hand in hand with your <SpellLink
           spell={SPELLS.RENEWING_MIST_CAST}
         />{' '}
@@ -187,13 +188,6 @@ class Vivify extends Analyzer {
         this spell has. This further emphasizes the importance of casting your rotational abilities
         in <SpellLink spell={getCurrentRSKTalent(this.selectedCombatant)} /> and{' '}
         <SpellLink spell={SPELLS.RENEWING_MIST_CAST} /> as often as possible.{' '}
-        <strong>
-          Now that square-root scaling is applied to{' '}
-          <SpellLink spell={TALENTS_MONK.INVIGORATING_MISTS_TALENT} />, be wary of casting{' '}
-          <SpellLink spell={SPELLS.VIVIFY} /> when at high{' '}
-          <SpellLink spell={SPELLS.RENEWING_MIST_CAST} /> counts when it will result in high amounts
-          of overheal. This will negatively impact your effective healing done.
-        </strong>
       </p>
     );
     const data = (
