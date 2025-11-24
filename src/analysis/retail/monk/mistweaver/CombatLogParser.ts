@@ -88,6 +88,7 @@ import RushingWindKick from './modules/spells/RushingWindKick';
 import T33TierSet from './modules/tier/T33TierSet';
 import JadeEmpowerment from './modules/spells/JadeEmpowerment';
 import T34ConduitTier from '../shared/hero/ConduitOfTheCelestials/tier/T34Tier';
+import MistyCoalescence from './modules/spells/MistyCoalescence';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -140,6 +141,7 @@ class CombatLogParser extends CoreCombatLogParser {
     vivaciousVivification: VivaciousVivification,
 
     // MW Talents
+    mistyCoalescence: MistyCoalescence,
     jadefireTeachings: JadefireTeachings,
     energizingBrew: EnergizingBrew,
     envelopingMists: EnvelopingMists,
