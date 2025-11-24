@@ -244,12 +244,6 @@ function reasonLabel(reason: PurifyReason): React.ReactNode {
       return 'High Stagger';
     case PurifyReason.PreventCapping:
       return 'Prevent Capping Charges';
-    case PurifyReason.RefreshPurifiedChi:
-      return (
-        <>
-          Refresh <SpellLink spell={SPELLS.PURIFIED_CHI} /> Stacks
-        </>
-      );
     default:
       return 'Other';
   }
@@ -259,7 +253,6 @@ const reasonOrder = [
   PurifyReason.BigHit,
   PurifyReason.HighStagger,
   PurifyReason.PreventCapping,
-  PurifyReason.RefreshPurifiedChi,
   PurifyReason.Unknown,
 ];
 
