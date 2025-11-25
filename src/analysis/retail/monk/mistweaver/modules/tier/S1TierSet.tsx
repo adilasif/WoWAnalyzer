@@ -7,12 +7,13 @@ import { TALENTS_MONK } from 'common/TALENTS';
 import { calculateEffectiveHealing } from 'parser/core/EventCalculateLib';
 import Statistic from 'parser/ui/Statistic';
 import ItemHealingDone from 'parser/ui/ItemHealingDone';
-import ItemSetLink from 'interface/ItemSetLink';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { isFromTFT } from '../../normalizers/EventLinks/TierEventLinks';
 import { formatNumber } from 'common/format';
 import SpellLink from 'interface/SpellLink';
 import { MONK_MID1_ID } from 'common/ITEMS';
+import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
+import BoringItemSetValueText from 'parser/ui/BoringItemSetValueText';
 
 const TWO_PIECE_INCREASE = 0.2;
 
@@ -110,6 +111,7 @@ class S1TierSet extends Analyzer {
   statistic() {
     return (
       <Statistic
+        position={STATISTIC_ORDER.CORE(1)}
         category={STATISTIC_CATEGORY.ITEMS}
         size="flexible"
         tooltip={
@@ -146,9 +148,18 @@ class S1TierSet extends Analyzer {
           </>
         }
       >
-        <ItemSetLink title="Voidspire Tier Set" id={MONK_MID1_ID}>
-          <ItemHealingDone amount={this.totalHealing} />
-        </ItemSetLink>
+        <BoringItemSetValueText setId={MONK_MID1_ID} title="Mistweaver Season 1 Tier Set">
+          2pc: <br />
+          <ItemHealingDone amount={this.twoPieceHealing} />
+          {this.hasFourPiece && (
+            <>
+              <hr />
+              4pc:
+              <br />
+              <ItemHealingDone amount={this.fourPieceHealing} />
+            </>
+          )}
+        </BoringItemSetValueText>
       </Statistic>
     );
   }
