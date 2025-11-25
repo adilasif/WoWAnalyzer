@@ -87,6 +87,7 @@ import RushingWindKick from './modules/spells/RushingWindKick';
 import JadeEmpowerment from './modules/spells/JadeEmpowerment';
 import T34ConduitTier from '../shared/hero/ConduitOfTheCelestials/tier/T34Tier';
 import MistyCoalescence from './modules/spells/MistyCoalescence';
+import S1TierSet from './modules/tier/S1TierSet';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -190,6 +191,7 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Borrowed Power
     t34ConduitTierSet: T34ConduitTier,
+    s1TierSet: S1TierSet,
 
     // Mana Tab
     manaTracker: ManaTracker,
