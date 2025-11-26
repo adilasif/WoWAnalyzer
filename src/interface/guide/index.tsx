@@ -76,7 +76,9 @@ import type CombatLogParser from 'parser/core/CombatLogParser';
 import { AnyEvent } from 'parser/core/Events';
 import { Info } from 'parser/core/metric';
 import Module from 'parser/core/Module';
-import React, { ComponentPropsWithoutRef, JSX, useContext, useMemo, useState } from 'react';
+import type { ComponentProps, PropsWithChildren, ReactNode, JSX } from 'react';
+import { ComponentPropsWithoutRef, createContext, use, useMemo, useState } from 'react';
+
 import './Guide.scss';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import styled from '@emotion/styled';
@@ -202,7 +204,7 @@ export const Section = ({
   children,
   title,
   expanded = true,
-}: React.PropsWithChildren<{ title: React.ReactNode; expanded?: boolean }>) => {
+}: PropsWithChildren<{ title: ReactNode; expanded?: boolean }>) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
 
   return (
@@ -221,7 +223,7 @@ type GuideContextValue = Omit<GuideProps<any>, 'info'> & {
   info?: GuideProps<any>['info'];
 };
 
-export const GuideContext = React.createContext<GuideContextValue>({
+export const GuideContext = createContext<GuideContextValue>({
   modules: {},
   events: [],
 });
@@ -230,14 +232,14 @@ export const GuideContext = React.createContext<GuideContextValue>({
  * Get the player `Info` object from within a Guide section.
  */
 export function useInfo(): GuideContextValue['info'] {
-  return useContext(GuideContext).info;
+  return use(GuideContext).info;
 }
 
 /**
  * Get the event list from within a Guide section.
  */
 export function useEvents(): GuideContextValue['events'] {
-  return useContext(GuideContext).events;
+  return use(GuideContext).events;
 }
 
 /**
@@ -269,7 +271,7 @@ export function useEvents(): GuideContextValue['events'] {
 export function useAnalyzer<T extends typeof Module>(moduleType: T): InstanceType<T> | undefined;
 export function useAnalyzer(moduleKey: string): Module | undefined;
 export function useAnalyzer<T extends typeof Module>(value: string | T) {
-  const ctx = useContext(GuideContext);
+  const ctx = use(GuideContext);
   return useMemo(() => {
     if (typeof value === 'string') {
       return ctx.modules[value];
@@ -313,7 +315,7 @@ type ModuleList<T> = {
 export function useAnalyzers<Arr extends Record<number, typeof Module>>(
   values: Arr,
 ): ModuleList<Arr> {
-  const ctx = useContext(GuideContext);
+  const ctx = use(GuideContext);
 
   return useMemo(
     () =>
@@ -334,7 +336,7 @@ const GuideContainer_ = styled.div`
  * The overall guide container. You will never need this, it is used by the WoWA
  * core to hold your `Guide` component.
  */
-export const GuideContainer = ({ children }: { children: React.ReactNode }) => (
+export const GuideContainer = ({ children }: { children: ReactNode }) => (
   <GuideContainer_ className="guide-container">{children}</GuideContainer_>
 );
 
@@ -357,7 +359,7 @@ export const SubSection = ({
   title,
   id,
   ...props
-}: Omit<React.ComponentProps<'div'>, 'title'> & { title?: React.ReactNode }) => (
+}: Omit<ComponentProps<'div'>, 'title'> & { title?: ReactNode }) => (
   <SubSectionContainer className="subsection" id={id}>
     <header>{title || ''}</header>
     <div {...props}>{children}</div>
