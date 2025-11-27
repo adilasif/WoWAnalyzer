@@ -17,14 +17,14 @@ export interface Zone {
 
 const ZONES: Zone[] = [
   {
-    id: 46,
+    id: 48, // TODO (@emallson): the release zone is 46
     name: 'Voidspire / Dreamrift / MQD',
     frozen: false,
     useBetaTooltips: true,
     encounters: Object.values(VSDRMQD.bosses),
   },
   {
-    id: 47,
+    id: 49, // TODO (@emallson): the release zone is 47
     name: 'Mythic+ Season 1',
     frozen: false,
     useBetaTooltips: true,
