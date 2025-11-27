@@ -524,6 +524,11 @@ const spells = {
     icon: 'inv_celestialserpentmount_jade',
   },
   // Brewmaster
+  ELEVATED_STAGGER_BUFF: {
+    id: 1260619,
+    name: 'Elevated Stagger',
+    icon: 'inv_misc_beer_06',
+  },
   NIUZAO_STOMP_DAMAGE: {
     id: 227291,
     name: 'Stomp',
