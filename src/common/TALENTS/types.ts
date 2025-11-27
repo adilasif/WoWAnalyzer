@@ -21,10 +21,6 @@ export interface Talent extends Spell {
   entryIds: number[];
   // this is mostly here for use by the spell link
   definitionIds: TalentDefinitionId[];
-  //These three are currently not exported in the script - but they could be if we deem the information necessary
-  reqPoints?: number;
-  talentType?: ClassNodeType;
-  spellType?: EntryType;
 }
 
 export const PLACEHOLDER_TALENT: Talent = {
