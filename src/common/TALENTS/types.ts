@@ -1,16 +1,5 @@
 import Spell from '../SPELLS/Spell';
 
-enum ClassNodeType {
-  Choice = 'choice',
-  Single = 'single',
-  Tiered = 'tiered',
-}
-
-enum EntryType {
-  Active = 'active',
-  Passive = 'passive',
-}
-
 interface TalentDefinitionId {
   id: number;
   specId: number;
