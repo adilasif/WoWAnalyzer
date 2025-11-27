@@ -9,7 +9,7 @@ import { formatNumber, formatPercentage } from 'common/format';
 const AP_RATIO = 10; // yes, 10x. not a typo
 const HEALTH_BONUS_RATIO = 2; // 300% effectiveness at 0% HP (i think -- untested. will validate once we get `staggerclear`)
 
-// TODO: on beta there is no `staggerclear` for this effect, hopefully this is fixed later
+// TODO (@emallson): on beta there is no `staggerclear` for this effect, hopefully this is fixed later
 export default class StaggeringStrikes extends StaggerStatistic {
   protected rank: number;
 
