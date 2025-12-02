@@ -163,12 +163,6 @@ class BaseCelestialAnalyzer extends Analyzer {
     return this.idealEnvmCastsUnhasted * (1 + avgHaste * ENVM_HASTE_FACTOR);
   }
 
-  getCelestialTalent() {
-    return this.selectedCombatant.hasTalent(TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT)
-      ? TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT
-      : TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT;
-  }
-
   getCooldownExpandableItems(
     cast: BaseCelestialTracker,
   ): [QualitativePerformance[], CooldownExpandableItem[]] {

@@ -16,23 +16,16 @@ import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../Guide';
 import RenewingMist from './RenewingMist';
 import Vivify from './Vivify';
 import uptimeBarSubStatistic from 'parser/ui/UptimeBarSubStatistic';
-import BaseCelestialAnalyzer from './BaseCelestialAnalyzer';
-import { formatPercentage } from 'common/format';
 import { isVivaciousVivification } from '../../normalizers/CastLinkNormalizer';
-import { calculateEffectiveHealing } from 'parser/core/EventCalculateLib';
-import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import Statistic from 'parser/ui/Statistic';
-import TalentSpellText from 'parser/ui/TalentSpellText';
-import ItemHealingDone from 'parser/ui/ItemHealingDone';
+import { CelestialHooks } from 'analysis/retail/monk/shared';
 
 class VivaciousVivification extends Analyzer {
   static dependencies = {
     vivify: Vivify,
     renewingMist: RenewingMist,
-    baseCelestial: BaseCelestialAnalyzer,
+    celestialHooks: CelestialHooks,
   };
-  protected baseCelestial!: BaseCelestialAnalyzer;
+  protected celestialHooks!: CelestialHooks;
   protected renewingMist!: RenewingMist;
   protected vivify!: Vivify;
   currentRenewingMists = 0;
@@ -74,7 +67,7 @@ class VivaciousVivification extends Analyzer {
     return (
       this.renewingMist.currentRenewingMists >= this.vivify.estimatedAverageReMs &&
       this.selectedCombatant.hasBuff(SPELLS.VIVIFICATION_BUFF.id) &&
-      !this.baseCelestial.celestialActive
+      !this.celestialHooks.celestialActive
     );
   }
 
