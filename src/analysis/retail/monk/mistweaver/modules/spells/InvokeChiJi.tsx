@@ -94,7 +94,6 @@ class InvokeChiJi extends BaseCelestialAnalyzer {
 
   //missed gcd mangement
   handleChijiStart(event: CastEvent) {
-    this.celestialActive = true;
     this.chijiStart = this.lastGlobal = event.timestamp;
     this.chijiGlobals += 1;
     this.chijiUses += 1;

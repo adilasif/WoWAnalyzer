@@ -19,6 +19,7 @@ import Haste from 'parser/shared/modules/Haste';
 import Pets from 'parser/shared/modules/Pets';
 import InformationIcon from 'interface/icons/Information';
 import { Talent } from 'common/TALENTS/types';
+import { CelestialHooks } from 'analysis/retail/monk/shared';
 
 const siDebug = false;
 
@@ -37,14 +38,15 @@ const YULON_GIFT_ENVMS = 4;
 
 class BaseCelestialAnalyzer extends Analyzer {
   static dependencies = {
+    celestialHooks: CelestialHooks,
     haste: Haste,
     pets: Pets,
   };
+  protected celestialHooks!: CelestialHooks;
   protected haste!: Haste;
   protected pets!: Pets;
 
   //celestial vars
-  celestialActive = false;
   currentCelestialStart = -1;
   lastCelestialEnd = -1;
   celestialWindows: Map<number, number> = new Map<number, number>();
@@ -96,8 +98,11 @@ class BaseCelestialAnalyzer extends Analyzer {
       (1 + this.selectedCombatant.getTalentRank(TALENTS_MONK.JADE_BOND_TALENT));
   }
 
+  get celestialActive() {
+    return this.celestialHooks.celestialActive;
+  }
+
   onSummon(event: CastEvent) {
-    this.celestialActive = true;
     this.currentCelestialStart = event.timestamp;
     this.hasteDataPoints = [];
   }
@@ -118,7 +123,6 @@ class BaseCelestialAnalyzer extends Analyzer {
       }
     }
     siDebug && console.log('Celestial Death: ', this.owner.formatTimestamp(event.timestamp));
-    this.celestialActive = false;
     this.celestialWindows.set(this.currentCelestialStart, event.timestamp);
     this.currentCelestialStart = -1;
     this.lastCelestialEnd = event.timestamp;
@@ -224,7 +228,7 @@ class BaseCelestialAnalyzer extends Analyzer {
   }
 
   private getSiBuffType(cast: BaseCelestialTracker): string {
-    console.log(cast);
+    siDebug && console.log(cast);
     if (cast.siBuffId === SPELLS.SECRET_INFUSION_CRIT_BUFF.id) {
       return 'Crit';
     }

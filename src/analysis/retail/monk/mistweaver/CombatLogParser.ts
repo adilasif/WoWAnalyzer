@@ -4,6 +4,7 @@ import {
   TouchOfDeath,
   SaveThemAll,
   TeachingsOfTheMonestary,
+  CelestialHooks,
 } from 'analysis/retail/monk/shared';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import ManaTracker from 'parser/core/healingEfficiency/ManaTracker';
@@ -106,6 +107,7 @@ class CombatLogParser extends CoreCombatLogParser {
     hotTrackerMW: HotTrackerMW,
     hotAttributor: HotAttributor,
     mysticTouch: MysticTouch,
+    celestialHooks: CelestialHooks,
 
     // Generic healer things
     manaLevelChart: ManaLevelChart,
