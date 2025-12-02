@@ -154,9 +154,14 @@ export function getCurrentRSKTalent(player: Combatant): Talent {
     ? TALENTS_MONK.RUSHING_WIND_KICK_MISTWEAVER_TALENT
     : TALENTS_MONK.RISING_SUN_KICK_TALENT;
 }
-
 export function getCurrentRSKTalentDamage(player: Combatant): Spell {
   return player.hasTalent(TALENTS_MONK.RUSHING_WIND_KICK_MISTWEAVER_TALENT)
     ? SPELLS.RUSHING_WIND_KICK_DAMAGE
     : SPELLS.RISING_SUN_KICK_DAMAGE;
+}
+
+export function getCurrentCelestialTalent(player: Combatant): Talent {
+  return player.hasTalent(TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT)
+    ? TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT
+    : TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT;
 }

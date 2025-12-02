@@ -253,6 +253,11 @@ const spells = {
     name: "Invoker's Delight",
     icon: 'inv_inscription_80_warscroll_battleshout',
   },
+  INVOKE_XUEN_BUFF: {
+    id: 123904,
+    name: 'Invoke Xuen, the White Tiger',
+    icon: 'ability_monk_prideofthetiger',
+  },
   FURY_OF_XUEN_BUFF: {
     id: 396168,
     name: 'Fury of Xuen',

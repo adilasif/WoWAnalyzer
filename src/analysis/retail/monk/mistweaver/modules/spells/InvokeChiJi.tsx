@@ -11,7 +11,6 @@ import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
   AbsorbedEvent,
   CastEvent,
-  DamageEvent,
   GlobalCooldownEvent,
   HealEvent,
   RefreshBuffEvent,
@@ -23,7 +22,7 @@ import Statistic from 'parser/ui/Statistic';
 import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
-import { getCurrentRSKTalent, getCurrentRSKTalentDamage, MAX_CHIJI_STACKS } from '../../constants';
+import { getCurrentRSKTalent } from '../../constants';
 import BaseCelestialAnalyzer, { BaseCelestialTracker } from './BaseCelestialAnalyzer';
 import InformationIcon from 'interface/icons/Information';
 
@@ -94,7 +93,6 @@ class InvokeChiJi extends BaseCelestialAnalyzer {
 
   //missed gcd mangement
   handleChijiStart(event: CastEvent) {
-    this.celestialActive = true;
     this.chijiStart = this.lastGlobal = event.timestamp;
     this.chijiGlobals += 1;
     this.chijiUses += 1;

@@ -13,7 +13,7 @@ import AplChoiceDescription from './modules/core/apl/AplChoiceDescription';
 import { AplSectionData } from 'interface/guide/components/Apl';
 import { defaultExplainers } from 'interface/guide/components/Apl/violations/claims';
 import { filterCelestial } from './modules/core/apl/ExplainCelestial';
-import { getCurrentRSKTalent } from './constants';
+import { getCurrentCelestialTalent, getCurrentRSKTalent } from './constants';
 
 const explainers = {
   overcast: filterCelestial(defaultExplainers.overcastFillers),
@@ -60,7 +60,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
         <p>
           <strong>
             It is important to note that using abilites like{' '}
-            <SpellLink spell={modules.invokeChiJi.getCelestialTalent()} /> have their own priority
+            <SpellLink spell={getCurrentCelestialTalent(info.combatant)} /> have their own priority
             that supercedes the priority list below. This section omits all casts in those windows.
           </strong>
         </p>

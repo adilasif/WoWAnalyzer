@@ -72,25 +72,27 @@ class CelestialConduit extends Analyzer {
 
   constructor(options: Options) {
     super(options);
+    //CONDUIT_2_ is the spellId for the cast/channel buff for mw and ww
+    //CONDUIT_1 is the WW specific buff for when Conduit is available to cast
     this.active = this.selectedCombatant.hasTalent(
-      TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT,
+      TALENTS_MONK.CELESTIAL_CONDUIT_2_WINDWALKER_TALENT,
     );
 
     this.addEventListener(
       Events.applybuff
         .by(SELECTED_PLAYER)
-        .spell(TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT),
+        .spell(TALENTS_MONK.CELESTIAL_CONDUIT_2_WINDWALKER_TALENT),
       this.onChannelStart,
     );
     this.addEventListener(
       Events.EndChannel.by(SELECTED_PLAYER).spell(
-        TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT,
+        TALENTS_MONK.CELESTIAL_CONDUIT_2_WINDWALKER_TALENT,
       ),
       this.onChannelEnd,
     );
     this.addEventListener(
       Events.EndChannel.by(SELECTED_PLAYER).spell(
-        TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT,
+        TALENTS_MONK.CELESTIAL_CONDUIT_2_WINDWALKER_TALENT,
       ),
       this.onUnityWithin,
     );
