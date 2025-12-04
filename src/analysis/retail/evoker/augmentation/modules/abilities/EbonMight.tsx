@@ -23,7 +23,6 @@ import {
   BREATH_OF_EONS_SPELLS,
   EBON_MIGHT_PERSONAL_DAMAGE_AMP,
   MID1_AUGMENTATION_2PC_EXTENSION_MODIFIER,
-  DUPLICATE_EBON_MIGHT_MULTIPLIER,
 } from 'analysis/retail/evoker/augmentation/constants';
 import StatTracker from 'parser/shared/modules/StatTracker';
 import { SpellUse } from 'parser/core/SpellUsage/core';
@@ -88,7 +87,6 @@ class EbonMight extends Analyzer {
 
   personalEbonMightDamage = 0;
   externalEbonMightDamage = 0;
-  personalEbonMightAmp = EBON_MIGHT_PERSONAL_DAMAGE_AMP;
 
   trackedSpells = [
     TALENTS.ERUPTION_TALENT,
@@ -128,16 +126,6 @@ class EbonMight extends Analyzer {
       Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_PERSONAL),
       this.onEbonRefresh,
     );
-    if (this.selectedCombatant.hasTalent(TALENTS.DUPLICATE_AMP_AUGMENTATION_TALENT)) {
-      this.addEventListener(
-        Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_PERSONAL),
-        this.updatePersonalEbonMightAmp,
-      );
-      this.addEventListener(
-        Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_PERSONAL),
-        this.updatePersonalEbonMightAmp,
-      );
-    }
 
     this.addEventListener(Events.cast.by(SELECTED_PLAYER).spell(this.trackedSpells), this.onCast);
     this.addEventListener(Events.empowerEnd.by(SELECTED_PLAYER).spell(this.empowers), this.onCast);
@@ -193,7 +181,6 @@ class EbonMight extends Analyzer {
     this.ebonMightActive = false;
     this.currentEbonMightDuration = 0;
     //console.log('Removed at: ' + formatDuration(event.timestamp - this.owner.fight.start_time));
-    this.personalEbonMightAmp = EBON_MIGHT_PERSONAL_DAMAGE_AMP;
   }
 
   private onEbonRefresh(event: RefreshBuffEvent) {
@@ -226,7 +213,10 @@ class EbonMight extends Analyzer {
 
   private onPersonalDamage(event: DamageEvent) {
     if (this.selectedCombatant.hasBuff(SPELLS.EBON_MIGHT_BUFF_PERSONAL.id)) {
-      this.personalEbonMightDamage += calculateEffectiveDamage(event, this.personalEbonMightAmp);
+      this.personalEbonMightDamage += calculateEffectiveDamage(
+        event,
+        EBON_MIGHT_PERSONAL_DAMAGE_AMP,
+      );
     }
   }
 
@@ -237,7 +227,7 @@ class EbonMight extends Analyzer {
       reverbEvents.forEach((reverbEvent) => {
         this.personalEbonMightDamage += calculateEffectiveDamage(
           reverbEvent,
-          this.personalEbonMightAmp,
+          EBON_MIGHT_PERSONAL_DAMAGE_AMP,
         );
       });
     }
@@ -245,15 +235,6 @@ class EbonMight extends Analyzer {
 
   private onExternalDamage(event: DamageEvent) {
     this.externalEbonMightDamage += event.amount;
-  }
-
-  private updatePersonalEbonMightAmp() {
-    if (this.selectedCombatant.hasBuff(SPELLS.DUPLICATE_SELF_BUFF.id)) {
-      this.personalEbonMightAmp =
-        EBON_MIGHT_PERSONAL_DAMAGE_AMP * (DUPLICATE_EBON_MIGHT_MULTIPLIER + 1);
-    } else {
-      this.personalEbonMightAmp = EBON_MIGHT_PERSONAL_DAMAGE_AMP;
-    }
   }
 
   /* Here we figure out how long the duration should be based on current mastery
