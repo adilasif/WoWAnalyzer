@@ -31,7 +31,6 @@ export { default as UnrelentingSiege } from './modules/talents/hero/scalecommand
 export { default as Wingleader } from './modules/talents/hero/scalecommander/Wingleader';
 export { default as Slipstream } from './modules/talents/hero/scalecommander/Slipstream';
 export { default as Chronoflame } from './modules/talents/hero/chronowarden/Chronoflame';
-export { default as ThreadsOfFate } from './modules/talents/hero/chronowarden/ThreadsOfFate';
 export { default as Reverberations } from './modules/talents/hero/chronowarden/Reverberations';
 export { default as Primacy } from './modules/talents/hero/chronowarden/Primacy';
 export { default as TimeConvergence } from './modules/talents/hero/chronowarden/TimeConvergence';

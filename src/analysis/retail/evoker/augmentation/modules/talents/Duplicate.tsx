@@ -11,12 +11,13 @@ import {
   DUPLICATE_EBON_MIGHT_MULTIPLIER,
   DUPLICATE_PERSONAL_DAMAGE_MULTIPLIER,
 } from '../../constants';
-import Events, { DamageEvent } from 'parser/core/Events';
+import Events, { DamageEvent, EmpowerEndEvent, GetRelatedEvents } from 'parser/core/Events';
 import TALENTS from 'common/TALENTS/evoker';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import DonutChart from 'parser/ui/DonutChart';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
 import { formatNumber } from 'common/format';
+import { UPHEAVAL_REVERBERATION_DAM_LINK } from '../normalizers/CastLinkNormalizer';
 /**
  * R1: Deep Breath / Breath of Eons summons Future Self for 20 sec, which will cast Eruption frequently and occasionally empower spells.
  * R2/R3: Sands of Time also extends the duration of Duplicate by 50%/100% of its value.
@@ -41,8 +42,6 @@ class Duplicate extends Analyzer {
     );
     // Filtering to SELECTED_PLAYER_PET breaks this. Eruption and Fire Breath use separate IDs,
     // so no filtering needed, but Upheaval uses the same ID as the player so must be distinguished.
-    // Additionally, the damage numbers are slightly inflated if there are multiple Augs,
-    // suggesting that some events from another Aug are being included.
     this.addEventListener(
       Events.damage.spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH]),
       this.onPetDamage,
@@ -51,12 +50,10 @@ class Duplicate extends Analyzer {
     this.addEventListener(Events.damage.spell([SPELLS.UPHEAVAL_DAM]), this.onPetUpheavalDamage);
 
     if (this.duplicateBuffsEbonMight) {
-      //If this is fixed to also buff Upheaval,
-      //add Upheaval (and Reverberations) here.
       this.addEventListener(
         Events.damage
           .by(SELECTED_PLAYER)
-          .spell([TALENTS.ERUPTION_TALENT, SPELLS.MASS_ERUPTION_DAMAGE]),
+          .spell([TALENTS.ERUPTION_TALENT, SPELLS.MASS_ERUPTION_DAMAGE, SPELLS.UPHEAVAL_DAM]),
         this.onPersonalDamage,
       );
 
@@ -64,6 +61,13 @@ class Duplicate extends Analyzer {
         Events.damage.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_EXTERNAL),
         this.onExternalDamage,
       );
+
+      if (this.selectedCombatant.hasTalent(TALENTS.REVERBERATIONS_TALENT)) {
+        this.addEventListener(
+          Events.empowerEnd.by(SELECTED_PLAYER).spell([SPELLS.UPHEAVAL, SPELLS.UPHEAVAL_FONT]),
+          this.addReverberationsDamage,
+        );
+      }
     }
   }
 
@@ -88,6 +92,19 @@ class Duplicate extends Analyzer {
       //meaning that the Duplicate buff may no longer be active when the damage is dealt,
       //and vice versa.
       this.externalDamage += calculateEffectiveDamage(event, DUPLICATE_EBON_MIGHT_MULTIPLIER);
+    }
+  }
+
+  addReverberationsDamage(event: EmpowerEndEvent) {
+    if (this.selectedCombatant.hasBuff(SPELLS.EBON_MIGHT_BUFF_PERSONAL.id)) {
+      const reverbEvents = GetRelatedEvents<DamageEvent>(event, UPHEAVAL_REVERBERATION_DAM_LINK);
+
+      reverbEvents.forEach((reverbEvent) => {
+        this.personalDamage += calculateEffectiveDamage(
+          reverbEvent,
+          DUPLICATE_PERSONAL_DAMAGE_MULTIPLIER,
+        );
+      });
     }
   }
 
