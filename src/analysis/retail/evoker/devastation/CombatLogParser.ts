@@ -55,6 +55,7 @@ import {
   DefensiveCastLinkNormalizer,
   MobilityCastLinkNormalizer,
   RenewingBlaze,
+  Engulf,
   ImminentDestruction,
   MeltArmor,
   MassDisintegrate,
@@ -65,7 +66,9 @@ import {
   Wingleader,
   Slipstream,
   ExpandedLungs,
+  RedHot,
   TimeSpiral,
+  FlameSiphon,
   RefinedEssence,
   CommandSquadron,
 } from 'analysis/retail/evoker/shared';
@@ -132,7 +135,9 @@ class CombatLogParser extends MainCombatLogParser {
     //scorchingEmbers: ScorchingEmbers,
 
     // hero talents
+    engulf: Engulf,
     expandedLungs: ExpandedLungs,
+    redHot: RedHot,
     meltArmor: MeltArmor,
     massDisintegrate: MassDisintegrate,
     mightOfTheBlackDragonflight: MightOfTheBlackDragonflight,
@@ -141,6 +146,7 @@ class CombatLogParser extends MainCombatLogParser {
     unrelentingSiege: UnrelentingSiege,
     wingLeader: Wingleader,
     slipstream: Slipstream,
+    flameSiphon: FlameSiphon,
     refinedEssence: RefinedEssence,
     commandSquadron: CommandSquadron,
 

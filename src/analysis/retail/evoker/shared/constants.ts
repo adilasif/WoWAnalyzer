@@ -69,7 +69,10 @@ export const BLACK_DAMAGE_SPELLS = [
   SPELLS.MASS_ERUPTION_DAMAGE,
 ];
 
+export const ENGULF_PERIODIC_INCREASE = 0.2;
 export const EXPANDED_LUNG_INCREASE = 0.3;
+export const RED_HOT_INCREASE = 0.2;
+export const FLAME_SIPHON_CDR_MS = 6_000;
 
 export const PRIMACY_HASTE_PER_STACK = 3;
 export const THREAD_OF_FATE_BASE_DURATION_MS = 10_000;
