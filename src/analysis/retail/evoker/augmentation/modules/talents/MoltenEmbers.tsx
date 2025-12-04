@@ -265,8 +265,8 @@ class MoltenEmbers extends Analyzer {
         </strong>{' '}
         amplifies the damage of your Black Spells such as <SpellLink spell={SPELLS.UPHEAVAL} />{' '}
         while <SpellLink spell={SPELLS.FIRE_BREATH} /> is active on the target. You should try to
-        use <SpellLink spell={SPELLS.FIRE_BREATH} /> at the lowest rank, and always ensure it is
-        active when you cast <SpellLink spell={SPELLS.UPHEAVAL} /> on a target.
+        use <SpellLink spell={SPELLS.FIRE_BREATH} /> at rank 1, and always ensure it is active when
+        you cast <SpellLink spell={SPELLS.UPHEAVAL} /> on a target.
       </section>
     );
 
