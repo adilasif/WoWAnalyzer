@@ -184,12 +184,12 @@ const spells = {
   SECRET_INFUSION_CRIT_BUFF: {
     id: 388498,
     name: 'Secret Infusion',
-    icon: 'ability_monk_chibrew',
+    icon: 'inv_12_profession_cooking_tea_orange',
   },
   SECRET_INFUSION_HASTE_BUFF: {
     id: 388497,
     name: 'Secret Infusion',
-    icon: 'ability_monk_chibrew',
+    icon: 'inv_12_profession_cooking_tea_green',
   },
   SECRET_INFUSION_MASTERY_BUFF: {
     id: 388499,
@@ -211,6 +211,11 @@ const spells = {
     id: 119611,
     name: 'Renewing Mist',
     icon: 'ability_monk_renewingmists',
+  },
+  RUSHING_WIND_KICK_HEAL: {
+    id: 1269159,
+    name: 'Rushing Wind Kick',
+    icon: 'inv12_ability_monk_rushingwindkick',
   },
   VIVIFY: {
     id: 116670,
@@ -248,6 +253,11 @@ const spells = {
     name: "Invoker's Delight",
     icon: 'inv_inscription_80_warscroll_battleshout',
   },
+  INVOKE_XUEN_BUFF: {
+    id: 123904,
+    name: 'Invoke Xuen, the White Tiger',
+    icon: 'ability_monk_prideofthetiger',
+  },
   FURY_OF_XUEN_BUFF: {
     id: 396168,
     name: 'Fury of Xuen',
@@ -258,11 +268,6 @@ const spells = {
     name: 'Fury of Xuen',
     icon: 'ability_monk_prideofthetiger',
   },
-  ENVELOPING_BREATH_HEAL: {
-    id: 325209,
-    name: 'Enveloping Breath',
-    icon: 'ability_monk_jadeserpentbreath',
-  },
   MANA_TEA_STACK: {
     id: 115867,
     name: 'Mana Tea',
@@ -270,11 +275,6 @@ const spells = {
   },
   MANA_TEA_CAST: {
     id: 115294,
-    name: 'Mana Tea',
-    icon: 'monk_ability_cherrymanatea',
-  },
-  MANA_TEA_BUFF: {
-    id: 197908,
     name: 'Mana Tea',
     icon: 'monk_ability_cherrymanatea',
   },
@@ -467,6 +467,11 @@ const spells = {
     name: 'Faeline Stomp',
     icon: 'ability_ardenweald_monk',
   },
+  JADEFIRE_STOMP_DAMAGE: {
+    id: 1248815,
+    name: 'Jadefire Stomp',
+    icon: 'inv_ability_monk_jadefirestomp',
+  },
   FAELINE_STOMP_PULSE_DAMAGE: {
     id: 327264,
     name: 'Faeline Stomp',
@@ -524,6 +529,11 @@ const spells = {
     icon: 'inv_celestialserpentmount_jade',
   },
   // Brewmaster
+  ELEVATED_STAGGER_BUFF: {
+    id: 1260619,
+    name: 'Elevated Stagger',
+    icon: 'inv_misc_beer_06',
+  },
   NIUZAO_STOMP_DAMAGE: {
     id: 227291,
     name: 'Stomp',
@@ -548,11 +558,6 @@ const spells = {
     id: 196608,
     name: 'Eye of the Tiger',
     icon: 'ability_druid_primalprecision',
-  },
-  PURIFIED_CHI: {
-    id: 325092,
-    name: 'Purified Chi',
-    icon: 'inv_misc_beer_06',
   },
   BREATH_OF_FIRE_DEBUFF: {
     id: 123725,

@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import SPELLS from 'common/SPELLS';
 import { TALENTS_MONK } from 'common/TALENTS';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
@@ -9,15 +10,16 @@ import { RoundedPanel } from 'interface/guide/components/GuideDivs';
 import { GUIDE_CORE_EXPLANATION_PERCENT } from '../../Guide';
 import { BoxRowEntry, PerformanceBoxRow } from 'interface/guide/components/PerformanceBoxRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
-import BaseCelestialAnalyzer from '../spells/BaseCelestialAnalyzer';
+import { CelestialHooks } from 'analysis/retail/monk/shared';
+import { getCurrentCelestialTalent } from '../../constants';
 
 class StrengthOfTheBlackOx extends Analyzer {
   static dependencies = {
-    celestial: BaseCelestialAnalyzer,
+    celestial: CelestialHooks,
   };
   wastedBuffs = 0;
   entries: BoxRowEntry[] = [];
-  protected celestial!: BaseCelestialAnalyzer;
+  protected celestial!: CelestialHooks;
 
   constructor(options: Options) {
     super(options);
@@ -47,11 +49,7 @@ class StrengthOfTheBlackOx extends Analyzer {
   }
 
   private hasManaBuff(): boolean {
-    return (
-      this.selectedCombatant.hasBuff(SPELLS.MANA_TEA_BUFF) ||
-      this.selectedCombatant.hasBuff(SPELLS.INNERVATE) ||
-      this.celestial.celestialActive
-    );
+    return this.selectedCombatant.hasBuff(SPELLS.INNERVATE) || this.celestial.celestialActive;
   }
 
   private onRemoveBuff(event: RemoveBuffEvent) {
@@ -75,7 +73,7 @@ class StrengthOfTheBlackOx extends Analyzer {
           {isConsumed && (
             <div>
               <SpellLink spell={TALENTS_MONK.MANA_TEA_TALENT} /> or{' '}
-              <SpellLink spell={this.celestial.getCelestialTalent()} /> active:{' '}
+              <SpellLink spell={getCurrentCelestialTalent(this.selectedCombatant)} /> active:{' '}
               <strong>{hasBuff ? 'Yes' : 'No'}</strong>
             </div>
           )}
@@ -94,7 +92,7 @@ class StrengthOfTheBlackOx extends Analyzer {
         have a reduced cast time and apply a shield to 5 nearby allies. It is very important to
         never let this buff refresh or expire as it is a considerable amount of shielding. Try to
         have <SpellLink spell={TALENTS_MONK.MANA_TEA_TALENT} /> or{' '}
-        <SpellLink spell={this.celestial.getCelestialTalent()} /> active when casting{' '}
+        <SpellLink spell={getCurrentCelestialTalent(this.selectedCombatant)} /> active when casting{' '}
         <SpellLink spell={TALENTS_MONK.ENVELOPING_MIST_TALENT} /> as it is very expensive.
       </p>
     );

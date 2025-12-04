@@ -4,6 +4,7 @@ import {
   TouchOfDeath,
   SaveThemAll,
   TeachingsOfTheMonestary,
+  CelestialHooks,
 } from 'analysis/retail/monk/shared';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import ManaTracker from 'parser/core/healingEfficiency/ManaTracker';
@@ -29,7 +30,6 @@ import RisingSunRevival from './modules/spells/UpliftedSpirits';
 import JadefireStompHealing from './modules/spells/JadefireStompHealing';
 import JadefireTeachings from './modules/spells/JadefireTeachings';
 import EnvelopingMists from './modules/spells/EnvelopingMists';
-import ExpelHarm from './modules/spells/ExpelHarm';
 import InvokeYulon from './modules/spells/InvokeYulon';
 import RenewingMist from './modules/spells/RenewingMist';
 import Revival from './modules/spells/Revival';
@@ -44,7 +44,6 @@ import JadeSerpentStatue from './modules/spells/JadeSerpentStatue';
 import ManaTea from './modules/spells/ManaTea';
 import MistyPeaks from './modules/spells/MistyPeaks';
 import MistsOfLife from './modules/spells/MistsOfLife';
-import RenewingMistDuringManaTea from './modules/spells/RenewingMistDuringManaTea';
 import RisingMist from './modules/spells/RisingMist';
 import VivaciousVivification from './modules/spells/VivaciousVivify';
 import YulonsWhisper from './modules/spells/YulonsWhisper';
@@ -76,7 +75,6 @@ import TearOfMorning from './modules/spells/TearOfMorning';
 import LotusInfusion from './modules/spells/LotusInfusion';
 import CraneStyle from './modules/spells/CraneStyle';
 import ZenPulse from './modules/spells/ZenPulse';
-import T32TierSet from './modules/tier/T32TierSet';
 import PoolOfMists from './modules/spells/PoolOfMists';
 import HeartOfTheJadeSerpent from '../shared/hero/ConduitOfTheCelestials/talents/HeartOfTheJadeSerpent';
 import RestoreBalance from '../shared/hero/ConduitOfTheCelestials/talents/RestoreBalance';
@@ -87,9 +85,10 @@ import StrengthOfTheBlackOx from './modules/heroTalents/StrengthOfTheBlackOx';
 import Coalesence from '../shared/hero/MasterOfHarmony/talents/Coalesence';
 import AspectOfHarmony from './modules/heroTalents/AspectOfHarmony';
 import RushingWindKick from './modules/spells/RushingWindKick';
-import T33TierSet from './modules/tier/T33TierSet';
 import JadeEmpowerment from './modules/spells/JadeEmpowerment';
 import T34ConduitTier from '../shared/hero/ConduitOfTheCelestials/tier/T34Tier';
+import MistyCoalescence from './modules/spells/MistyCoalescence';
+import S1TierSet from './modules/tier/S1TierSet';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -108,6 +107,7 @@ class CombatLogParser extends CoreCombatLogParser {
     hotTrackerMW: HotTrackerMW,
     hotAttributor: HotAttributor,
     mysticTouch: MysticTouch,
+    celestialHooks: CelestialHooks,
 
     // Generic healer things
     manaLevelChart: ManaLevelChart,
@@ -142,10 +142,10 @@ class CombatLogParser extends CoreCombatLogParser {
     vivaciousVivification: VivaciousVivification,
 
     // MW Talents
+    mistyCoalescence: MistyCoalescence,
     jadefireTeachings: JadefireTeachings,
     energizingBrew: EnergizingBrew,
     envelopingMists: EnvelopingMists,
-    expelHarm: ExpelHarm,
     jadefireStomp: JadefireStomp,
     jadefireStompHealing: JadefireStompHealing,
     invokeChiJi: InvokeChiJi,
@@ -158,7 +158,6 @@ class CombatLogParser extends CoreCombatLogParser {
     mistsOfLife: MistsOfLife,
     mistyPeaks: MistyPeaks,
     renewingMist: RenewingMist,
-    renewingMistDuringManaTea: RenewingMistDuringManaTea,
     revival: Revival,
     risingMist: RisingMist,
     risingSunRevival: RisingSunRevival,
@@ -193,9 +192,8 @@ class CombatLogParser extends CoreCombatLogParser {
     coalesence: Coalesence,
 
     // Borrowed Power
-    t32TierSet: T32TierSet,
-    t33TierSet: T33TierSet,
     t34ConduitTierSet: T34ConduitTier,
+    s1TierSet: S1TierSet,
 
     // Mana Tab
     manaTracker: ManaTracker,

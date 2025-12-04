@@ -36,7 +36,7 @@ class Buffs extends CoreAuras {
       },
       // Throughput Cooldown
       {
-        spellId: SPELLS.MANA_TEA_BUFF.id,
+        spellId: SPELLS.MANA_TEA_CAST.id,
         enabled: combatant.hasTalent(TALENTS_MONK.MANA_TEA_TALENT),
         timelineHighlight: true,
       },

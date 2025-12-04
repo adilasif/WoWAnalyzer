@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { SHATTER_DEBUFFS } from 'analysis/retail/mage/shared';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
@@ -115,7 +116,6 @@ class RayOfFrost extends Analyzer {
 
     const frostbolt = <SpellLink spell={SPELLS.FROSTBOLT} />;
     const icelance = <SpellLink spell={SPELLS.ICE_LANCE_DAMAGE} />;
-    const glacialSpike = <SpellLink spell={TALENTS.GLACIAL_SPIKE_TALENT} />;
 
     const icicles = <SpellLink spell={SPELLS.MASTERY_ICICLES} />;
 
@@ -151,8 +151,7 @@ class RayOfFrost extends Analyzer {
           ]}
         />
         <small>
-          {frostbolt} and {icelance} could be replaced with {glacialSpike} if you have enough{' '}
-          {icicles}.
+          {frostbolt} and {icelance} could be replaced with if you have enough {icicles}.
         </small>
       </>
     );

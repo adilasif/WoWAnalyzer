@@ -1,4 +1,5 @@
-import { Trans } from '@lingui/macro';
+import type { JSX } from 'react';
+import { Trans } from '@lingui/react/macro';
 import { formatPercentage, formatDuration, formatNth } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/shaman';
