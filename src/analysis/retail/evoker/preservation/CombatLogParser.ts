@@ -60,10 +60,8 @@ import {
   EssenceTracker,
   SourceOfMagic,
   PotentMana,
-  Engulf,
   Panacea,
   ExpandedLungs,
-  RedHot,
   Reverberations,
   Chronoflame,
   DoubleTime,
@@ -72,7 +70,6 @@ import {
   MotesOfAcceleration,
   TimeSpiral,
   MobilityCastLinkNormalizer,
-  FlameSiphon,
 } from '../shared';
 import T32Prevoker from './modules/tier/T32TierSet';
 import T33Prevoker from './modules/tier/T33TierSet';
@@ -157,9 +154,7 @@ class CombatLogParser extends CoreCombatLogParser {
     lifespark: Lifespark,
 
     // hero talents
-    engulf: Engulf,
     expandedLungs: ExpandedLungs,
-    redHot: RedHot,
     reverberations: Reverberations,
     chronoflame: Chronoflame,
     doubleTime: DoubleTime,
@@ -167,7 +162,6 @@ class CombatLogParser extends CoreCombatLogParser {
     primacy: Primacy,
     timeConvergence: TimeConvergence,
     motesOfAcceleration: MotesOfAcceleration,
-    flameSiphon: FlameSiphon,
 
     // other
     t32Prevoker: T32Prevoker,
