@@ -11,12 +11,13 @@ import {
   DUPLICATE_EBON_MIGHT_MULTIPLIER,
   DUPLICATE_PERSONAL_DAMAGE_MULTIPLIER,
 } from '../../constants';
-import Events, { DamageEvent } from 'parser/core/Events';
+import Events, { DamageEvent, EmpowerEndEvent, GetRelatedEvents } from 'parser/core/Events';
 import TALENTS from 'common/TALENTS/evoker';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 import DonutChart from 'parser/ui/DonutChart';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
 import { formatNumber } from 'common/format';
+import { UPHEAVAL_REVERBERATION_DAM_LINK } from '../normalizers/CastLinkNormalizer';
 /**
  * R1: Deep Breath / Breath of Eons summons Future Self for 20 sec, which will cast Eruption frequently and occasionally empower spells.
  * R2/R3: Sands of Time also extends the duration of Duplicate by 50%/100% of its value.
@@ -24,44 +25,56 @@ import { formatNumber } from 'common/format';
  * *As of current alpha build, Upheaval is not affected.
  */
 class Duplicate extends Analyzer {
-  canExtendDuplicate = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_R2_TALENT);
-  duplicateBuffsEbonMight = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_R4_TALENT);
+  canExtendDuplicate = this.selectedCombatant.hasTalent(
+    TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT,
+  );
+  duplicateBuffsEbonMight = this.selectedCombatant.hasTalent(
+    TALENTS_EVOKER.DUPLICATE_3_AUGMENTATION_TALENT,
+  );
   petDamage = 0;
   personalDamage = 0;
   externalDamage = 0;
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_R1_TALENT);
-
+    this.active = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT);
+    // Filtering to SELECTED_PLAYER_PET breaks this. Eruption and Fire Breath use separate IDs,
+    // so no filtering needed, but Upheaval uses the same ID as the player so must be distinguished.
     this.addEventListener(
-      Events.damage
-        .by(SELECTED_PLAYER_PET)
-        .spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH, SPELLS.UPHEAVAL_DAM]),
+      Events.damage.spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH]),
       this.onPetDamage,
     );
 
+    this.addEventListener(Events.damage.spell([SPELLS.UPHEAVAL_DAM]), this.onPetUpheavalDamage);
+
     if (this.duplicateBuffsEbonMight) {
-      //If this is fixed to also buff Upheaval,
-      //add Upheaval (and Reverberations) here.
       this.addEventListener(
         Events.damage
           .by(SELECTED_PLAYER)
-          .spell([TALENTS.ERUPTION_TALENT, SPELLS.MASS_ERUPTION_DAMAGE]),
+          .spell([TALENTS.ERUPTION_TALENT, SPELLS.MASS_ERUPTION_DAMAGE, SPELLS.UPHEAVAL_DAM]),
         this.onPersonalDamage,
       );
 
       this.addEventListener(
-        //Check how this interacts with Double-time.
-        //If it stacks additively, then don't include this with Double-time talented,
-        //as we cannot determine if an Ebon Might has crit.
         Events.damage.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_EXTERNAL),
         this.onExternalDamage,
       );
+
+      if (this.selectedCombatant.hasTalent(TALENTS.REVERBERATIONS_TALENT)) {
+        this.addEventListener(
+          Events.empowerEnd.by(SELECTED_PLAYER).spell([SPELLS.UPHEAVAL, SPELLS.UPHEAVAL_FONT]),
+          this.addReverberationsDamage,
+        );
+      }
     }
   }
 
   onPetDamage(event: DamageEvent) {
+    this.petDamage += event.amount;
+  }
+
+  onPetUpheavalDamage(event: DamageEvent) {
+    if (event.sourceID === this.selectedCombatant.id) return;
     this.petDamage += event.amount;
   }
 
@@ -80,6 +93,19 @@ class Duplicate extends Analyzer {
     }
   }
 
+  addReverberationsDamage(event: EmpowerEndEvent) {
+    if (this.selectedCombatant.hasBuff(SPELLS.EBON_MIGHT_BUFF_PERSONAL.id)) {
+      const reverbEvents = GetRelatedEvents<DamageEvent>(event, UPHEAVAL_REVERBERATION_DAM_LINK);
+
+      reverbEvents.forEach((reverbEvent) => {
+        this.personalDamage += calculateEffectiveDamage(
+          reverbEvent,
+          DUPLICATE_PERSONAL_DAMAGE_MULTIPLIER,
+        );
+      });
+    }
+  }
+
   statistic() {
     const buffUptime =
       this.selectedCombatant.getBuffUptime(SPELLS.DUPLICATE_SELF_BUFF.id) /
@@ -89,14 +115,14 @@ class Duplicate extends Analyzer {
       {
         color: 'rgb(255, 255, 0)',
         label: 'Future Self damage',
-        spellId: TALENTS_EVOKER.DUPLICATE_R1_TALENT.id,
+        spellId: TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT.id,
         valueTooltip: formatNumber(this.petDamage),
         value: this.petDamage,
       },
       {
         color: 'rgb(129, 52, 5)',
         label: 'Personal damage',
-        spellId: TALENTS_EVOKER.DUPLICATE_R4_TALENT.id,
+        spellId: TALENTS_EVOKER.DUPLICATE_3_AUGMENTATION_TALENT.id,
         valueTooltip: formatNumber(this.personalDamage),
         value: this.personalDamage,
       },
@@ -115,7 +141,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_R1_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage + this.personalDamage + this.externalDamage} />
               <br />
@@ -135,7 +161,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_R1_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage} />
               <br />
@@ -151,7 +177,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_R1_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage} />
             </div>

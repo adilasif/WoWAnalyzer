@@ -32,17 +32,14 @@ type AnyBuffEvent =
   | RemoveBuffEvent
   | RemoveBuffStackEvent;
 
-export const EB_FROM_EMERALD_TRANCE = 'ebFromEmeraldTrance';
 export const EB_FROM_AZURE_STRIKE = 'ebFromAzureStrike';
 export const EB_FROM_PRESCIENCE = 'ebFromPrescience';
-export const EB_FROM_ARCANE_VIGOR = 'ebFromArcaneVigor';
 export const EB_FROM_LF_CAST = 'ebFromLFCast';
 export const EB_FROM_LF_HEAL = 'ebFromLFHeal'; // Specifically used for Leaping Flames analysis
 export const EB_FROM_AUG_UNDERMINE_4PC = 'ebFromAugUndermine4pc';
 export const EB_FROM_AUG_UNDERMINE_4PC_EONS = 'ebFromAugUndermine4pcEons';
 const ESSENCE_BURST_BUFFER = 40; // Sometimes the EB comes a bit early/late
 const EB_LF_CAST_BUFFER = 1_000;
-const EMERALD_TRANCE_BUFFER = 5_000;
 
 export const EB_FROM_DIVERTED_POWER = 'ebFromDivertedPower';
 const EB_DIVERTED_POWER_BUFFER = 100; // These for some reason have longer delays
@@ -66,21 +63,6 @@ export const ESSENCE_BURST_CONSUME = 'EssenceBurstConsume';
  *    In this example the EB could land within our EB_FROM_LF_CAST search and be incorrectly attributed.
  */
 const EVENT_LINKS: EventLink[] = [
-  {
-    linkRelation: EB_FROM_ARCANE_VIGOR,
-    reverseLinkRelation: EB_FROM_ARCANE_VIGOR,
-    linkingEventId: SPELLS.SHATTERING_STAR.id,
-    linkingEventType: EventType.Cast,
-    referencedEventId: EB_BUFF_IDS,
-    referencedEventType: EB_GENERATION_EVENT_TYPES,
-    anyTarget: true,
-    forwardBufferMs: ESSENCE_BURST_BUFFER,
-    backwardBufferMs: ESSENCE_BURST_BUFFER,
-    maximumLinks: 1,
-    isActive(c) {
-      return c.hasTalent(TALENTS.ARCANE_VIGOR_TALENT);
-    },
-  },
   {
     linkRelation: EB_FROM_AUG_UNDERMINE_4PC,
     reverseLinkRelation: EB_FROM_AUG_UNDERMINE_4PC,
@@ -119,35 +101,6 @@ const EVENT_LINKS: EventLink[] = [
     backwardBufferMs: ESSENCE_BURST_BUFFER,
     maximumLinks: 1,
     isActive: (c) => c.hasTalent(TALENTS.ANACHRONISM_TALENT),
-  },
-  {
-    linkRelation: EB_FROM_EMERALD_TRANCE,
-    reverseLinkRelation: EB_FROM_EMERALD_TRANCE,
-    linkingEventId: SPELLS.EMERALD_TRANCE_T31_4PC_BUFF.id,
-    linkingEventType: EventType.ApplyBuff,
-    referencedEventId: EB_BUFF_IDS,
-    referencedEventType: EB_GENERATION_EVENT_TYPES,
-    anyTarget: true,
-    forwardBufferMs: EMERALD_TRANCE_BUFFER * 5 + ESSENCE_BURST_BUFFER,
-    maximumLinks: 5,
-    isActive: (c) => {
-      return c.has4PieceByTier(TIERS.DF3);
-    },
-    additionalCondition(linkingEvent, referencedEvent) {
-      // applies one EB each 5_000 ms for the duration of the buff (25_000ms)
-      // so check if the timestamp difference is divisible by 5_000 allowing the remainder to be withing the ESSENCE_BURST_BUFFER range
-      const timeDiff = Math.abs(
-        (linkingEvent.timestamp - referencedEvent.timestamp) % EMERALD_TRANCE_BUFFER,
-      );
-      if (
-        timeDiff > ESSENCE_BURST_BUFFER &&
-        EMERALD_TRANCE_BUFFER - timeDiff > ESSENCE_BURST_BUFFER // it can come early
-      ) {
-        return false;
-      }
-
-      return hasNoGenerationLink(referencedEvent as AnyBuffEvent);
-    },
   },
   {
     linkRelation: EB_FROM_AZURE_STRIKE,
@@ -271,8 +224,6 @@ class EssenceBurstCastLinkNormalizer extends EventLinkNormalizer {
 /** All the possible EB sources */
 export const EBSource = {
   Prescience: EB_FROM_PRESCIENCE,
-  ArcaneVigor: EB_FROM_ARCANE_VIGOR,
-  EmeraldTrance: EB_FROM_EMERALD_TRANCE,
   AzureStrike: EB_FROM_AZURE_STRIKE,
   LivingFlameCast: EB_FROM_LF_CAST,
   LivingFlameHeal: EB_FROM_LF_HEAL,
