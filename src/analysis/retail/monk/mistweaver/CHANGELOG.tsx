@@ -5,6 +5,7 @@ import { Vohrr } from 'CONTRIBUTORS';
 import SpellLink from 'interface/SpellLink';
 
 export default [
+  change(date(2025, 12, 5), <>Added <SpellLink spell={TALENTS_MONK.AMPLIFIED_RUSH_TALENT}/> statistic, removed Unison.</>, Vohrr),
   change(date(2025, 12, 2), <>Updated <SpellLink spell={TALENTS_MONK.RESTORE_BALANCE_TALENT}/> for Midnight and re-enabled <SpellLink spell={TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT}/> for Mistweaver.</>, Vohrr),
   change(date(2025, 11, 25), <>Added Season 1 Tier Set analysis for Mistweaver</>, Vohrr),
   change(date(2025, 11, 23), <>Minor bug fixes and typos. Added <SpellLink spell={TALENTS_MONK.MISTY_COALESCENCE_TALENT}/> module.</>, Vohrr),
