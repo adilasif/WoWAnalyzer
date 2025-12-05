@@ -1,5 +1,4 @@
 import { formatNumber, formatPercentage } from 'common/format';
-import SPELLS from 'common/SPELLS';
 import { TALENTS_MONK } from 'common/TALENTS';
 import { SpellLink } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
@@ -18,7 +17,6 @@ import {
   MISTWRAP_INCREASE,
 } from '../../constants';
 import HotTrackerMW from '../core/HotTrackerMW';
-import { Tracker } from 'parser/shared/modules/HotTracker';
 
 const ENVELOPING_BASE_DURATION = 6000;
 //TODO include boosts from env specific buffs like peaceful mending or Lifecocoon
