@@ -80,11 +80,11 @@ class MistWrap extends Analyzer {
   }
 
   private calculateEnvelopingMist(event: HealEvent) {
-    const envMistHot = this.getHot(event, TALENTS_MONK.ENVELOPING_MIST_TALENT.id);
+    const envMistHot = this.hotTracker.getHot(event, TALENTS_MONK.ENVELOPING_MIST_TALENT.id);
     if (envMistHot) {
       //check for extensions
       if (envMistHot.extensions?.length === 0) {
-        //bonus healing is 40% from additional time or 10% from additional healing based on timestamp
+        //bonus healing is full value from additional time or 10% from additional healing based on timestamp
         this.envMistHealingBoost +=
           envMistHot.start + ENVELOPING_BASE_DURATION < event.timestamp
             ? calculateEffectiveHealing(event, ENVELOPING_MIST_INCREASE + MISTWRAP_INCREASE)
@@ -106,12 +106,6 @@ class MistWrap extends Analyzer {
         }
       }
     }
-  }
-
-  private getHot(event: HealEvent, spellId: number): Tracker | undefined {
-    return this.hotTracker.hots[event.targetID]
-      ? this.hotTracker.hots[event.targetID][spellId] || undefined
-      : undefined;
   }
 
   get totalHealing() {
