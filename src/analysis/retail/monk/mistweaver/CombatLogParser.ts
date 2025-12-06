@@ -89,6 +89,7 @@ import JadeEmpowerment from './modules/spells/JadeEmpowerment';
 import T34ConduitTier from '../shared/hero/ConduitOfTheCelestials/tier/T34Tier';
 import MistyCoalescence from './modules/spells/MistyCoalescence';
 import S1TierSet from './modules/tier/S1TierSet';
+import AmplifiedRush from './modules/spells/AmplifiedRush';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -142,6 +143,7 @@ class CombatLogParser extends CoreCombatLogParser {
     vivaciousVivification: VivaciousVivification,
 
     // MW Talents
+    amplifiedRush: AmplifiedRush,
     mistyCoalescence: MistyCoalescence,
     jadefireTeachings: JadefireTeachings,
     energizingBrew: EnergizingBrew,
@@ -164,7 +166,7 @@ class CombatLogParser extends CoreCombatLogParser {
     soothingMist: SoothingMist,
     thunderFocusTea: ThunderFocusTea,
     yulonsWhisper: YulonsWhisper,
-    unison: Unison,
+    //unison: Unison,
     rapidDiffusion: RapidDiffusion,
     dancingMists: DancingMists,
     teachingsOfTheMonestary: TeachingsOfTheMonestary,

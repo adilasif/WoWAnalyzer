@@ -11,7 +11,6 @@ import RisingMist from '../spells/RisingMist';
 import InvokeChiJi from '../spells/InvokeChiJi';
 import InvokeYulon from '../spells/InvokeYulon';
 import { TALENTS_MONK } from 'common/TALENTS';
-import Unison from '../spells/Unison';
 import MistsOfLife from '../spells/MistsOfLife';
 import MistWrap from '../spells/MistWrap';
 import SheilunsGift from '../spells/SheilunsGift';
@@ -33,7 +32,6 @@ class TalentHealingStatistic extends Analyzer {
     dancingMists: DancingMists,
     rapidDiffusion: RapidDiffusion,
     saveThemAll: SaveThemAll,
-    unison: Unison,
     mistsOfLife: MistsOfLife,
     mistWrap: MistWrap,
     sheiluns: SheilunsGift,
@@ -55,7 +53,6 @@ class TalentHealingStatistic extends Analyzer {
   protected dancingMists!: DancingMists;
   protected rapidDiffusion!: RapidDiffusion;
   protected saveThemAll!: SaveThemAll;
-  protected unison!: Unison;
   protected mistsOfLife!: MistsOfLife;
   protected mistWrap!: MistWrap;
   protected sheiluns!: SheilunsGift;
@@ -92,9 +89,6 @@ class TalentHealingStatistic extends Analyzer {
     }
     if (this.selectedCombatant.hasTalent(TALENTS_MONK.SAVE_THEM_ALL_TALENT)) {
       talentList.push(this.saveThemAll.subStatistic());
-    }
-    if (this.selectedCombatant.hasTalent(TALENTS_MONK.UNISON_TALENT)) {
-      talentList.push(this.unison.subStatistic());
     }
     if (this.selectedCombatant.hasTalent(TALENTS_MONK.MISTS_OF_LIFE_TALENT)) {
       talentList.push(this.mistsOfLife.subStatistic());
