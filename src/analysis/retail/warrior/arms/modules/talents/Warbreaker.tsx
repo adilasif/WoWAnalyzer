@@ -16,6 +16,7 @@ import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
 
 const WARBREAKER_BONUS_DAMAGES = 0.3;
 
+// TODO can probably just get removed idk maybe just change it to CS
 class Warbreaker extends Analyzer {
   get dps() {
     return (this.totalDamages / this.owner.fightDuration) * 1000;
@@ -31,7 +32,7 @@ class Warbreaker extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS.WARBREAKER_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.COLOSSUS_SMASH_TALENT);
     this.addEventListener(Events.damage.by(SELECTED_PLAYER), this._onDamage);
   }
 
@@ -39,7 +40,7 @@ class Warbreaker extends Analyzer {
     if (event.targetIsFriendly) {
       return;
     }
-    if (event.ability.guid === TALENTS.WARBREAKER_TALENT.id) {
+    if (event.ability.guid === SPELLS.COLOSSUS_SMASH.id) {
       this.totalDamages += (event.amount || 0) + (event.absorbed || 0);
     }
     const target = this.enemies.getEntity(event);
@@ -53,7 +54,7 @@ class Warbreaker extends Analyzer {
       <StatisticListBoxItem
         title={
           <>
-            <SpellLink spell={TALENTS.WARBREAKER_TALENT} /> bonus damage
+            <SpellLink spell={TALENTS.COLOSSUS_SMASH_TALENT} /> bonus damage
           </>
         }
         value={`${formatThousands(this.dps)} DPS`}

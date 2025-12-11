@@ -87,24 +87,6 @@ export const buildSlayerApl = (
       ),
     },
 
-    // SkS inside execute
-    {
-      spell: TALENTS.SKULLSPLITTER_TALENT,
-      condition: cnd.optionalRule(
-        cnd.and(
-          cnd.hasResource(RESOURCE_TYPES.RAGE, { atMost: 400 }), // rage is logged 10x higher than the player's "real" value
-          cnd.inExecute(executeThreshold),
-        ),
-      ),
-      description: (
-        <>
-          (Optional) Cast <SpellLink spell={TALENTS.SKULLSPLITTER_TALENT} /> while below 40 rage and
-          in execute range. You can gamble on getting enough rage from other sources, but on average
-          it's best to avoid that.
-        </>
-      ),
-    },
-
     // OP inside execute with Opp (no rav)
     {
       spell: SPELLS.OVERPOWER,
@@ -245,17 +227,6 @@ export const buildSlayerApl = (
       ),
     },
 
-    // SkS outside execute
-    {
-      spell: TALENTS.SKULLSPLITTER_TALENT,
-      condition: cnd.not(cnd.inExecute(executeThreshold)),
-      description: (
-        <>
-          Cast <SpellLink spell={TALENTS.SKULLSPLITTER_TALENT} /> while outside execute range
-        </>
-      ),
-    },
-
     // OP
     {
       spell: SPELLS.OVERPOWER,
@@ -297,24 +268,6 @@ export const buildColossusApl = (
         <>
           Cast <SpellLink spell={executeSpell} /> when your <SpellLink spell={SPELLS.JUGGERNAUT} />{' '}
           is about to expire
-        </>
-      ),
-    },
-
-    // SkS in exe below 85
-    {
-      spell: TALENTS.SKULLSPLITTER_TALENT,
-      condition: cnd.optionalRule(
-        cnd.and(
-          cnd.hasResource(RESOURCE_TYPES.RAGE, { atMost: 400 }), // rage is logged 10x higher than the player's "real" value
-          cnd.inExecute(executeThreshold),
-        ),
-      ),
-      description: (
-        <>
-          (Optional) Cast <SpellLink spell={TALENTS.SKULLSPLITTER_TALENT} /> while below 40 rage and
-          in execute range. You can gamble on getting enough rage from other sources, but on average
-          it's best to avoid that.
         </>
       ),
     },
@@ -426,17 +379,6 @@ export const buildColossusApl = (
       description: (
         <>
           Cast <SpellLink spell={SPELLS.MORTAL_STRIKE} />
-        </>
-      ),
-    },
-
-    // SkS no exe
-    {
-      spell: TALENTS.SKULLSPLITTER_TALENT,
-      condition: cnd.not(cnd.inExecute(executeThreshold)),
-      description: (
-        <>
-          Cast <SpellLink spell={TALENTS.SKULLSPLITTER_TALENT} />
         </>
       ),
     },

@@ -3,10 +3,11 @@ import { AnyEvent, EventType } from 'parser/core/Events';
 import TALENTS from 'common/TALENTS/warrior';
 import { Options } from 'parser/core/Module';
 
+// TODO probably remove
 export default class BlademastersTormentNormalizer extends EventsNormalizer {
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS.BLADEMASTERS_TORMENT_TALENT);
+    this.active = false; //this.selectedCombatant.hasTalent(TALENTS.BLADEMASTERS_TORMENT_TALENT);
   }
 
   normalize(events: AnyEvent[]): AnyEvent[] {

@@ -17,7 +17,7 @@ class SuddenDeath extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS.SUDDEN_DEATH_SPEC_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.SUDDEN_DEATH_TALENT);
     this.addEventListener(
       Events.damage.by(SELECTED_PLAYER).spell(SPELLS.EXECUTE_DAMAGE),
       this._onExecuteDamage,
@@ -49,7 +49,7 @@ class SuddenDeath extends Analyzer {
         title={
           <>
             <SpellLink spell={SPELLS.EXECUTE_DAMAGE} /> with{' '}
-            <SpellLink spell={TALENTS.SUDDEN_DEATH_SPEC_TALENT} /> damage
+            <SpellLink spell={TALENTS.SUDDEN_DEATH_TALENT} /> damage
           </>
         }
         value={formatNumber(this.totalDamages)}
