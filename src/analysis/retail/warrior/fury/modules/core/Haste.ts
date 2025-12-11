@@ -11,9 +11,7 @@ class Haste extends CoreHaste {
       this.addHasteBuff(SPELLS.FRENZY.id, { hastePerStack: 0.02 });
     }
 
-    const STRIKES_RANKS =
-      this.selectedCombatant.getTalentRank(TALENTS.WILD_STRIKES_TALENT) +
-      this.selectedCombatant.getTalentRank(TALENTS.SWIFT_STRIKES_TALENT);
+    const STRIKES_RANKS = this.selectedCombatant.getTalentRank(TALENTS.WILD_STRIKES_TALENT);
 
     if (STRIKES_RANKS > 0) {
       // For each rank of Wild Strikes and Swift Strikes, you gain an additional 1% Haste.

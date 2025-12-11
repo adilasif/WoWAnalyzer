@@ -53,7 +53,7 @@ class SlayerExecute extends Analyzer {
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(talents.SLAYERS_DOMINANCE_TALENT);
-    this.hasAshenJuggernaut = this.selectedCombatant.hasTalent(talents.ASHEN_JUGGERNAUT_TALENT);
+    this.hasAshenJuggernaut = false; //this.selectedCombatant.hasTalent(talents.ASHEN_JUGGERNAUT_TALENT);
     this.addEventListener(Events.cast.by(SELECTED_PLAYER).spell(SPELLS.EXECUTE_FURY), this.onCast);
 
     this.addEventListener(
