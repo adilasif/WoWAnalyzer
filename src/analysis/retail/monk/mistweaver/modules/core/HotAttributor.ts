@@ -24,6 +24,7 @@ import {
 import HotTrackerMW from '../core/HotTrackerMW';
 import { isFromTFT } from '../../normalizers/EventLinks/TierEventLinks';
 import { hasConditionalFieldOrDatumDef } from 'vega-lite/build/src/channeldef';
+import { CelestialHooks } from 'analysis/retail/monk/shared';
 
 const debug = false;
 const remDebug = false;
@@ -34,10 +35,13 @@ class HotAttributor extends Analyzer {
   static dependencies = {
     hotTracker: HotTrackerMW,
     combatants: Combatants,
+    celestialHooks: CelestialHooks,
   };
 
   protected combatants!: Combatants;
   protected hotTracker!: HotTrackerMW;
+  protected celestialHooks!: CelestialHooks;
+
   bouncedAttrib = HotTracker.getNewAttribution(ATTRIBUTION_STRINGS.BOUNCED);
   jadeBondAttrib = HotTracker.getNewAttribution(ATTRIBUTION_STRINGS.JADE_BOND_ENVELOPING_MIST);
   envMistHardcastAttrib = HotTracker.getNewAttribution(
@@ -45,6 +49,9 @@ class HotAttributor extends Analyzer {
   );
   envMistMistyPeaksAttrib = HotTracker.getNewAttribution(
     ATTRIBUTION_STRINGS.MISTY_PEAKS_ENVELOPING_MIST,
+  );
+  envMistDuringCelestialAttrib = HotTracker.getNewAttribution(
+    ATTRIBUTION_STRINGS.DURING_CELESTIAL_ENVELOPING_MIST,
   );
   rapidDiffusionAttrib = HotTracker.getNewAttribution(
     ATTRIBUTION_STRINGS.RAPID_DIFFUSION_RENEWING_MIST,
@@ -170,6 +177,15 @@ class HotAttributor extends Analyzer {
             this.owner.formatTimestamp(event.timestamp, 3),
           'on ' + this.combatants.getEntity(event)?.name,
         );
+      if (this.celestialHooks.celestialActive) {
+        this.hotTracker.addAttributionFromApply(this.envMistDuringCelestialAttrib, event);
+        debug &&
+          console.log(
+            'Attributed Enveloping Mist hardcast during Celestial at ' +
+              this.owner.formatTimestamp(event.timestamp, 3),
+            'on ' + this.combatants.getEntity(event)?.name,
+          );
+      }
     } else if (isFromMistyPeaks(event)) {
       this.hotTracker.addAttributionFromApply(this.envMistMistyPeaksAttrib, event);
       hot.maxDuration = this.hotTracker._getMistyPeaksMaxDuration(this.selectedCombatant);

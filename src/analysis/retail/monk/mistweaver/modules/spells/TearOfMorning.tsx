@@ -1,13 +1,7 @@
 import talents, { TALENTS_MONK } from 'common/TALENTS/monk';
 import spells from 'common/SPELLS/monk';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import Events, {
-  CastEvent,
-  GetRelatedEvents,
-  HealEvent,
-  ApplyBuffEvent,
-  RemoveBuffEvent,
-} from 'parser/core/Events';
+import Events, { CastEvent, GetRelatedEvents, HealEvent } from 'parser/core/Events';
 import { calculateEffectiveHealing } from 'parser/core/EventCalculateLib';
 import Statistic from 'parser/ui/Statistic';
 import ItemHealingDone from 'parser/ui/ItemHealingDone';
@@ -28,13 +22,9 @@ import {
 import { TFT_ENV_TOM } from '../../normalizers/EventLinks/EventLinkConstants';
 import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
 import { CelestialHooks } from 'analysis/retail/monk/shared';
+import { Tracker } from 'parser/shared/modules/HotTracker';
 
 const UNAFFECTED_SPELLS: number[] = [TALENTS_MONK.ENVELOPING_MIST_TALENT.id];
-
-interface EnvDuringCelestial {
-  timestamp: number;
-  extraWindowHealing: number;
-}
 
 class TearOfMorning extends Analyzer {
   static dependencies = {
@@ -48,7 +38,7 @@ class TearOfMorning extends Analyzer {
   invigSheilunsHeal = spells.INVIGORATING_MISTS_HEAL;
   invigSheilunsHealing = 0;
 
-  envBaseDuration = 0;
+  _envBaseDuration = 0;
   envHealingIncrease = 0;
 
   envelopingMistHealing = 0;
@@ -57,8 +47,6 @@ class TearOfMorning extends Analyzer {
   envExtraDurationBonusHealing = 0;
   tftCleaveHealing = 0;
   envelopCasts = 0;
-
-  envsDuringCelestial: Map<number, EnvDuringCelestial> = new Map();
 
   constructor(options: Options) {
     super(options);
@@ -84,14 +72,6 @@ class TearOfMorning extends Analyzer {
     this.addEventListener(
       Events.cast.by(SELECTED_PLAYER).spell(talents.ENVELOPING_MIST_TALENT),
       this.onCast,
-    );
-    this.addEventListener(
-      Events.applybuff.by(SELECTED_PLAYER).spell(talents.ENVELOPING_MIST_TALENT),
-      this.onEnvApply,
-    );
-    this.addEventListener(
-      Events.removebuff.by(SELECTED_PLAYER).spell(talents.ENVELOPING_MIST_TALENT),
-      this.onEnvRemove,
     );
   }
 
@@ -119,20 +99,19 @@ class TearOfMorning extends Analyzer {
     );
   }
 
-  onEnvApply(event: ApplyBuffEvent) {
-    if (this.celestialHooks.celestialActive) {
-      const envHoT = this.hotTracker.getHot(event, talents.ENVELOPING_MIST_TALENT.id);
-      if (envHoT && this.hotTracker.fromHardcast(envHoT)) {
-        if (this.envBaseDuration === 0) {
-          this.envBaseDuration = this.hotTracker._calculateEnvDuration(this.selectedCombatant);
-        }
-
-        this.envsDuringCelestial.set(event.targetID, {
-          timestamp: event.timestamp,
-          extraWindowHealing: 0,
-        });
-      }
+  get envBaseDuration() {
+    if (this._envBaseDuration === 0) {
+      this._envBaseDuration = this.hotTracker._calculateEnvDuration(this.selectedCombatant);
     }
+    return this._envBaseDuration;
+  }
+
+  isExtraDurationHealing(envHoT: Tracker, eventTimestamp: number): boolean {
+    if (!this.hotTracker.duringCelestial(envHoT)) {
+      return false;
+    }
+    const timeSinceApplied = eventTimestamp - envHoT.start;
+    return timeSinceApplied > this.envBaseDuration;
   }
 
   handleEnv(event: HealEvent) {
@@ -140,13 +119,9 @@ class TearOfMorning extends Analyzer {
     if (event.tick) {
       this.envelopingMistHotHealing += eventHealAmount;
 
-      const envData = this.envsDuringCelestial.get(event.targetID);
-      if (envData) {
-        const tickTime = event.timestamp - envData.timestamp;
-
-        if (tickTime > this.envBaseDuration) {
-          envData.extraWindowHealing += eventHealAmount;
-        }
+      const envHoT = this.hotTracker.getHot(event, TALENTS_MONK.ENVELOPING_MIST_TALENT.id);
+      if (envHoT && this.isExtraDurationHealing(envHoT, event.timestamp)) {
+        this.envExtraDurationHealing += eventHealAmount;
       }
       return;
     }
@@ -163,29 +138,11 @@ class TearOfMorning extends Analyzer {
       return;
     }
 
-    const envData = this.envsDuringCelestial.get(event.targetID);
-    if (envData) {
-      const timeSinceEnvApplied = event.timestamp - envData.timestamp;
-
-      if (timeSinceEnvApplied > this.envBaseDuration) {
-        this.envExtraDurationBonusHealing += calculateEffectiveHealing(
-          event,
-          this.envHealingIncrease,
-        );
-      }
-    }
-  }
-
-  onEnvRemove(event: RemoveBuffEvent) {
-    const data = this.envsDuringCelestial.get(event.targetID);
-    if (data) {
-      const duration = event.timestamp - data.timestamp;
-
-      if (duration > this.envBaseDuration) {
-        this.envExtraDurationHealing += data.extraWindowHealing;
-      }
-
-      this.envsDuringCelestial.delete(event.targetID);
+    if (this.isExtraDurationHealing(envHoT, event.timestamp)) {
+      this.envExtraDurationBonusHealing += calculateEffectiveHealing(
+        event,
+        this.envHealingIncrease,
+      );
     }
   }
 
