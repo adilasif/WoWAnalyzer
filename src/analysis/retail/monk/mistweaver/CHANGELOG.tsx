@@ -1,10 +1,11 @@
 import { change, date } from 'common/changelog';
 import SPELLS from 'common/SPELLS';
 import { TALENTS_MONK } from 'common/TALENTS';
-import { Vohrr } from 'CONTRIBUTORS';
+import { swirl, Vohrr } from 'CONTRIBUTORS';
 import SpellLink from 'interface/SpellLink';
 
 export default [
+  change(date(2025, 12, 12), <>Updated <SpellLink spell={TALENTS_MONK.TEAR_OF_MORNING_TALENT}/> for Midnight.</>, swirl),
   change(date(2025, 12, 5), <>Added <SpellLink spell={TALENTS_MONK.AMPLIFIED_RUSH_TALENT}/> statistic, removed Unison.</>, Vohrr),
   change(date(2025, 12, 2), <>Updated <SpellLink spell={TALENTS_MONK.RESTORE_BALANCE_TALENT}/> for Midnight and re-enabled <SpellLink spell={TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT}/> for Mistweaver.</>, Vohrr),
   change(date(2025, 11, 25), <>Added Season 1 Tier Set analysis for Mistweaver</>, Vohrr),
