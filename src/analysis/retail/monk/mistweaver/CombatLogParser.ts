@@ -90,6 +90,8 @@ import T34ConduitTier from '../shared/hero/ConduitOfTheCelestials/tier/T34Tier';
 import MistyCoalescence from './modules/spells/MistyCoalescence';
 import S1TierSet from './modules/tier/S1TierSet';
 import AmplifiedRush from './modules/spells/AmplifiedRush';
+import WayOfTheSerpent from './modules/spells/WayOfTheSerpent';
+import MovementTracker from './modules/features/MovementDuringBuffTracker';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -127,6 +129,7 @@ class CombatLogParser extends CoreCombatLogParser {
     hotCountGraph: HotCountGraph,
     talentHealingStatistic: TalentHealingStatistic,
     risingMistBreakdown: RisingMistBreakdown,
+    movementTracker: MovementTracker,
 
     // Guide helpers
     sheilunsGiftCloudTracker: SheilunsGiftCloudTracker,
@@ -183,6 +186,7 @@ class CombatLogParser extends CoreCombatLogParser {
     poolOfMists: PoolOfMists,
     rushingWindKick: RushingWindKick,
     jadeEmpowerment: JadeEmpowerment,
+    wayOfTheSerpent: WayOfTheSerpent,
 
     // Hero Talents
     // Conduit
