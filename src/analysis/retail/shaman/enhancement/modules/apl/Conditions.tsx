@@ -23,13 +23,6 @@ export function minimumMaelstromWeaponStacks(minStacks: number): Condition<Resou
 export function getSpenderBlock(combatant: Combatant): Rule[] {
   const rules: Rule[] = [];
 
-  if (combatant.hasTalent(TALENTS.ELEMENTAL_SPIRITS_TALENT)) {
-    rules.push({
-      spell: TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT,
-      condition: minimumMaelstromWeaponStacks(MINIMUM_MAELSTROM_WEAPON_SPEND_STACKS),
-    });
-  }
-
   rules.push({
     spell: SPELLS.LIGHTNING_BOLT,
     condition: describe(
@@ -48,11 +41,3 @@ export function getSpenderBlock(combatant: Combatant): Rule[] {
 
   return rules;
 }
-
-export const iceStrikeRule = (combatant: Combatant) =>
-  combatant.hasTalent(TALENTS.ICE_STRIKE_1_ENHANCEMENT_TALENT)
-    ? {
-        spell: SPELLS.ICE_STRIKE_1_CAST,
-        condition: buffPresent(SPELLS.ICE_STRIKE_1_USABLE_BUFF),
-      }
-    : TALENTS.ICE_STRIKE_2_ENHANCEMENT_TALENT;

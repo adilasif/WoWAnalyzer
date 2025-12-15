@@ -18,20 +18,13 @@ export function totemic(combatant: Combatant): Apl {
     },
     TALENTS.SUNDERING_TALENT,
     {
-      spell: TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT,
-      condition: minimumMaelstromWeaponStacks(10),
-    },
-    {
       spell: SPELLS.LIGHTNING_BOLT,
       condition: minimumMaelstromWeaponStacks(10),
     },
     TALENTS.LAVA_LASH_TALENT,
     {
       spell: TALENTS.CRASH_LIGHTNING_TALENT,
-      condition: and(
-        hasTalent(TALENTS.UNRELENTING_STORMS_TALENT),
-        buffPresent(SPELLS.TWW_S2_ELECTROSTATIC_WAGER),
-      ),
+      condition: and(hasTalent(TALENTS.STORM_UNLEASHED_1_ENHANCEMENT_TALENT)),
     },
     SPELLS.STORMSTRIKE_CAST,
     SPELLS.VOLTAIC_BLAZE_CAST,

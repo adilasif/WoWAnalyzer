@@ -50,7 +50,7 @@ import {
   addInefficientCastReason,
 } from 'parser/core/EventMetaLib';
 import NPCS from 'common/NPCS';
-import Reactivity from '../hero/totemic/Reactivity';
+import Earthsurge from '../hero/totemic/Earthsurge';
 
 class HotHandRank {
   modRate: number;
@@ -76,11 +76,10 @@ const HOT_HAND: Record<number, HotHandRank> = {
  * a Hot Hand window so we don't want to unfairly punish the performance if
  * any of these are used  */
 const HIGH_PRIORITY_ABILITIES: HighPriorityAbilities = [
-  TALENTS.PRIMORDIAL_WAVE_TALENT.id,
   TALENTS.PRIMORDIAL_STORM_TALENT.id,
   TALENTS.FERAL_SPIRIT_TALENT.id,
   {
-    spellId: [TALENTS.TEMPEST_TALENT.id, TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT.id],
+    spellId: [TALENTS.TEMPEST_TALENT.id],
     condition: (e) =>
       e.resourceCost !== undefined && e.resourceCost[RESOURCE_TYPES.MAELSTROM_WEAPON.id] >= 6,
   },
@@ -98,7 +97,7 @@ interface HotHandTimeline {
   performance?: QualitativePerformance | null;
 }
 
-interface HotHandProc extends CooldownTrigger<ApplyBuffEvent | RefreshBuffEvent> {
+interface HotHandProc extends CooldownTrigger<ApplyBuffEvent> {
   hasteAdjustedWastedCooldown: number;
   timeline: HotHandTimeline;
   unusedGcdTime: number;
@@ -107,8 +106,10 @@ interface HotHandProc extends CooldownTrigger<ApplyBuffEvent | RefreshBuffEvent>
 
 /**
  * Melee auto-attacks with Flametongue Weapon active have a 5% chance to
- * reduce the cooldown of Lava Lash by [60/75]% and increase the damage of
+ * reduce the cooldown of Lava Lash by [25/50]% and increase the damage of
  * Lava Lash by [20/40]% for 8 sec.
+ *
+ * May not occur during an active Hot Hand.
  *
  * Example Log:
  *
@@ -119,12 +120,12 @@ class HotHand extends MajorCooldown<HotHandProc> {
     spellUsable: SpellUsable,
     haste: Haste,
     abilities: Abilities,
-    reactivity: Reactivity,
+    reactivity: Earthsurge,
   };
   protected spellUsable!: SpellUsable;
   protected haste!: Haste;
   protected abilities!: Abilities;
-  protected reactivity!: Reactivity;
+  protected reactivity!: Earthsurge;
 
   activeWindow: HotHandProc | null = null;
   globalCooldownEnds = 0;
@@ -137,7 +138,7 @@ class HotHand extends MajorCooldown<HotHandProc> {
   private lavaLashOnCooldown = true;
   private lastCooldownWasteCheck = 0;
 
-  protected hasReactivity = false;
+  protected hasEarthsurge = false;
   protected surgingTotemActive = false;
 
   constructor(options: Options) {
@@ -147,16 +148,12 @@ class HotHand extends MajorCooldown<HotHandProc> {
       return;
     }
 
-    this.hasReactivity = this.selectedCombatant.hasTalent(TALENTS.REACTIVITY_TALENT);
+    this.hasEarthsurge = this.selectedCombatant.hasTalent(TALENTS.EARTHSURGE_TALENT);
     this.hotHand = HOT_HAND[this.selectedCombatant.getTalentRank(TALENTS.HOT_HAND_TALENT)];
 
     this.addEventListener(
       Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.HOT_HAND_BUFF),
-      this.startOrRefreshWindow,
-    );
-    this.addEventListener(
-      Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.HOT_HAND_BUFF),
-      this.startOrRefreshWindow,
+      this.startWindow,
     );
     this.addEventListener(
       Events.removebuff.by(SELECTED_PLAYER).spell(SPELLS.HOT_HAND_BUFF),
@@ -173,7 +170,7 @@ class HotHand extends MajorCooldown<HotHandProc> {
       Events.UpdateSpellUsable.by(SELECTED_PLAYER).spell(TALENTS.LAVA_LASH_TALENT),
       this.detectLavaLashCasts,
     );
-    if (this.hasReactivity) {
+    if (this.hasEarthsurge) {
       const surgingTotemNpcId = this.owner.playerPets.find(
         (x) => x.guid === NPCS.SURGING_TOTEM.id,
       )?.id;
@@ -211,9 +208,7 @@ class HotHand extends MajorCooldown<HotHandProc> {
     this.activeWindow?.globalCooldowns.push(event.duration);
   }
 
-  startOrRefreshWindow(event: ApplyBuffEvent | RefreshBuffEvent) {
-    // on application applies a mod rate and also resets CD if proc was natural
-
+  startWindow(event: ApplyBuffEvent) {
     const whirlingFireRemovedEvent = GetRelatedEvent<RemoveBuffEvent>(
       event,
       EnhancementEventLinks.WHIRLING_FIRE_LINK,
@@ -361,10 +356,10 @@ class HotHand extends MajorCooldown<HotHandProc> {
           The section to the right shows breakdown of each time {hh} procced, and how well you
           utilised the window.
         </p>
-        {this.selectedCombatant.hasTalent(TALENTS.REACTIVITY_TALENT) && (
+        {this.selectedCombatant.hasTalent(TALENTS.EARTHSURGE_TALENT) && (
           <>
             <p>
-              With <SpellLink spell={TALENTS.REACTIVITY_TALENT} /> talented, each {ll} cast while{' '}
+              With <SpellLink spell={TALENTS.EARTHSURGE_TALENT} /> talented, each {ll} cast while{' '}
               {hh} is active will cast a <SpellLink spell={TALENTS.SUNDERING_TALENT} /> forward , so
               aiming is important, and your <SpellLink spell={TALENTS.SURGING_TOTEM_TALENT} /> will
               trigger an <SpellLink spell={TALENTS.EARTHSURGE_TALENT} />.
@@ -386,8 +381,6 @@ class HotHand extends MajorCooldown<HotHandProc> {
           <SpellIcon spell={SPELLS.LIGHTNING_BOLT} /> &rarr;
           <SpellIcon spell={TALENTS.LAVA_LASH_TALENT} /> &rarr;
           <SpellIcon spell={SPELLS.STORMSTRIKE_CAST} /> &rarr;
-          <SpellIcon spell={TALENTS.LAVA_LASH_TALENT} /> &rarr;
-          <SpellIcon spell={TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT} /> &rarr;
           <SpellIcon spell={TALENTS.LAVA_LASH_TALENT} />
         </p>
         {this.selectedCombatant.hasTalent(TALENTS.ASCENDANCE_ENHANCEMENT_TALENT) ||
@@ -551,7 +544,7 @@ class HotHand extends MajorCooldown<HotHandProc> {
       this.explainUsagePerformance(cast),
       this.explainGcdPerformance(cast),
     ];
-    if (this.selectedCombatant.hasTalent(TALENTS.REACTIVITY_TALENT)) {
+    if (this.selectedCombatant.hasTalent(TALENTS.EARTHSURGE_TALENT)) {
       const reactivityMissedSunderings = cast.timeline.events.filter(
         (event) =>
           event.type === EventType.Cast &&
@@ -572,7 +565,7 @@ class HotHand extends MajorCooldown<HotHandProc> {
           }),
           summary: (
             <>
-              One or more missed <SpellLink spell={TALENTS.REACTIVITY_TALENT} />{' '}
+              One or more missed <SpellLink spell={TALENTS.EARTHSURGE_TALENT} />{' '}
               <SpellLink spell={TALENTS.SUNDERING_TALENT} />
               's missed.
             </>

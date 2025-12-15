@@ -17,13 +17,6 @@ import {
 } from './Conditions';
 
 export function stormbringer(combatant: Combatant): Apl {
-  const iceStrikeRule = combatant.hasTalent(TALENTS.ICE_STRIKE_1_ENHANCEMENT_TALENT)
-    ? {
-        spell: SPELLS.ICE_STRIKE_1_CAST,
-        condition: buffPresent(SPELLS.ICE_STRIKE_1_USABLE_BUFF),
-      }
-    : TALENTS.ICE_STRIKE_2_ENHANCEMENT_TALENT;
-
   const rules: Rule[] = [
     /** Windstrike during ascendance */
     {
@@ -69,7 +62,6 @@ export function stormbringer(combatant: Combatant): Apl {
     SPELLS.STORMSTRIKE_CAST,
     TALENTS.CRASH_LIGHTNING_TALENT,
     TALENTS.LAVA_LASH_TALENT,
-    iceStrikeRule,
     {
       spell: TALENTS.FROST_SHOCK_TALENT,
       condition: buffPresent(SPELLS.HAILSTORM_BUFF),

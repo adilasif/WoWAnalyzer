@@ -22,12 +22,6 @@ class Buffs extends ClassBuffs {
         timelineHighlight: true,
       },
       {
-        spellId: SPELLS.HAILSTORM_BUFF.id,
-        triggeredBySpellId: TALENTS.HAILSTORM_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.HAILSTORM_TALENT),
-        timelineHighlight: true,
-      },
-      {
         spellId: SPELLS.DOOM_WINDS_BUFF.id,
         triggeredBySpellId: TALENTS.DOOM_WINDS_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.DOOM_WINDS_TALENT),
@@ -36,17 +30,17 @@ class Buffs extends ClassBuffs {
       {
         spellId: SPELLS.PRIMORDIAL_STORM_USABLE.id,
         enabled: combatant.hasTalent(TALENTS.PRIMORDIAL_STORM_TALENT),
-        triggeredBySpellId: TALENTS.PRIMORDIAL_WAVE_TALENT.id,
+        triggeredBySpellId: TALENTS.SUNDERING_TALENT.id,
       },
       {
-        spellId: SPELLS.LEGACY_OF_THE_FROST_WITCH_BUFF.id,
-        enabled: combatant.hasTalent(TALENTS.LEGACY_OF_THE_FROST_WITCH_TALENT),
+        spellId: SPELLS.LIGHTNING_STRIKES_BUFF.id,
+        enabled: combatant.hasTalent(TALENTS.LIGHTNING_STRIKES_TALENT),
         timelineHighlight: true,
       },
       {
-        spellId: SPELLS.SPLINTERED_ELEMENTS_BUFF.id,
-        enabled: combatant.hasTalent(TALENTS.SPLINTERED_ELEMENTS_TALENT),
-        triggeredBySpellId: TALENTS.PRIMORDIAL_WAVE_TALENT.id,
+        spellId: SPELLS.SURGING_ELEMENTS_BUFF.id,
+        enabled: combatant.hasTalent(TALENTS.SURGING_ELEMENTS_TALENT),
+        triggeredBySpellId: TALENTS.SUNDERING_TALENT.id,
       },
       {
         spellId: SPELLS.FERAL_SPIRIT_MAELSTROM_BUFF.id,

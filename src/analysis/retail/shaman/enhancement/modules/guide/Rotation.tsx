@@ -31,10 +31,10 @@ export default function Rotation({ modules, info }: GuideProps<typeof CombatLogP
       <AplSectionData checker={AplCheck.check} apl={AplCheck.apl(info)} />
       <hr />
       <p>
-        This list does not include cooldowns (e.g. <SpellLink spell={TALENTS.FERAL_SPIRIT_TALENT} />
+        This list does not include cooldowns (e.g. <SpellLink spell={TALENTS.DOOM_WINDS_TALENT} />
         , <SpellLink spell={TALENTS.ASCENDANCE_ENHANCEMENT_TALENT} />,{' '}
-        <SpellLink spell={TALENTS.PRIMORDIAL_WAVE_TALENT} />, etc). Cooldowns may often be held for
-        fight mechanics, and appear as common problems which interfere with rotation analysis.
+        <SpellLink spell={TALENTS.SUNDERING_TALENT} />, etc). Cooldowns may often be held for fight
+        mechanics, and appear as common problems which interfere with rotation analysis.
       </p>
       <div>
         This should be used as a reference point for improvement when comparing against other logs.

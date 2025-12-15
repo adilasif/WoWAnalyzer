@@ -118,6 +118,7 @@ const DEFAULT_HASTE_BUFFS: HasteBuffMap = {
   [TALENTS_SHAMAN.UNLIMITED_POWER_TALENT.id]: {
     hastePerStack: 0.01,
   },
+  [SPELLS.SURGING_ELEMENTS_BUFF.id]: 0.15,
   //endregion
 
   //region Warlock

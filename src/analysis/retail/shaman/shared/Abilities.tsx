@@ -41,15 +41,6 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: TALENTS.STONE_BULWARK_TOTEM_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.STONE_BULWARK_TOTEM_TALENT),
-        category: SPELL_CATEGORY.DEFENSIVE,
-        gcd: {
-          base: 1000,
-        },
-        cooldown: 180,
-      },
-      {
         spell: SPELLS.FLAME_SHOCK.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         cooldown: combatant.spec === SPECS.ENHANCEMENT_SHAMAN ? (haste) => 6 / (1 + haste) : 6,
@@ -107,21 +98,8 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: TALENTS.LAVA_BURST_TALENT.id,
-        charges:
-          combatant.spec === SPECS.ELEMENTAL_SHAMAN
-            ? 1 + (combatant.hasTalent(TALENTS.ECHO_OF_THE_ELEMENTS_TALENT) ? 1 : 0)
-            : combatant.spec === SPECS.ENHANCEMENT_SHAMAN
-              ? combatant.hasTalent(TALENTS.ELEMENTAL_BLAST_ENHANCEMENT_TALENT)
-                ? 0
-                : combatant.hasTalent(TALENTS.LAVA_BURST_TALENT)
-                  ? 1
-                  : 0
-              : 1,
-        enabled:
-          combatant.spec === SPECS.ENHANCEMENT_SHAMAN
-            ? combatant.hasTalent(TALENTS.LAVA_BURST_TALENT) &&
-              !combatant.hasTalent(TALENTS.ELEMENTAL_BLAST_ENHANCEMENT_TALENT)
-            : combatant.hasTalent(TALENTS.LAVA_BURST_TALENT),
+        charges: 1 + (combatant.hasTalent(TALENTS.ECHO_OF_THE_ELEMENTS_TALENT) ? 1 : 0),
+        enabled: combatant.hasTalent(TALENTS.LAVA_BURST_TALENT),
         cooldown: 8,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: {
@@ -236,24 +214,6 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: TALENTS.THUNDERSTORM_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.THUNDERSTORM_TALENT),
-        category: SPELL_CATEGORY.UTILITY,
-        cooldown: combatant.hasTalent(TALENTS.THUNDERSHOCK_TALENT) ? 25 : 30,
-        gcd: {
-          base: 1500,
-        },
-      },
-      {
-        spell: TALENTS.LIGHTNING_LASSO_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.LIGHTNING_LASSO_TALENT),
-        category: SPELL_CATEGORY.UTILITY,
-        cooldown: 45,
-        gcd: {
-          base: 1500,
-        },
-      },
-      {
         spell: TALENTS.HEX_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.HEX_TALENT),
         category: SPELL_CATEGORY.UTILITY,
@@ -362,11 +322,6 @@ class Abilities extends CoreAbilities {
         castEfficiency: {
           suggestion: false,
         },
-      },
-      {
-        spell: TALENTS.TOTEMIC_RECALL_TALENT.id,
-        category: SPELL_CATEGORY.UTILITY,
-        cooldown: 60 * (combatant.hasTalent(TALENTS.CALL_OF_THE_ELEMENTS_TALENT) ? 2 : 3),
       },
 
       /* Hero Talents */
