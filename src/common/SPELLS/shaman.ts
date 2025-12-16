@@ -670,10 +670,10 @@ const spells = {
     name: 'Stormsurge',
     icon: 'spell_nature_stormreach',
   },
-  LEGACY_OF_THE_FROST_WITCH_BUFF: {
+  LIGHTNING_STRIKES_BUFF: {
     id: 384451,
-    name: 'Legacy of the Frost Witch',
-    icon: 'ability_thunderking_thunderstruck',
+    name: 'Lightning Strikes',
+    icon: 'ability_thunderclap',
   },
   EARTHEN_MIGHT_TIER_BUFF: {
     id: 409689,
@@ -928,9 +928,9 @@ const spells = {
     name: 'Primordial Wave',
     icon: 'inv_ability_shaman_primordialwave',
   },
-  SPLINTERED_ELEMENTS_BUFF: {
+  SURGING_ELEMENTS_BUFF: {
     id: 382043,
-    name: 'Splintered Elements',
+    name: 'Surging Elements',
     icon: 'spell_nature_elementalprecision_1',
   },
   MANA_SPRING_RESTORATION: {
@@ -1067,7 +1067,7 @@ const spells = {
     name: 'Chain Heal',
     icon: 'spell_nature_healingwavegreater',
   },
-  SUNDERING_REACTIVITY: {
+  SUNDERING_EARTHSURGE: {
     id: 467283,
     name: 'Sundering',
     icon: 'ability_rhyolith_lavapool',

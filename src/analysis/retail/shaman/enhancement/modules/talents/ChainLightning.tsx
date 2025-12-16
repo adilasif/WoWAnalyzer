@@ -29,11 +29,6 @@ class ChainLightning extends Analyzer.withDependencies({ spellUsable: SpellUsabl
       Events.cast.by(SELECTED_PLAYER).spell(TALENTS.CHAIN_LIGHTNING_TALENT),
       this.onCast,
     );
-
-    this.addEventListener(
-      Events.damage.by(SELECTED_PLAYER).spell(TALENTS.CHAIN_LIGHTNING_TALENT),
-      this.onDamage,
-    );
   }
 
   onCast(event: CastEvent) {
@@ -48,15 +43,6 @@ class ChainLightning extends Analyzer.withDependencies({ spellUsable: SpellUsabl
         <>
           <SpellLink spell={TALENTS.CHAIN_LIGHTNING_TALENT} /> only hit one target
         </>,
-      );
-    }
-  }
-
-  onDamage() {
-    if (this.deps.spellUsable.isOnCooldown(TALENTS.CHAIN_LIGHTNING_TALENT.id)) {
-      this.deps.spellUsable.reduceCooldown(
-        TALENTS.CHAIN_LIGHTNING_TALENT.id,
-        CRASH_LIGHTNING_REDUCTION,
       );
     }
   }

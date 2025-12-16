@@ -44,21 +44,6 @@ class Abilities extends ClassAbilities {
         },
       },
       {
-        // This is no error. We actually use the elemental shaman elemental blast spell id.
-        spell: TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.ELEMENTAL_BLAST_ENHANCEMENT_TALENT),
-        charges: combatant.getMultipleTalentRanks(
-          TALENTS.ELEMENTAL_BLAST_ENHANCEMENT_TALENT,
-          TALENTS.LAVA_BURST_TALENT,
-        ),
-        category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 12,
-        gcd: {
-          base: 1500,
-        },
-        range: 40,
-      },
-      {
         spell: SPELLS.STORMSTRIKE_CAST.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         cooldown: (haste) => 7.5 / (1 + haste),
@@ -79,12 +64,12 @@ class Abilities extends ClassAbilities {
       },
       {
         spell: TALENTS.SUNDERING_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
+        category: SPELL_CATEGORY.COOLDOWNS,
         gcd: {
-          base: 1500 - (combatant.hasTalent(TALENTS.MOLTEN_THUNDER_TALENT) ? 250 : 0),
+          base: 1500,
         },
         enabled: combatant.hasTalent(TALENTS.SUNDERING_TALENT),
-        cooldown: 40 - (combatant.hasTalent(TALENTS.MOLTEN_THUNDER_TALENT) ? 10 : 0),
+        cooldown: 30,
       },
       {
         spell: TALENTS.FIRE_NOVA_TALENT.id,
@@ -94,41 +79,6 @@ class Abilities extends ClassAbilities {
         },
         enabled: combatant.hasTalent(TALENTS.FIRE_NOVA_TALENT),
         cooldown: (haste) => 15 / (1 + haste),
-      },
-      /** This version procs on spending maelstrom, has no cooldown, and has a 40 yard range */
-      {
-        spell: TALENTS.ICE_STRIKE_1_ENHANCEMENT_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
-        gcd: {
-          base: 1500,
-        },
-        enabled: combatant.hasTalent(TALENTS.ICE_STRIKE_1_ENHANCEMENT_TALENT),
-        range: 40,
-      },
-      /** This version has a 15 sec cooldown and is melee range */
-      {
-        spell: TALENTS.ICE_STRIKE_2_ENHANCEMENT_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
-        gcd: {
-          base: 1500,
-        },
-        enabled: combatant.hasTalent(TALENTS.ICE_STRIKE_2_ENHANCEMENT_TALENT),
-        cooldown: (haste) => 15 / (1 + haste),
-        range: 5,
-      },
-      {
-        spell: [SPELLS.PRIMORDIAL_WAVE.id, SPELLS.PRIMORDIAL_WAVE_DAMAGE.id],
-        category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 30,
-        gcd: {
-          base: 1500,
-        },
-        enabled: combatant.hasTalent(TALENTS.PRIMORDIAL_WAVE_TALENT),
-        castEfficiency: {
-          suggestion: true,
-          recommendedEfficiency: 1,
-        },
-        range: 40,
       },
       {
         spell: SPELLS.PRIMORDIAL_STORM_CAST.id,
@@ -186,11 +136,6 @@ class Abilities extends ClassAbilities {
         category: SPELL_CATEGORY.HIDDEN,
       },
       {
-        spell: TALENTS.HAILSTORM_TALENT.id,
-        category: SPELL_CATEGORY.HIDDEN,
-        enabled: combatant.hasTalent(TALENTS.HAILSTORM_TALENT),
-      },
-      {
         spell: TALENTS.ASCENDANCE_ENHANCEMENT_TALENT.id,
         category: SPELL_CATEGORY.COOLDOWNS,
         enabled: combatant.hasTalent(TALENTS.ASCENDANCE_ENHANCEMENT_TALENT),
@@ -224,8 +169,8 @@ class Abilities extends ClassAbilities {
         },
       },
       {
-        spell: SPELLS.SUNDERING_REACTIVITY.id,
-        enabled: combatant.hasTalent(TALENTS.REACTIVITY_TALENT),
+        spell: SPELLS.SUNDERING_EARTHSURGE.id,
+        enabled: combatant.hasTalent(TALENTS.EARTHSURGE_TALENT),
         category: SPELL_CATEGORY.HIDDEN,
         gcd: null,
       },

@@ -46,16 +46,6 @@ const chainLightningDamageLink: EventLink = {
   anyTarget: true,
   reverseLinkRelation: EnhancementEventLinks.CHAIN_LIGHTNING_LINK,
 };
-const crashLightningDamageLink: EventLink = {
-  linkRelation: EnhancementEventLinks.CRASH_LIGHTNING_LINK,
-  linkingEventId: TALENTS.CRASH_LIGHTNING_TALENT.id,
-  linkingEventType: EventType.Cast,
-  referencedEventId: TALENTS.CRASH_LIGHTNING_TALENT.id,
-  referencedEventType: EventType.Damage,
-  forwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
-  anyTarget: true,
-  isActive: (c) => c.hasTalent(TALENTS.UNRELENTING_STORMS_TALENT),
-};
 const tempestDamageLink: EventLink = {
   linkRelation: EnhancementEventLinks.TEMPEST_LINK,
   linkingEventId: SPELLS.TEMPEST_CAST.id,
@@ -75,34 +65,23 @@ const lightningBoltLink: EventLink = {
   forwardBufferMs: EventLinkBuffers.LIGHTNING_BOLT_BUFFER,
   anyTarget: true,
 };
-const splinteredElementsBuffLink: EventLink = {
+const surgingElementsBuffLink: EventLink = {
   linkRelation: SPLINTERED_ELEMENTS_LINK,
-  linkingEventId: SPELLS.SPLINTERED_ELEMENTS_BUFF.id,
+  linkingEventId: SPELLS.SURGING_ELEMENTS_BUFF.id,
   linkingEventType: EventType.ApplyBuff,
-  referencedEventId: TALENTS.PRIMORDIAL_WAVE_TALENT.id,
+  referencedEventId: TALENTS.SUNDERING_TALENT.id,
   referencedEventType: EventType.Cast,
   forwardBufferMs: 0,
-  backwardBufferMs: EventLinkBuffers.SPLINTERED_ELEMENTS_BUFFER,
+  backwardBufferMs: EventLinkBuffers.SURGING_ELEMENTS_BUFFER,
   anyTarget: true,
-  isActive: (c) => c.hasTalent(TALENTS.SPLINTERED_ELEMENTS_TALENT),
-  reverseLinkRelation: SPLINTERED_ELEMENTS_LINK,
-};
-const splinteredElementsDamageLink: EventLink = {
-  linkRelation: SPLINTERED_ELEMENTS_LINK,
-  linkingEventId: TALENTS.PRIMORDIAL_WAVE_TALENT.id,
-  linkingEventType: EventType.Cast,
-  referencedEventId: SPELLS.PRIMORDIAL_WAVE_DAMAGE.id,
-  referencedEventType: EventType.Damage,
-  forwardBufferMs: EventLinkBuffers.PRIMORDIAL_WAVE_DAMAGE_BUFFER,
-  anyTarget: true,
-  isActive: (c) => c.hasTalent(TALENTS.SPLINTERED_ELEMENTS_TALENT),
+  isActive: (c) => c.hasTalent(TALENTS.SURGING_ELEMENTS_TALENT),
   reverseLinkRelation: SPLINTERED_ELEMENTS_LINK,
 };
 const reactivityLink: EventLink = {
   linkRelation: EnhancementEventLinks.REACTIVITY_LINK,
   linkingEventId: TALENTS.LAVA_LASH_TALENT.id,
   linkingEventType: EventType.Cast,
-  referencedEventId: SPELLS.SUNDERING_REACTIVITY.id,
+  referencedEventId: SPELLS.SUNDERING_EARTHSURGE.id,
   referencedEventType: EventType.Cast,
   forwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
   backwardBufferMs: 5,
@@ -110,13 +89,13 @@ const reactivityLink: EventLink = {
 };
 const sunderingDamageLink: EventLink = {
   linkRelation: EnhancementEventLinks.SUNDERING_LINK,
-  linkingEventId: [TALENTS.SUNDERING_TALENT.id, SPELLS.SUNDERING_REACTIVITY.id],
+  linkingEventId: [TALENTS.SUNDERING_TALENT.id, SPELLS.SUNDERING_EARTHSURGE.id],
   linkingEventType: EventType.Cast,
-  referencedEventId: [TALENTS.SUNDERING_TALENT.id, SPELLS.SUNDERING_REACTIVITY.id],
+  referencedEventId: [TALENTS.SUNDERING_TALENT.id, SPELLS.SUNDERING_EARTHSURGE.id],
   referencedEventType: EventType.Damage,
   forwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
   anyTarget: true,
-  isActive: (c) => c.hasTalent(TALENTS.REACTIVITY_TALENT) || c.hasTalent(TALENTS.SUNDERING_TALENT),
+  isActive: (c) => c.hasTalent(TALENTS.EARTHSURGE_TALENT) || c.hasTalent(TALENTS.SUNDERING_TALENT),
 };
 const whirlingFireHotHandLink: EventLink = {
   linkRelation: EnhancementEventLinks.WHIRLING_FIRE_LINK,
@@ -155,11 +134,9 @@ class EventLinkNormalizer extends BaseEventLinkNormalizer {
       thorimsInvocationCastLink,
       stormStrikeLink,
       chainLightningDamageLink,
-      crashLightningDamageLink,
       tempestDamageLink,
       lightningBoltLink,
-      splinteredElementsBuffLink,
-      splinteredElementsDamageLink,
+      surgingElementsBuffLink,
       reactivityLink,
       sunderingDamageLink,
       whirlingFireHotHandLink,

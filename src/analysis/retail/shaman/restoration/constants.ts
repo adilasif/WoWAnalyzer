@@ -18,9 +18,7 @@ export const CHAIN_HEAL = 'ChainHeal';
 export const CHAIN_HEAL_GROUPING = 'ChainHealGrouping';
 export const FLOW_OF_THE_TIDES = 'FlowOfTheTides';
 export const DOWNPOUR = 'Downpour';
-export const HIGH_TIDE = 'HighTide';
 export const LIVELY_TOTEMS_CHAIN_HEAL = 'LivelyTotemsChainHeal';
-export const REACTIVITY = 'Reactivity';
 //event link ms settings
 export const CAST_BUFFER_MS = 100;
 // 50 was too low, 100 was too high
@@ -62,7 +60,7 @@ export const RESTORATION_COLORS = {
   HEALING_RAIN: '#21a2d5',
   OVERFLOWING_SHORES: '#0376a3',
   UNLEASH_LIFE: '#1ba691',
-  WELLSPRING: '#515c61',
+  // WELLSPRING: '#515c61', removed spell
   DOWNPOUR: '#3b6760',
   PRIMORDIAL_WAVE: '#0d2b36',
   UNUSED: '#CC3D20',
