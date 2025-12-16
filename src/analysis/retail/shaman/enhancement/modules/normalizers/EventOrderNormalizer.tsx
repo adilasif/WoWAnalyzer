@@ -41,40 +41,10 @@ const thorimsInvocationBuffAfterSpell: EventOrder = {
   maxMatches: 1,
 };
 
-/**
- * In some instances, the healcomes before the cast, so normalize to force it after
- */
-const healingOrder: EventOrder = {
-  afterEventId: [SPELLS.HEALING_SURGE.id, TALENTS.CHAIN_HEAL_TALENT.id],
-  afterEventType: [EventType.Heal, EventType.HealAbsorbed],
-  beforeEventId: [SPELLS.HEALING_SURGE.id, TALENTS.CHAIN_HEAL_TALENT.id],
-  beforeEventType: EventType.Cast,
-  anyTarget: true,
-  bufferMs: EventLinkBuffers.MaelstromWeapon,
-  updateTimestamp: true,
-};
-
-/** When primordial storm is cast with 10 maelstrom weapon, legacy of the frost witch applies after the cast
- * Re-order to apply before the cast for easier analysis later */
-const primordialStormEventOrder: EventOrder = {
-  afterEventId: SPELLS.PRIMORDIAL_STORM_CAST.id,
-  afterEventType: EventType.Cast,
-  beforeEventId: SPELLS.LEGACY_OF_THE_FROST_WITCH_BUFF.id,
-  beforeEventType: EventType.ApplyBuff,
-  anyTarget: true,
-  bufferMs: 5,
-  updateTimestamp: true,
-};
-
 export class EventOrderNormalizer extends BaseEventOrderNormalizer {
   private readonly hasRollingThunder: boolean;
   constructor(options: Options) {
-    super(options, [
-      thorimsInvocationSpellAfterWindstrike,
-      thorimsInvocationBuffAfterSpell,
-      healingOrder,
-      primordialStormEventOrder,
-    ]);
+    super(options, [thorimsInvocationSpellAfterWindstrike, thorimsInvocationBuffAfterSpell]);
 
     this.priority = NormalizerOrder.EventOrderNormalizer;
 

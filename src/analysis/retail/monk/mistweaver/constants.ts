@@ -104,6 +104,7 @@ export const ATTRIBUTION_STRINGS = {
   JADE_BOND_ENVELOPING_MIST: 'Jade Bond Enveloping Mist',
   HARDCAST_ENVELOPING_MIST: 'Enveloping Mist Hardcast',
   MISTY_PEAKS_ENVELOPING_MIST: 'Enveloping Mist Misty Peaks Proc',
+  DURING_CELESTIAL_ENVELOPING_MIST: 'During Celestial Enveloping Mist',
   HARDCAST_RENEWING_MIST: 'Renewing Mist Hardcast',
   RAPID_DIFFUSION_RENEWING_MIST: 'Renewing Mist Rapid Diffusion',
   DANCING_MIST_RENEWING_MIST: 'Renewing Mist Dancing Mist',

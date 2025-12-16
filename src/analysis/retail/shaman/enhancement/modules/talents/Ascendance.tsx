@@ -43,7 +43,6 @@ import { EnhancementEventLinks, GCD_TOLERANCE } from '../../constants';
 import RESOURCE_TYPES, { getResourceCost } from 'game/RESOURCE_TYPES';
 import { addEnhancedCastReason, addInefficientCastReason } from 'parser/core/EventMetaLib';
 import { getApplicableRules, HighPriorityAbilities } from '../../common';
-import ElementalSpirits from './ElementalSpirits';
 
 const SIMULATED_MEDIAN_CASTS_PER_DRE = 13;
 
@@ -75,7 +74,6 @@ class Ascendance extends MajorCooldown<AscendanceCooldownCast> {
     spellUsable: SpellUsable,
     abilities: Abilities,
     maelstromWeaponTracker: MaelstromWeaponTracker,
-    elementalSpirits: ElementalSpirits,
   };
 
   // dependency properties
@@ -83,7 +81,6 @@ class Ascendance extends MajorCooldown<AscendanceCooldownCast> {
   protected spellUsable!: SpellUsable;
   protected abilities!: Abilities;
   protected maelstromWeaponTracker!: MaelstromWeaponTracker;
-  protected elementalSpirits!: ElementalSpirits;
 
   protected activeWindow: AscendanceCooldownCast | null = null;
   protected windstrikeOnCooldown = true;
@@ -120,38 +117,18 @@ class Ascendance extends MajorCooldown<AscendanceCooldownCast> {
       },
     });
 
-    this.ascendanceCastRules.push(
-      TALENTS.FERAL_SPIRIT_TALENT.id,
-      {
-        spellId: SPELLS.TEMPEST_CAST.id,
-        condition: (cast) =>
-          getResourceCost(cast.resourceCost, RESOURCE_TYPES.MAELSTROM_WEAPON.id) === 10,
-        enhancedCastReason: (isvalid) =>
-          isvalid && (
-            <>
-              Cast <SpellLink spell={TALENTS.TEMPEST_TALENT} /> available and at 10{' '}
-              <SpellLink spell={SPELLS.MAELSTROM_WEAPON_BUFF} /> stacks
-            </>
-          ),
-      },
-      {
-        spellId: TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT.id,
-        condition: (cast) => {
-          const cost = getResourceCost(cast.resourceCost, RESOURCE_TYPES.MAELSTROM_WEAPON.id) ?? 0;
-          const elementalSpirits = this.elementalSpirits.elementalSpiritCount;
-          return cost >= 8 && elementalSpirits >= 6;
-        },
-        enhancedCastReason: (isValid) =>
-          isValid && (
-            <>
-              During <SpellLink spell={TALENTS.ASCENDANCE_ENHANCEMENT_TALENT} />, cast{' '}
-              <SpellLink spell={TALENTS.ELEMENTAL_BLAST_ENHANCEMENT_TALENT} /> when you have at
-              least 8 <SpellLink spell={SPELLS.MAELSTROM_WEAPON_BUFF} /> and 6{' '}
-              <SpellLink spell={TALENTS.ELEMENTAL_SPIRITS_TALENT} />
-            </>
-          ),
-      },
-    );
+    this.ascendanceCastRules.push(TALENTS.FERAL_SPIRIT_TALENT.id, {
+      spellId: SPELLS.TEMPEST_CAST.id,
+      condition: (cast) =>
+        getResourceCost(cast.resourceCost, RESOURCE_TYPES.MAELSTROM_WEAPON.id) === 10,
+      enhancedCastReason: (isvalid) =>
+        isvalid && (
+          <>
+            Cast <SpellLink spell={TALENTS.TEMPEST_TALENT} /> available and at 10{' '}
+            <SpellLink spell={SPELLS.MAELSTROM_WEAPON_BUFF} /> stacks
+          </>
+        ),
+    });
 
     if (this.selectedCombatant.hasTalent(TALENTS.ASCENDANCE_ENHANCEMENT_TALENT)) {
       this.addEventListener(

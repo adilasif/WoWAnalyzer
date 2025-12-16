@@ -18,23 +18,6 @@ class SpellUsable extends CoreSpellUsable.withDependencies({
       return;
     }
 
-    switch (spellId) {
-      case TALENTS.SUNDERING_TALENT.id: {
-        let isAvailable = super.isAvailable(spellId);
-        if (this.selectedCombatant.hasTalent(TALENTS.MOLTEN_THUNDER_TALENT) && !isAvailable) {
-          const cdInfo = this._currentCooldowns[spellId];
-          this.endCooldown(spellId, cdInfo.overallStart + RESET_BUFFER_MS);
-          addEnhancedCastReason(
-            triggeringEvent as CastEvent,
-            <>
-              <SpellLink spell={TALENTS.SUNDERING_TALENT} /> was reset by{' '}
-              <SpellLink spell={TALENTS.MOLTEN_THUNDER_TALENT} />
-            </>,
-          );
-          isAvailable = true;
-        }
-      }
-    }
     super.beginCooldown(triggeringEvent, spellId);
   }
 

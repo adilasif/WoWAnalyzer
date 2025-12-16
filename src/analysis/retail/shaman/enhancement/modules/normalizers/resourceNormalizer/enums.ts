@@ -15,7 +15,7 @@ export enum BufferMs {
   Ticks = 40,
   Damage = 75,
   SpendBackward = 25,
-  PrimordialWave = 100,
+  SurgingElements = 100,
   StaticAccumulation = 185,
 }
 

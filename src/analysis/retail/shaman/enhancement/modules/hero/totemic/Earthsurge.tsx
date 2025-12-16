@@ -20,10 +20,10 @@ import { EnhancementEventLinks } from '../../../constants';
  * While Hot Hand is active Lava Lash shatters the earth, causing a Sundering at 50% effectiveness.
  * Sunderings from this effect do not Incapacitate.
  */
-class Reactivity extends Analyzer {
+class Earthsurge extends Analyzer {
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS.REACTIVITY_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.EARTHSURGE_TALENT);
 
     if (!this.active) {
       return;
@@ -40,7 +40,7 @@ class Reactivity extends Analyzer {
       addInefficientCastReason(
         event,
         <>
-          <SpellLink spell={TALENTS.REACTIVITY_TALENT} /> triggered a{' '}
+          <SpellLink spell={TALENTS.EARTHSURGE_TALENT} /> triggered a{' '}
           <SpellLink spell={TALENTS.SUNDERING_TALENT} /> that didn't hit any targets.
         </>,
       );
@@ -71,4 +71,4 @@ class Reactivity extends Analyzer {
   }
 }
 
-export default Reactivity;
+export default Earthsurge;

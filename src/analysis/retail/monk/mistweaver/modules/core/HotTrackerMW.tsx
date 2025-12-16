@@ -165,6 +165,12 @@ class HotTrackerMW extends HotTracker {
     return hot.attributions.some((a) => a.name === ATTRIBUTION_STRINGS.THUNDER_FOCUS_TEA);
   }
 
+  duringCelestial(hot: Tracker): boolean {
+    return hot.attributions.some(
+      (a) => a.name === ATTRIBUTION_STRINGS.DURING_CELESTIAL_ENVELOPING_MIST,
+    );
+  }
+
   // Decide which extension is responsible for allowing this extra vivify cleave
   getRemExtensionForTimestamp(hot: Tracker, timestamp: number): Extension | null {
     if (timestamp <= hot.originalEnd) {

@@ -1,15 +1,13 @@
 import SPELLS from 'common/SPELLS';
-import { TALENTS_SHAMAN } from 'common/TALENTS';
+import TALENTS from 'common/TALENTS/shaman';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { ApplyBuffEvent, RemoveBuffEvent } from 'parser/core/Events';
-import { ELEMENTAL_BLAST_BUFFS } from './constants';
+import { ELEMENTAL_BLAST_BUFFS } from '../../../shared/constants';
 import DonutChart from 'parser/ui/DonutChart';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import { SpellLink } from 'interface';
-import { Talent } from 'common/TALENTS/types';
-import SPECS from 'game/SPECS';
 
 class ElementalBlast extends Analyzer {
   currentBuffAmount = 0;
@@ -21,17 +19,10 @@ class ElementalBlast extends Analyzer {
     [SPELLS.ELEMENTAL_BLAST_HASTE.id]: 0,
   };
 
-  talent: Talent;
-
   constructor(options: Options) {
     super(options);
 
-    this.talent =
-      this.selectedCombatant.spec?.id === SPECS.ELEMENTAL_SHAMAN.id
-        ? TALENTS_SHAMAN.ELEMENTAL_BLAST_ELEMENTAL_TALENT
-        : TALENTS_SHAMAN.ELEMENTAL_BLAST_ENHANCEMENT_TALENT;
-
-    this.active = this.selectedCombatant.hasTalent(this.talent);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.ELEMENTAL_BLAST_TALENT);
 
     if (!this.active) {
       return;
@@ -122,7 +113,7 @@ class ElementalBlast extends Analyzer {
       <Statistic position={STATISTIC_ORDER.OPTIONAL()} category={STATISTIC_CATEGORY.TALENTS}>
         <div className="pad">
           <label>
-            <SpellLink spell={this.talent} /> stat distribution
+            <SpellLink spell={TALENTS.ELEMENTAL_BLAST_TALENT} /> stat distribution
           </label>
           {this.elementalBlastDonut()}
         </div>
