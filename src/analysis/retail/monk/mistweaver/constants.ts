@@ -19,8 +19,8 @@ export const ABILITIES_AFFECTED_BY_HEALING_INCREASES = [
   SPELLS.GUSTS_OF_MISTS.id,
   SPELLS.GUST_OF_MISTS_CHIJI.id,
   SPELLS.EXPEL_HARM.id,
-  SPELLS.AJ_HEAL.id,
-  SPELLS.AJ_CRIT_HEAL.id,
+  SPELLS.WOTC_HEAL.id,
+  SPELLS.WOTC_CRIT_HEAL.id,
 
   //Hero Talents
   TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT.id,
@@ -60,6 +60,8 @@ export const LIFE_COCOON_HEALING_BOOST = 0.5;
 export const REM_BASE_DURATION = 20000;
 export const ENV_BASE_DURATION = 6000;
 export const TFT_REM_EXTRA_DURATION = 10000;
+export const AT_TRANSFER_COEFFICIENT = 0.25;
+export const AT_MAX_TARGETS = 5;
 
 // Talent Constants
 export const AMPLIFIED_RUSH_HEALING_BOOST = 0.5;
@@ -100,6 +102,10 @@ export const UPLIFTED_SPIRITS_COOLDOWN_REDUCTION = 30000;
 export const MISTY_COALESCENCE_MAX_INCREASE = 3.0;
 export const WAY_OF_THE_SERPENT_VIV_SG_INCREASE = 0.15;
 export const WAY_OF_THE_SERPENT_REM_INCREASE = 0.3;
+export const WAY_OF_THE_CRANE_BOK_CLEAVE = 0.2;
+export const WAY_OF_THE_CRANE_TP_STRIKES = 2;
+export const JADEFIRE_TEACHINGS_TRANSFER_COEFFICIENT = 1.8;
+export const MEDITATIVE_FOCUS_TRANSFER_COEFFICIENT = 0.5;
 
 export const ATTRIBUTION_STRINGS = {
   BOUNCED: 'Bounced',
@@ -168,4 +174,18 @@ export function getCurrentCelestialTalent(player: Combatant): Talent {
   return player.hasTalent(TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT)
     ? TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT
     : TALENTS_MONK.INVOKE_CHI_JI_THE_RED_CRANE_TALENT;
+}
+
+export function getCurrentAncientTeachingsTransferCoefficient(player: Combatant): number {
+  let coefficient = AT_TRANSFER_COEFFICIENT;
+
+  if (player.hasTalent(TALENTS_MONK.JADEFIRE_TEACHINGS_TALENT)) {
+    coefficient += JADEFIRE_TEACHINGS_TRANSFER_COEFFICIENT;
+  }
+
+  if (player.hasTalent(TALENTS_MONK.MEDITATIVE_FOCUS_TALENT)) {
+    coefficient += MEDITATIVE_FOCUS_TRANSFER_COEFFICIENT;
+  }
+
+  return coefficient;
 }

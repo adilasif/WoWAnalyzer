@@ -92,11 +92,14 @@ import S1TierSet from './modules/tier/S1TierSet';
 import AmplifiedRush from './modules/spells/AmplifiedRush';
 import WayOfTheSerpent from './modules/spells/WayOfTheSerpent';
 import MovementTracker from './modules/features/MovementDuringBuffTracker';
+import WayOfTheCrane from './modules/spells/WayOfTheCrane';
+import AncientTeachingsLinkNormalizer from './normalizers/AncientTeachingsLinkNormalizer';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Normalizer
     castLinkNormalizer: CastLinkNormalizer,
+    ancientTeachingsLinkNormalizer: AncientTeachingsLinkNormalizer,
     celestialConduitNormalizer: CelestialConduitNormalizer,
     conduitOfTheCelestialsEventLinks: ConduitOfTheCelestialsEventLinks,
     hotApplicationNormalizer: HotApplicationNormalizer,
@@ -187,6 +190,7 @@ class CombatLogParser extends CoreCombatLogParser {
     rushingWindKick: RushingWindKick,
     jadeEmpowerment: JadeEmpowerment,
     wayOfTheSerpent: WayOfTheSerpent,
+    wayOfTheCrane: WayOfTheCrane,
 
     // Hero Talents
     // Conduit

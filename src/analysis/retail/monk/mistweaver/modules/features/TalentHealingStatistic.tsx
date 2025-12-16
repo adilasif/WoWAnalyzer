@@ -23,6 +23,7 @@ import CraneStyle from '../spells/CraneStyle';
 import ZenPulse from '../spells/ZenPulse';
 import AverageTimeBetweenRSKs from '../spells/AverageTimeBetweenRSKs';
 import WayOfTheSerpent from '../spells/WayOfTheSerpent';
+import WayOfTheCrane from '../spells/WayOfTheCrane';
 
 class TalentHealingStatistic extends Analyzer {
   static dependencies = {
@@ -46,6 +47,7 @@ class TalentHealingStatistic extends Analyzer {
     zenPulse: ZenPulse,
     rushingWindKick: AverageTimeBetweenRSKs,
     wayOfTheSerpent: WayOfTheSerpent,
+    wayOfTheCrane: WayOfTheCrane,
   };
 
   protected risingMist!: RisingMist;
@@ -69,6 +71,7 @@ class TalentHealingStatistic extends Analyzer {
   protected zenPulse!: ZenPulse;
   protected rushingWindKick!: AverageTimeBetweenRSKs;
   protected wayOfTheSerpent!: WayOfTheSerpent;
+  protected wayOfTheCrane!: WayOfTheCrane;
 
   buildTalentList() {
     const talentList = [];
@@ -128,6 +131,9 @@ class TalentHealingStatistic extends Analyzer {
     }
     if (this.selectedCombatant.hasTalent(TALENTS_MONK.WAY_OF_THE_SERPENT_TALENT)) {
       talentList.push(this.wayOfTheSerpent.subStatistic());
+    }
+    if (this.selectedCombatant.hasTalent(TALENTS_MONK.WAY_OF_THE_CRANE_TALENT)) {
+      talentList.push(this.wayOfTheCrane.subStatistic());
     }
 
     const sortedTalentList = talentList.sort(

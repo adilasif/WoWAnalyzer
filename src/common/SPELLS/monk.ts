@@ -288,12 +288,12 @@ const spells = {
     name: 'Expel Harm',
     icon: 'ability_monk_expelharm',
   },
-  AJ_HEAL: {
+  WOTC_HEAL: {
     id: 389325,
     name: 'Awakened Jadefire',
     icon: 'inv_leather_raidmonkt2_d_01_helm',
   },
-  AJ_CRIT_HEAL: {
+  WOTC_CRIT_HEAL: {
     id: 389328,
     name: 'Awakened Jadefire',
     icon: 'inv_leather_raidmonkt2_d_01_helm',

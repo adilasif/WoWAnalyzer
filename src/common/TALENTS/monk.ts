@@ -1037,6 +1037,14 @@ const talents = {
     entryIds: [124882],
     definitionIds: [{ id: 129720, specId: 270 }],
   },
+  MEDITATIVE_FOCUS_TALENT: {
+    id: 1271105,
+    name: 'Meditative Focus',
+    icon: 'inv_misc_herb_mountainsilversage',
+    maxRanks: 1,
+    entryIds: [135954],
+    definitionIds: [{ id: 140709, specId: 270 }],
+  },
   JADE_BOND_TALENT: {
     id: 388031,
     name: 'Jade Bond',
