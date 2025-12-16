@@ -37,6 +37,7 @@ class AngerManagement extends Analyzer.withDependencies({
   private talentRecklessness = false;
   private talentRavager = false;
   private talentBladestorm = false;
+  private furyApexRampageCostReduction = 0;
 
   constructor(options: Options) {
     super(options);
@@ -45,6 +46,9 @@ class AngerManagement extends Analyzer.withDependencies({
     this.talentRecklessness = this.selectedCombatant.hasTalent(TALENTS.RECKLESSNESS_TALENT);
     this.talentRavager = this.selectedCombatant.hasTalent(TALENTS.RAVAGER_TALENT);
     this.talentBladestorm = this.selectedCombatant.hasTalent(TALENTS.BLADESTORM_TALENT);
+
+    this.furyApexRampageCostReduction =
+      this.selectedCombatant.getTalentRank(TALENTS.RAMPAGING_BERSERKER_2_FURY_TALENT) * 15; // fury apex reduces rampage rage cost by 15 rage per rank
 
     this.active =
       this.talentAngerManagement &&
@@ -67,9 +71,16 @@ class AngerManagement extends Analyzer.withDependencies({
       return;
     }
 
-    const rageSpent = rage.cost * RAGE_SCALE_FACTOR;
+    let rageSpent = rage.cost * RAGE_SCALE_FACTOR;
     if (event.ability.guid === SPELLS.RAMPAGE.id) {
-      console.log(rageSpent);
+      if (this.selectedCombatant.hasBuff(SPELLS.RECKLESSNESS.id)) {
+        rageSpent -= this.furyApexRampageCostReduction;
+        // TODO probably better to reduce the cost of the actual event instead of doing this workaround
+        // but I'm kinda dumb
+        // maybe some sort of normalizer
+      }
+      this.deps.spellUsable.reduceCooldown(SPELLS.ODYNS_FURY.id, 1000);
+      // TODO this probably shouldn't be in the AM section
     }
     this.totalRageSpent += rageSpent;
     const reduction = (rageSpent / RAGE_NEEDED_FOR_PROC) * CDR_PER_PROC;
@@ -93,6 +104,7 @@ class AngerManagement extends Analyzer.withDependencies({
     }
 
     // TODO bladestorm no longer gets AM cdr
+    // need to add it in from executioner
 
     // if (this.talentBladestorm) {
     //   const effectiveReduction = this.deps.spellUsable.reduceCooldown(
