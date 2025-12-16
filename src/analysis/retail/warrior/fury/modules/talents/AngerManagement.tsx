@@ -114,6 +114,8 @@ class AngerManagement extends Analyzer.withDependencies({
     //   this.bladestormCDR.effective += effectiveReduction;
     //   this.bladestormCDR.wasted += reduction - effectiveReduction;
     // }
+
+    // TODO add avatar here
   }
 
   private extraCasts(

@@ -50,6 +50,7 @@ import UnhingedMortalStrikeNormalizer from './normalizers/UnhingedMortalStrikeNo
 import Demolish from './modules/talents/Demolish';
 import DemolishNormalizer from './normalizers/DemolishNormalizer';
 import SuddenDeathBuffNormalizer from '../shared/modules/normalizers/SuddenDeathBuffNormalizer';
+import Guide from './Guide';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -125,6 +126,8 @@ class CombatLogParser extends CoreCombatLogParser {
 
     apl: AplCheck,
   };
+
+  static guide = Guide;
 }
 
 export default CombatLogParser;
