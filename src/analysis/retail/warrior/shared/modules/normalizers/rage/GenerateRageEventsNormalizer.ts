@@ -65,6 +65,9 @@ export default class GenerateRageEventsNormalizer extends EventsNormalizer {
 
     switch (this.selectedCombatant.spec?.id) {
       case SPECS.ARMS_WARRIOR.id: {
+        // TODO arms no longer gets warlords torment
+        // so this can be removed
+        // but it's probably not doing anything rn anyways
         this.recklessnessIncrease = WARLORDS_TORMENT_RECKLESSNESS_INCREASE;
 
         this.rawRagePerSwing = this.calculateRawRagePerSwing(

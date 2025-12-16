@@ -12,8 +12,8 @@ class RageTracker extends ResourceTracker {
     super(options);
     this.resource = RESOURCE_TYPES.RAGE;
 
-    // Add 15 rage for each rank of Overwhelming Rage, adjust for scale factor
-    this.maxResource += this.selectedCombatant.getTalentRank(TALENTS.OVERWHELMING_RAGE_TALENT) * 15;
+    // Add 30 rage for each rank of Overwhelming Rage, adjust for scale factor
+    this.maxResource += this.selectedCombatant.getTalentRank(TALENTS.OVERWHELMING_RAGE_TALENT) * 30;
   }
   getAdjustedGain(event: ResourceChangeEvent): { gain: number; waste: number } {
     const baseGain = super.getAdjustedGain(event);

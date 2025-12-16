@@ -37,6 +37,7 @@ import Channeling from 'parser/shared/normalizers/Channeling';
 import WhirlwindBuffOrderNormalizer from './modules/normalizers/WhirlwindBuffOrderNormalizer';
 import BrutalFinishBuffNormalizer from './modules/normalizers/BrutalFinishBuffNormalizer';
 import SuddenDeathBuffNormalizer from '../shared/modules/normalizers/SuddenDeathBuffNormalizer';
+import Guide from './Guide';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -93,6 +94,8 @@ class CombatLogParser extends CoreCombatLogParser {
     // Debuggers
     rageCountDebugger: RageCountDebugger,
   };
+
+  static guide = Guide;
 }
 
 export default CombatLogParser;

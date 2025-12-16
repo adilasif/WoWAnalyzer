@@ -68,6 +68,9 @@ class AngerManagement extends Analyzer.withDependencies({
     }
 
     const rageSpent = rage.cost * RAGE_SCALE_FACTOR;
+    if (event.ability.guid === SPELLS.RAMPAGE.id) {
+      console.log(rageSpent);
+    }
     this.totalRageSpent += rageSpent;
     const reduction = (rageSpent / RAGE_NEEDED_FOR_PROC) * CDR_PER_PROC;
 
@@ -89,14 +92,16 @@ class AngerManagement extends Analyzer.withDependencies({
       this.recklessnessCDR.wasted += reduction - effectiveReduction;
     }
 
-    if (this.talentBladestorm) {
-      const effectiveReduction = this.deps.spellUsable.reduceCooldown(
-        SPELLS.BLADESTORM.id,
-        reduction,
-      );
-      this.bladestormCDR.effective += effectiveReduction;
-      this.bladestormCDR.wasted += reduction - effectiveReduction;
-    }
+    // TODO bladestorm no longer gets AM cdr
+
+    // if (this.talentBladestorm) {
+    //   const effectiveReduction = this.deps.spellUsable.reduceCooldown(
+    //     SPELLS.BLADESTORM.id,
+    //     reduction,
+    //   );
+    //   this.bladestormCDR.effective += effectiveReduction;
+    //   this.bladestormCDR.wasted += reduction - effectiveReduction;
+    // }
   }
 
   private extraCasts(
