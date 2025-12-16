@@ -672,8 +672,8 @@ const spells = {
   },
   LIGHTNING_STRIKES_BUFF: {
     id: 384451,
-    name: 'Legacy of the Frost Witch',
-    icon: 'ability_thunderking_thunderstruck',
+    name: 'Lightning Strikes',
+    icon: 'ability_thunderclap',
   },
   EARTHEN_MIGHT_TIER_BUFF: {
     id: 409689,

@@ -1,4 +1,4 @@
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import Analyzer, { Options } from 'parser/core/Analyzer';
 import TALENTS from 'common/TALENTS/shaman';
 
 /**

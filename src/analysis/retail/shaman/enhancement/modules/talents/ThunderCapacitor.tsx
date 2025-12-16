@@ -8,7 +8,7 @@ import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import TalentSpellText from 'parser/ui/TalentSpellText';
-import { SpellIcon, SpellLink } from 'interface';
+import { SpellIcon } from 'interface';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
 
 const THUNDER_CAPACITOR_DAMAGE_INCREASE = 0.2;

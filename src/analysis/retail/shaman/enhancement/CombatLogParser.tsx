@@ -14,7 +14,6 @@ import ElementalAssault from './modules/talents/ElementalAssault';
 import Stormsurge from './modules/spells/Stormsurge';
 import FeralSpirit from './modules/talents/FeralSpirit';
 import ChainLightning from './modules/talents/ChainLightning';
-import AplCheck from './modules/apl/AplCheck';
 import ElementalOrbit from '../shared/talents/ElementalOrbit';
 import EarthenHarmony from '../restoration/modules/talents/EarthenHarmony';
 import Guide from './Guide';
@@ -103,8 +102,6 @@ class CombatLogParser extends CoreCombatLogParser {
     maelstromWeaponCastNormalizer: MaelstromWeaponCastNormalizer, // links
     eventLinkNormalizer: EventLinkNormalizer, // links various maelstrom casts to damage events, and spells made instant via maelstrom weapon
     maelstromWeaponResourceNormalizer: MaelstromWeaponResourceNormalizer, // converts maelstrom weapon buff stacks into resourchange events and ClassResource costs
-
-    aplCheck: AplCheck,
   };
 
   static guide = Guide;

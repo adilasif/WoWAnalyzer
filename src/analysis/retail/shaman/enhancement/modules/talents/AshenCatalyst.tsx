@@ -18,7 +18,6 @@ class AshenCatalyst extends Analyzer.withDependencies({
   spellUsable: SpellUsable,
   enemies: Enemies,
 }) {
-  protected damageGained = 0;
   protected effectiveCooldownReduction = 0;
 
   constructor(options: Options) {
@@ -58,8 +57,6 @@ class AshenCatalyst extends Analyzer.withDependencies({
       >
         <TalentSpellText talent={TALENTS.ASHEN_CATALYST_TALENT}>
           <>
-            <ItemDamageDone amount={this.damageGained} />
-            <br />
             <UptimeIcon /> {formatNumber(this.effectiveCooldownReduction / 1000)}{' '}
             <small>sec cooldown reduction</small>
           </>
