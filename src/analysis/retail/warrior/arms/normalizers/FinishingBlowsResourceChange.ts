@@ -15,14 +15,15 @@ export default class FinishingBlowsResourceChange extends EventsNormalizer {
       event.ability.guid === SPELLS.STRENGTH_OF_ARMS_RAGE.id
         ? {
             ...event,
-            ability: {
-              type: event.ability.type,
-              abilityIcon: TALENTS.FINISHING_BLOWS_TALENT.icon,
-              name: TALENTS.FINISHING_BLOWS_TALENT.name,
-              guid: TALENTS.FINISHING_BLOWS_TALENT.id,
-            },
+            // ability: {
+            //   type: event.ability.type,
+            //   abilityIcon: TALENTS.FINISHING_BLOWS_TALENT.icon,
+            //   name: TALENTS.FINISHING_BLOWS_TALENT.name,
+            //   guid: TALENTS.FINISHING_BLOWS_TALENT.id,
+            // },
           }
         : event,
     );
   }
 }
+// TODO figure out what this is doing
