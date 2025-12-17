@@ -17,28 +17,12 @@ const COOLDOWNS: Cooldown[] = [
     isActive: (c) => c.hasTalent(TALENTS.ASCENDANCE_ELEMENTAL_TALENT),
   },
   {
-    spell: TALENTS.PRIMORDIAL_WAVE_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.PRIMORDIAL_WAVE_TALENT),
-  },
-  {
     spell: SPELLS.ANCESTRAL_SWIFTNESS_CAST,
     isActive: (c) => c.hasTalent(TALENTS.ANCESTRAL_SWIFTNESS_TALENT),
   },
   {
     spell: SPELLS.STORMKEEPER_BUFF_AND_CAST,
     isActive: (c) => c.hasTalent(TALENTS.STORMKEEPER_TALENT),
-  },
-  {
-    spell: TALENTS.LIQUID_MAGMA_TOTEM_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.LIQUID_MAGMA_TOTEM_TALENT),
-  },
-  {
-    spell: TALENTS.STORM_ELEMENTAL_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.STORM_ELEMENTAL_TALENT),
-  },
-  {
-    spell: TALENTS.FIRE_ELEMENTAL_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.FIRE_ELEMENTAL_TALENT),
   },
 ];
 
@@ -47,8 +31,7 @@ function Cooldowns({ info, modules }: GuideProps<typeof CombatLogParser>) {
     <div>
       <SubSection title="Major Individual Cooldowns">
         {modules.ascendance.active && modules.ascendance.guideSubsection}
-        {modules.primalStormElemental.active && modules.primalStormElemental.guideSubsection}
-        {modules.primalFireElemental.active && modules.primalFireElemental.guideSubsection}
+        {modules.primalElementalist.active && modules.primalElementalist.guideSubsection}
         <CooldownGraphSubsection checklist={COOLDOWNS} />
       </SubSection>
     </div>

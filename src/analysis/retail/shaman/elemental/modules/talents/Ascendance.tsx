@@ -71,7 +71,7 @@ interface Spender {
 }
 
 const maelstromSpenders: number[] = [
-  TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT.id,
+  TALENTS.ELEMENTAL_BLAST_TALENT.id,
   TALENTS.EARTH_SHOCK_TALENT.id,
   TALENTS.EARTHQUAKE_1_ELEMENTAL_TALENT.id,
   TALENTS.EARTHQUAKE_2_ELEMENTAL_TALENT.id,
@@ -108,8 +108,8 @@ class Ascendance extends MajorCooldown<AscendanceCooldownCast> {
       this.selectedCombatant.hasTalent(TALENTS.ASCENDANCE_ELEMENTAL_TALENT) ||
       this.selectedCombatant.hasTalent(TALENTS.DEEPLY_ROOTED_ELEMENTS_TALENT);
 
-    if (this.selectedCombatant.hasTalent(TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT)) {
-      this.spender.spell = TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT;
+    if (this.selectedCombatant.hasTalent(TALENTS.ELEMENTAL_BLAST_TALENT)) {
+      this.spender.spell = TALENTS.ELEMENTAL_BLAST_TALENT;
       this.spender.costReduction = this.selectedCombatant.hasTalent(TALENTS.EYE_OF_THE_STORM_TALENT)
         ? 10
         : 0;
@@ -150,7 +150,7 @@ class Ascendance extends MajorCooldown<AscendanceCooldownCast> {
           .by(SELECTED_PLAYER)
           .spell([
             TALENTS.EARTH_SHOCK_TALENT,
-            TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT,
+            TALENTS.ELEMENTAL_BLAST_TALENT,
             TALENTS.EARTHQUAKE_1_ELEMENTAL_TALENT,
             TALENTS.EARTHQUAKE_2_ELEMENTAL_TALENT,
           ]),

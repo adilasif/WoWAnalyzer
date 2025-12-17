@@ -22,16 +22,6 @@ const spells = {
     name: 'Earth Shock Overload',
     icon: 'spell_nature_earthshock',
   },
-  FUSION_OF_THE_ELEMENTS_NATURE_BUFF: {
-    id: 462841,
-    name: 'Fusion of Elements',
-    icon: 'inv_10_enchanting2_elementalswirl_color1',
-  },
-  FUSION_OF_THE_ELEMENTS_FIRE_BUFF: {
-    id: 462843,
-    name: 'Fusion of Elements',
-    icon: 'inv_10_enchanting2_elementalswirl_color1',
-  },
   PURIFY_SPIRIT: {
     id: 77130,
     name: 'Purify Spirit',
@@ -331,16 +321,6 @@ const spells = {
     name: 'Aftershock',
     icon: 'spell_nature_stormreach',
   },
-  MASTER_OF_THE_ELEMENTS_BUFF: {
-    id: 260734,
-    name: 'Master Of The Elements Buff',
-    icon: 'spell_nature_elementalabsorption',
-  },
-  SURGE_OF_POWER_BUFF: {
-    id: 285514,
-    name: 'Surge of Power',
-    icon: 'spell_nature_shamanrage',
-  },
   UNLIMITED_POWER_BUFF: {
     id: 272737,
     name: 'Unlimited Power Buff',
@@ -376,6 +356,11 @@ const spells = {
     id: 157348,
     name: 'Call Lightning',
     icon: 'ability_vehicle_electrocharge',
+  },
+  PRIMAL_FIRE_ELEMENTAL: {
+    id: 118291,
+    name: 'Primal Fire Elemental',
+    icon: 'spell_fire_elemental_totem',
   },
   FIRE_ELEMENTAL_METEOR: {
     id: 117588,
@@ -502,21 +487,6 @@ const spells = {
     id: 470058,
     name: 'Voltaic Blaze',
     icon: 'inv_10_dungeonjewelry_primalist_trinket_1ragingelement_fire',
-  },
-  ICE_STRIKE_FROST_SHOCK_BUFF: {
-    id: 384357,
-    name: 'Ice Strike',
-    icon: 'spell_frost_frostbolt',
-  },
-  ICE_STRIKE_1_CAST: {
-    id: 342240,
-    name: 'Ice Strike',
-    icon: 'spell_frost_frostbolt',
-  },
-  ICE_STRIKE_1_USABLE_BUFF: {
-    id: 466469,
-    name: 'Ice Strike',
-    icon: 'spell_frost_frostbolt',
   },
   MAELSTROM_WEAPON: {
     id: 187890,
