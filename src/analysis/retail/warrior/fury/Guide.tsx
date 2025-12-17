@@ -12,6 +12,8 @@ import ActiveTimeGraph from 'parser/ui/ActiveTimeGraph';
 import CombatLogParser from './CombatLogParser';
 import FoundationDowntimeSectionV2 from 'interface/guide/foundation/FoundationDowntimeSectionV2';
 import CooldownGraphSubsection from './guide/CooldownGraphSubSection';
+import { AplSectionData } from 'interface/guide/components/Apl';
+import * as AplCheck from './modules/core/AplCheck';
 
 export default function Guide({ modules, events, info }: GuideProps<typeof CombatLogParser>) {
   return (
@@ -40,7 +42,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
       </Section>
       {/* <ResourceUsageSection modules={modules} events={events} info={info} /> */}
       <CooldownSection modules={modules} events={events} info={info} />
-      {/* <RotationSection modules={modules} events={events} info={info} /> */}
+      <RotationSection modules={modules} events={events} info={info} />
       <PreparationSection />
     </>
   );
@@ -49,11 +51,52 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
 function CooldownSection({ modules, info }: GuideProps<typeof CombatLogParser>) {
   return (
     <Section title="Cooldowns">
-      <HideExplanationsToggle id="hide-explanations-cooldowns" />
-      <HideGoodCastsToggle id="hide-good-casts-cooldowns" />
       <CooldownGraphSubsection />
-      {/* <CooldownUsage analyzer={modules.essenceBreak} title="Essence Break" />
-      <CooldownUsage analyzer={modules.eyeBeam} title="Eye Beam" /> */}
+    </Section>
+  );
+}
+
+function RotationSection({ modules, info }: GuideProps<typeof CombatLogParser>) {
+  return (
+    <Section title="Rotation">
+      <p>
+        This single target rotation analyzer is based on a number of sources, including the guides
+        at{' '}
+        <a
+          href="https://www.wowhead.com/guide/classes/warrior/fury/rotation-cooldowns-pve-dps"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Wowhead
+        </a>
+        {' and '}
+        <a
+          href="https://maxroll.gg/wow/class-guides/fury-warrior-raid-guide"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Maxroll
+        </a>{' '}
+        (credit to Archimtiros and Revvez for writing these guides).
+      </p>
+      <p>
+        This should be used as a reference point for improvement when comparing against other logs.
+        It does not cover the full set of priorites used by Simulationcraft/Raidbots (much like the
+        written guides) as the list would be far too long and too complex to follow.
+      </p>
+      <div>
+        Potential areas of inaccuracy:
+        <ul>
+          <li>Holding cooldowns for raid events</li>
+          <li>Multiple targets</li>
+          <li>Movement or periods of downtime</li>
+        </ul>
+      </div>
+      <p>
+        <strong> NOTE:</strong> The priority list below does not include{' '}
+        <SpellLink spell={TALENTS.REND_TALENT} icon />
+      </p>
+      <AplSectionData checker={AplCheck.check} apl={AplCheck.apl(info)} />
     </Section>
   );
 }

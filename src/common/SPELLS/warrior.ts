@@ -324,6 +324,16 @@ const spells = {
     name: 'Avatar',
     icon: 'warrior_talent_icon_avatar',
   },
+  VIOLENT_EUPHORIA_BUFF: {
+    id: 1270731,
+    name: 'Violent Euphoria',
+    icon: 'ability_butcher_exsanguination',
+  },
+  THUNDER_BLAST_BUFF: {
+    id: 435615,
+    name: 'Thunder Blast',
+    icon: 'warrior_talent_icon_bloodandthunder',
+  },
 
   // Arms:
   BLADESTORM: {

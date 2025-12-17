@@ -11,6 +11,10 @@ class Haste extends CoreHaste {
       this.addHasteBuff(SPELLS.FRENZY.id, { hastePerStack: 0.02 });
     }
 
+    if (this.selectedCombatant.hasTalent(TALENTS.VIOLENT_EUPHORIA_TALENT)) {
+      this.addHasteBuff(SPELLS.VIOLENT_EUPHORIA_BUFF.id, 0.15);
+    }
+
     const STRIKES_RANKS = this.selectedCombatant.getTalentRank(TALENTS.WILD_STRIKES_TALENT);
 
     if (STRIKES_RANKS > 0) {

@@ -38,6 +38,7 @@ import WhirlwindBuffOrderNormalizer from './modules/normalizers/WhirlwindBuffOrd
 import BrutalFinishBuffNormalizer from './modules/normalizers/BrutalFinishBuffNormalizer';
 import SuddenDeathBuffNormalizer from '../shared/modules/normalizers/SuddenDeathBuffNormalizer';
 import Guide from './Guide';
+import AplCheck from './modules/core/AplCheck';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -93,6 +94,8 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Debuggers
     rageCountDebugger: RageCountDebugger,
+
+    apl: AplCheck,
   };
 
   static guide = Guide;

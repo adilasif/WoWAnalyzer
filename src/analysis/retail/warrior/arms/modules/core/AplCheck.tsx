@@ -20,12 +20,6 @@ const SUDDEN_DEATH_DURATION = 12000;
 export const MASSACRE_EXECUTE_THRESHOLD = 0.35;
 export const DEFAULT_EXECUTE_THRESHOLD = 0.2;
 
-// tmy https://www.warcraftlogs.com/reports/Lna7ANqKFbBWkD2Q?fight=20&type=casts&source=376
-// bris https://www.warcraftlogs.com/reports/1R9TkvMF7HLPpVdm?fight=19&type=damage-done&source=43
-// nezy (opp) https://www.warcraftlogs.com/reports/y9gBTjamNH84vGMZ?fight=26&type=damage-done&source=2
-// walhe (col) https://www.warcraftlogs.com/reports/Ft8NByGLZ64AMX2f?fight=14&type=summary&source=12
-// pravum (col, wb, no massacre) https://www.warcraftlogs.com/reports/WTgD24mMz6wYaBL1?fight=5&type=summary&source=138
-
 export const apl = (info: PlayerInfo): Apl => {
   const executeThreshold = info.combatant.hasTalent(TALENTS.MASSACRE_SPEC_TALENT)
     ? MASSACRE_EXECUTE_THRESHOLD

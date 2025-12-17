@@ -65,7 +65,7 @@ function RotationSection({ modules, info }: GuideProps<typeof CombatLogParser>) 
         This single target rotation analyzer is based on a number of sources, including the guides
         at{' '}
         <a
-          href="https://www.wowhead.com/guide/classes/warrior/fury/rotation-cooldowns-pve-dps"
+          href="https://www.wowhead.com/guide/classes/warrior/arms/rotation-cooldowns-pve-dps"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -73,7 +73,7 @@ function RotationSection({ modules, info }: GuideProps<typeof CombatLogParser>) 
         </a>
         {' and '}
         <a
-          href="https://maxroll.gg/wow/class-guides/fury-warrior-raid-guide"
+          href="https://maxroll.gg/wow/class-guides/arms-warrior-raid-guide"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -99,8 +99,6 @@ function RotationSection({ modules, info }: GuideProps<typeof CombatLogParser>) 
         <SpellLink spell={TALENTS.REND_TALENT} icon />
       </p>
       <AplSectionData checker={AplCheck.check} apl={AplCheck.apl(info)} />
-      {/* <CooldownUsage analyzer={modules.essenceBreak} title="Essence Break" />
-      <CooldownUsage analyzer={modules.eyeBeam} title="Eye Beam" /> */}
     </Section>
   );
 }
