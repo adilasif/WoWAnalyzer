@@ -17,19 +17,10 @@ import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
 import Statistic from 'parser/ui/Statistic';
 import { STATISTIC_ORDER } from 'parser/ui/StatisticBox';
-import {
-  ON_CAST_BUFF_REMOVAL_GRACE_MS,
-  ENABLE_MOTE_CHECKS,
-  ENABLE_SOP_CHECKS,
-} from '../../constants';
+import { ON_CAST_BUFF_REMOVAL_GRACE_MS } from '../../constants';
 import CooldownUsage from 'parser/core/MajorCooldowns/CooldownUsage';
 import MajorCooldown, { CooldownTrigger } from 'parser/core/MajorCooldowns/MajorCooldown';
-import {
-  QualitativePerformance,
-  QualitativePerformanceThreshold,
-  evaluateQualitativePerformanceByThreshold,
-  getLowestPerf,
-} from 'parser/ui/QualitativePerformance';
+import { QualitativePerformance, getLowestPerf } from 'parser/ui/QualitativePerformance';
 import Enemies from 'parser/shared/modules/Enemies';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import { FLAMESHOCK_BASE_DURATION } from 'analysis/retail/shaman/shared/core/FlameShock';
@@ -43,10 +34,8 @@ import { ChecklistUsageInfo, SpellUse } from 'parser/core/SpellUsage/core';
 import { ResourceLink, SpellIcon, SpellLink } from 'interface';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import { formatDuration } from 'common/format';
-import { PerformanceMark } from 'interface/guide';
 import SpellMaelstromCost from '../core/SpellMaelstromCost';
 import MaelstromTracker from '../resources/MaelstromTracker';
-import { addEnhancedCastReason, addInefficientCastReason } from 'parser/core/EventMetaLib';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 
 const SK_DAMAGE_AFFECTED_ABILITIES = [
@@ -72,10 +61,6 @@ interface StormkeeperCast extends CooldownTrigger<BeginCastEvent | ApplyBuffEven
   maelstromOnCast: number;
   /** How long Flameshock had left when starting the window rotation */
   flameshockDurationOnCast: number;
-  /** If the user had Surge of Power already active when casting SK */
-  sopOnCast: boolean;
-  /** If the user had Master of the Elements already active when casting SK */
-  moteOnCast: boolean;
   /** What the user cast between casting SK and consuming the second buff. */
   timeline: SKTimeline;
   /** The ability that started the window. */
@@ -89,20 +74,7 @@ interface MaelstromGenerator {
   overload: number;
 }
 
-// Spells that must have SOP if cast within the SK window
-const SPELLS_SOP_BUFF_REQUIRED = [SPELLS.LIGHTNING_BOLT.id, TALENTS.CHAIN_LIGHTNING_TALENT.id];
-/** The performance to set the timeline to if the user missed SoP on one of
- *  the spells above
- */
-const SOP_BUFF_MISSING_PERFORMANCE = QualitativePerformance.Fail;
-
-/** The performance to set the timeline to if the user missed the Mote buff
- *  on EB
- */
-const MISSING_MOTE_PERFORMANCE = QualitativePerformance.Ok;
-
 const FLAMESHOCK_IDEAL_DURATION_REMAINING = 10000;
-const ELECTRIFIED_SHOCKS_IDEAL_DURATION_REMAINING = 6000;
 
 class Stormkeeper extends MajorCooldown<StormkeeperCast> {
   static dependencies = {
@@ -142,8 +114,8 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
   constructor(options: Options) {
     super({ spell: TALENTS.STORMKEEPER_TALENT }, options);
 
-    this.stSpender = this.selectedCombatant.hasTalent(TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT)
-      ? TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT
+    this.stSpender = this.selectedCombatant.hasTalent(TALENTS.ELEMENTAL_BLAST_TALENT)
+      ? TALENTS.ELEMENTAL_BLAST_TALENT
       : TALENTS.EARTH_SHOCK_TALENT;
 
     this.active =
@@ -151,8 +123,7 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
       this.selectedCombatant.hasTalent(TALENTS.ROLLING_THUNDER_TALENT);
     this.stSpenderCost = this.stSpender.maelstromCost ?? 0;
     if (this.selectedCombatant.hasTalent(TALENTS.EYE_OF_THE_STORM_TALENT)) {
-      this.stSpenderCost -=
-        this.stSpender.id === TALENTS.ELEMENTAL_BLAST_ELEMENTAL_TALENT.id ? 10 : 5;
+      this.stSpenderCost -= this.stSpender.id === TALENTS.ELEMENTAL_BLAST_TALENT.id ? 10 : 5;
     }
     if (!this.active) {
       return;
@@ -186,20 +157,16 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
       Events.damage.by(SELECTED_PLAYER).spell(SK_DAMAGE_AFFECTED_ABILITIES),
       this.onDamage,
     );
-    this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.LAVA_BURST_TALENT),
-      this.onLavaBurstCast,
-    );
   }
 
-  startWindowMaelstromRequired(hasSurgeOfPower: boolean): number {
-    /** in order to cast 2 lighting bolts with Surge of Power, need enough starting maelstrom
-     *  to cast 2 spenders, or 1 spender if Surge of Power was present at the start */
-    return (
-      this.stSpenderCost * (hasSurgeOfPower ? 1 : 2) -
-      /** subtract maelstrom generated from one lightning bolt + 3 overloads (2 from surge of power, 1 from stormkeeper) */
-      (this.maelstromGeneration.lightningBolt.base +
-        3 * this.maelstromGeneration.lightningBolt.overload)
+  startWindowMaelstromRequired(): number {
+    // Rough heuristic: enough maelstrom to fit both spenders during the window,
+    // accounting for the maelstrom gained from the first Lightning Bolt cast.
+    return Math.max(
+      0,
+      this.stSpenderCost * 2 -
+        (this.maelstromGeneration.lightningBolt.base +
+          this.maelstromGeneration.lightningBolt.overload),
     );
   }
 
@@ -218,8 +185,6 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
               FLAMESHOCK_BASE_DURATION * (1 + PANDEMIC_WINDOW),
               event.timestamp,
             ) || 0,
-        sopOnCast: this.selectedCombatant.hasBuff(SPELLS.SURGE_OF_POWER_BUFF.id),
-        moteOnCast: this.selectedCombatant.hasBuff(SPELLS.MASTER_OF_THE_ELEMENTS_BUFF.id),
         timeline: {
           start: event.timestamp,
           end: -1,
@@ -254,11 +219,6 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
     event: BeginCastEvent | BeginChannelEvent | EndChannelEvent | CastEvent | GlobalCooldownEvent,
   ) {
     if (this.activeWindow) {
-      const spenderNotAlreadyCast = !this.activeWindow.timeline.events
-        .filter((e) => e.type === EventType.Cast)
-        .map((e) => (e.type === EventType.Cast ? e.ability.guid : -1))
-        .includes(this.stSpender.id);
-
       if (event.type === EventType.Cast) {
         if (
           !this.activeWindow.firstStormkeeperEnhancedCast &&
@@ -266,53 +226,6 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
         ) {
           this.activeWindow.maelstromOnCast = this.maelstromTracker.current;
           this.activeWindow.firstStormkeeperEnhancedCast ??= event;
-        }
-
-        if (
-          ENABLE_MOTE_CHECKS &&
-          event.ability.guid === this.stSpender.id &&
-          !this.selectedCombatant.hasBuff(
-            SPELLS.MASTER_OF_THE_ELEMENTS_BUFF.id,
-            event.timestamp,
-            ON_CAST_BUFF_REMOVAL_GRACE_MS,
-          ) &&
-          // Some rotations cast SK before pull. In this case, the rotation is slightly different.
-          !(this.activeWindow.prepull && spenderNotAlreadyCast)
-        ) {
-          addInefficientCastReason(
-            event,
-            <>{this.stSpender.name} cast without Master of the Elements</>,
-          );
-          this.activeWindow.timeline.performance = getLowestPerf([
-            MISSING_MOTE_PERFORMANCE,
-            this.activeWindow.timeline.performance,
-          ]);
-        }
-
-        const sopSpellNotAlreadyCast =
-          this.activeWindow.timeline.events
-            .filter((e) => e.type === EventType.Cast)
-            .map((e) => (e.type === EventType.Cast ? e.ability.guid : -1))
-            .filter((e) => SPELLS_SOP_BUFF_REQUIRED.includes(e)).length === 0;
-
-        if (
-          ENABLE_SOP_CHECKS &&
-          SPELLS_SOP_BUFF_REQUIRED.includes(event.ability.guid) &&
-          !this.selectedCombatant.hasBuff(
-            SPELLS.SURGE_OF_POWER_BUFF.id,
-            event.timestamp,
-            ON_CAST_BUFF_REMOVAL_GRACE_MS,
-          ) &&
-          // Some rotations cast SK before pull. In this case, the rotation is slightly different.
-          !(this.activeWindow.prepull && sopSpellNotAlreadyCast) &&
-          (!this.maelstromTracker.lastBuilderInfo ||
-            this.maelstromTracker.lastBuilderInfo.amount >= this.stSpenderCost)
-        ) {
-          addInefficientCastReason(event, <>{event.ability.name} cast without Surge of Power</>);
-          this.activeWindow.timeline.performance = getLowestPerf([
-            SOP_BUFF_MISSING_PERFORMANCE,
-            this.activeWindow.timeline.performance,
-          ]);
         }
       }
 
@@ -334,34 +247,6 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
     this.damageDoneByBuffedCasts += event.amount + (event.absorbed || 0);
   }
 
-  onLavaBurstCast(event: CastEvent) {
-    if (this.activeWindow && !this.activeWindow.prepull) {
-      if (
-        this.selectedCombatant.hasBuff(
-          SPELLS.PRIMORDIAL_WAVE_BUFF,
-          event.timestamp,
-          ON_CAST_BUFF_REMOVAL_GRACE_MS,
-        )
-      ) {
-        addEnhancedCastReason(
-          event,
-          <>
-            Consuming <SpellLink spell={TALENTS.PRIMORDIAL_WAVE_TALENT} />
-          </>,
-        );
-      } else {
-        // false &&
-        //   addInefficientCastReason(
-        //     event,
-        //     <>
-        //       <SpellLink spell={TALENTS.LAVA_BURST_TALENT} /> should only be cast to consume{' '}
-        //       <SpellLink spell={TALENTS.PRIMORDIAL_WAVE_TALENT} />
-        //     </>,
-        //   );
-      }
-    }
-  }
-
   private explainTimelineWithDetails(cast: StormkeeperCast) {
     const checklistItem = {
       performance: cast.timeline.performance,
@@ -371,58 +256,16 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
       timestamp: cast.event.timestamp,
     };
 
-    // check all lightning bolts are buffed by both SoP and SK
-    const lightningBolts = cast.timeline.events.filter(
-      (e) => e.type === EventType.Cast && e.ability.guid === SPELLS.LIGHTNING_BOLT.id,
+    // check the window consumed the 2 Stormkeeper charges with LB/CL casts
+    const stormkeeperConsumers = cast.timeline.events.filter(
+      (e) =>
+        e.type === EventType.Cast &&
+        [SPELLS.LIGHTNING_BOLT.id, TALENTS.CHAIN_LIGHTNING_TALENT.id].includes(e.ability.guid),
     ) as CastEvent[];
-    switch (lightningBolts.length) {
-      case 2: {
-        const sopCasts = lightningBolts.filter((e) => e.meta?.isEnhancedCast).length;
-        checklistItem.performance =
-          sopCasts === 2 || (sopCasts === 1 && cast.prepull)
-            ? QualitativePerformance.Perfect
-            : sopCasts === 1
-              ? QualitativePerformance.Ok
-              : QualitativePerformance.Fail;
-        break;
-      }
-      default:
-        checklistItem.performance = QualitativePerformance.Fail;
-        break;
-    }
-
-    // look for any inefficient LvBs
-    const inefficientLavaBurstCasts = cast.timeline.events.filter((e) => {
-      if (e.type === EventType.Cast && e.ability.guid === TALENTS.LAVA_BURST_TALENT.id) {
-        return e.meta?.isInefficientCast;
-      }
-      return false;
-    }).length;
-    if (inefficientLavaBurstCasts > 0) {
-      const thresholds: QualitativePerformanceThreshold = {
-        actual: inefficientLavaBurstCasts,
-        isLessThanOrEqual: {
-          perfect: 0,
-          good: 1,
-          ok: 2,
-        },
-      };
-      checklistItem.performance = getLowestPerf([
-        checklistItem.performance,
-        evaluateQualitativePerformanceByThreshold(thresholds),
-      ]);
-    }
-
-    const showPrecastSop =
-      cast.sopOnCast &&
-      cast.firstStormkeeperEnhancedCast &&
-      SPELLS_SOP_BUFF_REQUIRED.includes(cast.firstStormkeeperEnhancedCast.ability.guid);
-    // lava burst and therefore master of the elements are not currently relevant to stormkeeper windows
-    const showPrecastMote =
-      ENABLE_MOTE_CHECKS &&
-      [this.stSpender.id].includes(cast.firstStormkeeperEnhancedCast!.ability.guid);
-
-    const showPrecastAny = showPrecastSop || showPrecastMote;
+    checklistItem.performance =
+      stormkeeperConsumers.length === 2
+        ? QualitativePerformance.Perfect
+        : QualitativePerformance.Fail;
 
     const extraDetails = (
       <div
@@ -430,36 +273,6 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
           overflowX: 'scroll',
         }}
       >
-        {showPrecastAny && (
-          <p style={{ marginBottom: '0px' }}>
-            <strong>Precast</strong>
-          </p>
-        )}
-        {showPrecastSop && (
-          <p>
-            <SpellIcon spell={TALENTS.SURGE_OF_POWER_TALENT} />:{' '}
-            <PerformanceMark
-              perf={
-                cast.firstStormkeeperEnhancedCast!.meta?.isEnhancedCast
-                  ? QualitativePerformance.Good
-                  : QualitativePerformance.Fail
-              }
-            />
-          </p>
-        )}
-
-        {showPrecastMote && (
-          <p>
-            <SpellIcon spell={TALENTS.MASTER_OF_THE_ELEMENTS_ELEMENTAL_TALENT} />:{' '}
-            <PerformanceMark
-              perf={
-                cast.firstStormkeeperEnhancedCast!.meta?.isEnhancedCast
-                  ? QualitativePerformance.Good
-                  : QualitativePerformance.Fail
-              }
-            />
-          </p>
-        )}
         <EmbeddedTimelineContainer
           secondWidth={60}
           secondsShown={(cast.timeline.end - cast.timeline.start) / 1000}
@@ -488,21 +301,13 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
   ): QualitativePerformance {
     if (cast.maelstromOnCast >= maelstromRequired) {
       return QualitativePerformance.Perfect;
-    } else if (cast.prepull) {
-      const maelstromForOneSoP =
-        this.stSpenderCost -
-        (this.maelstromGeneration.lightningBolt.base +
-          this.maelstromGeneration.lightningBolt.overload);
-      return cast.maelstromOnCast >= maelstromForOneSoP
-        ? QualitativePerformance.Perfect
-        : QualitativePerformance.Ok;
     } else {
       return QualitativePerformance.Ok;
     }
   }
 
   private explainMaelstromPerformance(cast: StormkeeperCast) {
-    const maelstromRequired = this.startWindowMaelstromRequired(cast.prepull || cast.sopOnCast);
+    const maelstromRequired = this.startWindowMaelstromRequired();
     const maelstromOnCastPerformance = this.determineMaelstromPerformance(maelstromRequired, cast);
 
     const checklistItem = {
@@ -559,20 +364,12 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
     return checklistItem;
   }
 
-  private determineElshocksPerformance(elshocksDurationOnCast: number): QualitativePerformance {
-    if (elshocksDurationOnCast > ELECTRIFIED_SHOCKS_IDEAL_DURATION_REMAINING) {
-      return QualitativePerformance.Perfect;
-    } else {
-      return QualitativePerformance.Ok;
-    }
-  }
-
   private determineTotalWindowPerformance(
     timelinePerformance: QualitativePerformance,
     maelstromOnCastPerformance: QualitativePerformance,
     FlSPerformance: QualitativePerformance,
   ) {
-    // if timeline performance is perfect, aka both LB were cast with SoP, and no LvB cast without PW, we can make maelstrom performance perfect as well
+    // if timeline performance is perfect, we can make maelstrom performance perfect as well
     if (timelinePerformance === QualitativePerformance.Perfect) {
       maelstromOnCastPerformance = QualitativePerformance.Perfect;
     }
@@ -598,17 +395,15 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
     const totalPerformance = this.determineTotalWindowPerformance(
       timeline.checklistItem.performance,
       maelstromOnCast.performance,
-      ENABLE_MOTE_CHECKS ? FlSDuration.performance : QualitativePerformance.Perfect,
+      FlSDuration.performance,
     );
 
     return {
       event: cast.event,
       performance: totalPerformance,
-      checklistItems: [
-        maelstromOnCast,
-        ENABLE_MOTE_CHECKS ? FlSDuration : null,
-        timeline.checklistItem,
-      ].filter((x) => x) as ChecklistUsageInfo[],
+      checklistItems: [maelstromOnCast, FlSDuration, timeline.checklistItem].filter(
+        (x) => x,
+      ) as ChecklistUsageInfo[],
       extraDetails: timeline.extraDetails,
     };
   }
@@ -657,9 +452,7 @@ class Stormkeeper extends MajorCooldown<StormkeeperCast> {
   }
 
   guideSubsection() {
-    return this.selectedCombatant.hasTalent(TALENTS.SURGE_OF_POWER_TALENT) ? (
-      <CooldownUsage analyzer={this} title="Stormkeeper" />
-    ) : null;
+    return this.active ? <CooldownUsage analyzer={this} title="Stormkeeper" /> : null;
   }
 }
 

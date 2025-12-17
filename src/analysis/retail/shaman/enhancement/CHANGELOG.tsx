@@ -3,5 +3,5 @@ import { Seriousnes } from 'CONTRIBUTORS';
 
 // prettier-ignore
 export default [
-    change(date(2024, 6, 12), <>Initial update for Midnight</>, Seriousnes)
+    change(date(2025, 12, 17), <>Initial update for Midnight</>, Seriousnes)
 ];
