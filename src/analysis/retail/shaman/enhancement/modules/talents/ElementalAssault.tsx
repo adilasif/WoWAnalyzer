@@ -26,7 +26,7 @@ import { maybeGetTalentOrSpell } from 'common/maybeGetTalentOrSpell';
 const STORMSTRIKE_DAMAGE_INCREASE = 0.2;
 
 const BAR_COLORS: Record<number, string> = {
-  [SPELLS.STORMSTRIKE_CAST.id]: '#3b7fb0',
+  [SPELLS.STORMSTRIKE.id]: '#3b7fb0',
   [TALENTS.LAVA_LASH_TALENT.id]: '#f37735',
   [-1]: '#532121', // wasted
 };
@@ -72,9 +72,7 @@ class ElementalAssault extends Analyzer.withDependencies({
     );
     if (cast) {
       const spellId =
-        cast.ability.guid === SPELLS.WINDSTRIKE_CAST.id
-          ? SPELLS.STORMSTRIKE_CAST.id
-          : cast.ability.guid;
+        cast.ability.guid === SPELLS.WINDSTRIKE_CAST.id ? SPELLS.STORMSTRIKE.id : cast.ability.guid;
       if (!this.elementalAssaultGenerators[spellId]) {
         this.elementalAssaultGenerators[spellId] = { generated: 0, wasted: 0 };
       }

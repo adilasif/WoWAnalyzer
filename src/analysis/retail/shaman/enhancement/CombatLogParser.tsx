@@ -1,7 +1,11 @@
-import { AnkhNormalizer, AstralShift, StaticCharge } from 'analysis/retail/shaman/shared';
+import {
+  AnkhNormalizer,
+  AstralShift,
+  FlameShock,
+  StaticCharge,
+} from 'analysis/retail/shaman/shared';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 
-import FlameShock from './modules/spells/FlameShock';
 import Abilities from './modules/Abilities';
 import Buffs from './modules/Buffs';
 import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
@@ -17,8 +21,6 @@ import ChainLightning from './modules/talents/ChainLightning';
 import ElementalOrbit from '../shared/talents/ElementalOrbit';
 import EarthenHarmony from '../restoration/modules/talents/EarthenHarmony';
 import Guide from './Guide';
-import StormBlast from './modules/talents/Stormblast';
-import LightningStrikes from './modules/talents/LightningStrikes';
 import { EventOrderNormalizer } from './modules/normalizers/EventOrderNormalizer';
 import SpellUsable from './modules/core/SpellUsable';
 import ManaSpring from '../shared/talents/ManaSpring';
@@ -28,7 +30,8 @@ import ThorimsInvocation from './modules/talents/ThorimsInvocation';
 import GlobalCooldown from 'parser/shared/modules/GlobalCooldown';
 import AshenCatalyst from './modules/talents/AshenCatalyst';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
-import Ascendance from './modules/talents/Ascendance';
+import DoomWinds from './modules/talents/DoomWinds';
+import ElementalTempo from './modules/talents/ElementalTempo';
 import MaelstromWeaponResourceNormalizer from './modules/normalizers/MaelstromWeaponResourceNormalizer';
 import {
   MaelstromWeaponDetails,
@@ -36,11 +39,12 @@ import {
   MaelstromWeaponSpenders,
   MaelstromWeaponTracker,
 } from './modules/resourcetracker';
-import MaestromRefreshBuffNormalizer from './modules/normalizers/MaelstromRefreshBuffNormalizer';
+import EnhancementRefreshBuffNormalizer from './modules/normalizers/MaelstromRefreshBuffNormalizer';
 import StaticAccumulation from './modules/talents/ThunderCapacitor';
 import PrimordialStorm from './modules/talents/PrimordialStorm';
 import Earthsurge from './modules/hero/totemic/Earthsurge';
 import EnchantChecker from './modules/core/EnchantChecker';
+import StormUnleashed from './modules/talents/StormUnleashed';
 
 class CombatLogParser extends CoreCombatLogParser {
   static defaultModules = {
@@ -80,24 +84,24 @@ class CombatLogParser extends CoreCombatLogParser {
     manaSpring: ManaSpring,
 
     // Enhancement Core Talents
-    ascendance: Ascendance,
+    doomWinds: DoomWinds,
     stormflurry: Stormflurry,
     hotHand: HotHand,
+    elementalTempo: ElementalTempo,
     elementalAssault: ElementalAssault,
-    stormBlast: StormBlast,
     feralSpirit: FeralSpirit,
     stormbringer: Stormsurge,
     thorimsInvocation: ThorimsInvocation,
     ashenCatalyst: AshenCatalyst,
     staticAccumulation: StaticAccumulation,
     primordialStorm: PrimordialStorm,
-    lightningStrikes: LightningStrikes,
+    stormUnleashed: StormUnleashed,
 
     // hero talents
     reactivity: Earthsurge,
 
     // Normalizers
-    maestromRefreshBuffNormalizer: MaestromRefreshBuffNormalizer, // removes refresh events following applybuff and applybuffstack
+    maestromRefreshBuffNormalizer: EnhancementRefreshBuffNormalizer, // removes refresh events following applybuff and applybuffstack
     eventOrderNormalizer: EventOrderNormalizer, // correct events occur out of order
     maelstromWeaponCastNormalizer: MaelstromWeaponCastNormalizer, // links
     eventLinkNormalizer: EventLinkNormalizer, // links various maelstrom casts to damage events, and spells made instant via maelstrom weapon

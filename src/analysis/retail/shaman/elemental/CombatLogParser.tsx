@@ -3,7 +3,6 @@ import {
   AstralShift,
   EarthShield,
   ElementalBlast,
-  FlameShock,
   SpiritWolf,
   StaticCharge,
 } from 'analysis/retail/shaman/shared';
@@ -18,6 +17,7 @@ import SubOptimalChainLightning from './modules/features/SubOptimalChainLightnin
 import Aftershock from './modules/talents/Aftershock';
 import Ascendance from './modules/talents/Ascendance';
 import Stormkeeper from './modules/talents/Stormkeeper';
+import MasterOfTheElements from './modules/talents/MasterOfTheElements';
 import ElementalOrbit from '../shared/talents/ElementalOrbit';
 import EarthenHarmony from '../restoration/modules/talents/EarthenHarmony';
 import ManaSpring from 'analysis/retail/shaman/shared/talents/ManaSpring';
@@ -33,7 +33,7 @@ import EventOrderNormalizer from './modules/normalizers/EventOrderNormalizer';
 import HeraldOfTheStorms from './modules/talents/HeraldOfTheStorms';
 import OfferingFromBeyond from './modules/hero/farseer/OfferingFromBeyond';
 import MaelstromSpenders from './modules/features/MaelstromSpenders';
-import PrimalElementalist from './modules/talents/PrimalElementalist';
+import FlameShock from './modules/core/FlameShock';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -59,9 +59,9 @@ class CombatLogParser extends CoreCombatLogParser {
     elementalOrbit: ElementalOrbit,
     earthenHarmony: EarthenHarmony,
     staticCharge: StaticCharge,
-    primalElementalist: PrimalElementalist,
     stormkeeper: Stormkeeper,
     ascendance: Ascendance,
+    masterOfTheElements: MasterOfTheElements,
     manaSpring: ManaSpring,
     heraldOfTheStorms: HeraldOfTheStorms,
 

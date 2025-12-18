@@ -26,17 +26,11 @@ const COOLDOWNS: Cooldown[] = [
   },
 ];
 
-function Cooldowns({ info, modules }: GuideProps<typeof CombatLogParser>) {
-  return (
-    <div>
-      <SubSection title="Major Individual Cooldowns">
-        {modules.ascendance.active && modules.ascendance.guideSubsection}
-        {modules.primalElementalist.active && modules.primalElementalist.guideSubsection}
-        <CooldownGraphSubsection checklist={COOLDOWNS} />
-      </SubSection>
-    </div>
-  );
+function Cooldowns({ modules }: GuideProps<typeof CombatLogParser>) {
+  return modules.ascendance.guideSubsection;
 }
+
+export const ElementalCooldownGraphs = () => <CooldownGraphSubsection checklist={COOLDOWNS} />;
 
 const CooldownGraphSubsection = ({ checklist }: Props) => {
   const info = useInfo();

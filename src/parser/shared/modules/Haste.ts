@@ -119,6 +119,7 @@ const DEFAULT_HASTE_BUFFS: HasteBuffMap = {
     hastePerStack: 0.01,
   },
   [SPELLS.SURGING_ELEMENTS_BUFF.id]: 0.15,
+  [SPELLS.MIDNIGHT_S1_THUNDEROUS_VELOCITY_BUFF.id]: 0.15,
   //endregion
 
   //region Warlock

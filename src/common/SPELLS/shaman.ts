@@ -256,6 +256,11 @@ const spells = {
     name: 'Chain Lightning Overload',
     icon: 'spell_nature_chainlightning',
   },
+  CHAIN_LIGHTNING_RIDE_THE_LIGHTNING_DAMAGE: {
+    id: 211094,
+    name: 'Chain Lightning',
+    icon: 'spell_nature_chainlightning',
+  },
   EARTHQUAKE_DAMAGE: {
     id: 77478,
     name: 'Earthquake',
@@ -320,6 +325,11 @@ const spells = {
     id: 210712,
     name: 'Aftershock',
     icon: 'spell_nature_stormreach',
+  },
+  MASTER_OF_THE_ELEMENTS_BUFF: {
+    id: 260734,
+    name: 'Master Of The Elements Buff',
+    icon: 'spell_nature_elementalabsorption',
   },
   UNLIMITED_POWER_BUFF: {
     id: 272737,
@@ -403,11 +413,6 @@ const spells = {
     name: 'Feral Spirit',
     icon: 'spell_shaman_feralspirit',
   },
-  FERAL_SPIRIT_MAELSTROM_BUFF: {
-    id: 333957,
-    name: 'Feral Spirit',
-    icon: 'spell_shaman_feralspirit',
-  },
   ELEMENTAL_SPIRITS_BUFF_MOLTEN_WEAPON: {
     id: 224125,
     name: 'Molten Weapon',
@@ -433,7 +438,7 @@ const spells = {
     name: 'Feral Spirit',
     icon: 'spell_shaman_feralspirit',
   },
-  STORMSTRIKE_CAST: {
+  STORMSTRIKE: {
     id: 17364,
     name: 'Stormstrike',
     icon: 'ability_shaman_stormstrike',
@@ -595,10 +600,30 @@ const spells = {
     name: 'Flametongue Attack',
     icon: 'spell_shaman_unleashweapon_flame',
   },
-  CRASH_LIGHTNING_BUFF: {
+  FLAMETONGUE_IMBUEMENT_MASTERY_TORNADO: {
+    id: 467386,
+    name: 'Flametongue Attack',
+    icon: 'spell_shaman_unleashweapon_flame',
+  },
+  CRASH_LIGHTNING_BUFF_DAMAGE: {
     id: 195592,
     name: 'Crash Lightning',
     icon: 'spell_shaman_crashlightning',
+  },
+  CRASH_LIGHTNING_BUFF: {
+    id: 1252415,
+    name: 'Crash Lightning',
+    icon: 'spell_shaman_crashlightning',
+  },
+  CRASH_LIGHTNING_UNLEASHED_DAMAGE: {
+    id: 1252431,
+    name: 'Crash Lightning (Unleashed)',
+    icon: 'spell_shaman_crashlightning',
+  },
+  STORM_UNLEASHED_BUFF: {
+    id: 1262830,
+    name: 'Storm Unleashed',
+    icon: 'spell_druid_astralstorm',
   },
   SPIRIT_OF_THE_MAELSTROM: {
     id: 204880,
@@ -990,16 +1015,6 @@ const spells = {
     name: 'Tempest',
     icon: 'inv_ability_stormcallershaman_tempest',
   },
-  AWAKENING_STORMS_DAMAGE: {
-    id: 455130,
-    name: 'Awakening Storms',
-    icon: 'spell_nature_stormreach',
-  },
-  AWAKENING_STORMS_BUFF: {
-    id: 462131,
-    name: 'Awakening Storms',
-    icon: 'spell_nature_stormreach',
-  },
   // Farseer
   ANCESTRAL_SWIFTNESS_CAST: {
     id: 443454,
@@ -1044,10 +1059,10 @@ const spells = {
   },
 
   // Tier sets
-  TWW_S2_ELECTROSTATIC_WAGER: {
-    id: 1223332,
-    name: 'Electrostatic Wager',
-    icon: 'shaman_pvp_staticcling',
+  MIDNIGHT_S1_THUNDEROUS_VELOCITY_BUFF: {
+    id: 1272101,
+    name: 'Thunderous Velocity',
+    icon: 'ability_thunderking_thunderstruck',
   },
 } satisfies Record<string, Spell>;
 

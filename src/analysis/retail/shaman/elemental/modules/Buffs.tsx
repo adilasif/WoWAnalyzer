@@ -1,5 +1,6 @@
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/shaman';
+import { TIERS } from 'game/TIERS';
 import { SpellbookAura } from 'parser/core/modules/Aura';
 import CoreAuras from 'parser/core/modules/Auras';
 
@@ -30,6 +31,12 @@ class Buffs extends CoreAuras {
         timelineHighlight: true,
       },
       {
+        spellId: SPELLS.MASTER_OF_THE_ELEMENTS_BUFF.id,
+        enabled: combatant.hasTalent(TALENTS.MASTER_OF_THE_ELEMENTS_TALENT),
+        triggeredBySpellId: TALENTS.LAVA_BURST_TALENT.id,
+        timelineHighlight: true,
+      },
+      {
         spellId: SPELLS.PRIMAL_FIRE_ELEMENTAL.id,
         enabled: combatant.hasTalent(TALENTS.PRIMAL_ELEMENTALIST_TALENT),
         triggeredBySpellId: TALENTS.ASCENDANCE_ELEMENTAL_TALENT.id,
@@ -44,6 +51,11 @@ class Buffs extends CoreAuras {
         enabled: combatant.hasTalent(TALENTS.CALL_OF_THE_ANCESTORS_TALENT),
         triggeredBySpellId: SPELLS.ANCESTRAL_SWIFTNESS_CAST.id,
         timelineHighlight: true,
+      },
+      {
+        spellId: SPELLS.MIDNIGHT_S1_THUNDEROUS_VELOCITY_BUFF.id,
+        enabled: combatant.has2PieceByTier(TIERS.MID1),
+        triggeredBySpellId: SPELLS.STORMKEEPER_BUFF_AND_CAST.id,
       },
     ];
   }

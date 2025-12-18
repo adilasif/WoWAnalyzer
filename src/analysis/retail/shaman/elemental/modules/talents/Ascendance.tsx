@@ -311,26 +311,24 @@ class Ascendance extends MajorCooldown<AscendanceCooldownCast> {
   description(): ReactNode {
     return (
       <>
-        <p>
-          <ol>
-            <li>
-              <strong>Uptime</strong>: You need to maximise the number of casts during your{' '}
-              <SpellLink spell={TALENTS.ASCENDANCE_ELEMENTAL_TALENT} /> window. It is often worth
-              pairing with <SpellLink spell={TALENTS.SPIRITWALKERS_GRACE_TALENT} /> to ensure
-              movement doesn't impact on your overall casts.
-            </li>
-            <li>
-              Try to avoid casting spells that don't interact with{' '}
-              <SpellLink spell={SPELLS.ELEMENTAL_MASTERY} />, such as{' '}
-              <SpellLink spell={TALENTS.FROST_SHOCK_TALENT} /> and{' '}
-              <SpellLink spell={SPELLS.FLAME_SHOCK} />.
-            </li>
-            <li>
-              If possible, try to cast <SpellLink spell={TALENTS.STORMKEEPER_TALENT} /> before{' '}
-              <SpellLink spell={TALENTS.ASCENDANCE_ELEMENTAL_TALENT} /> to not lose casting uptime.
-            </li>
-          </ol>
-        </p>
+        <ol>
+          <li>
+            <strong>Uptime</strong>: You need to maximise the number of casts during your{' '}
+            <SpellLink spell={TALENTS.ASCENDANCE_ELEMENTAL_TALENT} /> window. It is often worth
+            pairing with <SpellLink spell={TALENTS.SPIRITWALKERS_GRACE_TALENT} /> to ensure movement
+            doesn't impact on your overall casts.
+          </li>
+          <li>
+            Try to avoid casting spells that don't interact with{' '}
+            <SpellLink spell={SPELLS.ELEMENTAL_MASTERY} />, such as{' '}
+            <SpellLink spell={TALENTS.FROST_SHOCK_TALENT} /> and{' '}
+            <SpellLink spell={SPELLS.FLAME_SHOCK} />.
+          </li>
+          <li>
+            If possible, try to cast <SpellLink spell={TALENTS.STORMKEEPER_TALENT} /> before{' '}
+            <SpellLink spell={TALENTS.ASCENDANCE_ELEMENTAL_TALENT} /> to not lose casting uptime.
+          </li>
+        </ol>
       </>
     );
   }
@@ -448,9 +446,14 @@ class Ascendance extends MajorCooldown<AscendanceCooldownCast> {
   get guideSubsection() {
     return (
       this.active && (
-        <>
-          <CooldownUsage analyzer={this} title="Ascendance" />
-        </>
+        <CooldownUsage
+          analyzer={this}
+          title={
+            <>
+              <SpellLink spell={TALENTS.ASCENDANCE_ELEMENTAL_TALENT} />
+            </>
+          }
+        />
       )
     );
   }
