@@ -1,7 +1,3 @@
-/**
- * While Hot Hand is active Lava Lash shatters the earth, causing a Sundering at 50% effectiveness.
- * Sunderings from this effect do not Incapacitate.
- */
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/shaman';
 import { SpellLink } from 'interface';

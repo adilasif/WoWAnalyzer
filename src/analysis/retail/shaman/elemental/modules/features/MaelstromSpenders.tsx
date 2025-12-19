@@ -1,5 +1,6 @@
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import TALENTS from 'common/TALENTS/shaman';
+import SPELLS from 'common/SPELLS';
 import Events, {
   CastEvent,
   UpdateSpellUsableEvent,
@@ -19,6 +20,7 @@ import { ReactNode } from 'react';
 
 interface SpenderCast {
   event: CastEvent;
+  hasMoTE: boolean;
   currentMaelstrom: number;
   lavaBurstAvailableDuration: number;
 }
@@ -29,10 +31,18 @@ class MaelstromSpenders extends Analyzer.withDependencies({
 }) {
   spenderCasts: SpenderCast[] = [];
 
+  enabledTalents: {
+    masterOfTheElements: boolean;
+  };
+
   oneChargeLavaBurstTimestamp: number | null = this.owner.fight.start_time;
 
   constructor(options: Options) {
     super(options);
+
+    this.enabledTalents = {
+      masterOfTheElements: this.selectedCombatant.hasTalent(TALENTS.MASTER_OF_THE_ELEMENTS_TALENT),
+    };
 
     this.addEventListener(
       Events.cast
@@ -89,6 +99,9 @@ class MaelstromSpenders extends Analyzer.withDependencies({
   onSpenderCast(event: CastEvent) {
     const cast: SpenderCast = {
       event: event,
+      hasMoTE:
+        this.enabledTalents.masterOfTheElements &&
+        this.selectedCombatant.hasBuff(SPELLS.MASTER_OF_THE_ELEMENTS_BUFF.id, event.timestamp),
       currentMaelstrom:
         this.deps.maelstromTracker.current +
         (this.deps.maelstromTracker.lastSpenderInfo?.amount ?? 0),
@@ -97,6 +110,24 @@ class MaelstromSpenders extends Analyzer.withDependencies({
         : 0,
     };
     this.spenderCasts.push(cast);
+  }
+
+  // Create a checklist item for Master of the Elements state
+  private createMoteChecklistItem(cast: SpenderCast): ChecklistUsageInfo {
+    const explanation = (
+      <>
+        <SpellLink spell={TALENTS.MASTER_OF_THE_ELEMENTS_TALENT} /> was{' '}
+        {cast.hasMoTE ? 'active' : 'not active'}
+      </>
+    );
+
+    return {
+      timestamp: cast.event.timestamp,
+      summary: explanation,
+      check: 'has-mote',
+      performance: cast.hasMoTE ? QualitativePerformance.Perfect : QualitativePerformance.Fail,
+      details: <div>{explanation}</div>,
+    };
   }
 
   // Create a comprehensive checklist item for spender selection (merging Echoes and spender logic)
@@ -200,6 +231,13 @@ class MaelstromSpenders extends Analyzer.withDependencies({
   }
 
   calculateCastPerformance(cast: SpenderCast): QualitativePerformance {
+    if (this.enabledTalents.masterOfTheElements) {
+      // Prefer casting spenders with the MoTE buff; exceptions are allowed when near-capping.
+      if (cast.hasMoTE) {
+        return QualitativePerformance.Perfect;
+      }
+    }
+
     if (this.nearMaelstromCap(cast.currentMaelstrom)) {
       return cast.lavaBurstAvailableDuration < 1000
         ? QualitativePerformance.Good
@@ -209,7 +247,7 @@ class MaelstromSpenders extends Analyzer.withDependencies({
     }
   }
 
-  guideSubsection() {
+  get guideSubsection() {
     if (this.spenderCasts.length === 0) {
       return null;
     }
@@ -219,15 +257,24 @@ class MaelstromSpenders extends Analyzer.withDependencies({
       const maelstromCapChecklistItem = this.createMaelstromCapChecklistItem(cast);
       const lavaBurstCharges = this.createLavaBurstChecklistItem(cast);
       const spenderSelectionChecklistItem = this.createSpenderSelectionChecklistItem(cast);
+      const moteChecklistItem = this.createMoteChecklistItem(cast);
 
       const checks = [spenderSelectionChecklistItem];
+
+      if (this.enabledTalents.masterOfTheElements) {
+        checks.push(moteChecklistItem);
+      }
 
       let extraDetail: ReactNode | null = null;
       const performance = this.calculateCastPerformance(cast);
       // If not perfect, add additional details
       if (performance !== QualitativePerformance.Perfect) {
         checks.push(maelstromCapChecklistItem);
-        checks.push(lavaBurstCharges);
+
+        // If MoTE wasn't active, show lava burst availability to explain why.
+        if (!this.enabledTalents.masterOfTheElements || !cast.hasMoTE) {
+          checks.push(lavaBurstCharges);
+        }
 
         const warnings: ReactNode[] = [];
         warnings.push(<li key="maelstrom-warning">{this.getMaelstromWarning(cast)}</li>);
@@ -237,7 +284,15 @@ class MaelstromSpenders extends Analyzer.withDependencies({
             <li key="lava-burst-warning">
               One or more charges of <SpellLink spell={TALENTS.LAVA_BURST_TALENT} /> were available
               for <strong>{formatSeconds(cast.lavaBurstAvailableDuration, 1)}s</strong> - you should
-              have cast it earlier.
+              have cast it earlier
+              {this.enabledTalents.masterOfTheElements ? (
+                <>
+                  {' '}
+                  to have <SpellLink spell={TALENTS.MASTER_OF_THE_ELEMENTS_TALENT} /> active.
+                </>
+              ) : (
+                '.'
+              )}
             </li>,
           );
         }
@@ -274,16 +329,32 @@ class MaelstromSpenders extends Analyzer.withDependencies({
     const explanation = (
       <>
         <p>
-          You should aim to cast your <ResourceLink id={RESOURCE_TYPES.MAELSTROM.id} /> spenders to
-          avoid overcapping <ResourceLink id={RESOURCE_TYPES.MAELSTROM.id} /> (within 15 of your
-          maximum).
+          You should aim to cast your <ResourceLink id={RESOURCE_TYPES.MAELSTROM.id} /> spenders
+          {this.enabledTalents.masterOfTheElements ? (
+            <>
+              {' '}
+              with the <SpellLink spell={TALENTS.MASTER_OF_THE_ELEMENTS_TALENT} /> buff active to
+              maximize your damage output, or to avoid overcapping{' '}
+              <ResourceLink id={RESOURCE_TYPES.MAELSTROM.id} /> (within 15 of your maximum).
+            </>
+          ) : (
+            <>
+              {' '}
+              to avoid overcapping <ResourceLink id={RESOURCE_TYPES.MAELSTROM.id} /> (within 15 of
+              your maximum).
+            </>
+          )}
         </p>
       </>
     );
 
     return (
       <SpellUsageSubSection
-        title="Maelstrom Spender Usage"
+        title={
+          <>
+            <ResourceLink id={RESOURCE_TYPES.MAELSTROM.id} /> Spender Usage
+          </>
+        }
         explanation={explanation}
         performances={performances}
         uses={spellUses}

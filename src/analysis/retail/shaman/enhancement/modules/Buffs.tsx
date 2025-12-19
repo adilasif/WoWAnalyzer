@@ -43,11 +43,6 @@ class Buffs extends ClassBuffs {
         triggeredBySpellId: TALENTS.SUNDERING_TALENT.id,
       },
       {
-        spellId: SPELLS.FERAL_SPIRIT_MAELSTROM_BUFF.id,
-        enabled: combatant.hasTalent(TALENTS.FERAL_SPIRIT_TALENT),
-        triggeredBySpellId: TALENTS.FERAL_SPIRIT_TALENT.id,
-      },
-      {
         spellId: [SPELLS.WHIRLING_AIR.id, SPELLS.WHIRLING_EARTH.id, SPELLS.WHIRLING_FIRE.id],
         enabled: combatant.hasTalent(TALENTS.WHIRLING_ELEMENTS_TALENT),
         triggeredBySpellId: SPELLS.SURGING_TOTEM.id,
@@ -55,6 +50,11 @@ class Buffs extends ClassBuffs {
       },
       {
         spellId: TALENTS.VOLTAIC_BLAZE_TALENT.id,
+        timelineHighlight: true,
+      },
+      {
+        spellId: SPELLS.STORM_UNLEASHED_BUFF.id,
+        enabled: combatant.hasTalent(TALENTS.STORM_UNLEASHED_1_ENHANCEMENT_TALENT),
         timelineHighlight: true,
       },
     ];

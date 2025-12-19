@@ -38,7 +38,9 @@ const COOLDOWNS: Cooldown[] = [
 function Cooldowns({ info, modules, events }: GuideProps<typeof CombatLogParser>) {
   return (
     <Section title="Core">
-      {modules.ascendance.guideSubsection}
+      {modules.doomWinds.guideSubsection}
+      {modules.stormUnleashed.guideSubsection}
+      {modules.elementalTempo.guideSubsection}
       {modules.hotHand.guideSubsection}
       {modules.primordialStorm.guideSubsection}
       <SubSection title="Cooldowns">
