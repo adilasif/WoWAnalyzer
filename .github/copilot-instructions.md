@@ -190,7 +190,7 @@ import { GetRelatedEvent, GetRelatedEvents } from 'parser/core/Events';
 const damage = GetRelatedEvent<DamageEvent>(event, 'cast-to-damage');
 
 // Get all linked events
-const damages = GetRelatedEvents<DamageEvent>(event, EventType.Damage);
+const damages = GetRelatedEvents<DamageEvent>(event, 'cast-to-damage');
 ```
 
 ### Track Resources

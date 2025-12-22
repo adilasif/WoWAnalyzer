@@ -191,7 +191,7 @@ onCast(event: CastEvent) {
   const precast = GetRelatedEvent(event, 'precast');
   
   // Get multiple related events
-  const damages = GetRelatedEvents(event, EventType.Damage);
+  const damages = GetRelatedEvents<DamageEvent>(event, 'damage');
 }
 ```
 

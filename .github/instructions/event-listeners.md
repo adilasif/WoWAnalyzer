@@ -334,7 +334,7 @@ onCast(event: CastEvent) {
   }
 
   // Get all related damage events
-  const damages = GetRelatedEvents(event, EventType.Damage);
+  const damages = GetRelatedEvents<DamageEvent>(event, 'stormstrike-damage');
   damages.forEach((damage) => {
     this.totalDamage += damage.amount;
   });

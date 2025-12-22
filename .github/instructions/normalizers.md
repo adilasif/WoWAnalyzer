@@ -372,9 +372,9 @@ Lower priority value = runs first. Default priority is 0.
 6. **Type Safety**: Export link relation constants and use them consistently:
 
 ```typescript
-export const STORMSTRIKE_LINK: 'stormstrike-link';
-export const CHAIN_LIGHTNING_LINK: 'chain-lightning-link';
-export const TEMPEST_LINK: 'tempest-link';
+export const STORMSTRIKE_LINK = 'stormstrike-link';
+export const CHAIN_LIGHTNING_LINK = 'chain-lightning-link';
+export const TEMPEST_LINK = 'tempest-link';
 ```
 
 7. **Order Matters**: Register normalizers in the correct order based on dependencies. If an EventLinkNormalizer expects events in a certain order, ensure EventOrderNormalizer has a lower priority
