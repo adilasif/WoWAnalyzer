@@ -9,6 +9,7 @@ applyTo: '**'
 Normalizers pre-process combat log events to fix ordering issues, link related events, and transform event data. They run before analyzers process events.
 
 > **Clean Examples**: See Enhancement and Elemental shaman normalizers:
+>
 > - `src/analysis/retail/shaman/enhancement/modules/normalizers/`
 > - `src/analysis/retail/shaman/elemental/modules/normalizers/`
 
@@ -40,14 +41,14 @@ class EventLinkNormalizer extends BaseEventLinkNormalizer {
         linkingEventType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
         referencedEventId: SPELLS.STORMKEEPER_BUFF_AND_CAST.id,
         referencedEventType: EventType.BeginCast,
-        forwardBufferMs: -1,      // Only look backwards
-        backwardBufferMs: 2000,   // Up to 2s before
+        forwardBufferMs: -1, // Only look backwards
+        backwardBufferMs: 2000, // Up to 2s before
         anySource: true,
         anyTarget: true,
         maximumLinks: 1,
         isActive: (c) => c.hasTalent(TALENTS.STORMKEEPER_TALENT),
       },
-      
+
       // Link cast to damage
       {
         linkRelation: EVENT_LINKS.ChainLightning,
@@ -55,7 +56,7 @@ class EventLinkNormalizer extends BaseEventLinkNormalizer {
         linkingEventType: [EventType.Cast, EventType.FreeCast],
         referencedEventId: TALENTS.CHAIN_LIGHTNING_TALENT.id,
         referencedEventType: EventType.Damage,
-        forwardBufferMs: 500,     // Look up to 500ms forward
+        forwardBufferMs: 500, // Look up to 500ms forward
         anyTarget: true,
         reverseLinkRelation: EVENT_LINKS.ChainLightning, // Bidirectional
       },
@@ -113,7 +114,7 @@ class CustomNormalizer extends EventsNormalizer {
   normalize(events: AnyEvent[]): AnyEvent[] {
     // Transform events
     const modifiedEvents: AnyEvent[] = [];
-    
+
     for (const event of events) {
       // Modify or filter events
       if (event.type === EventType.Cast) {
@@ -123,7 +124,7 @@ class CustomNormalizer extends EventsNormalizer {
         modifiedEvents.push(event);
       }
     }
-    
+
     return modifiedEvents;
   }
 
@@ -158,40 +159,40 @@ const basicLink: EventLink = {
 interface EventLink {
   // REQUIRED: Key describing the relationship
   linkRelation: string;
-  
+
   // REQUIRED: Ability ID(s) of linking event (null matches any)
   linkingEventId: null | number | number[];
-  
+
   // REQUIRED: Event type(s) of linking event
   linkingEventType: EventType | EventType[];
-  
+
   // REQUIRED: Ability ID(s) of referenced event (null matches any)
   referencedEventId: null | number | number[];
-  
+
   // REQUIRED: Event type(s) of referenced event
   referencedEventType: EventType | EventType[];
-  
+
   // OPTIONAL: Max ms forward to search (default: 0)
   forwardBufferMs?: number;
-  
+
   // OPTIONAL: Max ms backward to search (default: 0)
   backwardBufferMs?: number;
-  
+
   // OPTIONAL: Allow different sources (default: false)
   anySource?: boolean;
-  
+
   // OPTIONAL: Allow different targets (default: false)
   anyTarget?: boolean;
-  
+
   // OPTIONAL: Create reverse link with this relation
   reverseLinkRelation?: string;
-  
+
   // OPTIONAL: Maximum links to create
   maximumLinks?: number | ((c: Combatant) => number);
-  
+
   // OPTIONAL: Additional condition function
   additionalCondition?: (linking: AnyEvent, referenced: AnyEvent) => boolean;
-  
+
   // OPTIONAL: Check if link should be active
   isActive?: (c: Combatant) => boolean;
 }
@@ -271,15 +272,15 @@ import { GetRelatedEvent, GetRelatedEvents } from 'parser/core/Events';
 class MyAnalyzer extends Analyzer {
   onCast(event: CastEvent) {
     // Get single linked event
-    const damage = GetRelatedEvent(event, 'stormstrike-damage');
+    const damage = GetRelatedEvent<DamageEvent>(event, 'stormstrike-damage');
     if (damage) {
       console.log('Found linked damage:', damage.amount);
     }
-    
-    // Get all linked events of a type
-    const allDamages = GetRelatedEvents(event, EventType.Damage);
+
+    // Get all linked events with a relation
+    const allDamages = GetRelatedEvents<DamageEvent>(event, 'stormstrike-damage');
     console.log(`Found ${allDamages.length} damage events`);
-    
+
     // Access _linkedEvents directly
     if (event._linkedEvents) {
       event._linkedEvents.forEach((link) => {
@@ -324,7 +325,7 @@ class CombatLogParser extends CoreCombatLogParser {
     eventOrderNormalizer: EventOrderNormalizer,
     eventLinkNormalizer: EventLinkNormalizer,
     maelstromResourceNormalizer: MaelstromResourceNormalizer,
-    
+
     // Then analyzers
     abilities: Abilities,
     stormflurry: Stormflurry,
@@ -341,19 +342,20 @@ Set priority to control execution order:
 class EventLinkNormalizer extends BaseEventLinkNormalizer {
   constructor(options: Options) {
     super(options, links);
-    this.priority = NormalizerOrder.EventLinkNormalizer; // 100
+    // Priority is optional; lower runs first
+    this.priority = -100;
   }
 }
 
 class EventOrderNormalizer extends BaseEventOrderNormalizer {
   constructor(options: Options) {
     super(options, orders);
-    this.priority = NormalizerOrder.EventOrderNormalizer; // 50
+    this.priority = -50;
   }
 }
 ```
 
-Higher priority = runs first. Default priority is 0.
+Lower priority value = runs first. Default priority is 0.
 
 ## Best Practices
 
@@ -370,20 +372,14 @@ Higher priority = runs first. Default priority is 0.
 6. **Type Safety**: Export link relation constants and use them consistently:
 
 ```typescript
-export const EnhancementEventLinks = {
-  STORMSTRIKE_LINK: 'stormstrike-link',
-  CHAIN_LIGHTNING_LINK: 'chain-lightning-link',
-  TEMPEST_LINK: 'tempest-link',
-} as const;
+export const STORMSTRIKE_LINK: 'stormstrike-link';
+export const CHAIN_LIGHTNING_LINK: 'chain-lightning-link';
+export const TEMPEST_LINK: 'tempest-link';
 ```
 
-7. **Test Complex Links**: Verify links work correctly with combat logs before relying on them.
+7. **Order Matters**: Register normalizers in the correct order based on dependencies. If an EventLinkNormalizer expects events in a certain order, ensure EventOrderNormalizer has a lower priority
 
-8. **Document Links**: Comment what each link does and why it's needed.
-
-9. **Order Matters**: Register normalizers in the correct order - EventOrderNormalizer before EventLinkNormalizer.
-
-10. **Verify Events**: Don't assume events or spells exist. Search for them in the codebase first.
+8. **Verify Events**: Don't assume events or spells exist. Search for them in the codebase first.
 
 ## Common Patterns
 

@@ -24,6 +24,7 @@ grep -r "Ascendance" src/common/SPELLS/shaman.ts
 ```
 
 Or use the file search:
+
 - Check `src/common/SPELLS/` for manually-defined spells
 - Check class-specific SPELLS files like `src/analysis/retail/shaman/enhancement/SPELLS.ts`
 
@@ -81,7 +82,7 @@ const spell = TALENTS_SHAMAN.LAVA_BURST_TALENT;
 
 ```typescript
 // ❌ Don't assume
-Events.customEventType // Might not exist
+Events.customEventType; // Might not exist
 
 // ✅ Check Events.ts first
 import Events, { EventType } from 'parser/core/Events';
@@ -167,16 +168,19 @@ import SPELLS from 'common/SPELLS/shaman'; // Class-specific
 ### Testing Changes
 
 1. **Build the Code**:
+
 ```bash
 pnpm typecheck
 ```
 
 2. **Check for Lint Errors**:
+
 ```bash
 pnpm lint
 ```
 
 3. **Manual Verification**:
+
 - Start dev server: `pnpm start`
 - Load a relevant combat log
 - Verify analyzer appears in statistics/guide
@@ -184,15 +188,12 @@ pnpm lint
 
 ### Common Mistakes
 
-#### 1. Using Wrong Spell Object
+#### 1. Spell and Talent Objects
 
 ```typescript
-// ❌ Using talent object where spell expected
+// ✅ Using a talent object where Spell | Talent is expected
 import { TALENTS_SHAMAN } from 'common/TALENTS';
-Events.cast.by(SELECTED_PLAYER).spell(TALENTS_SHAMAN.ASCENDANCE_ELEMENTAL_TALENT)
-
-// ✅ Correct - talents work here too
-// EventFilter accepts Spell | Talent objects
+Events.cast.by(SELECTED_PLAYER).spell(TALENTS_SHAMAN.ASCENDANCE_ELEMENTAL_TALENT);
 ```
 
 #### 2. Missing Dependencies
@@ -206,7 +207,17 @@ class MyAnalyzer extends Analyzer {
 }
 
 // ✅ Declare dependency
-class MyAnalyzer extends Analyzer {
+class MyAnalyzer extends Analyzer.withDependencies({
+  spellUsable: SpellUsable,
+}) {
+  onCast(event: CastEvent) {
+    if (this.deps.spellUsable.chargesAvailable(event.ability.guid)) {
+    }
+  }
+}
+
+// ✅ Declare dependency alternative
+class MyAnalyzer extends MajorCooldown<BigCooldown> {
   static dependencies = {
     spellUsable: SpellUsable,
   };
