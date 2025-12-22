@@ -48,21 +48,6 @@ import { SpellIcon } from 'interface';
 - **Redux**: Redux Toolkit 2.9.2 with Redux Thunk
 - **React Redux**: 9.2.0
 
-### Internationalization
-- **Library**: @lingui/core 5.5.1 with @lingui/macro
-- **Format**: JSON format with lingui extract
-
-```typescript
-// Using lingui macros for translations
-import { Trans, t } from '@lingui/macro';
-
-// In JSX
-<Trans>Cast efficiency</Trans>
-
-// In code
-const message = t`Not enough mana`;
-```
-
 ### Testing
 - **Test Runner**: Vitest 3.2.4
 - **Testing Library**: @testing-library/react 16.3.0
@@ -106,17 +91,6 @@ src/
 
 ## Key Conventions
 
-### Module Resolution
-Use path aliases instead of relative imports:
-```typescript
-// ✅ Correct
-import SPELLS from 'common/SPELLS';
-import Analyzer from 'parser/core/Analyzer';
-
-// ❌ Incorrect
-import SPELLS from '../../../../common/SPELLS';
-```
-
 ### File Organization
 - Talent analyzers: `src/analysis/retail/{class}/{spec}/modules/talents/`
 - Spell analyzers: `src/analysis/retail/{class}/{spec}/modules/spells/`
@@ -126,7 +100,7 @@ import SPELLS from '../../../../common/SPELLS';
 - Guide components: `src/analysis/retail/{class}/{spec}/guide/`
 
 > Note: Some older specs use different structures (e.g., `analyzers/` instead of `modules/talents/`). 
-> Prefer the Enhancement/Elemental shaman structure for new code.
+> Prefer the Brewmaster monk/Enhancement shaman structure for new code.
 
 ### Naming Conventions
 - Classes: PascalCase (`ArcaneBarrage`, `SpellUsable`)

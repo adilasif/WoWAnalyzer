@@ -479,21 +479,3 @@ class Ascendance extends Analyzer {
   }
 }
 ```
-
-## Best Practices
-
-1. **Verify Events Exist**: Don't assume event types or spells exist. Search for them first or ask for clarification.
-
-2. **Type Your Handlers**: Always specify the event type in the handler signature.
-
-3. **Filter Appropriately**: Use `.by(SELECTED_PLAYER)` and `.spell()` to reduce unnecessary event processing.
-
-4. **Return Early**: Check conditions and return early to avoid nested logic.
-
-5. **Use Linked Events**: Prefer getting related events from normalizers rather than searching manually.
-
-6. **Conditional Registration**: Only register listeners when the module is active.
-
-7. **Handler Naming**: Use descriptive names like `onFlameShockCast`, `onAscendanceApply`.
-
-8. **Single Responsibility**: Each handler should do one thing well. Split complex logic into helper methods.

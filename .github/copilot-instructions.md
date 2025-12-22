@@ -10,6 +10,7 @@ WoWAnalyzer is a World of Warcraft combat log analyzer built with React and Type
 - **[Normalizers](instructions/normalizers.md)** - Pre-processing events and linking related events
 - **[Verification](instructions/verification.md)** - How to verify code and avoid assumptions
 - **[Build Instructions](instructions/build.instructions.md)** - Building and testing
+- **[Follow-up questions](instructions/follow-up-questions.instructions.md)** - Always ask for clarification until you have 97% confidence that you know what to build
 
 ## Quick Start
 
@@ -45,9 +46,9 @@ See [Verification Guide](instructions/verification.md) for details.
 
 When implementing new features or fixing bugs, refer to these clean, well-structured examples:
 
-**Primary Examples** (preferred):
+**Primary Examples**
+- `src/analysis/retail/monk/brewmaster/` - Brewmaster Monk
 - `src/analysis/retail/shaman/enhancement/` - Enhancement Shaman
-- `src/analysis/retail/shaman/elemental/` - Elemental Shaman
 
 **Structure Example**:
 ```
@@ -68,7 +69,6 @@ src/analysis/retail/{class}/{spec}/
 - Use proper TypeScript types
 - Specify event types in handlers: `onCast(event: CastEvent)`
 - Handle optional properties: `event.absorb || 0`
-- Run `pnpm typecheck` before committing
 
 ### 4. Use Path Aliases
 
@@ -187,10 +187,10 @@ this.selectedCombatant.getTalentRank(TALENTS_SHAMAN.STORMKEEPER_TALENT)
 import { GetRelatedEvent, GetRelatedEvents } from 'parser/core/Events';
 
 // Get single linked event
-const damage = GetRelatedEvent(event, 'cast-to-damage');
+const damage = GetRelatedEvent<DamageEvent>(event, 'cast-to-damage');
 
 // Get all linked events
-const damages = GetRelatedEvents(event, EventType.Damage);
+const damages = GetRelatedEvents<DamageEvent>(event, EventType.Damage);
 ```
 
 ### Track Resources
@@ -228,24 +228,11 @@ this.maelstromTracker.wasted   // Total wasted
 - Functions: camelCase (`onCast()`)
 - Constants: SCREAMING_SNAKE_CASE (`MAX_CHARGES`)
 
-## Code Review Checklist
-
-Before submitting code, verify:
-
-- [ ] `pnpm typecheck` passes without errors
-- [ ] All spells/talents/modules exist and are imported correctly
-- [ ] Event handlers have correct signatures
-- [ ] Dependencies are declared in `static dependencies`
-- [ ] Conditional logic sets `this.active` appropriately
-- [ ] Path aliases are used instead of relative imports
-- [ ] Code follows patterns from Enhancement/Elemental shaman examples
-- [ ] Complex logic is commented
-
 ## Getting Help
 
 If you're unsure about:
 - Whether a spell/talent exists → Search the codebase or ask
-- Which pattern to follow → Check Enhancement/Elemental shaman examples
+- Which pattern to follow → Check Brewmaster Monk/Enhancement Shaman examples
 - How to implement something → See documentation links above or ask
 - Event types or APIs → Check `src/parser/core/` files or ask
 

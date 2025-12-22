@@ -305,30 +305,3 @@ class AlwaysBeCasting extends CoreAlwaysBeCasting {
   // Customized ABC for the spec
 }
 ```
-
-## Best Practices
-
-1. **Verify Before Assuming**: Never assume a spell, talent, or buff exists. Search for it in SPELLS or TALENTS first.
-
-2. **Check Activation**: Always set `this.active` appropriately in the constructor.
-
-3. **Type Safety**: Use proper TypeScript types for events (CastEvent, DamageEvent, etc.).
-
-4. **Early Returns**: Return early if the analyzer is inactive or events don't match expected conditions.
-
-5. **Linked Events**: Use event linking from normalizers instead of manually searching for related events.
-
-6. **Comments**: Add comments for complex logic or non-obvious mechanics.
-
-7. **Clean Imports**: Import only what you need, using path aliases.
-
-```typescript
-// ✅ Good
-import { TALENTS_SHAMAN } from 'common/TALENTS';
-import SPELLS from 'common/SPELLS/shaman';
-
-// ❌ Bad - don't use relative paths
-import SPELLS from '../../../../common/SPELLS/shaman';
-```
-
-8. **Consistent Structure**: Follow the Enhancement/Elemental shaman module organization.
