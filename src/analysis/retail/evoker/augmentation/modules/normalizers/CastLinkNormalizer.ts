@@ -379,7 +379,7 @@ const EVENT_LINKS: EventLink[] = [
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CAST_BUFFER_MS,
     isActive: (C) => C.hasTalent(TALENTS.INFERNOS_BLESSING_TALENT),
-    maximumLinks: 5,
+    maximumLinks: 2,
   },
   {
     linkRelation: EMERALD_BLOSSOM_SYMBIOTIC_APPLY,
