@@ -19,7 +19,7 @@ interface Props {
   windows: BreathOfEonsWindows[];
   fightStartTime: number;
   fightEndTime: number;
-  ebonMightCount: SpellTracker[];
+  prescienceCount: SpellTracker[];
   shiftingSandsCount: SpellTracker[];
 }
 
@@ -27,7 +27,7 @@ const BreathOfEonsSection: FC<Props> = ({
   windows,
   fightStartTime,
   fightEndTime,
-  ebonMightCount,
+  prescienceCount,
   shiftingSandsCount,
 }) => {
   const graphData: GraphData[] = [];
@@ -52,16 +52,16 @@ const BreathOfEonsSection: FC<Props> = ({
           strokeWidth: 3,
         },
         {
-          spellTracker: ebonMightCount,
+          spellTracker: prescienceCount,
           type: 'line',
-          color: '#F3A738',
-          label: 'Ebon Might',
+          color: 'rgb(255, 225, 130)',
+          label: 'Prescience',
           size: 4,
         },
         {
           spellTracker: shiftingSandsCount,
           type: 'line',
-          color: '#F7EC59',
+          color: 'rgb(255, 255, 0)',
           label: 'Shifting Sands',
           size: 4,
         },

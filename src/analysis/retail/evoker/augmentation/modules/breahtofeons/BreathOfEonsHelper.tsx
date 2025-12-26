@@ -75,7 +75,6 @@ const BreathOfEonsHelper: FC<Props> = ({ windows, fightStartTime, fightEndTime, 
   const filter = useMemo(() => {
     const filter = `type = "damage" 
     AND (target.id != source.id)
-    AND target.id not in(169428, 169430, 169429, 169426, 169421, 169425, 168932)
     AND not (target.id = source.owner.id)
     AND not (supportedActor.id = target.id)
     AND not (source.id = target.owner.id)
@@ -437,7 +436,7 @@ const BreathOfEonsHelper: FC<Props> = ({ windows, fightStartTime, fightEndTime, 
         (sourceID) => sourceID.sourceID !== -1 && sourceID.sourceID !== owner.selectedCombatant.id,
       )
       .sort((a, b) => b.damage - a.damage)
-      .splice(0, 4);
+      .splice(0, 20);
     // Add back the player (if they did damage)
     if (playerDammies) {
       sortedDamageWindow.push(playerDammies);
