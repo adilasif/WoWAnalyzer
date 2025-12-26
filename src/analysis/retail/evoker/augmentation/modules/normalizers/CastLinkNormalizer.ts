@@ -114,7 +114,6 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventId: SPELLS.EBON_MIGHT_BUFF_EXTERNAL.id,
     referencedEventType: [EventType.ApplyBuff, EventType.RefreshBuff],
     anyTarget: true,
-    maximumLinks: 4,
     forwardBufferMs: EBON_MIGHT_BUFFER,
     backwardBufferMs: EBON_MIGHT_BUFFER,
   },
