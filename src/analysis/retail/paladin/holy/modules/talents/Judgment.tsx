@@ -22,7 +22,7 @@ class Judgment extends Analyzer {
         generating <ResourceLink id={RESOURCE_TYPES.HOLY_POWER.id} />,{' '}
         <SpellLink spell={TALENTS.GREATER_JUDGMENT_HOLY_TALENT} /> and{' '}
         <SpellLink spell={SPELLS.INFUSION_OF_LIGHT} />, and{' '}
-        <SpellLink spell={TALENTS.EMPYREAN_LEGACY_TALENT} />.
+        <SpellLink spell={TALENTS.EMPYREAN_LEGACY_HOLY_TALENT} />.
       </p>
     );
 
