@@ -54,6 +54,7 @@ import { GUST_OF_MISTS_EVENT_LINKS } from './EventLinks/GustOfMistEventLinks';
 import { MANA_TEA_EVENT_LINKS } from './EventLinks/ManaTeaEventLinks';
 import { VIVIFY_EVENT_LINKS } from './EventLinks/VivifyEventLinks';
 import { ENVELOPING_MIST_EVENT_LINKS } from './EventLinks/EnvelopingMistEventLinks';
+import { DAMAGING_ABILITIES_EVENT_LINKS } from './EventLinks/DamagingAbilitiesEventLinks';
 import { HERO_TALENT_EVENT_LINKS } from './EventLinks/HeroTalentEventLinks';
 import { TIER_EVENT_LINKS } from './EventLinks/TierEventLinks';
 import SPELLS from 'common/SPELLS';
@@ -71,6 +72,7 @@ const EVENT_LINKS: EventLink[] = [
   ...MANA_TEA_EVENT_LINKS,
   ...VIVIFY_EVENT_LINKS,
   ...ENVELOPING_MIST_EVENT_LINKS,
+  ...DAMAGING_ABILITIES_EVENT_LINKS,
   ...HERO_TALENT_EVENT_LINKS,
   ...TIER_EVENT_LINKS,
   {
