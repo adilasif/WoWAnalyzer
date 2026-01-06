@@ -8,10 +8,7 @@ applyTo: '**'
 
 Event listeners are the primary mechanism for analyzers to respond to combat log events. They are registered in the analyzer's constructor using `addEventListener`.
 
-> **Reference Examples**: See Enhancement and Elemental shaman for clean event listener patterns:
->
-> - `src/analysis/retail/shaman/enhancement/modules/talents/Stormflurry.tsx`
-> - `src/analysis/retail/shaman/elemental/modules/talents/Ascendance.tsx`
+> Reference implementations: see `.github/instructions/reference-examples.md`.
 
 ## addEventListener Signature
 
@@ -260,18 +257,8 @@ Return early for events that don't match your criteria:
 
 ```typescript
 onCast(event: CastEvent) {
-  // Check for linked events
-  if (!event._linkedEvents) {
-    return;
-  }
-
-  // Check combatant state
-  if (!this.selectedCombatant.hasBuff(SPELLS.ASCENDANCE_ELEMENTAL_BUFF.id)) {
-    return;
-  }
-
-  // Check resource availability
-  if (this.maelstromTracker.current < 60) {
+  // Example guard
+  if (!event.ability) {
     return;
   }
 
@@ -321,139 +308,6 @@ onResourceChange(event: ResourceChangeEvent) {
 }
 ```
 
-### Processing Linked Events
-
-```typescript
-import { GetRelatedEvent, GetRelatedEvents, EventType } from 'parser/core/Events';
-
-onCast(event: CastEvent) {
-  // Get single related event
-  const precast = GetRelatedEvent(event, 'precast');
-  if (precast) {
-    // Process precast
-  }
-
-  // Get all related damage events
-  const damages = GetRelatedEvents(event, EventType.Damage);
-  damages.forEach((damage) => {
-    this.totalDamage += damage.amount;
-  });
-
-  // Using _linkedEvents directly
-  if (event._linkedEvents) {
-    const stormstrikeDamages = event._linkedEvents
-      .filter((le) => le.relation === EnhancementEventLinks.STORMSTRIKE_LINK)
-      .map((le) => le.event as DamageEvent);
-  }
-}
-```
-
 ## Complete Example
 
-```typescript
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import Events, {
-  CastEvent,
-  ApplyBuffEvent,
-  RemoveBuffEvent,
-  GlobalCooldownEvent,
-  FightEndEvent,
-  EventType,
-} from 'parser/core/Events';
-import SPELLS from 'common/SPELLS/shaman';
-import { TALENTS_SHAMAN } from 'common/TALENTS';
-import MaelstromTracker from '../resources/MaelstromTracker';
-
-class Ascendance extends Analyzer {
-  static dependencies = {
-    maelstromTracker: MaelstromTracker,
-  };
-  protected maelstromTracker!: MaelstromTracker;
-
-  protected currentWindow: AscendanceWindow | null = null;
-  protected globalCooldownEnds = 0;
-
-  constructor(options: Options) {
-    super(options);
-
-    this.active = this.selectedCombatant.hasTalent(TALENTS_SHAMAN.ASCENDANCE_ELEMENTAL_TALENT);
-
-    if (!this.active) {
-      return;
-    }
-
-    // Global cooldown tracking
-    this.addEventListener(Events.GlobalCooldown, this.onGlobalCooldown);
-
-    // Ascendance cast
-    this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS_SHAMAN.ASCENDANCE_ELEMENTAL_TALENT),
-      this.onAscendanceCast,
-    );
-
-    // Ascendance buff application (for procs)
-    this.addEventListener(
-      Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.ASCENDANCE_ELEMENTAL_BUFF),
-      this.onAscendanceApply,
-    );
-
-    // Ascendance ending
-    this.addEventListener(
-      Events.removebuff.by(SELECTED_PLAYER).spell(SPELLS.ASCENDANCE_ELEMENTAL_BUFF),
-      this.onAscendanceEnd,
-    );
-
-    // Track all casts during window
-    this.addEventListener(Events.any.by(SELECTED_PLAYER), this.onCast);
-
-    // Handle fight end
-    this.addEventListener(Events.fightend, this.onFightEnd);
-  }
-
-  onGlobalCooldown(event: GlobalCooldownEvent) {
-    this.globalCooldownEnds = event.duration + event.timestamp;
-  }
-
-  onAscendanceCast(event: CastEvent) {
-    this.currentWindow = {
-      start: Math.max(event.timestamp, this.globalCooldownEnds),
-      events: [],
-    };
-  }
-
-  onAscendanceApply(event: ApplyBuffEvent) {
-    // Handle procs from Deeply Rooted Elements
-    if (!this.currentWindow) {
-      this.currentWindow = {
-        start: event.timestamp,
-        events: [],
-      };
-    }
-  }
-
-  onAscendanceEnd(event: RemoveBuffEvent) {
-    if (this.currentWindow) {
-      this.currentWindow.end = event.timestamp;
-      this.analyzeWindow(this.currentWindow);
-      this.currentWindow = null;
-    }
-  }
-
-  onCast(event: AnyEvent) {
-    if (this.currentWindow && event.type === EventType.Cast) {
-      this.currentWindow.events.push(event);
-    }
-  }
-
-  onFightEnd(event: FightEndEvent) {
-    if (this.currentWindow) {
-      this.currentWindow.end = event.timestamp;
-      this.analyzeWindow(this.currentWindow);
-    }
-  }
-
-  analyzeWindow(window: AscendanceWindow) {
-    // Analyze ascendance usage
-  }
-}
-```
+See the spec analyzers referenced in the Overview section for a full end-to-end module.

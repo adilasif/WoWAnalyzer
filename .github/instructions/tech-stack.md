@@ -4,11 +4,20 @@ applyTo: '**'
 
 # Tech Stack
 
+## Version Policy
+
+This project upgrades dependencies over time. Do not assume specific version numbers from this document.
+
+- Source of truth for library/tool versions: `package.json` (and `pnpm-lock.yaml` for the exact resolved tree).
+- Source of truth for TypeScript/JS features and module resolution: `tsconfig.json`.
+- When using a library/framework feature that may be version-specific, verify it exists in the current dependency versions before relying on it.
+
 ## Core Technologies
 
 ### TypeScript & React
-- **Language**: TypeScript 5.9.3 (strict mode enabled)
-- **UI Framework**: React 19.2.0 with React Hooks
+
+- **Language**: TypeScript (strict mode enabled)
+- **UI Framework**: React with React Hooks
 - **JSX Transform**: `react-jsx` (automatic runtime)
 - **Styling**: Emotion (`@emotion/react`, `@emotion/styled`)
 
@@ -32,8 +41,9 @@ function MyComponent() {
 ```
 
 ### Build System
-- **Build Tool**: Vite 7.1.12
-- **Package Manager**: pnpm 9.5.0
+
+- **Build Tool**: Vite
+- **Package Manager**: pnpm (see `package.json#packageManager`)
 - **Module Resolution**: Bundler mode with path aliases
 
 ```typescript
@@ -45,17 +55,20 @@ import { SpellIcon } from 'interface';
 ```
 
 ### State Management
-- **Redux**: Redux Toolkit 2.9.2 with Redux Thunk
-- **React Redux**: 9.2.0
+
+- **Redux**: Redux Toolkit with Redux Thunk
+- **React Redux**: react-redux
 
 ### Testing
-- **Test Runner**: Vitest 3.2.4
-- **Testing Library**: @testing-library/react 16.3.0
-- **E2E Testing**: Playwright 1.54
+
+- **Test Runner**: Vitest
+- **Testing Library**: @testing-library/react
+- **E2E Testing**: Playwright
 
 ### Linting & Formatting
-- **ESLint**: 9.38.0 with typescript-eslint 8.46.2
-- **Prettier**: 3.6.2
+
+- **Linter**: ESLint with typescript-eslint
+- **Formatter**: Prettier
 - **Pre-commit**: Husky with lint-staged
 
 ## Project Structure
@@ -92,6 +105,7 @@ src/
 ## Key Conventions
 
 ### File Organization
+
 - Talent analyzers: `src/analysis/retail/{class}/{spec}/modules/talents/`
 - Spell analyzers: `src/analysis/retail/{class}/{spec}/modules/spells/`
 - Normalizers: `src/analysis/retail/{class}/{spec}/modules/normalizers/`
@@ -99,10 +113,11 @@ src/
 - Feature modules: `src/analysis/retail/{class}/{spec}/modules/features/`
 - Guide components: `src/analysis/retail/{class}/{spec}/guide/`
 
-> Note: Some older specs use different structures (e.g., `analyzers/` instead of `modules/talents/`). 
+> Note: Some older specs use different structures (e.g., `analyzers/` instead of `modules/talents/`).
 > Prefer the Brewmaster monk/Enhancement shaman structure for new code.
 
 ### Naming Conventions
+
 - Classes: PascalCase (`ArcaneBarrage`, `SpellUsable`)
 - Files: PascalCase for components/classes (`ArcaneBarrage.tsx`)
 - Constants: SCREAMING_SNAKE_CASE (`MAX_ARCANE_CHARGES`)
@@ -110,6 +125,7 @@ src/
 ## Dependencies to Know
 
 ### Parser Core
+
 - `parser/core/Analyzer` - Base class for all analyzers
 - `parser/core/Events` - Event types and utilities
 - `parser/core/EventFilter` - Event filtering for listeners
@@ -117,39 +133,19 @@ src/
 - `parser/core/EventOrderNormalizer` - Reorders events
 
 ### Parser Shared Modules
+
 - `parser/shared/modules/SpellUsable` - Track spell cooldowns
 - `parser/shared/modules/Combatants` - Access to combatant info
 - `parser/shared/modules/StatTracker` - Track stat changes
 - `parser/shared/modules/resources/resourcetracker/ResourceTracker` - Track resources
 
 ### Common Data
+
 - `common/SPELLS` - Spell definitions (manually maintained)
 - `common/TALENTS/{class}` - Talent definitions (auto-generated)
 - `game/RESOURCE_TYPES` - Resource type constants
 
 ### UI Components
+
 - `interface` - Reusable UI components (SpellIcon, SpellLink, etc)
 - `parser/ui` - Parser-specific UI components
-
-## Build Commands
-
-```bash
-# Development server
-pnpm start
-
-# Type checking
-pnpm typecheck
-
-# Build production
-pnpm build
-
-# Linting
-pnpm lint
-pnpm lint:fix
-
-# Extract translations
-pnpm extract
-
-# Generate talents (from Blizzard API)
-pnpm generate-talents
-```

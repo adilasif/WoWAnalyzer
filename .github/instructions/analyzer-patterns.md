@@ -8,59 +8,27 @@ applyTo: '**'
 
 Analyzers are modules that process combat log events and generate statistics, suggestions, and guide content. They extend the `Analyzer` base class and use an event-driven architecture.
 
-> **Clean Code Examples**: Refer to Enhancement and Elemental shaman specs for well-structured examples:
-> - `src/analysis/retail/shaman/enhancement/`
-> - `src/analysis/retail/shaman/elemental/`
+> Reference implementations: see `.github/instructions/reference-examples.md`.
 
 ## Basic Analyzer Structure
 
 ```typescript
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import Events, { CastEvent, DamageEvent } from 'parser/core/Events';
+import Analyzer, { Options } from 'parser/core/Analyzer';
 import SPELLS from 'common/SPELLS';
 import { TALENTS_SHAMAN } from 'common/TALENTS';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 
 class Stormflurry extends Analyzer {
-  static dependencies = {
-    abilityTracker: AbilityTracker,
-  };
-  protected abilityTracker!: AbilityTracker;
-
-  protected extraHits = 0;
-  protected extraDamage = 0;
-
   constructor(options: Options) {
     super(options);
-    
+
     // Conditionally activate based on talents
     this.active = this.selectedCombatant.hasTalent(TALENTS_SHAMAN.STORMFLURRY_TALENT);
     if (!this.active) {
       return;
     }
 
-    // Register event listeners
-    this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(SPELLS.STORMSTRIKE),
-      this.onStormstrike,
-    );
-  }
-
-  onStormstrike(event: CastEvent) {
-    // Process event
-    if (!event._linkedEvents) {
-      return;
-    }
-    // ... analyzer logic
-  }
-
-  statistic() {
-    // Return UI component
-    return (
-      <Statistic>
-        {/* Display results */}
-      </Statistic>
-    );
+    // Register event listeners (see Event Listeners docs for patterns)
+    // this.addEventListener(...)
   }
 }
 
@@ -76,41 +44,57 @@ Always check if the analyzer should be active based on talents, items, or spec:
 ```typescript
 constructor(options: Options) {
   super(options);
-  
+
   // Deactivate if talent not selected
   this.active = this.selectedCombatant.hasTalent(TALENTS_SHAMAN.ASCENDANCE_ELEMENTAL_TALENT) ||
     this.selectedCombatant.hasTalent(TALENTS_SHAMAN.DEEPLY_ROOTED_ELEMENTS_TALENT);
-  
+
   if (!this.active) {
     return;
   }
-  
+
   // ... rest of constructor
 }
 ```
 
 ### 2. Dependencies
 
-Use `static dependencies` to inject other modules:
+Use `withDependencies` to inject other modules:
 
 ```typescript
-class Ascendance extends Analyzer {
-  static dependencies = {
-    abilities: Abilities,
-    enemies: Enemies,
-    spellUsable: SpellUsable,
-    maelstromTracker: MaelstromTracker,
-  };
-
-  protected abilities!: Abilities;
-  protected enemies!: Enemies;
-  protected spellUsable!: SpellUsable;
-  protected maelstromTracker!: MaelstromTracker;
-
+// Declare dependencies to inject via `withDependencies`
+class Ascendance extends Analyzer.withDependencies({
+  abilities: Abilities,
+  enemies: Enemies,
+  spellUsable: SpellUsable,
+  maelstromTracker: MaelstromTracker,
+}) {
   constructor(options: Options) {
     super(options);
-    // Dependencies are automatically injected
-    // Access via this.maelstromTracker.current
+    // Dependencies are automatically injected, and accessible via this.deps.{dependencyName}, including in the constructor
+  }
+}
+```
+
+Some analyzer types don't support the `withDependencies` pattern, such as `MajorCooldown`. Use `static dependencies` instead:
+
+```typescript
+class MyMajorCooldown extends MajorCooldown<MyCooldownCast> {
+  static dependencies = {
+    // parent dependencies must be spread
+    ...MajorCooldown.dependencies,
+    // any additional dependencies
+    enemies: Enemies,
+    spellUsable: SpellUsable,
+  };
+
+  // define properties for the additional dependencies
+  protected enemies!: Enemies;
+  protected spellUsable!: SpellUsable;
+
+  constructor(options: Options) {
+    super({ spell: SPELLS.BIG_COOLDOWN_SPELL }, options);
+    // ⚠️ static dependencies are not present during the constructor
   }
 }
 ```
@@ -148,10 +132,10 @@ Use `this.selectedCombatant` to check player state:
 onCast(event: CastEvent) {
   // Check if player has a buff
   const hasBuff = this.selectedCombatant.hasBuff(SPELLS.ASCENDANCE_ELEMENTAL_BUFF.id);
-  
+
   // Check talent rank (for multi-rank talents)
   const rank = this.selectedCombatant.getTalentRank(TALENTS_SHAMAN.STORMKEEPER_TALENT);
-  
+
   // Check if player has talent
   if (this.selectedCombatant.hasTalent(TALENTS_SHAMAN.ELEMENTAL_BLAST_TALENT)) {
     // Do something
@@ -168,12 +152,12 @@ onStormstrike(event: CastEvent) {
   if (!event._linkedEvents) {
     return;
   }
-  
+
   // Get all linked damage events
   const damageEvents = event._linkedEvents
     .filter((le) => le.relation === EnhancementEventLinks.STORMSTRIKE_LINK)
     .map((le) => le.event as DamageEvent);
-  
+
   // Process damage events
   damageEvents.forEach((damageEvent) => {
     this.extraDamage += damageEvent.amount + (damageEvent.absorb || 0);
@@ -189,7 +173,7 @@ import { GetRelatedEvent, GetRelatedEvents } from 'parser/core/Events';
 onCast(event: CastEvent) {
   // Get single related event
   const precast = GetRelatedEvent(event, 'precast');
-  
+
   // Get multiple related events
   const damages = GetRelatedEvents(event, EventType.Damage);
 }
@@ -259,49 +243,4 @@ import { calculateEffectiveHealing, calculateEffectiveDamage } from 'parser/core
 
 // Calculate effective increase from a multiplier
 const effectiveHealing = calculateEffectiveHealing(event, 0.25); // 25% increase
-```
-
-## Module Types
-
-### Talent Analyzers
-
-Location: `modules/talents/`
-
-Analyze specific talent usage and provide recommendations:
-
-```typescript
-// src/analysis/retail/shaman/enhancement/modules/talents/Stormflurry.tsx
-class Stormflurry extends Analyzer {
-  constructor(options: Options) {
-    super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS_SHAMAN.STORMFLURRY_TALENT);
-    // ...
-  }
-}
-```
-
-### Core Modules
-
-Location: `modules/core/`
-
-Handle core spec mechanics:
-
-```typescript
-// src/analysis/retail/shaman/elemental/modules/core/FlameShock.tsx
-class FlameShock extends BaseFlameShock {
-  // Track flame shock uptime, bad lava burst usage, etc.
-}
-```
-
-### Feature Modules
-
-Location: `modules/features/`
-
-General purpose analyzers (ABC, cooldown tracking, etc.):
-
-```typescript
-// src/analysis/retail/shaman/enhancement/modules/features/AlwaysBeCasting.tsx
-class AlwaysBeCasting extends CoreAlwaysBeCasting {
-  // Customized ABC for the spec
-}
 ```

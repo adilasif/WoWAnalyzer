@@ -8,10 +8,7 @@ applyTo: '**'
 
 Normalizers pre-process combat log events to fix ordering issues, link related events, and transform event data. They run before analyzers process events.
 
-> **Clean Examples**: See Enhancement and Elemental shaman normalizers:
->
-> - `src/analysis/retail/shaman/enhancement/modules/normalizers/`
-> - `src/analysis/retail/shaman/elemental/modules/normalizers/`
+> Reference implementations: see `.github/instructions/reference-examples.md`.
 
 ## Types of Normalizers
 
@@ -262,57 +259,6 @@ const conditionalLink: EventLink = {
 };
 ```
 
-## Accessing Linked Events
-
-### In Analyzers
-
-```typescript
-import { GetRelatedEvent, GetRelatedEvents } from 'parser/core/Events';
-
-class MyAnalyzer extends Analyzer {
-  onCast(event: CastEvent) {
-    // Get single linked event
-    const damage = GetRelatedEvent<DamageEvent>(event, 'stormstrike-damage');
-    if (damage) {
-      console.log('Found linked damage:', damage.amount);
-    }
-
-    // Get all linked events with a relation
-    const allDamages = GetRelatedEvents<DamageEvent>(event, 'stormstrike-damage');
-    console.log(`Found ${allDamages.length} damage events`);
-
-    // Access _linkedEvents directly
-    if (event._linkedEvents) {
-      event._linkedEvents.forEach((link) => {
-        console.log('Relation:', link.relation);
-        console.log('Event:', link.event);
-      });
-    }
-  }
-}
-```
-
-### Helper Functions
-
-```typescript
-import { HasRelatedEvent, GetRelatedEvent } from 'parser/core/Events';
-
-// Check if event has a linked event
-if (HasRelatedEvent(event, 'my-relation')) {
-  const related = GetRelatedEvent(event, 'my-relation');
-  // Process related event
-}
-
-// Get with filter
-import { GetRelatedEvent } from 'parser/core/Events';
-
-const specificLinked = GetRelatedEvent<ApplyBuffEvent>(
-  event,
-  'my-relation',
-  (e) => e.type === EventType.ApplyBuff && e.ability.guid === SPELLS.SPECIFIC_BUFF.id,
-);
-```
-
 ## Normalizer Registration
 
 Register normalizers in `CombatLogParser.tsx`:
@@ -378,8 +324,6 @@ export const TEMPEST_LINK: 'tempest-link';
 ```
 
 7. **Order Matters**: Register normalizers in the correct order based on dependencies. If an EventLinkNormalizer expects events in a certain order, ensure EventOrderNormalizer has a lower priority
-
-8. **Verify Events**: Don't assume events or spells exist. Search for them in the codebase first.
 
 ## Common Patterns
 
