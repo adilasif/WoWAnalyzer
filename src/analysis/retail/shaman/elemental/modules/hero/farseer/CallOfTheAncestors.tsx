@@ -51,8 +51,8 @@ interface CallAncestor extends CooldownTrigger<CastEvent | SummonEvent> {
 }
 
 const SUMMON_ANCESTOR_SPELLS = [
-  TALENTS.PRIMORDIAL_WAVE_TALENT.id,
   SPELLS.ANCESTRAL_SWIFTNESS_CAST.id,
+  SPELLS.STORMKEEPER_BUFF_AND_CAST.id,
 ];
 
 const RELATED_WINDOW_BUFFER = 2000;
@@ -253,7 +253,16 @@ class CallOfTheAncestors extends MajorCooldown<CallAncestor> {
   }
 
   guideSubsection(): JSX.Element {
-    return <CooldownUsage analyzer={this} title="Farseer" />;
+    return (
+      <CooldownUsage
+        analyzer={this}
+        title={
+          <>
+            <SpellLink spell={TALENTS.CALL_OF_THE_ANCESTORS_TALENT} />
+          </>
+        }
+      />
+    );
   }
 
   explainPerformance(cast: CallAncestor): SpellUse {
@@ -282,7 +291,6 @@ class CallOfTheAncestors extends MajorCooldown<CallAncestor> {
         </>
       ) : (
         <>
-          <SpellLink spell={TALENTS.PRIMORDIAL_WAVE_TALENT} /> or{' '}
           <SpellLink spell={TALENTS.ANCESTRAL_SWIFTNESS_TALENT} />
         </>
       );

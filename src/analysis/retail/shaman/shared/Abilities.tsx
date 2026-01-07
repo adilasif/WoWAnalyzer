@@ -43,11 +43,12 @@ class Abilities extends CoreAbilities {
       {
         spell: SPELLS.FLAME_SHOCK.id,
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: combatant.spec === SPECS.ENHANCEMENT_SHAMAN ? (haste) => 6 / (1 + haste) : 6,
+        cooldown: 6,
         gcd: {
           base: 1500,
         },
         range: 40,
+        enabled: !combatant.hasTalent(TALENTS.VOLTAIC_BLAZE_TALENT),
       },
       {
         spell: SPELLS.GHOST_WOLF.id,
@@ -322,6 +323,16 @@ class Abilities extends CoreAbilities {
         castEfficiency: {
           suggestion: false,
         },
+      },
+      {
+        spell: SPELLS.VOLTAIC_BLAZE_CAST.id,
+        category: SPELL_CATEGORY.ROTATIONAL,
+        enabled: combatant.hasTalent(TALENTS.VOLTAIC_BLAZE_TALENT),
+        gcd: {
+          base: 1500,
+        },
+        cooldown: 10 - (combatant.hasTalent(TALENTS.CRACKLING_FURY_TALENT) ? 3 : 0),
+        range: 40,
       },
 
       /* Hero Talents */

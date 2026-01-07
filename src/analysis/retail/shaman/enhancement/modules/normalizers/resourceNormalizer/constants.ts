@@ -36,6 +36,18 @@ export const MAELSTROM_ABILITIES: Record<string, MaelstromAbility> = {
     linkToEventType: SPEND_EVENT_TYPES,
     searchDirection: SearchDirection.ForwardsFirst,
   },
+  STATIC_ACCUMULATION: {
+    spellId: TALENTS.STATIC_ACCUMULATION_TALENT.id,
+    linkFromEventType: [EventType.ResourceChange, ...GAIN_EVENT_TYPES],
+    linkToEventType: GAIN_EVENT_TYPES,
+    forwardBufferMs: BufferMs.Ticks * 2,
+    backwardsBufferMs: BufferMs.Ticks,
+    searchDirection: SearchDirection.ForwardsFirst,
+    matchMode: MatchMode.MatchLast,
+    maximum: 2,
+    requiresExact: true,
+    updateExistingEvent: true,
+  },
   SUPERCHARGE: {
     spellId: [SPELLS.LIGHTNING_BOLT.id, TALENTS.CHAIN_LIGHTNING_TALENT.id, SPELLS.TEMPEST_CAST.id],
     type: MaelstromAbilityType.Builder,
@@ -68,10 +80,12 @@ export const MAELSTROM_ABILITIES: Record<string, MaelstromAbility> = {
     linkToEventType: GAIN_EVENT_TYPES,
     searchDirection: SearchDirection.ForwardsFirst,
     maximum: (c: Combatant) => (c.hasTalent(TALENTS.FIRE_NOVA_TALENT) ? 3 : 1),
+    forwardBufferMs: 0,
+    backwardsBufferMs: BufferMs.Cast,
     requiresExact: true,
   },
   ELEMENTAL_ASSAULT: {
-    spellId: [SPELLS.STORMSTRIKE_CAST.id, SPELLS.WINDSTRIKE_CAST.id, TALENTS.LAVA_LASH_TALENT.id],
+    spellId: [SPELLS.STORMSTRIKE.id, SPELLS.WINDSTRIKE_CAST.id, TALENTS.LAVA_LASH_TALENT.id],
     linkFromEventType: EventType.Cast,
     enabled: (c: Combatant) => c.hasTalent(TALENTS.ELEMENTAL_ASSAULT_TALENT),
     spellIdOverride: TALENTS.ELEMENTAL_ASSAULT_TALENT.id,
@@ -81,7 +95,7 @@ export const MAELSTROM_ABILITIES: Record<string, MaelstromAbility> = {
     matchMode: MatchMode.MatchFirst,
   },
   LIGHTNING_STRIKES: {
-    spellId: [SPELLS.STORMSTRIKE_CAST.id, SPELLS.WINDSTRIKE_CAST.id, TALENTS.LAVA_LASH_TALENT.id],
+    spellId: [SPELLS.STORMSTRIKE.id, SPELLS.WINDSTRIKE_CAST.id, TALENTS.LAVA_LASH_TALENT.id],
     linkFromEventType: EventType.Cast,
     enabled: (c: Combatant) => c.hasTalent(TALENTS.LIGHTNING_STRIKES_TALENT),
     spellIdOverride: TALENTS.LIGHTNING_STRIKES_TALENT.id,
@@ -103,18 +117,6 @@ export const MAELSTROM_ABILITIES: Record<string, MaelstromAbility> = {
     searchDirection: SearchDirection.BackwardsOnly,
     matchMode: MatchMode.MatchLast,
   },
-  STATIC_ACCUMULATION: {
-    spellId: [TALENTS.ASCENDANCE_ENHANCEMENT_TALENT.id],
-    linkFromEventType: [EventType.ResourceChange, ...GAIN_EVENT_TYPES],
-    linkToEventType: GAIN_EVENT_TYPES,
-    forwardBufferMs: BufferMs.Ticks * 2,
-    backwardsBufferMs: BufferMs.Ticks,
-    searchDirection: SearchDirection.ForwardsFirst,
-    matchMode: MatchMode.MatchLast,
-    maximum: (c: Combatant) => c.getTalentRank(TALENTS.STATIC_ACCUMULATION_TALENT), // 1 per rank per second
-    requiresExact: true,
-    updateExistingEvent: true,
-  },
   // Melee weapon attacks have a lower priority than other cast and special interaction damage events
   STORMSTRIKE: {
     spellId: [
@@ -123,7 +125,7 @@ export const MAELSTROM_ABILITIES: Record<string, MaelstromAbility> = {
       SPELLS.WINDSTRIKE_DAMAGE.id,
       SPELLS.WINDSTRIKE_DAMAGE_OFFHAND.id,
     ],
-    spellIdOverride: SPELLS.STORMSTRIKE_CAST.id,
+    spellIdOverride: SPELLS.STORMSTRIKE.id,
     forwardBufferMs: BufferMs.Damage,
     linkFromEventType: EventType.Damage,
     linkToEventType: GAIN_EVENT_TYPES,
@@ -135,7 +137,7 @@ export const MAELSTROM_ABILITIES: Record<string, MaelstromAbility> = {
     spellId: [
       TALENTS.LAVA_LASH_TALENT.id,
       TALENTS.CRASH_LIGHTNING_TALENT.id,
-      SPELLS.CRASH_LIGHTNING_BUFF.id,
+      SPELLS.CRASH_LIGHTNING_BUFF_DAMAGE.id,
       TALENTS.DOOM_WINDS_TALENT.id,
       TALENTS.SUNDERING_TALENT.id,
       SPELLS.WINDFURY_ATTACK.id,
@@ -150,11 +152,10 @@ export const MAELSTROM_ABILITIES: Record<string, MaelstromAbility> = {
       },
       {
         replaceWithSpellId: TALENTS.CRASH_LIGHTNING_TALENT.id,
-        spellId: SPELLS.CRASH_LIGHTNING_BUFF.id,
+        spellId: SPELLS.CRASH_LIGHTNING_BUFF_DAMAGE.id,
       },
     ],
     forwardBufferMs: BufferMs.Damage,
-    backwardsBufferMs: BufferMs.MinimumDamageBuffer,
     linkFromEventType: EventType.Damage,
     minimumBuffer: BufferMs.MinimumDamageBuffer,
     linkToEventType: GAIN_EVENT_TYPES,
@@ -181,13 +182,13 @@ export const MAELSTROM_SPENDER_SPELLIDS =
  */
 export const PERIODIC_SPELLS: PeriodicGainEffect[] = [
   {
-    spellId: SPELLS.FERAL_SPIRIT_MAELSTROM_BUFF.id,
-    frequencyMs: 3000,
-    spellIdOverride: TALENTS.FERAL_SPIRIT_TALENT.id,
+    spellId: SPELLS.DOOM_WINDS_BUFF.id,
+    frequencyMs: 1000,
+    spellIdOverride: TALENTS.STATIC_ACCUMULATION_TALENT.id,
   },
   {
     spellId: TALENTS.ASCENDANCE_ENHANCEMENT_TALENT.id,
     frequencyMs: 1000,
-    spellIdOverride: TALENTS.ASCENDANCE_ENHANCEMENT_TALENT.id,
+    spellIdOverride: TALENTS.STATIC_ACCUMULATION_TALENT.id,
   },
 ];

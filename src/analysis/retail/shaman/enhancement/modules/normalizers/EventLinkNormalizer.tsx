@@ -14,17 +14,38 @@ import { SPLINTERED_ELEMENTS_LINK } from 'analysis/retail/shaman/shared/constant
 
 const thorimsInvocationCastLink: EventLink = {
   linkRelation: EnhancementEventLinks.THORIMS_INVOCATION_LINK,
-  linkingEventId: SPELLS.WINDSTRIKE_CAST.id,
+  linkingEventId: [
+    SPELLS.STORMSTRIKE.id,
+    SPELLS.WINDSTRIKE_CAST.id,
+    TALENTS.CRASH_LIGHTNING_TALENT.id,
+  ],
   linkingEventType: EventType.Cast,
   referencedEventId: [
     SPELLS.LIGHTNING_BOLT.id,
     TALENTS.CHAIN_LIGHTNING_TALENT.id,
     SPELLS.TEMPEST_CAST.id,
   ],
-  referencedEventType: [EventType.Damage],
+  referencedEventType: [EventType.FreeCast],
   forwardBufferMs: EventLinkBuffers.MaelstromWeapon,
   anyTarget: true,
   isActive: (c) => c.hasTalent(TALENTS.THORIMS_INVOCATION_TALENT),
+};
+const thorimsInvocationDamageLink: EventLink = {
+  linkRelation: EnhancementEventLinks.THORIMS_INVOCATION_DAMAGE_LINK,
+  linkingEventId: [
+    SPELLS.LIGHTNING_BOLT.id,
+    TALENTS.CHAIN_LIGHTNING_TALENT.id,
+    SPELLS.TEMPEST_CAST.id,
+  ],
+  linkingEventType: EventType.FreeCast,
+  referencedEventId: [
+    SPELLS.LIGHTNING_BOLT.id,
+    TALENTS.CHAIN_LIGHTNING_TALENT.id,
+    SPELLS.TEMPEST_CAST.id,
+  ],
+  referencedEventType: EventType.Damage,
+  forwardBufferMs: EventLinkBuffers.CastDamageBuffer * 2,
+  anyTarget: true,
 };
 const stormStrikeLink: EventLink = {
   linkRelation: EnhancementEventLinks.STORMSTRIKE_LINK,
@@ -42,7 +63,7 @@ const chainLightningDamageLink: EventLink = {
   linkingEventType: [EventType.Cast, EventType.FreeCast],
   referencedEventId: TALENTS.CHAIN_LIGHTNING_TALENT.id,
   referencedEventType: EventType.Damage,
-  forwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
+  forwardBufferMs: EventLinkBuffers.CastDamageBuffer,
   anyTarget: true,
   reverseLinkRelation: EnhancementEventLinks.CHAIN_LIGHTNING_LINK,
 };
@@ -52,7 +73,7 @@ const tempestDamageLink: EventLink = {
   linkingEventType: [EventType.Cast, EventType.FreeCast],
   referencedEventId: SPELLS.TEMPEST_CAST.id,
   referencedEventType: EventType.Damage,
-  forwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
+  forwardBufferMs: EventLinkBuffers.CastDamageBuffer,
   anyTarget: true,
   isActive: (c) => c.hasTalent(TALENTS.TEMPEST_TALENT),
 };
@@ -83,7 +104,7 @@ const reactivityLink: EventLink = {
   linkingEventType: EventType.Cast,
   referencedEventId: SPELLS.SUNDERING_EARTHSURGE.id,
   referencedEventType: EventType.Cast,
-  forwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
+  forwardBufferMs: EventLinkBuffers.CastDamageBuffer,
   backwardBufferMs: 5,
   anyTarget: true,
 };
@@ -93,7 +114,7 @@ const sunderingDamageLink: EventLink = {
   linkingEventType: EventType.Cast,
   referencedEventId: [TALENTS.SUNDERING_TALENT.id, SPELLS.SUNDERING_EARTHSURGE.id],
   referencedEventType: EventType.Damage,
-  forwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
+  forwardBufferMs: EventLinkBuffers.CastDamageBuffer,
   anyTarget: true,
   isActive: (c) => c.hasTalent(TALENTS.EARTHSURGE_TALENT) || c.hasTalent(TALENTS.SUNDERING_TALENT),
 };
@@ -112,7 +133,7 @@ const whirlingFireLavaLashLink: EventLink = {
   linkingEventType: EventType.RemoveBuff,
   referencedEventId: TALENTS.LAVA_LASH_TALENT.id,
   referencedEventType: EventType.Cast,
-  backwardBufferMs: EventLinkBuffers.CAST_DAMAGE_BUFFER,
+  backwardBufferMs: EventLinkBuffers.CastDamageBuffer,
   anyTarget: true,
   additionalCondition: (le, _) => {
     if (le.type === EventType.RemoveBuff && le.ability.guid === SPELLS.WHIRLING_FIRE.id) {
@@ -127,11 +148,23 @@ const whirlingFireLavaLashLink: EventLink = {
     return false;
   },
 };
+const stormUnleashedConsumeLink: EventLink = {
+  linkRelation: EnhancementEventLinks.STORM_UNLEASHED_LINK,
+  linkingEventId: TALENTS.CRASH_LIGHTNING_TALENT.id,
+  linkingEventType: EventType.Cast,
+  referencedEventId: SPELLS.STORM_UNLEASHED_BUFF.id,
+  referencedEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
+  forwardBufferMs: EventLinkBuffers.StormUnleashed,
+  anyTarget: true,
+  reverseLinkRelation: EnhancementEventLinks.STORM_UNLEASHED_LINK,
+  isActive: (c) => c.hasTalent(TALENTS.STORM_UNLEASHED_1_ENHANCEMENT_TALENT),
+};
 
 class EventLinkNormalizer extends BaseEventLinkNormalizer {
   constructor(options: Options) {
     super(options, [
       thorimsInvocationCastLink,
+      thorimsInvocationDamageLink,
       stormStrikeLink,
       chainLightningDamageLink,
       tempestDamageLink,
@@ -141,6 +174,7 @@ class EventLinkNormalizer extends BaseEventLinkNormalizer {
       sunderingDamageLink,
       whirlingFireHotHandLink,
       whirlingFireLavaLashLink,
+      stormUnleashedConsumeLink,
     ]);
 
     this.priority = NormalizerOrder.EventLinkNormalizer;

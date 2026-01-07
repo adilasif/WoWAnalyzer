@@ -1,4 +1,3 @@
-import ITEMS from 'common/ITEMS';
 import BaseEnchantChecker from 'parser/retail/modules/items/EnchantChecker';
 
 class EnchantChecker extends BaseEnchantChecker {

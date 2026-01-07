@@ -33,18 +33,7 @@ class Abilities extends ClassAbilities {
         range: 5,
       },
       {
-        spell: TALENTS.FERAL_SPIRIT_TALENT.id,
-        category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 90,
-        gcd: {
-          base: 1500,
-        },
-        castEfficiency: {
-          suggestion: true,
-        },
-      },
-      {
-        spell: SPELLS.STORMSTRIKE_CAST.id,
+        spell: SPELLS.STORMSTRIKE.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         cooldown: (haste) => 7.5 / (1 + haste),
         charges: 1 + (combatant.hasTalent(TALENTS.STORMS_WRATH_TALENT) ? 1 : 0),
@@ -60,7 +49,7 @@ class Abilities extends ClassAbilities {
         gcd: {
           base: 1500,
         },
-        cooldown: (haste) => 12 / (1 + haste),
+        cooldown: (haste) => 15 / (1 + haste),
       },
       {
         spell: TALENTS.SUNDERING_TALENT.id,
@@ -73,12 +62,8 @@ class Abilities extends ClassAbilities {
       },
       {
         spell: TALENTS.FIRE_NOVA_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL_AOE,
-        gcd: {
-          base: 1500,
-        },
+        category: SPELL_CATEGORY.HIDDEN,
         enabled: combatant.hasTalent(TALENTS.FIRE_NOVA_TALENT),
-        cooldown: (haste) => 15 / (1 + haste),
       },
       {
         spell: SPELLS.PRIMORDIAL_STORM_CAST.id,
@@ -141,14 +126,6 @@ class Abilities extends ClassAbilities {
         enabled: combatant.hasTalent(TALENTS.ASCENDANCE_ENHANCEMENT_TALENT),
         cooldown: 180 - (combatant.hasTalent(TALENTS.THORIMS_INVOCATION_TALENT) ? 60 : 0),
       },
-      {
-        spell: SPELLS.VOLTAIC_BLAZE_CAST.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: combatant.hasTalent(TALENTS.VOLTAIC_BLAZE_TALENT),
-        gcd: {
-          base: 1500,
-        },
-      },
 
       // Hero talents
       {
@@ -163,7 +140,7 @@ class Abilities extends ClassAbilities {
         spell: SPELLS.SURGING_TOTEM.id,
         enabled: combatant.hasTalent(TALENTS.SURGING_TOTEM_TALENT),
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 24,
+        cooldown: 60,
         gcd: {
           base: 1000,
         },
