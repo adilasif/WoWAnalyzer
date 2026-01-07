@@ -39,6 +39,7 @@ import BrutalFinishBuffNormalizer from './modules/normalizers/BrutalFinishBuffNo
 import SuddenDeathBuffNormalizer from '../shared/modules/normalizers/SuddenDeathBuffNormalizer';
 import Guide from './Guide';
 import AplCheck from './modules/core/AplCheck';
+import Executioner from '../shared/modules/talents/Executioner';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -90,6 +91,7 @@ class CombatLogParser extends CoreCombatLogParser {
     spellReflection: SpellReflection,
     impendingVictory: ImpendingVictory,
     hackAndSlash: HackAndSlash,
+    executioner: Executioner,
     // championsMight: ChampionsMight,
 
     // Debuggers

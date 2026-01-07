@@ -34,7 +34,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           <br />
           If you notice any issues or errors in this analysis or if there is additional analysis you
           would like added, please ping <code>@Bigbowwl</code> in the{' '}
-          <a href="https://discord.gg/skyhold">Skyhold</a> discord.
+          <a href="https://discord.gg/skyhold">Skyhold</a> discord (please don't DM me).
         </>
       </Section>
       <Section title="Always Be Casting">

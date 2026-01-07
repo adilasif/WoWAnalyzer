@@ -51,6 +51,7 @@ import Demolish from './modules/talents/Demolish';
 import DemolishNormalizer from './normalizers/DemolishNormalizer';
 import SuddenDeathBuffNormalizer from '../shared/modules/normalizers/SuddenDeathBuffNormalizer';
 import Guide from './Guide';
+import Executioner from '../shared/modules/talents/Executioner';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -120,6 +121,7 @@ class CombatLogParser extends CoreCombatLogParser {
     ChampionsSpear: ChampionsSpear,
     // ChampionsMight: ChampionsMight,
     demolish: Demolish,
+    executioner: Executioner,
 
     // Debuggers
     rageCountDebugger: RageCountDebugger,

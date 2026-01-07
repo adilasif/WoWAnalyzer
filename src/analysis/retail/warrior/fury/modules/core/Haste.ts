@@ -18,7 +18,7 @@ class Haste extends CoreHaste {
     const STRIKES_RANKS = this.selectedCombatant.getTalentRank(TALENTS.WILD_STRIKES_TALENT);
 
     if (STRIKES_RANKS > 0) {
-      // For each rank of Wild Strikes and Swift Strikes, you gain an additional 1% Haste.
+      // For each rank of Wild Strikes, you gain an additional 1% Haste.
       // We do this "manually" since there is no buff associated with this.
       const newHaste = Haste.addHaste(this.current, STRIKES_RANKS * 0.01);
       this._triggerChangeHaste(null, this.current, newHaste);

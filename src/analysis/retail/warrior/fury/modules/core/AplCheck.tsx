@@ -24,7 +24,7 @@ export const apl = (info: PlayerInfo): Apl => {
     ? MASSACRE_EXECUTE_THRESHOLD
     : DEFAULT_EXECUTE_THRESHOLD;
   const executeUsable = cnd.or(
-    cnd.buffPresent(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF), // TODO fury also uses this buff now, should probably rename the spell
+    cnd.buffPresent(SPELLS.SUDDEN_DEATH_TALENT_BUFF), // TODO fury also uses this buff now, should probably rename the spell
     cnd.inExecute(executeThreshold),
   );
   const executeSpell = info.combatant.hasTalent(TALENTS.MASSACRE_FURY_TALENT)
@@ -67,10 +67,10 @@ export const buildSlayerApl = (
       condition: cnd.and(
         executeUsable,
         cnd.or(
-          cnd.buffRemaining(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF, SUDDEN_DEATH_DURATION, {
+          cnd.buffRemaining(SPELLS.SUDDEN_DEATH_TALENT_BUFF, SUDDEN_DEATH_DURATION, {
             atMost: 3000,
           }),
-          cnd.buffStacks(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF, { atLeast: 2, atMost: 2 }),
+          cnd.buffStacks(SPELLS.SUDDEN_DEATH_TALENT_BUFF, { atLeast: 2, atMost: 2 }),
         ),
       ),
       description: (
@@ -78,10 +78,10 @@ export const buildSlayerApl = (
           Cast <SpellLink spell={executeSpell} /> when any of the following conditions are met:
           <ul>
             <li>
-              Your <SpellLink spell={SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF} /> is about to expire
+              Your <SpellLink spell={SPELLS.SUDDEN_DEATH_TALENT_BUFF} /> is about to expire
             </li>
             <li>
-              You have 2 stacks of <SpellLink spell={SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF} />
+              You have 2 stacks of <SpellLink spell={SPELLS.SUDDEN_DEATH_TALENT_BUFF} />
             </li>
           </ul>
         </>
@@ -94,8 +94,8 @@ export const buildSlayerApl = (
       condition: cnd.hasResource(RESOURCE_TYPES.RAGE, { atLeast: rampageRageThreshold }),
       description: (
         <>
-          Cast <SpellLink spell={SPELLS.RAMPAGE} /> on high rage (above {rampageRageThreshold / 10}
-          ).
+          Cast <SpellLink spell={SPELLS.RAMPAGE} /> above {rampageRageThreshold / 10} rage to avoid
+          overcapping.
         </>
       ),
     },
@@ -197,10 +197,10 @@ export const buildThaneApl = (
       condition: cnd.and(
         executeUsable,
         cnd.or(
-          cnd.buffRemaining(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF, SUDDEN_DEATH_DURATION, {
+          cnd.buffRemaining(SPELLS.SUDDEN_DEATH_TALENT_BUFF, SUDDEN_DEATH_DURATION, {
             atMost: 3000,
           }),
-          cnd.buffStacks(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF, { atLeast: 2, atMost: 2 }),
+          cnd.buffStacks(SPELLS.SUDDEN_DEATH_TALENT_BUFF, { atLeast: 2, atMost: 2 }),
         ),
       ),
       description: (
@@ -208,26 +208,26 @@ export const buildThaneApl = (
           Cast <SpellLink spell={executeSpell} /> when any of the following conditions are met:
           <ul>
             <li>
-              Your <SpellLink spell={SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF} /> is about to expire
+              Your <SpellLink spell={SPELLS.SUDDEN_DEATH_TALENT_BUFF} /> is about to expire
             </li>
             <li>
-              You have 2 stacks of <SpellLink spell={SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF} />
+              You have 2 stacks of <SpellLink spell={SPELLS.SUDDEN_DEATH_TALENT_BUFF} />
             </li>
           </ul>
         </>
       ),
     },
 
-    // thunder blast
+    // 2 stack thunder blast
     {
       spell: SPELLS.THUNDER_CLAP, // TODO seems like the cast is tied to TC but can still check for the TB buff
-      condition: cnd.buffPresent(SPELLS.THUNDER_BLAST_BUFF),
+      condition: cnd.buffStacks(SPELLS.THUNDER_BLAST_BUFF, { atLeast: 2 }),
       //   cnd.and(
       //     cnd.spellAvailable(SPELLS.THUNDER_BLAST) // maybe need to check TC here instead idk how those get handled
       //   ),
       description: (
         <>
-          Cast <SpellLink spell={SPELLS.THUNDER_BLAST} />.
+          Cast <SpellLink spell={SPELLS.THUNDER_BLAST} /> with 2 stacks.
         </>
       ),
     },
@@ -238,8 +238,8 @@ export const buildThaneApl = (
       condition: cnd.hasResource(RESOURCE_TYPES.RAGE, { atLeast: rampageRageThreshold }),
       description: (
         <>
-          Cast <SpellLink spell={SPELLS.RAMPAGE} /> on high rage (above {rampageRageThreshold / 10}
-          ).
+          Cast <SpellLink spell={SPELLS.RAMPAGE} /> above {rampageRageThreshold / 10} rage to avoid
+          overcapping.
         </>
       ),
     },
@@ -251,17 +251,6 @@ export const buildThaneApl = (
       description: (
         <>
           Cast <SpellLink spell={executeSpell} />.
-        </>
-      ),
-    },
-
-    // RB below rage threshold
-    {
-      spell: SPELLS.RAGING_BLOW,
-      condition: cnd.spellAvailable(SPELLS.RAGING_BLOW),
-      description: (
-        <>
-          Cast <SpellLink spell={SPELLS.RAGING_BLOW} />.
         </>
       ),
     },
@@ -278,6 +267,20 @@ export const buildThaneApl = (
       ),
     },
 
+    // 1 stack thunder blast
+    {
+      spell: SPELLS.THUNDER_CLAP, // TODO seems like the cast is tied to TC but can still check for the TB buff
+      condition: cnd.buffPresent(SPELLS.THUNDER_BLAST_BUFF),
+      //   cnd.and(
+      //     cnd.spellAvailable(SPELLS.THUNDER_BLAST) // maybe need to check TC here instead idk how those get handled
+      //   ),
+      description: (
+        <>
+          Cast <SpellLink spell={SPELLS.THUNDER_BLAST} />.
+        </>
+      ),
+    },
+
     // fallback rampage
     {
       spell: SPELLS.RAMPAGE,
@@ -285,6 +288,17 @@ export const buildThaneApl = (
       description: (
         <>
           Cast <SpellLink spell={SPELLS.RAMPAGE} />.
+        </>
+      ),
+    },
+
+    // RB below rage threshold
+    {
+      spell: SPELLS.RAGING_BLOW,
+      condition: cnd.spellAvailable(SPELLS.RAGING_BLOW),
+      description: (
+        <>
+          Cast <SpellLink spell={SPELLS.RAGING_BLOW} />.
         </>
       ),
     },

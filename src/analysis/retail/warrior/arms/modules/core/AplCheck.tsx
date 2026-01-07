@@ -25,7 +25,7 @@ export const apl = (info: PlayerInfo): Apl => {
     ? MASSACRE_EXECUTE_THRESHOLD
     : DEFAULT_EXECUTE_THRESHOLD;
   const executeUsable = cnd.or(
-    cnd.buffPresent(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF),
+    cnd.buffPresent(SPELLS.SUDDEN_DEATH_TALENT_BUFF),
     cnd.and(
       cnd.inExecute(executeThreshold),
       cnd.hasResource(RESOURCE_TYPES.RAGE, { atLeast: 200 }),
@@ -52,12 +52,12 @@ export const buildSlayerApl = (
       condition: cnd.and(
         executeUsable,
         cnd.or(
-          cnd.buffRemaining(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF, SUDDEN_DEATH_DURATION, {
+          cnd.buffRemaining(SPELLS.SUDDEN_DEATH_TALENT_BUFF, SUDDEN_DEATH_DURATION, {
             atMost: 3000,
           }),
           cnd.buffRemaining(SPELLS.JUGGERNAUT, JUGGERNAUT_DURATION, { atMost: 3000 }),
-          cnd.buffStacks(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF, { atLeast: 2, atMost: 2 }),
-          cnd.debuffStacks(SPELLS.MARKED_FOR_EXECUTION, { atLeast: 3, atMost: 3 }),
+          cnd.buffStacks(SPELLS.SUDDEN_DEATH_TALENT_BUFF, { atLeast: 2, atMost: 2 }),
+          cnd.buffStacks(SPELLS.EXECUTIONER_TALENT_BUFF, { atLeast: 3, atMost: 3 }),
         ),
       ),
       description: (
@@ -65,16 +65,16 @@ export const buildSlayerApl = (
           Cast <SpellLink spell={executeSpell} /> when any of the following conditions are met:
           <ul>
             <li>
-              Your target has 3 stacks of <SpellLink spell={SPELLS.MARKED_FOR_EXECUTION} />
+              Your target has 3 stacks of <SpellLink spell={SPELLS.EXECUTIONER_TALENT_BUFF} />
             </li>
             <li>
               Your <SpellLink spell={SPELLS.JUGGERNAUT} /> is about to expire
             </li>
             <li>
-              Your <SpellLink spell={SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF} /> is about to expire
+              Your <SpellLink spell={SPELLS.SUDDEN_DEATH_TALENT_BUFF} /> is about to expire
             </li>
             <li>
-              You have 2 stacks of <SpellLink spell={SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF} />
+              You have 2 stacks of <SpellLink spell={SPELLS.SUDDEN_DEATH_TALENT_BUFF} />
             </li>
           </ul>
         </>

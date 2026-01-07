@@ -23,17 +23,17 @@ class SuddenDeath extends Analyzer {
       this._onExecuteDamage,
     );
     this.addEventListener(
-      Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF),
+      Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.SUDDEN_DEATH_TALENT_BUFF),
       this._countSuddenDeathProc,
     );
     this.addEventListener(
-      Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF),
+      Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.SUDDEN_DEATH_TALENT_BUFF),
       this._countSuddenDeathProc,
     );
   }
 
   _onExecuteDamage(event: DamageEvent) {
-    if (!this.selectedCombatant.hasBuff(SPELLS.SUDDEN_DEATH_ARMS_TALENT_BUFF.id)) {
+    if (!this.selectedCombatant.hasBuff(SPELLS.SUDDEN_DEATH_TALENT_BUFF.id)) {
       return;
     }
     this.totalDamages += event.amount + (event.absorbed || 0);
