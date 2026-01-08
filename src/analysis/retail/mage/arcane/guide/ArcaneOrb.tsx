@@ -4,14 +4,12 @@ import { SpellLink } from 'interface';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
 import GuideSection from 'interface/guide/components/GuideSection';
-import CastEfficiencyBar from 'parser/ui/CastEfficiencyBar';
-import { GapHighlight } from 'parser/ui/CooldownBar';
-import CastDetail, {
-  type PerCastData,
-  type PerCastStat,
-} from 'interface/guide/components/CastDetail';
+import CastSummary, { type CastEvaluation } from 'interface/guide/components/CastSummary';
+import CastOverview from 'interface/guide/components/CastOverview';
 
 import ArcaneOrb from '../analyzers/ArcaneOrb';
+import CastEfficiencyBar from 'parser/ui/CastEfficiencyBar';
+import { GapHighlight } from 'parser/ui/CooldownBar';
 
 interface ArcaneOrbCast {
   timestamp: number;
@@ -29,96 +27,65 @@ class ArcaneOrbGuide extends Analyzer {
 
   protected arcaneOrb!: ArcaneOrb;
 
-  /**
-   * Evaluates a single Arcane Orb cast for CastDetail.
-   * Returns complete cast information including performance and stats.
-   */
-  private evaluateOrbCast(cast: ArcaneOrbCast): PerCastData {
+  private buildOverviewStats() {
+    const stats = [];
+
+    const totalCasts = this.arcaneOrb.orbData.length;
+    const totalTargetsHit = this.arcaneOrb.orbData.reduce((sum, cast) => sum + cast.targetsHit, 0);
+    const averageTargetsHit = totalTargetsHit / totalCasts;
+
+    // Average targets hit
+    stats.push({
+      value: averageTargetsHit.toFixed(1),
+      label: 'Avg Targets Hit',
+      tooltip: <>Average number of targets hit per Arcane Orb cast.</>,
+    });
+
+    return stats;
+  }
+
+  private evaluateOrbCast(cast: ArcaneOrbCast): CastEvaluation {
     const hitTargets = cast.targetsHit > 0;
     const efficientCharges = cast.chargesBefore <= ORB_EFFICIENT_CHARGE_THRESHOLD;
     const multiTarget = cast.targetsHit >= AOE_THRESHOLD;
 
-    // Determine overall performance
-    let performance: QualitativePerformance;
-    let notes: ReactNode;
+    const castData = {
+      timestamp: cast.timestamp,
+    };
 
-    // Fail conditions
+    // FAIL CONDITIONS
     if (!hitTargets) {
-      performance = QualitativePerformance.Fail;
-      notes = 'Failed to hit any targets - wasted cast';
-    } else if (!efficientCharges) {
-      performance = QualitativePerformance.Fail;
-      notes = (
-        <>
-          Inefficient usage - already had {cast.chargesBefore}{' '}
-          <SpellLink spell={SPELLS.ARCANE_CHARGE} />s (use at ≤{ORB_EFFICIENT_CHARGE_THRESHOLD}{' '}
-          charges)
-        </>
-      );
-    }
-    // Perfect condition - hit multiple targets with efficient charges
-    else if (hitTargets && efficientCharges && multiTarget) {
-      performance = QualitativePerformance.Perfect;
-      notes = (
-        <>
-          Perfect usage - {cast.targetsHit} targets hit with efficient charge usage (
-          {cast.chargesBefore}/{ORB_EFFICIENT_CHARGE_THRESHOLD})
-        </>
-      );
-    }
-    // Good condition - hit target(s) with efficient charges
-    else if (hitTargets && efficientCharges) {
-      performance = QualitativePerformance.Good;
-      notes = (
-        <>
-          Good usage - {cast.targetsHit} target(s) hit with efficient charge usage (
-          {cast.chargesBefore}/{ORB_EFFICIENT_CHARGE_THRESHOLD})
-        </>
-      );
-    }
-    // Default fallback
-    else {
-      performance = QualitativePerformance.Fail;
-      notes = 'Arcane Orb usage needs improvement';
+      return {
+        performance: QualitativePerformance.Fail,
+        reason: 'Failed to hit any targets - wasted cast',
+        timestamp: cast.timestamp,
+      };
     }
 
-    // Build stats array
-    const stats: PerCastStat[] = [];
+    // PERFECT CONDITIONS
+    if (hitTargets && efficientCharges && multiTarget) {
+      return {
+        performance: QualitativePerformance.Perfect,
+        reason: `Perfect usage - ${cast.targetsHit} targets hit with efficient charge usage (${cast.chargesBefore}/${ORB_EFFICIENT_CHARGE_THRESHOLD})`,
 
-    // Targets Hit
-    stats.push({
-      label: 'Targets Hit',
-      value: `${cast.targetsHit}`,
-      tooltip:
-        cast.targetsHit >= AOE_THRESHOLD
-          ? 'Great AoE value!'
-          : cast.targetsHit > 0
-            ? 'Hit at least one target'
-            : 'Missed all targets',
-    });
+        timestamp: cast.timestamp,
+      };
+    }
 
-    // Charges Before Cast
-    stats.push({
-      label: 'Charges Before',
-      value: `${cast.chargesBefore} / ${ORB_EFFICIENT_CHARGE_THRESHOLD}`,
-      tooltip: efficientCharges
-        ? 'Efficient - used with low charges'
-        : `Too many charges (${cast.chargesBefore}) - should use at ≤${ORB_EFFICIENT_CHARGE_THRESHOLD}`,
-    });
+    // GOOD CONDITIONS
+    if (hitTargets && efficientCharges) {
+      return {
+        performance: QualitativePerformance.Good,
+        reason: `Good usage - ${cast.targetsHit} target(s) hit with efficient charge usage (${cast.chargesBefore}/${ORB_EFFICIENT_CHARGE_THRESHOLD})`,
+        timestamp: cast.timestamp,
+      };
+    }
 
-    // Charges Generated (always 2 minimum)
-    const chargesGenerated = Math.max(2, cast.targetsHit);
-    stats.push({
-      label: 'Charges Generated',
-      value: `${chargesGenerated}`,
-      tooltip: 'Arcane Orb generates 2 charges minimum, +1 per additional target hit',
-    });
-
+    // DEFAULT
     return {
-      performance,
-      timestamp: this.owner.formatTimestamp(cast.timestamp),
-      stats,
-      details: notes,
+      performance: QualitativePerformance.Fail,
+      reason: 'Arcane Orb usage needs improvement',
+      timestamp: cast.timestamp,
     };
   }
 
@@ -161,9 +128,11 @@ class ArcaneOrbGuide extends Analyzer {
 
     return (
       <GuideSection spell={SPELLS.ARCANE_ORB} explanation={explanation} title="Arcane Orb">
-        <CastDetail
-          title="Arcane Orb Casts"
+        <CastOverview spell={SPELLS.ARCANE_ORB} stats={this.buildOverviewStats()} />
+        <CastSummary
+          spell={SPELLS.ARCANE_ORB}
           casts={this.arcaneOrb.orbData.map((cast) => this.evaluateOrbCast(cast))}
+          showBreakdown
         />
         <CastEfficiencyBar
           spell={SPELLS.ARCANE_ORB}

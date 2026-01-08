@@ -4,17 +4,25 @@ import Analyzer from 'parser/core/Analyzer';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent, GetRelatedEvents, DamageEvent, EventType } from 'parser/core/Events';
 import EventHistory from 'parser/shared/modules/EventHistory';
-import { ARCANE_MISSILES_MAX_TICKS, CLEARCASTING_MAX_STACKS } from '../../shared';
 import { ThresholdStyle } from 'parser/core/ParseResults';
+import { ARCANE_MISSILES_BASE_TICKS, CLEARCASTING_BASE_STACKS } from '../../shared';
+import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 
 export default class ArcaneMissiles extends Analyzer {
   static dependencies = {
     eventHistory: EventHistory,
+    arcaneChargeTracker: ArcaneChargeTracker,
   };
 
   protected eventHistory!: EventHistory;
+  protected arcaneChargeTracker!: ArcaneChargeTracker;
 
-  hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.AETHER_ATTUNEMENT_TALENT);
+  hasAmplification: boolean = this.selectedCombatant.hasTalent(TALENTS.AMPLIFICATION_TALENT);
+  hasImprovedClearcasting: boolean = this.selectedCombatant.hasTalent(
+    TALENTS.IMPROVED_CLEARCASTING_TALENT,
+  );
+  hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.ARCANE_MISSILES_TALENT);
+
   missileData: ArcaneMissilesData[] = [];
 
   constructor(options: Options) {
@@ -27,6 +35,12 @@ export default class ArcaneMissiles extends Analyzer {
   }
 
   onMissiles(event: CastEvent) {
+    const maxTicks = this.hasAmplification
+      ? ARCANE_MISSILES_BASE_TICKS + 2
+      : ARCANE_MISSILES_BASE_TICKS;
+    const maxCCStacks = this.hasImprovedClearcasting
+      ? CLEARCASTING_BASE_STACKS + 2
+      : CLEARCASTING_BASE_STACKS;
     const damageTicks: DamageEvent | DamageEvent[] | undefined = GetRelatedEvents(
       event,
       EventType.Damage,
@@ -35,12 +49,14 @@ export default class ArcaneMissiles extends Analyzer {
     this.missileData.push({
       cast: event,
       ticks: damageTicks.length,
-      aetherAttunement: this.selectedCombatant.hasBuff(SPELLS.AETHER_ATTUNEMENT_PROC_BUFF.id),
-      arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
-      clipped: damageTicks && damageTicks.length < ARCANE_MISSILES_MAX_TICKS,
+      arcaneCharges: this.arcaneChargeTracker.current,
+      clipped: damageTicks && damageTicks.length < maxTicks,
+      opMissiles: this.selectedCombatant.hasBuff(
+        SPELLS.OVERPOWERED_MISSILES_BUFF,
+        event.timestamp - 10,
+      ),
       clearcastingCapped:
-        (this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id)?.stacks ?? 0) >=
-        CLEARCASTING_MAX_STACKS,
+        (this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id)?.stacks ?? 0) >= maxCCStacks,
       clearcastingProcs: this.selectedCombatant.getBuff(SPELLS.CLEARCASTING_ARCANE.id)?.stacks ?? 0,
     });
   }
@@ -107,11 +123,11 @@ export default class ArcaneMissiles extends Analyzer {
 export interface ArcaneMissilesData {
   cast: CastEvent;
   ticks: number;
-  aetherAttunement: boolean;
-  arcaneSoul: boolean;
+  arcaneCharges: number;
   clearcastingCapped: boolean;
   clearcastingProcs: number;
   clipped: boolean;
+  opMissiles: boolean;
   channelEnd?: number;
   gcdEnd?: number;
   channelEndDelay?: number;

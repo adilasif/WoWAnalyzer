@@ -103,9 +103,7 @@ const DEFAULT_HASTE_BUFFS: HasteBuffMap = {
   [SPELLS.MANA_ADDICTION_BUFF_ARCANE.id]: {
     hastePerStack: 0.03,
   },
-  [SPELLS.ARCANE_TEMPO_BUFF.id]: {
-    hastePerStack: 0.02,
-  },
+  [TALENTS_MAGE.ARCANE_TEMPO_TALENT.id]: 0.02,
   //endregion
 
   //region Monk

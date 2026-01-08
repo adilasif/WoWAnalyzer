@@ -26,8 +26,6 @@ class ArcaneSurgeGuide extends Analyzer {
 
   protected arcaneSurge!: ArcaneSurge;
 
-  hasSiphonStorm: boolean = this.selectedCombatant.hasTalent(TALENTS.EVOCATION_TALENT);
-
   /**
    * Evaluates a single Arcane Surge cast for CastSummary.
    * Returns performance and reason for tooltip display.
@@ -51,7 +49,7 @@ class ArcaneSurgeGuide extends Analyzer {
     }
 
     // Perfect conditions
-    if (hasMaxCharges && (!this.hasSiphonStorm || cast.siphonStormBuff)) {
+    if (hasMaxCharges) {
       return {
         timestamp: cast.cast,
         performance: QualitativePerformance.Perfect,
@@ -62,7 +60,7 @@ class ArcaneSurgeGuide extends Analyzer {
     }
 
     // Good conditions
-    if (hasMaxCharges && cast.siphonStormBuff) {
+    if (hasMaxCharges) {
       return {
         timestamp: cast.cast,
         performance: QualitativePerformance.Good,
@@ -122,16 +120,6 @@ class ArcaneSurgeGuide extends Analyzer {
               : `${surgeCast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`;
           },
         },
-        {
-          label: (
-            <>
-              <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} /> Active
-            </>
-          ),
-          getResult: (cast: unknown) => (cast as ArcaneSurgeData).siphonStormBuff,
-          getDetails: (cast: unknown) =>
-            (cast as ArcaneSurgeData).siphonStormBuff ? 'Active' : 'Not active',
-        },
       ],
     });
   }
@@ -143,7 +131,6 @@ class ArcaneSurgeGuide extends Analyzer {
     const evocation = <SpellLink spell={TALENTS.EVOCATION_TALENT} />;
     const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
     const arcaneMissiles = <SpellLink spell={TALENTS.ARCANE_MISSILES_TALENT} />;
-    const siphonStorm = <SpellLink spell={SPELLS.SIPHON_STORM_BUFF} />;
 
     const explanation = (
       <>
@@ -156,7 +143,7 @@ class ArcaneSurgeGuide extends Analyzer {
           </li>
           <li>
             Full channel {evocation} before each {arcaneSurge} cast to cap your mana and grant an
-            intellect buff from {siphonStorm}.
+            intellect buff from.
           </li>
           <li>
             Channeling {evocation} will give you a {clearcasting} proc. Cast {arcaneMissiles} to get

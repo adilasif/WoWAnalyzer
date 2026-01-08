@@ -1,4 +1,3 @@
-import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Analyzer from 'parser/core/Analyzer';
@@ -33,7 +32,6 @@ export default class ArcaneSurge extends Analyzer {
     this.surgeData.push({
       cast: event.timestamp,
       charges: this.chargeTracker.current,
-      siphonStormBuff: this.selectedCombatant.hasBuff(SPELLS.SIPHON_STORM_BUFF.id),
       mana: getManaPercentage(event),
     });
   }
@@ -61,5 +59,4 @@ export interface ArcaneSurgeData {
   cast: number;
   mana?: number;
   charges: number;
-  siphonStormBuff: boolean;
 }
