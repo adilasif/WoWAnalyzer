@@ -131,18 +131,69 @@ class SandsOfTime extends Analyzer {
       return null;
     }
 
-    const explanation = (
+    let explanation = (
       <section>
         <strong>
           <SpellLink spell={SPELLS.SANDS_OF_TIME} />
         </strong>{' '}
         extends the duration of your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> when casting{' '}
-        <SpellLink spell={SPELLS.FIRE_BREATH} />, <SpellLink spell={SPELLS.UPHEAVAL} />,{' '}
-        <SpellLink spell={TALENTS.ERUPTION_TALENT} /> or{' '}
-        <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} />. You should never cast these spells
-        outside your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> windows.
+        <SpellLink spell={SPELLS.FIRE_BREATH} />, <SpellLink spell={SPELLS.UPHEAVAL} />
+        , <SpellLink spell={TALENTS.ERUPTION_TALENT} /> or{' '}
+        <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} />.<br></br>
+        You should never cast these spells outside your{' '}
+        <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> windows.
       </section>
     );
+    if (
+      this.selectedCombatant.hasTalent(TALENTS.DUPLICATE_1_AUGMENTATION_TALENT) &&
+      this.selectedCombatant.hasTalent(TALENTS.PROLONG_LIFE_TALENT)
+    ) {
+      explanation = (
+        <section>
+          <strong>
+            <SpellLink spell={SPELLS.SANDS_OF_TIME} />
+          </strong>{' '}
+          extends the duration of your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} />,{' '}
+          <SpellLink spell={TALENTS.DUPLICATE_2_AUGMENTATION_TALENT} />, and{' '}
+          <SpellLink spell={TALENTS.SYMBIOTIC_BLOOM_TALENT} /> when casting{' '}
+          <SpellLink spell={SPELLS.FIRE_BREATH} />, <SpellLink spell={SPELLS.UPHEAVAL} />
+          , <SpellLink spell={TALENTS.ERUPTION_TALENT} /> or{' '}
+          <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} />.<br></br>
+          You should never cast these spells outside your{' '}
+          <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> windows.
+        </section>
+      );
+    } else if (this.selectedCombatant.hasTalent(TALENTS.DUPLICATE_1_AUGMENTATION_TALENT)) {
+      explanation = (
+        <section>
+          <strong>
+            <SpellLink spell={SPELLS.SANDS_OF_TIME} />
+          </strong>{' '}
+          extends the duration of your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> and{' '}
+          <SpellLink spell={TALENTS.DUPLICATE_2_AUGMENTATION_TALENT} /> when casting{' '}
+          <SpellLink spell={SPELLS.FIRE_BREATH} />, <SpellLink spell={SPELLS.UPHEAVAL} />
+          , <SpellLink spell={TALENTS.ERUPTION_TALENT} /> or{' '}
+          <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} />.<br></br>
+          You should never cast these spells outside your{' '}
+          <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> windows.
+        </section>
+      );
+    } else if (this.selectedCombatant.hasTalent(TALENTS.PROLONG_LIFE_TALENT)) {
+      explanation = (
+        <section>
+          <strong>
+            <SpellLink spell={SPELLS.SANDS_OF_TIME} />
+          </strong>{' '}
+          extends the duration of your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> and{' '}
+          <SpellLink spell={TALENTS.SYMBIOTIC_BLOOM_TALENT} /> when casting{' '}
+          <SpellLink spell={SPELLS.FIRE_BREATH} />, <SpellLink spell={SPELLS.UPHEAVAL} />
+          , <SpellLink spell={TALENTS.ERUPTION_TALENT} /> or{' '}
+          <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} />.<br></br>
+          You should never cast these spells outside your{' '}
+          <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> windows.
+        </section>
+      );
+    }
 
     return (
       <ContextualSpellUsageSubSection
