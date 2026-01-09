@@ -45,12 +45,6 @@ class TouchOfTheMagiGuide extends Analyzer {
     });
   }
 
-  /**
-   * Evaluates a single Touch of the Magi cast.
-   * Returns performance and reason for tooltip display.
-   *
-   * Evaluation priority: fail → perfect → good → ok → default
-   */
   private evaluateTouchCast(cast: TouchOfTheMagiData): CastEvaluation {
     const noCharges = cast.charges === 0;
     const maxCharges = cast.charges === MAX_ARCANE_CHARGES;

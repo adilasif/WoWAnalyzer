@@ -3,13 +3,7 @@ import SPELLS from 'common/SPELLS';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Analyzer from 'parser/core/Analyzer';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import Events, {
-  CastEvent,
-  DamageEvent,
-  EventType,
-  GetRelatedEvents,
-  ResourceChangeEvent,
-} from 'parser/core/Events';
+import Events, { CastEvent, DamageEvent, EventType, GetRelatedEvents } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
