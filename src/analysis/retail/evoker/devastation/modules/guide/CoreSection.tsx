@@ -77,13 +77,11 @@ export function CoreSection({ modules, events, info }: GuideProps<typeof CombatL
             {formatPercentage(modules.cancelledCasts.cancelledPercentage, 1)}%
           </PerformanceStrong>{' '}
         </p>
-        <p>
-          <ActiveTimeGraph
-            activeTimeSegments={modules.alwaysBeCasting.activeTimeSegments}
-            fightStart={info.fightStart}
-            fightEnd={info.fightEnd}
-          />
-        </p>
+        <ActiveTimeGraph
+          activeTimeSegments={modules.alwaysBeCasting.activeTimeSegments}
+          fightStart={info.fightStart}
+          fightEnd={info.fightEnd}
+        />
       </SubSection>
     </Section>
   );
