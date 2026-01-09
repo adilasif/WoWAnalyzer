@@ -160,6 +160,21 @@ class ShiftingSands extends Analyzer {
             <div>Tanks cannot receive Ebon Might.</div>
           ),
       };
+    } else if (
+      !application.ebonMightOn &&
+      !(application.combatant.spec?.role === ROLES.DPS.RANGED) &&
+      !(application.combatant.spec?.role === ROLES.DPS.MELEE)
+    ) {
+      ebonMightPerformance = {
+        performance: QualitativePerformance.Fail,
+        summary: ebonSummary,
+        details:
+          application.combatant.spec?.role === ROLES.HEALER ? (
+            <div>Healers cannot receive Ebon Might.</div>
+          ) : (
+            <div>Tanks cannot receive Ebon Might.</div>
+          ),
+      };
     } else if (!application.ebonMightOn) {
       ebonMightPerformance = {
         performance: QualitativePerformance.Fail,
