@@ -21,13 +21,10 @@ export interface TalentInfo {
 const default_rotation = (rules: Rules): Rule[] => {
   return [
     /** Top priority spells */
-    rules.snapFireFirestorm,
     rules.ehEternitySurge,
     rules.fireBreath,
     rules.aoeEternitySurge,
-    rules.shatteringStar,
     rules.stEternitySurge,
-    rules.aoeFirestorm,
     rules.aoeLivingFlame,
     rules.stBurnoutLivingFlame,
 
@@ -37,7 +34,6 @@ const default_rotation = (rules: Rules): Rule[] => {
     rules.disintegrate,
 
     /** Fillers */
-    rules.stFirestorm,
     rules.aoeAzureStrike,
     rules.greenSpells,
     rules.dragonRageFillerLivingFlame,
