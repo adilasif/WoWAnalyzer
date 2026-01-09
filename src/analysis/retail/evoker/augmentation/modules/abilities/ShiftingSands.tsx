@@ -37,7 +37,12 @@ class ShiftingSands extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    this.active = !this.selectedCombatant.hasTalent(TALENTS_EVOKER.MOTES_OF_POSSIBILITY_TALENT);
+
+    // deactivate in M+ with Motes as no cases where casts can be counted as a fail
+    this.active = !(
+      this.selectedCombatant.hasTalent(TALENTS_EVOKER.MOTES_OF_POSSIBILITY_TALENT) &&
+      isMythicPlus(this.owner.fight)
+    );
 
     this.addEventListener(
       Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.SHIFTING_SANDS_BUFF),

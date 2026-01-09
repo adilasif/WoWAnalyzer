@@ -45,6 +45,15 @@ class Prescience extends MajorCooldown<PrescienceCooldownCast> {
 
   constructor(options: Options) {
     super({ spell: TALENTS.PRESCIENCE_TALENT }, options);
+
+    // deactivate in M+ with Clairvoyant as no cases where casts can be counted as a fail
+    this.active =
+      this.selectedCombatant.hasTalent(TALENTS.PRESCIENCE_TALENT) &&
+      !(
+        this.selectedCombatant.hasTalent(TALENTS.CLAIRVOYANT_TALENT) &&
+        isMythicPlus(this.owner.fight)
+      );
+
     this.addEventListener(
       Events.cast.by(SELECTED_PLAYER).spell(TALENTS.PRESCIENCE_TALENT),
       this.onCast,
