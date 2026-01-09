@@ -358,9 +358,9 @@ class ShiftingSands extends Analyzer {
           <SpellLink spell={SPELLS.UPHEAVAL} /> and <SpellLink spell={SPELLS.FIRE_BREATH} />,
           preferring targets with <SpellLink spell={SPELLS.EBON_MIGHT_BUFF_EXTERNAL} /> active.
           <br />
-          <SpellLink spell={TALENTS_EVOKER.MOTES_OF_POSSIBILITY_TALENT} /> also have a 33% chance to
-          give <SpellLink spell={SPELLS.SHIFTING_SANDS_BUFF} /> to players who consume them. If you
-          personally consume a mote, it will instead apply as if you had cast an empower.
+          Additionally, <SpellLink spell={TALENTS_EVOKER.MOTES_OF_POSSIBILITY_TALENT} /> have a
+          chance when consumed to apply <SpellLink spell={SPELLS.SHIFTING_SANDS_BUFF} /> to a nearby
+          target as if you had cast an empower.
           <br />
           Ideally you should try to buff targets that also have{' '}
           <SpellLink spell={SPELLS.PRESCIENCE_BUFF} /> active.
