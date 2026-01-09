@@ -42,16 +42,6 @@ class Buffs extends CoreAuras {
         enabled: combatant.hasTalent(TALENTS.BURNOUT_TALENT),
       },
       // Tier Set
-      {
-        spellId: SPELLS.EMERALD_TRANCE_T31_4PC_BUFF.id,
-        timelineHighlight: true,
-        enabled: combatant.has4PieceByTier(TIERS.DF3),
-      },
-      {
-        spellId: SPELLS.BLAZING_SHARDS.id,
-        timelineHighlight: true,
-        enabled: combatant.has4PieceByTier(TIERS.DF2) || combatant.has4PieceByTier(TIERS.DF4),
-      },
       // Defensive
       {
         spellId: TALENTS.OBSIDIAN_SCALES_TALENT.id,
