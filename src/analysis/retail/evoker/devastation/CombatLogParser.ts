@@ -2,7 +2,6 @@ import MainCombatLogParser from 'parser/core/CombatLogParser';
 
 import Abilities from './modules/Abilities';
 
-import ShatteringStar from './modules/abilities/ShatteringStar';
 import Buffs from './modules/Buffs';
 import Guide from './Guide';
 //import AplCheck from './modules/AplCheck/AplCheck';
@@ -143,7 +142,6 @@ class CombatLogParser extends MainCombatLogParser {
 
     // core abilities
     disintegrate: Disintegrate,
-    shatteringStar: ShatteringStar,
     essenceBurst: EssenceBurst,
     burnout: Burnout,
     dragonRage: DragonRage,
