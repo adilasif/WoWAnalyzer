@@ -11,7 +11,6 @@ import Burnout from './modules/abilities/Burnout';
 import DragonRage from './modules/abilities/DragonRage';
 import CastLinkNormalizer from './modules/normalizers/CastLinkNormalizer';
 import EssenceBurstNormalizer from './modules/normalizers/EssenceBurstNormalizer';
-import Snapfire from './modules/abilities/Snapfire';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import Catalyze from './modules/talents/Catalyze';
 import Scintillation from './modules/talents/Scintillation';
@@ -115,7 +114,6 @@ class CombatLogParser extends MainCombatLogParser {
     causality: Causality,
     volatility: Volatility,
     arcaneIntensity: ArcaneIntensity,
-    snapfire: Snapfire,
     heatWave: HeatWave,
     spellweaversDominance: SpellweaversDominance,
     honedAggression: HonedAggression,
