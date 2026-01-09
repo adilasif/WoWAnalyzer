@@ -63,8 +63,8 @@ class TimeSkip extends Analyzer {
 
   MAX_CDR = this.selectedCombatant.hasTalent(TALENTS.TEMPORAL_BURST_TALENT)
     ? this.selectedCombatant.hasTalent(TALENTS.TOMORROW_TODAY_TALENT)
-      ? 39000
-      : 26000
+      ? 38550
+      : 25700
     : this.selectedCombatant.hasTalent(TALENTS.TOMORROW_TODAY_TALENT)
       ? 30000
       : 20000;
@@ -96,6 +96,10 @@ class TimeSkip extends Analyzer {
       this.temporalBurstRemoveStacks = this.selectedCombatant.getBuffStacks(
         SPELLS.TEMPORAL_BURST_BUFF,
       );
+      if (this.temporalBurstApplyStacks == 1 && this.temporalBurstRemoveStacks > 20) {
+        // log error causes 30 stacks to instead appear as 1 stack
+        this.temporalBurstApplyStacks = 30;
+      }
     }
     this.calculateCDR();
   }

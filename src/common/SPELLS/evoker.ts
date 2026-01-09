@@ -745,7 +745,7 @@ const spells = {
     icon: 'ability_evoker_firebreath',
   },
   TEMPORAL_BURST_BUFF: {
-    id: 413698,
+    id: 431698,
     name: 'Temporal Burst',
     icon: 'ability_evoker_essenceburst5',
   },
