@@ -3,7 +3,7 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import SPELLS from 'common/SPELLS/evoker';
 import Events from 'parser/core/Events';
 
-import { ApplyBuffEvent } from 'parser/core/Events';
+import { ApplyBuffEvent, RemoveBuffEvent } from 'parser/core/Events';
 import { ChecklistUsageInfo, SpellUse } from 'parser/core/SpellUsage/core';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import { SpellLink } from 'interface';
@@ -14,12 +14,14 @@ import ROLES from 'game/ROLES';
 import Combatant from 'parser/core/Combatant';
 import SPECS from 'game/SPECS';
 import { TALENTS_EVOKER } from 'common/TALENTS';
+import { isMythicPlus } from 'common/isMythicPlus';
 
 interface ShiftingSandsApplications {
   event: ApplyBuffEvent;
   ebonMightOn: boolean;
   prescienceOn: boolean;
   combatant: Combatant;
+  recentSkip: boolean;
 }
 
 class ShiftingSands extends Analyzer {
@@ -31,6 +33,8 @@ class ShiftingSands extends Analyzer {
   };
   protected combatants!: Combatants;
 
+  timeSkipTimestamp = 0;
+
   constructor(options: Options) {
     super(options);
     this.active = !this.selectedCombatant.hasTalent(TALENTS_EVOKER.MOTES_OF_POSSIBILITY_TALENT);
@@ -39,8 +43,23 @@ class ShiftingSands extends Analyzer {
       Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.SHIFTING_SANDS_BUFF),
       this.onCast,
     );
+    if (isMythicPlus(this.owner.fight)) {
+      // In M+, Time Skip may cause Sands to apply to healers/tanks, even without Motes talented
+      this.addEventListener(
+        Events.applybuff.by(SELECTED_PLAYER).spell(TALENTS_EVOKER.TIME_SKIP_TALENT),
+        this.onTimeSkip,
+      );
+      this.addEventListener(
+        Events.removebuff.by(SELECTED_PLAYER).spell(TALENTS_EVOKER.TIME_SKIP_TALENT),
+        this.onTimeSkip,
+      );
+    }
 
     this.addEventListener(Events.fightend, this.finalize);
+  }
+
+  private onTimeSkip(event: ApplyBuffEvent | RemoveBuffEvent) {
+    this.timeSkipTimestamp = event.timestamp;
   }
 
   private onCast(event: ApplyBuffEvent) {
@@ -61,6 +80,10 @@ class ShiftingSands extends Analyzer {
       ebonMightOn: target.hasBuff(SPELLS.EBON_MIGHT_BUFF_EXTERNAL.id) ?? false,
       prescienceOn: target.hasBuff(SPELLS.PRESCIENCE_BUFF.id) ?? false,
       combatant: target,
+      recentSkip:
+        event.timestamp - this.timeSkipTimestamp < 10000 && this.timeSkipTimestamp > 0
+          ? true
+          : false,
     };
 
     this.shiftingSandsApplications.push(shiftingSandsApplication);
@@ -79,8 +102,9 @@ class ShiftingSands extends Analyzer {
     const ebonMightPerformance = this.getEbonMightPerformance(application);
     const presciencePerformance = this.getPresciencePerformance(application);
     const rolePerformance = this.getRolePerformance(application);
-
-    if (
+    if (rolePerformance.performance === QualitativePerformance.Ok) {
+      performance = QualitativePerformance.Ok;
+    } else if (
       ebonMightPerformance.performance === QualitativePerformance.Fail ||
       rolePerformance.performance === QualitativePerformance.Fail
     ) {
@@ -119,7 +143,24 @@ class ShiftingSands extends Analyzer {
         Have <SpellLink spell={SPELLS.EBON_MIGHT_BUFF_EXTERNAL} /> active
       </div>
     );
-    if (!application.ebonMightOn) {
+
+    if (
+      !application.ebonMightOn &&
+      application.recentSkip &&
+      !(application.combatant.spec?.role === ROLES.DPS.RANGED) &&
+      !(application.combatant.spec?.role === ROLES.DPS.MELEE)
+    ) {
+      ebonMightPerformance = {
+        performance: QualitativePerformance.Ok,
+        summary: ebonSummary,
+        details:
+          application.combatant.spec?.role === ROLES.HEALER ? (
+            <div>Healers cannot receive Ebon Might.</div>
+          ) : (
+            <div>Tanks cannot receive Ebon Might.</div>
+          ),
+      };
+    } else if (!application.ebonMightOn) {
       ebonMightPerformance = {
         performance: QualitativePerformance.Fail,
         summary: ebonSummary,
@@ -152,8 +193,22 @@ class ShiftingSands extends Analyzer {
         Have <SpellLink spell={SPELLS.PRESCIENCE_BUFF} /> active
       </div>
     );
-
-    if (!application.prescienceOn) {
+    if (
+      !application.prescienceOn &&
+      application.recentSkip &&
+      !(application.combatant.spec?.role === ROLES.DPS.RANGED) &&
+      !(application.combatant.spec?.role === ROLES.DPS.MELEE)
+    ) {
+      presciencePerformance = {
+        performance: QualitativePerformance.Ok,
+        summary: prescienceSummary,
+        details: (
+          <div>
+            Target didn't have <SpellLink spell={SPELLS.PRESCIENCE_BUFF} /> active.
+          </div>
+        ),
+      };
+    } else if (!application.prescienceOn) {
       presciencePerformance = {
         performance: QualitativePerformance.Fail,
         summary: prescienceSummary,
@@ -184,7 +239,8 @@ class ShiftingSands extends Analyzer {
 
     if (
       !(application.combatant.spec?.role === ROLES.DPS.RANGED) &&
-      !(application.combatant.spec?.role === ROLES.DPS.MELEE)
+      !(application.combatant.spec?.role === ROLES.DPS.MELEE) &&
+      !application.recentSkip
     ) {
       rolePerformance = {
         performance: QualitativePerformance.Fail,
@@ -201,6 +257,29 @@ class ShiftingSands extends Analyzer {
               Buffed Tank: <span className={className}>{application.combatant.name}</span> with{' '}
               <SpellLink spell={SPELLS.SHIFTING_SANDS_BUFF} />. You should always try and buff DPS
               players.
+            </div>
+          ),
+      };
+    } else if (
+      !(application.combatant.spec?.role === ROLES.DPS.RANGED) &&
+      !(application.combatant.spec?.role === ROLES.DPS.MELEE) &&
+      application.recentSkip
+    ) {
+      rolePerformance = {
+        performance: QualitativePerformance.Ok,
+        summary: roleSummary,
+        details:
+          application.combatant.spec?.role === ROLES.HEALER ? (
+            <div>
+              Buffed Healer: <span className={className}>{application.combatant.name}</span> with{' '}
+              <SpellLink spell={SPELLS.SHIFTING_SANDS_BUFF} /> shortly after casting{' '}
+              <SpellLink spell={TALENTS_EVOKER.TIME_SKIP_TALENT} />.
+            </div>
+          ) : (
+            <div>
+              Buffed Tank: <span className={className}>{application.combatant.name}</span> with{' '}
+              <SpellLink spell={SPELLS.SHIFTING_SANDS_BUFF} /> shortly after casting{' '}
+              <SpellLink spell={TALENTS_EVOKER.TIME_SKIP_TALENT} />.
             </div>
           ),
       };
