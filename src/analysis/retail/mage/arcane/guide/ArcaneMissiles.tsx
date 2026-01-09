@@ -22,6 +22,11 @@ class ArcaneMissilesGuide extends Analyzer {
   protected arcaneMissiles!: ArcaneMissiles;
 
   hasAetherAttunement: boolean = this.selectedCombatant.hasTalent(TALENTS.AETHER_ATTUNEMENT_TALENT);
+  hasOrbMastery: boolean = this.selectedCombatant.hasTalent(TALENTS.ORB_MASTERY_TALENT);
+  hasHighVoltage: boolean = this.selectedCombatant.hasTalent(TALENTS.HIGH_VOLTAGE_TALENT);
+  hasOverpoweredMissiles: boolean = this.selectedCombatant.hasTalent(
+    TALENTS.OVERPOWERED_MISSILES_TALENT,
+  );
 
   channelDelayUtil(delay: number) {
     const thresholds = this.arcaneMissiles.channelDelayThresholds.isGreaterThan;
@@ -36,12 +41,43 @@ class ArcaneMissilesGuide extends Analyzer {
     });
   }
 
-  /**
-   * Evaluates a single Arcane Missiles cast for CastSummary.
-   * Returns performance and reason for tooltip display.
-   *
-   * Evaluation priority: fail → perfect → good → ok → default
-   */
+  private buildOverviewStats() {
+    const stats = [];
+
+    const totalCasts = this.arcaneMissiles.missileData.length;
+    const averageTicks =
+      this.arcaneMissiles.missileData.reduce((sum, m) => sum + m.ticks, 0) / totalCasts;
+
+    // Average delay from channel end
+    stats.push({
+      value: formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
+      label: 'Avg Channel End Delay ',
+      tooltip: (
+        <>
+          {formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3)} Average Delay
+          from End Channel to Next Cast.
+        </>
+      ),
+      performance: this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay),
+    });
+
+    // Total casts
+    stats.push({
+      value: `${totalCasts}`,
+      label: 'Total Casts',
+      tooltip: <>Total number of Arcane Missiles casts during the encounter.</>,
+    });
+
+    // Average ticks
+    stats.push({
+      value: averageTicks.toFixed(1),
+      label: 'Average Ticks',
+      tooltip: <>Average number of damage ticks per Arcane Missiles cast.</>,
+    });
+
+    return stats;
+  }
+
   private evaluateMissilesCast(am: ArcaneMissilesData): CastEvaluation {
     const clippedBeforeGCD =
       am.channelEnd && am.gcdEnd && am.gcdEnd - am.channelEnd > MISSILE_EARLY_CLIP_DELAY;
@@ -51,193 +87,105 @@ class ArcaneMissilesGuide extends Analyzer {
       (this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Good ||
         this.channelDelayUtil(am.channelEndDelay!) === QualitativePerformance.Perfect);
 
-    // Fail conditions (highest priority)
+    // FAIL CONDITIONS
     if (clippedBeforeGCD) {
       return {
-        timestamp: am.cast.timestamp,
         performance: QualitativePerformance.Fail,
-        reason: 'Clipped Missiles before GCD ended - significant DPS loss',
+        reason: 'Arcane Missiles Clipped during GCD',
+        timestamp: am.cast.timestamp,
       };
     }
 
-    if (!hasValidTiming) {
+    if (am.clearcastingProcs === 0) {
       return {
-        timestamp: am.cast.timestamp,
         performance: QualitativePerformance.Fail,
-        reason: 'Cannot determine channel timing - likely data issue',
+        reason: 'No Clearcasting Proc',
+        timestamp: am.cast.timestamp,
       };
     }
 
-    // Perfect conditions
+    // PERFECT CONDITIONS
+    // Capped on Clearcasting
     if (am.clearcastingCapped) {
       return {
-        timestamp: am.cast.timestamp,
         performance: QualitativePerformance.Perfect,
-        reason: 'Perfect - avoided munching Clearcasting charges by using when capped',
+        reason: 'Capped on Clearcasting',
+        timestamp: am.cast.timestamp,
       };
     }
 
-    if (this.hasAetherAttunement && am.aetherAttunement && am.clipped && goodChannelDelay) {
+    if (!this.hasOrbMastery) {
       return {
-        timestamp: am.cast.timestamp,
         performance: QualitativePerformance.Perfect,
-        reason: 'Perfect clip timing with Aether Attunement and good delay',
+        reason: 'Cast with Clearcasting and without Orb Mastery',
+        timestamp: am.cast.timestamp,
       };
     }
 
-    // Good conditions
-    if (this.hasAetherAttunement && am.aetherAttunement && am.clipped) {
+    if (this.hasHighVoltage && am.arcaneCharges < 3) {
       return {
+        performance: QualitativePerformance.Perfect,
+        reason: `Had ${am.arcaneCharges} with High Voltage`,
         timestamp: am.cast.timestamp,
+      };
+    }
+
+    if (this.hasOverpoweredMissiles && am.opMissiles) {
+      return {
+        performance: QualitativePerformance.Perfect,
+        reason: 'Had Overpowered Missiles',
+        timestamp: am.cast.timestamp,
+      };
+    }
+
+    // GOOD CONDITIONS
+    if (am.clearcastingProcs > 0) {
+      return {
         performance: QualitativePerformance.Good,
-        reason: 'Good clip timing with Aether Attunement',
-      };
-    }
-
-    if (!this.hasAetherAttunement && !am.aetherAttunement && !am.clipped) {
-      return {
+        reason: 'Had Clearcasting',
         timestamp: am.cast.timestamp,
-        performance: QualitativePerformance.Good,
-        reason: 'Good - full channel without Aether Attunement (optimal without talent)',
       };
     }
 
-    if (goodChannelDelay) {
-      return {
-        timestamp: am.cast.timestamp,
-        performance: QualitativePerformance.Good,
-        reason: `Good timing - ${am.channelEndDelay ? formatDurationMillisMinSec(am.channelEndDelay, 3) : '???'} delay to next cast`,
-      };
-    }
-
-    // Ok conditions
-    if (!am.aetherAttunement && !am.clipped) {
-      return {
-        timestamp: am.cast.timestamp,
-        performance: QualitativePerformance.Ok,
-        reason: 'Full channel - not clipped but could be optimized with Aether Attunement',
-      };
-    }
-
-    // Default
+    // DEFAULT
     return {
-      timestamp: am.cast.timestamp,
       performance: QualitativePerformance.Ok,
       reason: am.channelEndDelay
         ? `Standard usage - ${formatDurationMillisMinSec(am.channelEndDelay, 3)} delay to next cast`
         : 'Standard Arcane Missiles usage',
+      timestamp: am.cast.timestamp,
     };
   }
 
   get guideSubsection(): JSX.Element {
+    const arcaneCharge = <SpellLink spell={SPELLS.ARCANE_CHARGE} />;
     const arcaneMissiles = <SpellLink spell={TALENTS.ARCANE_MISSILES_TALENT} />;
     const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
-    const aetherAttunement = <SpellLink spell={TALENTS.AETHER_ATTUNEMENT_TALENT} />;
+    const orbMastery = <SpellLink spell={TALENTS.ORB_MASTERY_TALENT} />;
+    const highVoltage = <SpellLink spell={TALENTS.HIGH_VOLTAGE_TALENT} />;
+    const overpoweredMissiles = <SpellLink spell={TALENTS.OVERPOWERED_MISSILES_TALENT} />;
 
     const explanation = (
       <>
-        Ensure you are spending your <b>{clearcasting}</b> procs effectively with {arcaneMissiles}.
+        <b>{arcaneMissiles}</b> is a rotational ability that provides several benefits and are
+        modified by various buffs and talents. In general, you should only cast {arcaneMissiles}{' '}
+        when you both have a {clearcasting} proc and one of the below conditions is true;
         <ul>
+          <li>You are capped on {clearcasting} procs.</li>
+          <li>You do not have the {orbMastery} talent</li>
           <li>
-            Cast {arcaneMissiles} immediately if capped on {clearcasting} charges, ignoring any of
-            the below items, to avoid munching procs (gaining a charge while capped).
+            You are talented into {highVoltage} and have less than 3 {arcaneCharge}s
           </li>
-          <li>Do not cast {arcaneMissiles} if you have .</li>
-          <li>
-            If you don't have {aetherAttunement}, you can optionally clip your {arcaneMissiles} cast
-            once the GCD ends for a small damage boost.
-          </li>
+          <li>You have an {overpoweredMissiles} proc.</li>
         </ul>
+        Additionally, while it is sometimes acceptable to end your {arcaneMissiles} channel early,
+        you should never end it before the GCD has finished.
       </>
     );
-
-    const averageDelayTooltip = (
-      <>
-        {formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3)} Average Delay from
-        End Channel to Next Cast.
-      </>
-    );
-
-    const averageDelayPerf = this.channelDelayUtil(this.arcaneMissiles.averageChannelDelay);
-
-    const totalCasts = this.arcaneMissiles.missileData.length;
-    const totalCastsTooltip = <>Total number of Arcane Missiles casts during the encounter.</>;
-
-    const castsWithoutNextCast = this.arcaneMissiles.castsWithoutNextCast;
-    const castsWithoutNextCastTooltip = (
-      <>
-        Number of Arcane Missiles casts where no follow-up cast was detected (typically at end of
-        fight).
-      </>
-    );
-
-    const clippedCasts = this.arcaneMissiles.missileData.filter((m) => m.clipped).length;
-    const clippedCastsTooltip = (
-      <>Number of Arcane Missiles casts that were clipped (didn't reach full channel duration).</>
-    );
-
-    const cappedCasts = this.arcaneMissiles.missileData.filter((m) => m.clearcastingCapped).length;
-    const cappedCastsTooltip = (
-      <>
-        Number of Arcane Missiles casts made while at maximum Clearcasting stacks (avoiding munched
-        procs).
-      </>
-    );
-
-    const aetherAttunementCasts = this.arcaneMissiles.missileData.filter(
-      (m) => m.aetherAttunement,
-    ).length;
-    const aetherAttunementTooltip = (
-      <>Number of Arcane Missiles casts made with the Aether Attunement buff active.</>
-    );
-
-    const averageTicks =
-      this.arcaneMissiles.missileData.reduce((sum, m) => sum + m.ticks, 0) / totalCasts;
-    const averageTicksTooltip = <>Average number of damage ticks per Arcane Missiles cast.</>;
 
     return (
       <GuideSection spell={TALENTS.ARCANE_MISSILES_TALENT} explanation={explanation}>
-        <CastOverview
-          spell={TALENTS.ARCANE_MISSILES_TALENT}
-          stats={[
-            {
-              value: formatDurationMillisMinSec(this.arcaneMissiles.averageChannelDelay, 3),
-              label: 'Avg Delay from Channel End',
-              tooltip: averageDelayTooltip,
-              performance: averageDelayPerf,
-            },
-            {
-              value: `${totalCasts}`,
-              label: 'Total Casts',
-              tooltip: totalCastsTooltip,
-            },
-            {
-              value: `${castsWithoutNextCast}`,
-              label: 'Casts Without Follow-up',
-              tooltip: castsWithoutNextCastTooltip,
-            },
-            {
-              value: `${clippedCasts}`,
-              label: 'Clipped Casts',
-              tooltip: clippedCastsTooltip,
-            },
-            {
-              value: `${cappedCasts}`,
-              label: 'Casts While Capped',
-              tooltip: cappedCastsTooltip,
-            },
-            {
-              value: `${aetherAttunementCasts}`,
-              label: 'Aether Attunement Casts',
-              tooltip: aetherAttunementTooltip,
-            },
-            {
-              value: averageTicks.toFixed(1),
-              label: 'Average Ticks',
-              tooltip: averageTicksTooltip,
-            },
-          ]}
-        />
+        <CastOverview spell={TALENTS.ARCANE_MISSILES_TALENT} stats={this.buildOverviewStats()} />
         <CastSummary
           spell={TALENTS.ARCANE_MISSILES_TALENT}
           casts={this.arcaneMissiles.missileData.map((cast) => this.evaluateMissilesCast(cast))}

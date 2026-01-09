@@ -2,9 +2,6 @@ import Analyzer from 'parser/core/Analyzer';
 import { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
   CastEvent,
-  ApplyBuffEvent,
-  ApplyBuffStackEvent,
-  RefreshBuffEvent,
   GetRelatedEvents,
   GetRelatedEvent,
   EventType,
@@ -14,8 +11,6 @@ import TALENTS from 'common/TALENTS/mage';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import ArcaneChargeTracker from '../core/ArcaneChargeTracker';
 import { getManaPercentage, getTargetHealthPercentage } from '../../shared/helpers';
-
-const TEMPO_DURATION = 12000;
 
 export default class ArcaneBarrage extends Analyzer {
   static dependencies = {
@@ -27,30 +22,13 @@ export default class ArcaneBarrage extends Analyzer {
   protected arcaneChargeTracker!: ArcaneChargeTracker;
 
   barrageData: ArcaneBarrageData[] = [];
-  private lastTempoApply = 0;
 
   constructor(options: Options) {
     super(options);
     this.addEventListener(
-      Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.ARCANE_TEMPO_BUFF),
-      this.onTempo,
-    );
-    this.addEventListener(
-      Events.applybuffstack.by(SELECTED_PLAYER).spell(SPELLS.ARCANE_TEMPO_BUFF),
-      this.onTempo,
-    );
-    this.addEventListener(
-      Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.ARCANE_TEMPO_BUFF),
-      this.onTempo,
-    );
-    this.addEventListener(
       Events.cast.by(SELECTED_PLAYER).spell(SPELLS.ARCANE_BARRAGE),
       this.onBarrage,
     );
-  }
-
-  onTempo(event: ApplyBuffEvent | ApplyBuffStackEvent | RefreshBuffEvent) {
-    this.lastTempoApply = event.timestamp;
   }
 
   onBarrage(event: CastEvent) {
@@ -64,23 +42,18 @@ export default class ArcaneBarrage extends Analyzer {
         SPELLS.CLEARCASTING_ARCANE.id,
         event.timestamp - 10,
       ),
-      arcaneSoul: this.selectedCombatant.hasBuff(SPELLS.ARCANE_SOUL_BUFF.id),
       burdenOfPower: this.selectedCombatant.hasBuff(SPELLS.BURDEN_OF_POWER_BUFF.id),
       gloriousIncandescence: this.selectedCombatant.hasBuff(
         TALENTS.GLORIOUS_INCANDESCENCE_TALENT.id,
       ),
+      salvoStacks:
+        this.selectedCombatant.getBuff(SPELLS.ARCANE_SALVO_BUFF, event.timestamp - 10)?.stacks || 0,
       arcaneOrbAvail: this.spellUsable.isAvailable(SPELLS.ARCANE_ORB.id),
       touchCD: this.spellUsable.cooldownRemaining(TALENTS.TOUCH_OF_THE_MAGI_TALENT.id),
-      tempoRemaining: this.getTempoData(event),
       health: getTargetHealthPercentage(event),
     });
 
     this.arcaneChargeTracker.clearCharges(event);
-  }
-
-  private getTempoData(event: CastEvent): number | undefined {
-    const hasTempo = this.selectedCombatant.hasBuff(SPELLS.ARCANE_TEMPO_BUFF.id);
-    return hasTempo ? TEMPO_DURATION - (event.timestamp - this.lastTempoApply) : undefined;
   }
 }
 
@@ -91,11 +64,10 @@ export interface ArcaneBarrageData {
   precast?: CastEvent;
   targetsHit: number;
   clearcasting: boolean;
-  arcaneSoul: boolean;
   burdenOfPower: boolean;
   gloriousIncandescence: boolean;
+  salvoStacks: number;
   arcaneOrbAvail: boolean;
   touchCD: number;
-  tempoRemaining?: number;
   health?: number;
 }
