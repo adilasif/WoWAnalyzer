@@ -87,7 +87,6 @@ const BreathOfEonsHelper: FC<BreathOfEonsHelperProps> = ({
     const filter = `type = "damage" 
     AND not (source.role = "tank" or source.role = "healer")
     AND (target.id != source.id)
-    AND target.id not in(169428, 169430, 169429, 169426, 169421, 169425, 168932)
     AND not (target.id = source.owner.id)
     AND not (supportedActor.id = target.id)
     AND not (source.id = target.owner.id)
