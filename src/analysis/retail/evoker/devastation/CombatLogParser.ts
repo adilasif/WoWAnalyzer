@@ -54,7 +54,6 @@ import {
   DefensiveNormalizer,
   DefensiveCastLinkNormalizer,
   MobilityCastLinkNormalizer,
-  RenewingBlaze,
   ImminentDestruction,
   MeltArmor,
   MassDisintegrate,
@@ -96,7 +95,6 @@ class CombatLogParser extends MainCombatLogParser {
     defensiveCastLinkNormalizer: DefensiveCastLinkNormalizer,
     defensiveNormalizer: DefensiveNormalizer,
     mobilityCastLinkNormalizer: MobilityCastLinkNormalizer,
-    renewingBlaze: RenewingBlaze,
     timeSpiral: TimeSpiral,
 
     // Core
