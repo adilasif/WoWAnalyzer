@@ -21,27 +21,11 @@ class Abilities extends CoreAbilities {
         enabled: combatant.hasTalent(TALENTS.PYRE_TALENT),
       },
       {
-        spell: TALENTS.FIRESTORM_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL_AOE,
-        cooldown: 20,
-        gcd: {
-          base: 1500,
-        },
-        castEfficiency: {
-          suggestion: true,
-          recommendedEfficiency: 0.9,
-        },
-        range: BASE_EVOKER_RANGE,
-        enabled: combatant.hasTalent(TALENTS.FIRESTORM_TALENT),
-      },
-      {
         spell: combatant.hasTalent(TALENTS.FONT_OF_MAGIC_DEVASTATION_TALENT)
           ? SPELLS.ETERNITY_SURGE_FONT.id
           : SPELLS.ETERNITY_SURGE.id,
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown:
-          (combatant.hasTalent(TALENTS.EVENT_HORIZON_TALENT) ? 27 : 30) -
-          (combatant.has4PieceByTier(TIERS.TWW1) ? 4 : 0),
+        cooldown: combatant.hasTalent(TALENTS.EVENT_HORIZON_TALENT) ? 27 : 30,
         gcd: {
           base: EMPOWER_BASE_GCD,
           minimum: EMPOWER_MINIMUM_GCD,
@@ -52,21 +36,6 @@ class Abilities extends CoreAbilities {
         },
         range: BASE_EVOKER_RANGE,
         enabled: combatant.hasTalent(TALENTS.ETERNITY_SURGE_TALENT),
-      },
-      {
-        spell: TALENTS.SHATTERING_STAR_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 20 - (combatant.has4PieceByTier(TIERS.TWW1) ? 4 : 0),
-        gcd: {
-          base: 1500,
-        },
-        castEfficiency: {
-          suggestion: true,
-          recommendedEfficiency: 0.9,
-          extraSuggestion: 'You should aim to use this off CD.',
-        },
-        range: BASE_EVOKER_RANGE,
-        enabled: combatant.hasTalent(TALENTS.SHATTERING_STAR_TALENT),
       },
       //endregion
       //region Cooldowns
