@@ -4,7 +4,6 @@ import { SpellbookAbility } from 'parser/core/modules/Ability';
 import SPELL_CATEGORY from 'parser/core/SPELL_CATEGORY';
 import SPELLS from 'common/SPELLS';
 import { BASE_EVOKER_RANGE, EMPOWER_BASE_GCD, EMPOWER_MINIMUM_GCD } from '../../shared';
-import { TIERS } from 'game/TIERS';
 
 class Abilities extends CoreAbilities {
   spellbook(): SpellbookAbility[] {

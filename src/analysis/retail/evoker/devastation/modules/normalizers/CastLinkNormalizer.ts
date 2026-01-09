@@ -17,7 +17,6 @@ import {
   RemoveBuffEvent,
 } from 'parser/core/Events';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
-import { TIERS } from 'game/TIERS';
 
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
@@ -32,8 +31,6 @@ export const DISINTEGRATE_DEBUFF_TICK_LINK = 'DisintegrateDebuffTickLink';
 export const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
 export const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
 export const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
-export const JACKPOT_CONSUME = 'JackpotConsume';
-export const JACKPOT_APPLY_REMOVE_LINK = 'JackpotApplyRemoveLink';
 export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
 export const ENGULF_DAMAGE = 'EngulfDamage';
 export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
@@ -43,9 +40,7 @@ export const PYRE_MAX_TRAVEL_TIME = 1_050;
 const CAST_BUFFER_MS = 100;
 const IRIDESCENCE_RED_BACKWARDS_BUFFER_MS = 500;
 const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
-const JACK_APPLY_REMOVE_BUFFER = 30_000; // Realistically it will never be this long, but we hate edgecases
 const ENGULF_TRAVEL_TIME_MS = 500;
-const JACKPOT_CONSUME_FORWARD_BUFFER_MS = 300;
 
 const EVENT_LINKS: EventLink[] = [
   {
@@ -227,35 +222,6 @@ const EVENT_LINKS: EventLink[] = [
     },
   },
   {
-    linkRelation: JACKPOT_CONSUME,
-    reverseLinkRelation: JACKPOT_CONSUME,
-    linkingEventId: [
-      SPELLS.FIRE_BREATH.id,
-      SPELLS.FIRE_BREATH_FONT.id,
-      SPELLS.ETERNITY_SURGE.id,
-      SPELLS.ETERNITY_SURGE_FONT.id,
-    ],
-    linkingEventType: EventType.EmpowerEnd,
-    referencedEventId: SPELLS.JACKPOT_BUFF.id,
-    referencedEventType: EventType.RemoveBuff,
-    anyTarget: true,
-    backwardBufferMs: CAST_BUFFER_MS,
-    forwardBufferMs: JACKPOT_CONSUME_FORWARD_BUFFER_MS,
-    isActive: (C) => C.has4PieceByTier(TIERS.TWW2),
-    maximumLinks: 1,
-  },
-  {
-    linkRelation: JACKPOT_APPLY_REMOVE_LINK,
-    reverseLinkRelation: JACKPOT_APPLY_REMOVE_LINK,
-    linkingEventId: SPELLS.JACKPOT_BUFF.id,
-    linkingEventType: EventType.RemoveBuff,
-    referencedEventId: SPELLS.JACKPOT_BUFF.id,
-    referencedEventType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
-    maximumLinks: 1,
-    backwardBufferMs: JACK_APPLY_REMOVE_BUFFER,
-    isActive: (C) => C.has4PieceByTier(TIERS.TWW2),
-  },
-  {
     linkRelation: FIRE_BREATH_DEBUFF,
     reverseLinkRelation: FIRE_BREATH_DEBUFF,
     linkingEventId: [SPELLS.FIRE_BREATH.id, SPELLS.FIRE_BREATH_FONT.id],
@@ -377,36 +343,6 @@ export function isMassDisintegrateTick(event: DamageEvent) {
 
 export function isMassDisintegrateDebuff(event: ApplyDebuffEvent | RefreshDebuffEvent) {
   return HasRelatedEvent(event, MASS_DISINTEGRATE_DEBUFF);
-}
-
-/** Returns the number of stacks consumed by a Jackpot! remove event or empower end event
- * will return 0 if the event didn't consume Jackpot! */
-export function getConsumedJackpotStacks(event: EmpowerEndEvent | RemoveBuffEvent) {
-  if (event.type === EventType.EmpowerEnd) {
-    const maybeConsumeEvent = GetRelatedEvent<RemoveBuffEvent>(event, JACKPOT_CONSUME);
-
-    if (maybeConsumeEvent) {
-      event = maybeConsumeEvent;
-    }
-  }
-
-  if (event.ability.guid === SPELLS.JACKPOT_BUFF.id && event.type === EventType.RemoveBuff) {
-    const applyEvent = GetRelatedEvent<ApplyBuffEvent | ApplyBuffStackEvent>(
-      event,
-      JACKPOT_APPLY_REMOVE_LINK,
-    );
-
-    switch (applyEvent?.type) {
-      case EventType.ApplyBuff:
-        return 1;
-      case EventType.ApplyBuffStack:
-        return applyEvent.stack ?? 2;
-      default:
-        return 0;
-    }
-  }
-
-  return 0;
 }
 
 export default CastLinkNormalizer;

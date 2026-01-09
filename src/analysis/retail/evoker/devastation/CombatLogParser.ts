@@ -66,7 +66,6 @@ import {
   RefinedEssence,
   CommandSquadron,
 } from 'analysis/retail/evoker/shared';
-import TWW2TierSet from './modules/tier/TWW2TierSet';
 
 class CombatLogParser extends MainCombatLogParser {
   static specModules = {
@@ -148,7 +147,6 @@ class CombatLogParser extends MainCombatLogParser {
     pyre: Pyre,
 
     // tier
-    tww2TierSet: TWW2TierSet,
   };
 
   static guide = Guide;

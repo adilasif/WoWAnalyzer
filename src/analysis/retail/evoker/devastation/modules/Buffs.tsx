@@ -3,7 +3,6 @@ import PRIEST_TALENTS from 'common/TALENTS/priest';
 import BLOODLUST_BUFFS from 'game/BLOODLUST_BUFFS';
 import CoreAuras from 'parser/core/modules/Auras';
 import TALENTS from 'common/TALENTS/evoker';
-import { TIERS } from 'game/TIERS';
 
 class Buffs extends CoreAuras {
   auras() {

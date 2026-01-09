@@ -36,7 +36,6 @@ export function DamageEfficiency(props: GuideProps<typeof CombatLogParser>) {
       <DisintegrateSubsection {...props} />
       <NoWastedProcsSubsection {...props} />
       {props.modules.shatteringStarGuide.guideSubsection()}
-      {props.modules.tww2TierSet.guideSubsection()}
       {props.modules.engulf.guideSubsection()}
     </Section>
   );
