@@ -52,7 +52,7 @@ interface DamageWindow {
 }
 
 /** Range to search for other windows */
-const WINDOW_BUFFER_RANGE_MS = 4000;
+const WINDOW_BUFFER_RANGE_MS = 20000;
 
 interface DamageSources {
   sourceID: number;
@@ -209,13 +209,8 @@ const BreathOfEonsHelper: FC<BreathOfEonsHelperProps> = ({
     <SubSection title="Breath of Eons helper">
       <p>
         This module offers a detailed damage breakdown of your{' '}
-        <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} /> usage.
-        <br />
-        Additionally, it helps you determine if there was a more optimal timing for your{' '}
-        <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} />. This can be particularly valuable when
-        dealing with bursty specs like <span className="Druid">Balance or Feral Druids</span>,{' '}
-        <span className="Monk">Windwalker Monks</span>, or{' '}
-        <span className="Rogue">Subtlety Rogues</span>.
+        <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT} /> usage, helping you determine if there
+        was a more optimal timing to cast it.
       </p>
 
       <LazyLoadGuideSection loader={loadData.bind(this)} value={getSectionContent.bind(this)} />

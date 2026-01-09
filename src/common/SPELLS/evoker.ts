@@ -598,21 +598,6 @@ const spells = {
     name: 'Chronoflame',
     icon: 'inv_ability_chronowardenevoker_chronoflame',
   },
-  THREAD_OF_FATE_BUFF: {
-    id: 431716,
-    name: 'Thread of Fate',
-    icon: 'ability_evoker_sandsoftime',
-  },
-  THREAD_OF_FATE_HEALING: {
-    id: 432896,
-    name: 'Thread of Fate',
-    icon: 'ability_evoker_sandsoftime',
-  },
-  THREAD_OF_FATE_DAMAGE: {
-    id: 432895,
-    name: 'Thread of Fate',
-    icon: 'ability_evoker_sandsoftime',
-  },
   PRIMACY_BUFF: {
     id: 431654,
     name: 'Primacy',
@@ -747,7 +732,7 @@ const spells = {
   DUPLICATE_SELF_BUFF: {
     id: 1259171,
     name: 'Duplicate',
-    icon: 'ability_evoker_masterylifebinder_bronze',
+    icon: 'inv12_apextalent_evoker_duplicate',
   },
   DUPLICATE_ERUPTION: {
     id: 1259172,
@@ -758,6 +743,11 @@ const spells = {
     id: 431164,
     name: 'Fire Breath (Duplicate)',
     icon: 'ability_evoker_firebreath',
+  },
+  TEMPORAL_BURST_BUFF: {
+    id: 413698,
+    name: 'Temporal Burst',
+    icon: 'ability_evoker_essenceburst5',
   },
   // endregion
 } satisfies Record<string, Spell>;

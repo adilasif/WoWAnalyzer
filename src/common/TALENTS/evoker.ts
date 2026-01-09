@@ -408,7 +408,7 @@ const talents = {
   DUPLICATE_2_AUGMENTATION_TALENT: {
     id: 1259173,
     name: 'Duplicate',
-    icon: 'ability_evoker_recall',
+    icon: 'inv12_apextalent_evoker_duplicate',
     maxRanks: 1,
     entryIds: [135729],
     definitionIds: [{ id: 140484, specId: 1473 }],

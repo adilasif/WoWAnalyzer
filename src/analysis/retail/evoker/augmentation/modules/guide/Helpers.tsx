@@ -19,7 +19,6 @@ export function Helpers({ modules }: GuideProps<typeof CombatLogParser>) {
           until you click the <span className="clickToLoad">Click to load</span> buttons.
         </strong>
       </p>
-      {modules.breathOfEonsRotational.helperSection()}
     </Section>
   );
 }

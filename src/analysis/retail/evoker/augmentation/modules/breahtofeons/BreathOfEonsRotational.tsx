@@ -30,7 +30,6 @@ import BreathOfEonsSection from './BreathOfEonsSection';
 import Combatant from 'parser/core/Combatant';
 import Combatants from 'parser/shared/modules/Combatants';
 import { SpellTracker } from 'analysis/retail/evoker/shared/modules/components/ExplanationGraph';
-import BreathOfEonsHelper from './BreathOfEonsHelper';
 import { BREATH_OF_EONS_SPELLS } from '../../constants';
 import Spell from 'common/SPELLS/Spell';
 
@@ -621,19 +620,6 @@ class BreathOfEonsRotational extends Analyzer {
         fightEndTime={this.owner.fight.end_time}
         prescienceCount={this.prescienceCount}
         shiftingSandsCount={this.shiftingSandsCount}
-      />
-    );
-  }
-  helperSection(): JSX.Element | null {
-    if (!this.active) {
-      return null;
-    }
-    return (
-      <BreathOfEonsHelper
-        windows={this.windows}
-        fightStartTime={this.owner.fight.start_time}
-        fightEndTime={this.owner.fight.end_time}
-        owner={this.owner}
       />
     );
   }

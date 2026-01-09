@@ -21,6 +21,9 @@ class TimeSkip extends Analyzer {
   timeSkipApplyTimestamp = 0;
   timeSkipRemoveTimestamp = 0;
 
+  temporalBurstApplyStacks = 0;
+  temporalBurstRemoveStacks = 0;
+
   spellIdsToCDR = [
     SPELLS.UPHEAVAL,
     SPELLS.UPHEAVAL_FONT,
@@ -58,7 +61,13 @@ class TimeSkip extends Analyzer {
   // Amount to CDR for each MS.
   CDR_MS = 10;
 
-  MAX_CDR = this.selectedCombatant.hasTalent(TALENTS.TOMORROW_TODAY_TALENT) ? 30000 : 20000;
+  MAX_CDR = this.selectedCombatant.hasTalent(TALENTS.TEMPORAL_BURST_TALENT)
+    ? this.selectedCombatant.hasTalent(TALENTS.TOMORROW_TODAY_TALENT)
+      ? 39000
+      : 26000
+    : this.selectedCombatant.hasTalent(TALENTS.TOMORROW_TODAY_TALENT)
+      ? 30000
+      : 20000;
 
   constructor(options: Options) {
     super(options);
@@ -75,19 +84,39 @@ class TimeSkip extends Analyzer {
 
   onApplyBuff(event: ApplyBuffEvent) {
     this.timeSkipApplyTimestamp = event.timestamp;
+    if (this.selectedCombatant.hasBuff(SPELLS.TEMPORAL_BURST_BUFF)) {
+      this.temporalBurstApplyStacks = this.selectedCombatant.getBuffStacks(
+        SPELLS.TEMPORAL_BURST_BUFF,
+      );
+    }
   }
   onRemoveBuff(event: RemoveBuffEvent) {
     this.timeSkipRemoveTimestamp = event.timestamp;
-
+    if (this.selectedCombatant.hasBuff(SPELLS.TEMPORAL_BURST_BUFF)) {
+      this.temporalBurstRemoveStacks = this.selectedCombatant.getBuffStacks(
+        SPELLS.TEMPORAL_BURST_BUFF,
+      );
+    }
     this.calculateCDR();
   }
 
   private calculateCDR() {
-    let CDRAmount = (this.timeSkipRemoveTimestamp - this.timeSkipApplyTimestamp) * this.CDR_MS;
+    let temporalBurstMultiplier = 1;
+    // Use the average Temporal Burst stacks to calculate CDR multiplier
+    if (this.temporalBurstApplyStacks > 0 && this.temporalBurstRemoveStacks > 0) {
+      temporalBurstMultiplier +=
+        (this.temporalBurstApplyStacks + this.temporalBurstRemoveStacks) * 0.5 * 0.01;
+    }
+    let CDRAmount =
+      (this.timeSkipRemoveTimestamp - this.timeSkipApplyTimestamp) *
+      this.CDR_MS *
+      temporalBurstMultiplier;
+
+    this.temporalBurstApplyStacks = 0;
+    this.temporalBurstRemoveStacks = 0;
     if (CDRAmount > this.MAX_CDR) {
       CDRAmount = this.MAX_CDR;
     }
-
     this.spellIdsToCDR.forEach((spellId) => {
       if (!this.spellUsable.isOnCooldown(spellId)) {
         return;
