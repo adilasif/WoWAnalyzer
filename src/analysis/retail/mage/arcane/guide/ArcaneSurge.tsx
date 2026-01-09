@@ -1,127 +1,95 @@
 import type { JSX } from 'react';
+import { formatPercentage, formatDuration } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
 import { SpellSeq } from 'parser/ui/SpellSeq';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import { EventType } from 'parser/core/Events';
 import Analyzer from 'parser/core/Analyzer';
+import { evaluateQualitativePerformanceByThreshold } from 'parser/ui/QualitativePerformance';
 import GuideSection from 'interface/guide/components/GuideSection';
 import { type CastEvaluation } from 'interface/guide/components/CastSummary';
-import {
-  type ExpandableConfig,
-  ExpandableBreakdown,
-  createExpandableConfig,
-} from '../../shared/components';
+import CastSequence, {
+  type CastSequenceEntry,
+  type CastInSequence,
+} from 'interface/guide/components/CastSequence';
+import CastDetail, { type PerCastData } from 'interface/guide/components/CastDetail';
+import EventHistory from 'parser/shared/modules/EventHistory';
 
 import ArcaneSurge, { ArcaneSurgeData } from '../analyzers/ArcaneSurge';
 
 const ARCANE_CHARGE_MAX_STACKS = 4;
-const OPENER_DURATION = 20000;
-const SHORT_FIGHT_DURATION = 60000;
+const SURGE_PRE_WINDOW = 10000;
+const SURGE_POST_WINDOW = 5000; // 7.5 seconds before and after
 
 class ArcaneSurgeGuide extends Analyzer {
   static dependencies = {
     arcaneSurge: ArcaneSurge,
+    eventHistory: EventHistory,
   };
 
   protected arcaneSurge!: ArcaneSurge;
+  protected eventHistory!: EventHistory;
 
-  /**
-   * Evaluates a single Arcane Surge cast for CastSummary.
-   * Returns performance and reason for tooltip display.
-   *
-   * Evaluation priority: fail → perfect → good → ok → default
-   */
+  manaUtil(manaPercent: number) {
+    const thresholds = this.arcaneSurge.arcaneSurgeManaThresholds.isLessThan;
+    return evaluateQualitativePerformanceByThreshold({
+      actual: manaPercent,
+      isGreaterThan: {
+        perfect: thresholds.minor,
+        good: thresholds.average,
+        ok: thresholds.major,
+        fail: 0,
+      },
+    });
+  }
+
   private evaluateArcaneSurgeCast(cast: ArcaneSurgeData): CastEvaluation {
-    const opener = cast.cast - this.owner.fight.start_time < OPENER_DURATION;
-    const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
-    const fightTimeRemaining = this.owner.fight.end_time - cast.cast;
-    const shortFight = fightTimeRemaining < SHORT_FIGHT_DURATION;
+    const hasMaxCharges = cast.charges === ARCANE_CHARGE_MAX_STACKS;
+    const mana = cast.mana || 0;
+    const manaPerf = this.manaUtil(mana) as QualitativePerformance;
 
+    // Fail conditions (highest priority)
     if (!hasMaxCharges) {
       return {
         timestamp: cast.cast,
         performance: QualitativePerformance.Fail,
-        reason: opener
-          ? `Opener with ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`
-          : `Only ${cast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges - need 4 or cast Arcane Orb first`,
+        reason: `Low Arcane Charges. After clearing Charges with Arcane Barrage, refill them with Touch of the Magi before Arcane Surge`,
       };
     }
 
-    // Perfect conditions
-    if (hasMaxCharges) {
+    if (manaPerf === QualitativePerformance.Fail) {
       return {
         timestamp: cast.cast,
-        performance: QualitativePerformance.Perfect,
-        reason: opener
-          ? 'Perfect opener with available buffs'
-          : 'Perfect combo: max charges + all available buffs (Siphon Storm + Nether Precision)',
+        performance: QualitativePerformance.Fail,
+        reason: `Low Mana. Use Evocation to top off your mana before your Burn Phase.`,
       };
     }
 
-    // Good conditions
-    if (hasMaxCharges) {
+    if (!cast.touchActive) {
       return {
         timestamp: cast.cast,
-        performance: QualitativePerformance.Good,
-        reason: `Good usage: ${cast.charges} charges + Siphon Storm`,
+        performance: QualitativePerformance.Fail,
+        reason: `Touch of the Magi Debuff not active on target.`,
       };
     }
 
-    if (hasMaxCharges && shortFight) {
+    // Performance based on Mana
+    if (cast.mana) {
       return {
         timestamp: cast.cast,
-        performance: QualitativePerformance.Good,
-        reason: 'Good emergency usage - short fight/encounter ending',
+        performance: manaPerf,
+        reason: `${manaPerf} Usage: ${formatPercentage(cast.mana, 1)}% Mana`,
       };
     }
 
-    // Ok/default
-    if (hasMaxCharges) {
-      return {
-        timestamp: cast.cast,
-        performance: QualitativePerformance.Ok,
-        reason: opener
-          ? `Opener usage with ${cast.charges} charges`
-          : `Basic usage with ${cast.charges} charges - could optimize with buffs`,
-      };
-    }
-
-    // Fallback (should not reach here due to fail condition above)
+    // Fallback for any unexpected edge cases
     return {
       timestamp: cast.cast,
-      performance: QualitativePerformance.Fail,
-      reason: 'Suboptimal Arcane Surge usage',
+      performance: QualitativePerformance.Ok,
+      reason: `Unexpected Result. You should report this.`,
     };
-  }
-
-  private get expandableConfig(): ExpandableConfig {
-    return createExpandableConfig({
-      spell: TALENTS.ARCANE_SURGE_TALENT,
-      formatTimestamp: (timestamp: number) => this.owner.formatTimestamp(timestamp),
-      getTimestamp: (cast: unknown) => (cast as ArcaneSurgeData).cast,
-      checklistItems: [
-        {
-          label: (
-            <>
-              <SpellLink spell={SPELLS.ARCANE_CHARGE} />s Before Surge
-            </>
-          ),
-          getResult: (cast: unknown) => {
-            const surgeCast = cast as ArcaneSurgeData;
-            const opener = surgeCast.cast - this.owner.fight.start_time < OPENER_DURATION;
-            return surgeCast.charges === ARCANE_CHARGE_MAX_STACKS || opener;
-          },
-          getDetails: (cast: unknown) => {
-            const surgeCast = cast as ArcaneSurgeData;
-            const opener = surgeCast.cast - this.owner.fight.start_time < OPENER_DURATION;
-            return opener
-              ? `${surgeCast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges (opener)`
-              : `${surgeCast.charges}/${ARCANE_CHARGE_MAX_STACKS} charges`;
-          },
-        },
-      ],
-    });
   }
 
   get guideSubsection(): JSX.Element {
@@ -162,18 +130,67 @@ class ArcaneSurgeGuide extends Analyzer {
       </>
     );
 
+    const surgeSequenceEvents: CastSequenceEntry<ArcaneSurgeData>[] =
+      this.arcaneSurge.surgeData.map((cast) => {
+        const windowStart = cast.cast - SURGE_PRE_WINDOW;
+        const windowEnd = cast.cast + SURGE_POST_WINDOW;
+
+        const castEvents = this.eventHistory.getEvents([EventType.Cast], {
+          searchBackwards: false,
+          startTimestamp: windowStart,
+          duration: windowEnd - windowStart,
+        });
+
+        const casts: CastInSequence[] = castEvents.map((event) => ({
+          timestamp: event.timestamp,
+          spellId: event.ability.guid,
+          spellName: event.ability.name,
+          icon: event.ability.abilityIcon.replace('.jpg', ''),
+          performance: undefined,
+        }));
+
+        return {
+          data: cast,
+          start: windowStart,
+          end: windowEnd,
+          casts,
+        };
+      });
+
+    const perCastData: PerCastData[] = this.arcaneSurge.surgeData.map((cast) => {
+      const evaluation = this.evaluateArcaneSurgeCast(cast);
+
+      return {
+        performance: evaluation.performance,
+        timestamp: this.owner.formatTimestamp(cast.cast),
+        stats: [
+          {
+            value: `${cast.charges}`,
+            label: 'Charges',
+            tooltip: <>Arcane Charges before Arcane Surge cast</>,
+          },
+          {
+            value: `${formatPercentage(cast.mana || 0, 0)}%`,
+            label: 'Mana',
+            tooltip: <>Mana percentage at cast time</>,
+          },
+          {
+            value: cast.touchActive ? 'Yes' : 'No',
+            label: 'TOTM Active',
+            tooltip: <>Touch of the Magi Debuff on Target.</>,
+          },
+        ],
+        details: evaluation.reason,
+      };
+    });
+
     return (
       <GuideSection spell={TALENTS.ARCANE_SURGE_TALENT} explanation={explanation}>
-        <ExpandableBreakdown
-          castData={this.arcaneSurge.surgeData}
-          evaluatedData={this.arcaneSurge.surgeData.map((cast) => {
-            const evaluation = this.evaluateArcaneSurgeCast(cast);
-            return {
-              value: evaluation.performance,
-              tooltip: evaluation.reason,
-            };
-          })}
-          expandableConfig={this.expandableConfig}
+        <CastDetail title="Arcane Surge Casts" casts={perCastData} />
+        <CastSequence
+          spell={TALENTS.ARCANE_SURGE_TALENT}
+          sequences={surgeSequenceEvents}
+          castTimestamp={(data) => formatDuration(data.cast - this.owner.fight.start_time)}
         />
       </GuideSection>
     );
