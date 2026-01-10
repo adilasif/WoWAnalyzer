@@ -764,6 +764,11 @@ const spells = {
     name: 'Azure Sweep',
     icon: 'inv_10_skinning_dragonscales_blue',
   },
+  TWIN_FLAME_CAST: {
+    id: 1265980,
+    name: 'Twin Flame',
+    icon: 'ability_evoker_infernosblessing',
+  },
   // endregion
 } satisfies Record<string, Spell>;
 
