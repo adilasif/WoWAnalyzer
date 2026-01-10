@@ -15,8 +15,14 @@ import {
   HasRelatedEvent,
   RefreshDebuffEvent,
   RemoveBuffEvent,
+  RemoveBuffStackEvent,
 } from 'parser/core/Events';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
+import { IRIDESCENCE_BLUE_CAST_SPELLS, IRIDESCENCE_RED_CAST_SPELLS } from '../../constants';
+import {
+  LEAPING_FLAMES_HITS,
+  LIVING_FLAME_CAST_HIT,
+} from 'analysis/retail/evoker/shared/modules/normalizers/LeapingFlamesNormalizer';
 
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
@@ -35,12 +41,14 @@ export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
 export const ENGULF_DAMAGE = 'EngulfDamage';
 export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
 
+const CAST_LINK = 'CastLink';
+const DAMAGE_LINK = 'DamageLink';
+
 export const PYRE_MIN_TRAVEL_TIME = 950;
 export const PYRE_MAX_TRAVEL_TIME = 1_050;
 const CAST_BUFFER_MS = 100;
 const IRIDESCENCE_RED_BACKWARDS_BUFFER_MS = 500;
 const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
-const ENGULF_TRAVEL_TIME_MS = 500;
 
 const EVENT_LINKS: EventLink[] = [
   {
@@ -61,9 +69,9 @@ const EVENT_LINKS: EventLink[] = [
   {
     linkRelation: IRIDESCENCE_RED_CONSUME,
     reverseLinkRelation: IRIDESCENCE_RED_CONSUME,
-    linkingEventId: [SPELLS.IRIDESCENCE_RED.id],
+    linkingEventId: SPELLS.IRIDESCENCE_RED.id,
     linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    referencedEventId: [SPELLS.PYRE.id, SPELLS.PYRE_DENSE_TALENT.id, SPELLS.LIVING_FLAME_CAST.id],
+    referencedEventId: IRIDESCENCE_RED_CAST_SPELLS.map((spell) => spell.id),
     referencedEventType: EventType.Cast,
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
@@ -76,18 +84,14 @@ const EVENT_LINKS: EventLink[] = [
   {
     linkRelation: IRIDESCENCE_BLUE_CONSUME,
     reverseLinkRelation: IRIDESCENCE_BLUE_CONSUME,
-    linkingEventId: [SPELLS.IRIDESCENCE_BLUE.id],
+    linkingEventId: SPELLS.IRIDESCENCE_BLUE.id,
     linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    referencedEventId: [
-      SPELLS.DISINTEGRATE.id,
-      SPELLS.UNRAVEL.id,
-      SPELLS.AZURE_STRIKE.id,
-      SPELLS.SHATTERING_STAR.id,
-    ],
+    referencedEventId: IRIDESCENCE_BLUE_CAST_SPELLS.map((spell) => spell.id),
     referencedEventType: EventType.Cast,
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CAST_BUFFER_MS,
+    maximumLinks: 1,
     isActive(c) {
       return c.hasTalent(TALENTS.IRIDESCENCE_TALENT);
     },
@@ -231,6 +235,27 @@ const EVENT_LINKS: EventLink[] = [
     forwardBufferMs: CAST_BUFFER_MS,
     anyTarget: true,
   },
+  {
+    linkRelation: DAMAGE_LINK,
+    reverseLinkRelation: CAST_LINK,
+    linkingEventId: SPELLS.AZURE_STRIKE.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.AZURE_STRIKE.id,
+    referencedEventType: EventType.Damage,
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+  },
+  {
+    linkRelation: DAMAGE_LINK,
+    reverseLinkRelation: CAST_LINK,
+    linkingEventId: SPELLS.AZURE_SWEEP.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.AZURE_SWEEP.id,
+    referencedEventType: EventType.Damage,
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+    isActive: (c) => c.hasTalent(TALENTS.AZURE_SWEEP_TALENT),
+  },
   // TODO: Figure out what to do with these when Flameshaper gets worked on
   /* {
     linkRelation: ENGULF_DAMAGE,
@@ -290,11 +315,10 @@ export function isPyreFromCast(event: DamageEvent) {
 }
 
 export function getPyreEvents(event: CastEvent): DamageEvent[] {
-  if (event.ability.guid === TALENTS.PYRE_TALENT.id) {
-    return GetRelatedEvents<DamageEvent>(event, PYRE_CAST);
+  if (event.ability.guid === TALENTS.DRAGONRAGE_TALENT.id) {
+    return GetRelatedEvents<DamageEvent>(event, PYRE_DRAGONRAGE);
   }
-
-  return GetRelatedEvents<DamageEvent>(event, PYRE_DRAGONRAGE);
+  return GetRelatedEvents<DamageEvent>(event, PYRE_CAST);
 }
 
 function pyreHitIsUnique(castEvent: CastEvent, damageEvent: DamageEvent, maxHitsAllowed = 1) {
@@ -324,7 +348,13 @@ export function getDisintegrateDebuffEvents(
   return GetRelatedEvents(event, DISINTEGRATE_CAST_DEBUFF_LINK);
 }
 
-/** Returns the damage events linked to the Disintegrate debuff events */
+/** Returns the damage events linked to the Disintegrate debuff events
+ *
+ * TODO: This should be able to conditionally get chained ticks as well, since some modifiers
+ * carry over to the next cast
+ *
+ * FIXME: Improve this once Disintegrate gets reworked event linking!
+ */
 export function getDisintegrateDamageEvents(event: CastEvent): DamageEvent[] {
   const debuffEvents = getDisintegrateDebuffEvents(event);
   const damageEvents = debuffEvents.map((debuffEvent) =>
@@ -343,6 +373,50 @@ export function isMassDisintegrateTick(event: DamageEvent) {
 
 export function isMassDisintegrateDebuff(event: ApplyDebuffEvent | RefreshDebuffEvent) {
   return HasRelatedEvent(event, MASS_DISINTEGRATE_DEBUFF);
+}
+
+/** Get ALL related damage events from a cast event
+ *
+ * Still WIP so make sure to check if it works for your specific use case
+ *
+ * The main use case currently for this is Iridescence
+ */
+export function getDamageEventsFromCast(event: CastEvent): DamageEvent[] {
+  switch (event.ability.guid) {
+    case SPELLS.LIVING_FLAME_CAST.id:
+      return [
+        // TODO: DoT
+        ...GetRelatedEvents<DamageEvent>(event, LIVING_FLAME_CAST_HIT),
+        ...GetRelatedEvents<DamageEvent>(event, LEAPING_FLAMES_HITS),
+      ];
+    case SPELLS.PYRE.id:
+    case SPELLS.PYRE_DENSE_TALENT.id:
+    case TALENTS.DRAGONRAGE_TALENT.id:
+      return getPyreEvents(event);
+    case SPELLS.DISINTEGRATE.id:
+      // TODO: Chained Ticks
+      return getDisintegrateDamageEvents(event);
+  }
+
+  return GetRelatedEvents<DamageEvent>(event, DAMAGE_LINK);
+}
+
+/** Get the cast event that triggered the damage event
+ *
+ * Still WIP so make sure to check if it works for your specific use case
+ */
+export function getCastEventFromDamage(event: DamageEvent): CastEvent | undefined {
+  return GetRelatedEvent<CastEvent>(event, CAST_LINK);
+}
+
+export function getIridescenceConsumeEvent(
+  event: RemoveBuffEvent | RemoveBuffStackEvent,
+): CastEvent | undefined {
+  if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
+    return GetRelatedEvent<CastEvent>(event, IRIDESCENCE_BLUE_CONSUME);
+  }
+
+  return GetRelatedEvent<CastEvent>(event, IRIDESCENCE_RED_CONSUME);
 }
 
 export default CastLinkNormalizer;
