@@ -759,6 +759,11 @@ const spells = {
     name: 'Fire Breath (Duplicate)',
     icon: 'ability_evoker_firebreath',
   },
+  AZURE_SWEEP_CAST: {
+    id: 1265872,
+    name: 'Azure Sweep',
+    icon: 'inv_10_skinning_dragonscales_blue',
+  },
   // endregion
 } satisfies Record<string, Spell>;
 
