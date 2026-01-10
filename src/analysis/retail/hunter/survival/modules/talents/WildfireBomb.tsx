@@ -22,7 +22,7 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import CastSummaryAndBreakdown from 'interface/guide/components/CastSummaryAndBreakdown';
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { BoxRowEntry } from 'interface/guide/components/PerformanceBoxRow';
-import { BadColor, GoodColor, OkColor, PerfectColor } from 'interface/guide';
+import { BadColor, GoodColor, OkColor } from 'interface/guide';
 
 /**
  * Hurl a bomb at the target, exploding for (45% of Attack power) Fire damage in a cone and coating enemies in wildfire, scorching them for (90% of Attack power) Fire damage over 6 sec.
@@ -120,96 +120,43 @@ class WildfireBomb extends Analyzer {
       castAtCap = true;
     }
 
-    // Good or Bad Cast Checking Tip, CA is almost up, or capped are good casts of bomb.
-    // TODO: Set up sentinel conditions (They are similar to existing.)
-    if (this.selectedCombatant.hasTalent(TALENTS.SENTINEL_TALENT)) {
-      if (castAtCap && this.selectedCombatant.hasOwnBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id)) {
-        value = QualitativePerformance.Ok;
-        perfExplanation = (
-          <h5 style={{ color: OkColor }}>
-            ACCEPTABLE. Casted at maximum stacks with a Tip. Do not delay bomb for a tip if it means
-            it will cap!
-            <br />
-          </h5>
-        );
-        this.goodCast += 1;
-      } else if (castAtCap) {
-        value = QualitativePerformance.Ok;
-        perfExplanation = (
-          <h5 style={{ color: OkColor }}>
-            ACCEPTABLE. Casted at maximum stacks. Try to cast bomb before it caps.
-            <br />
-          </h5>
-        );
-        this.goodCast += 1;
-      } else if (this.selectedCombatant.hasOwnBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id)) {
-        this.tippedCast += 1;
-        this.goodCast += 1;
-        value = QualitativePerformance.Good;
-        perfExplanation = (
-          <h5 style={{ color: GoodColor }}>
-            Tipped Cast.
-            <br />
-          </h5>
-        );
-      } else if (
-        !this.spellUsable.isOnCooldown(TALENTS.COORDINATED_ASSAULT_TALENT.id) ||
-        this.spellUsable.cooldownRemaining(TALENTS.COORDINATED_ASSAULT_TALENT.id) < 4000
-      ) {
-        this.goodCast += 1;
-        value = QualitativePerformance.Good;
-        perfExplanation = (
-          <h5 style={{ color: GoodColor }}>
-            ACCEPTABLE. Casted Prior to Coordinated Assault.
-            <br />
-          </h5>
-        );
-      } else {
-        value = QualitativePerformance.Fail;
-        perfExplanation = (
-          <h5 style={{ color: BadColor }}>
-            BAD. Cast without a Tip of the Spear or other APL conditions being true!
-            <br />
-          </h5>
-        );
-      }
+    if (castAtCap && this.selectedCombatant.hasOwnBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id)) {
+      value = QualitativePerformance.Ok;
+      perfExplanation = (
+        <h5 style={{ color: OkColor }}>
+          ACCEPTABLE. Casted at maximum stacks with a Tip. Do not delay bomb for a tip if it means
+          it will cap!
+          <br />
+        </h5>
+      );
+      this.goodCast += 1;
+    } else if (castAtCap) {
+      value = QualitativePerformance.Ok;
+      perfExplanation = (
+        <h5 style={{ color: OkColor }}>
+          ACCEPTABLE. Casted at maximum stacks. Try to cast bomb before it caps.
+          <br />
+        </h5>
+      );
+      this.goodCast += 1;
+    } else if (this.selectedCombatant.hasOwnBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id)) {
+      this.tippedCast += 1;
+      this.goodCast += 1;
+      value = QualitativePerformance.Good;
+      perfExplanation = (
+        <h5 style={{ color: GoodColor }}>
+          Tipped Cast.
+          <br />
+        </h5>
+      );
     } else {
-      //Pack Leader only cares to tip the bomb, doesn't want to send it without a tip ever (except pre-pull)
-      if (castAtCap && this.selectedCombatant.hasOwnBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id)) {
-        value = QualitativePerformance.Good;
-        perfExplanation = (
-          <h5 style={{ color: OkColor }}>
-            ACCEPTABLE. Casted at maximum stacks with a Tip. Do not delay bomb for a tip if it means
-            it will cap!
-            <br />
-          </h5>
-        );
-        this.goodCast += 1;
-      } else if (this.selectedCombatant.hasOwnBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id)) {
-        value = QualitativePerformance.Perfect;
-        perfExplanation = (
-          <h5 style={{ color: PerfectColor }}>
-            PERFECT. Cast bombs with tip.
-            <br />
-          </h5>
-        );
-      } else if (event.timestamp - this.owner.fight.start_time <= 500) {
-        value = QualitativePerformance.Perfect;
-        perfExplanation = (
-          <h5 style={{ color: GoodColor }}>
-            GOOD. Pre-cast bomb.
-            <br />
-          </h5>
-        );
-      } else {
-        value = QualitativePerformance.Fail;
-        perfExplanation = (
-          <h5 style={{ color: BadColor }}>
-            Bombs should always be tipped for Pack Leader.
-            <br />
-          </h5>
-        );
-      }
+      value = QualitativePerformance.Fail;
+      perfExplanation = (
+        <h5 style={{ color: BadColor }}>
+          BAD. Cast without a Tip of the Spear or other APL conditions being true!
+          <br />
+        </h5>
+      );
     }
     const tooltip = (
       <>
@@ -265,10 +212,6 @@ class WildfireBomb extends Analyzer {
         <ol>
           <li>You are capped on bomb charges. </li>
           <li>Lunar Storm is ready </li>
-          <li>
-            You are about to press Coordinated Assault and have{' '}
-            <SpellLink spell={TALENTS.BOMBARDIER_TALENT} /> talented.{' '}
-          </li>
           <li>
             You are about to press Butchery and the cooldown reduction from Frenzied Strikes would
             overcap bomb.{' '}
