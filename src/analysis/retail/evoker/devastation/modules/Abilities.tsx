@@ -37,7 +37,7 @@ class Abilities extends CoreAbilities {
         enabled: combatant.hasTalent(TALENTS.ETERNITY_SURGE_TALENT),
       },
       {
-        spell: SPELLS.AZURE_SWEEP_CAST.id,
+        spell: SPELLS.AZURE_SWEEP.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: {
           base: 1500,
