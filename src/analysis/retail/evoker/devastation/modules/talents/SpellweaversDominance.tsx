@@ -27,9 +27,6 @@ class SpellweaversDominance extends Analyzer {
   }
 
   onHit(event: DamageEvent) {
-    if (event.ability.guid === 1236970) {
-      console.log(event);
-    }
     if (event.hitType === HIT_TYPES.CRIT) {
       this.SpellweaversDominanceDamage += calculateEffectiveDamageFromCritDamageIncrease(
         event,
