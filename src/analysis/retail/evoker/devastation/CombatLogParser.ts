@@ -27,7 +27,7 @@ import LayWaste from './modules/talents/LayWaste';
 import Iridescence from './modules/talents/Iridescence';
 import Pyre from './modules/abilities/Pyre';
 import EternitySurgeNormalizer from './modules/normalizers/EternitySurgeNormalizer';
-//import ScorchingEmbers from './modules/talents/ScorchingEmbers';
+import ScorchingEmbers from './modules/talents/ScorchingEmbers';
 import AlwaysBeCasting from 'parser/shared/modules/AlwaysBeCasting';
 import CancelledCasts from 'parser/shared/modules/CancelledCasts';
 
@@ -122,7 +122,7 @@ class CombatLogParser extends MainCombatLogParser {
     engulfingBlaze: EngulfingBlaze,
     layWaste: LayWaste,
     iridescence: Iridescence,
-    //scorchingEmbers: ScorchingEmbers,
+    scorchingEmbers: ScorchingEmbers,
 
     // hero talents
     expandedLungs: ExpandedLungs,
