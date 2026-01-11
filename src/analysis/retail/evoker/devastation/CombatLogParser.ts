@@ -30,6 +30,7 @@ import EternitySurgeNormalizer from './modules/normalizers/EternitySurgeNormaliz
 import ScorchingEmbers from './modules/talents/ScorchingEmbers';
 import AlwaysBeCasting from 'parser/shared/modules/AlwaysBeCasting';
 import CancelledCasts from 'parser/shared/modules/CancelledCasts';
+import DisintegrateChainCastLinks from './modules/normalizers/DisintegrateChainCastLinks';
 
 // Shared
 import {
@@ -101,6 +102,7 @@ class CombatLogParser extends MainCombatLogParser {
     castLinkNormalizer: CastLinkNormalizer,
     essenceBurstNormalizer: EssenceBurstNormalizer,
     eternitySurgeNormalizer: EternitySurgeNormalizer,
+    disintegrateChainCastLinks: DisintegrateChainCastLinks,
 
     // features
     //apls: AplCheck,
