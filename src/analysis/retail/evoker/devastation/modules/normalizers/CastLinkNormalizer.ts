@@ -24,6 +24,7 @@ import {
   LEAPING_FLAMES_HITS,
   LIVING_FLAME_CAST_HIT,
 } from 'analysis/retail/evoker/shared/modules/normalizers/LeapingFlamesNormalizer';
+import { CHAINED_CAST, CHAINED_FROM_CAST } from './DisintegrateChainCastLinks';
 
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
@@ -348,6 +349,12 @@ export function getDisintegrateTargetCount(event: CastEvent) {
   return getDisintegrateDebuffEvents(event).length;
 }
 
+/** Returns the number of extra targets that was hit by a Mass Disintegrate cast */
+export function getMassDisintegrateTargetCount(event: CastEvent) {
+  return GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, MASS_DISINTEGRATE_DEBUFF)
+    .length;
+}
+
 /** Returns the apply/refresh debuff events that were caused by a Disintegrate cast */
 export function getDisintegrateDebuffEvents(
   event: CastEvent,
@@ -358,16 +365,95 @@ export function getDisintegrateDebuffEvents(
   ];
 }
 
-/** Returns the damage events linked to the Disintegrate debuff events
+/**
+ * Returns the damage events associated with a Disintegrate cast.
  *
- * TODO: This should be able to conditionally get chained ticks as well, since some modifiers
- * carry over to the next cast
+ * When `discriminateChainedTicks` is enabled, the returned events are adjusted to account for Disintegrate chaining:
+ *  - Damage ticks that were carried over *into* this cast are removed
+ *  - Damage ticks that are carried over *from* this cast are added
+ *
+ * This is intended to be used as an easy path for correctly evaluating modifiers that persist
+ * across chained Disintegrate ticks (e.g. Iridescence), but may be expensive
+ * depending on call frequency and usage.
+ *
+ * NOTE: This assumes that the first tick in a chained Disintegrate is the chained tick.
+ *
+ * @param discriminateChainedTicks If true, will remove ticks that were chained into this cast and add ticks that were chained from this cast
  */
-export function getDisintegrateDamageEvents(event: CastEvent): DamageEvent[] {
-  return [
-    ...GetRelatedEvents<DamageEvent>(event, DISINTEGRATE_TICK),
-    ...GetRelatedEvents<DamageEvent>(event, MASS_DISINTEGRATE_TICK),
-  ];
+export function getDisintegrateDamageEvents(
+  event: CastEvent,
+  discriminateChainedTicks = false,
+): DamageEvent[] {
+  const disintegrateTicks = GetRelatedEvents<DamageEvent>(event, DISINTEGRATE_TICK);
+  let massDisintegrateTicks = GetRelatedEvents<DamageEvent>(event, MASS_DISINTEGRATE_TICK);
+
+  if (!discriminateChainedTicks) {
+    return [...disintegrateTicks, ...massDisintegrateTicks];
+  }
+
+  const chainedFromCast = getChainedFromCast(event);
+  if (chainedFromCast) {
+    disintegrateTicks.shift();
+
+    // You can only chain into a Mass Disintegrate from another Mass Disintegrate
+    if (massDisintegrateTicks.length > 0) {
+      const amountOfChainedTicks = Math.min(
+        getMassDisintegrateTargetCount(event),
+        getMassDisintegrateTargetCount(chainedFromCast),
+      );
+
+      if (amountOfChainedTicks > 0) {
+        const seenTargets = new Set<string>();
+
+        massDisintegrateTicks = massDisintegrateTicks.filter((tick) => {
+          if (seenTargets.size >= amountOfChainedTicks) return true;
+
+          const target = encodeEventTargetString(tick);
+          if (seenTargets.has(target)) return true;
+
+          seenTargets.add(target);
+          return false;
+        });
+      }
+    }
+  }
+
+  const chainedCast = getChainedCast(event);
+  if (chainedCast) {
+    const chainedCastTicks = GetRelatedEvents<DamageEvent>(chainedCast, DISINTEGRATE_TICK);
+    if (chainedCastTicks.length > 0) {
+      disintegrateTicks.push(chainedCastTicks[0]);
+    }
+
+    // Chaining into a normal Disintegrate won't carry over Mass ticks
+    // So this case will only be a Mass Disintegrate chained into another Mass Disintegrate
+    const chainedCastMassDisintegrateTicks = GetRelatedEvents<DamageEvent>(
+      chainedCast,
+      MASS_DISINTEGRATE_TICK,
+    );
+    if (chainedCastMassDisintegrateTicks.length > 0) {
+      const amountOfChainedTicks = Math.min(
+        getMassDisintegrateTargetCount(event),
+        getMassDisintegrateTargetCount(chainedCast),
+      );
+
+      if (amountOfChainedTicks > 0) {
+        const seenTargets = new Set<string>();
+
+        for (const tick of chainedCastMassDisintegrateTicks) {
+          const target = encodeEventTargetString(tick);
+          if (seenTargets.has(target)) continue;
+
+          seenTargets.add(target);
+          massDisintegrateTicks.push(tick);
+
+          if (seenTargets.size >= amountOfChainedTicks) break;
+        }
+      }
+    }
+  }
+
+  return [...disintegrateTicks, ...massDisintegrateTicks];
 }
 
 export function isFromMassDisintegrate(event: CastEvent) {
@@ -380,6 +466,22 @@ export function isMassDisintegrateTick(event: DamageEvent) {
 
 export function isMassDisintegrateDebuff(event: ApplyDebuffEvent | RefreshDebuffEvent) {
   return HasRelatedEvent(event, MASS_DISINTEGRATE_DEBUFF);
+}
+
+export function isChainedCast(event: CastEvent) {
+  return HasRelatedEvent(event, CHAINED_FROM_CAST);
+}
+
+export function hasChainedCast(event: CastEvent) {
+  return HasRelatedEvent(event, CHAINED_CAST);
+}
+
+export function getChainedCast(event: CastEvent) {
+  return GetRelatedEvent<CastEvent>(event, CHAINED_CAST);
+}
+
+export function getChainedFromCast(event: CastEvent) {
+  return GetRelatedEvent<CastEvent>(event, CHAINED_FROM_CAST);
 }
 
 /** Get ALL related damage events from a cast event
@@ -401,8 +503,7 @@ export function getDamageEventsFromCast(event: CastEvent): DamageEvent[] {
     case TALENTS.DRAGONRAGE_TALENT.id:
       return getPyreEvents(event);
     case SPELLS.DISINTEGRATE.id:
-      // TODO: Chained Ticks
-      return getDisintegrateDamageEvents(event);
+      return getDisintegrateDamageEvents(event, true);
   }
 
   return GetRelatedEvents<DamageEvent>(event, DAMAGE_LINK);

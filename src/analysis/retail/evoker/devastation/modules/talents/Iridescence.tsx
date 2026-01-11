@@ -22,8 +22,6 @@ type DamageSources = Record<number, { amount: number; spell: Ability }>;
 
 // TODO:
 // Living Flame DoT
-// Disintegrate chained ticks
-// Mass Disintegrate?
 // Show wasted buffs, maybe - would need to make sure we count wasted buff *stacks*
 
 /** Casting an empower spell increases the damage of your next 2 spells of the same color by 20% within 10 sec. */
