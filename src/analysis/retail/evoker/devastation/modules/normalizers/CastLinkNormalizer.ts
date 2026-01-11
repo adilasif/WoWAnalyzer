@@ -15,7 +15,11 @@ import {
   RemoveBuffStackEvent,
 } from 'parser/core/Events';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
-import { IRIDESCENCE_BLUE_CAST_SPELLS, IRIDESCENCE_RED_CAST_SPELLS } from '../../constants';
+import {
+  GetMaxDisintegrateTargetCount,
+  IRIDESCENCE_BLUE_CAST_SPELLS,
+  IRIDESCENCE_RED_CAST_SPELLS,
+} from '../../constants';
 import {
   LEAPING_FLAMES_HITS,
   LIVING_FLAME_CAST_HIT,
@@ -29,7 +33,7 @@ export const DISINTEGRATE_REMOVE_APPLY = 'DisintegrateRemoveApply';
 export const PYRE_CAST = 'PyreCast';
 export const PYRE_DRAGONRAGE = 'PyreDragonrage';
 export const PYRE_VOLATILITY = 'PyreVolatility';
-const DISINTEGRATE_CAST_DEBUFF_LINK = 'DisintegrateCastDebuffLink';
+const DISINTEGRATE_DEBUFF = 'DisintegrateDebuff';
 const DISINTEGRATE_TICK = 'DisintegrateTick';
 const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
 const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
@@ -159,15 +163,14 @@ const EVENT_LINKS: EventLink[] = [
     },
   },
   {
-    linkRelation: DISINTEGRATE_CAST_DEBUFF_LINK,
-    reverseLinkRelation: DISINTEGRATE_CAST_DEBUFF_LINK,
+    linkRelation: DISINTEGRATE_DEBUFF,
+    reverseLinkRelation: DISINTEGRATE_DEBUFF,
     linkingEventId: SPELLS.DISINTEGRATE.id,
     linkingEventType: EventType.Cast,
     referencedEventId: SPELLS.DISINTEGRATE.id,
     referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
-    anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
-    maximumLinks: (c) => (c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT) ? 3 : 1),
+    maximumLinks: 1,
   },
   {
     linkRelation: MASS_DISINTEGRATE_CONSUME,
@@ -221,7 +224,7 @@ const EVENT_LINKS: EventLink[] = [
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     isActive: (c) => c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
-    maximumLinks: 10,
+    maximumLinks: (c) => GetMaxDisintegrateTargetCount(c) - 1,
     additionalCondition(linkingEvent, referencedEvent) {
       return encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent);
     },
@@ -339,14 +342,17 @@ function pyreHitIsUnique(castEvent: CastEvent, damageEvent: DamageEvent, maxHits
 
 /** Returns the number of targets that was hit by a Disintegrate cast */
 export function getDisintegrateTargetCount(event: CastEvent) {
-  return GetRelatedEvents(event, DISINTEGRATE_CAST_DEBUFF_LINK).length;
+  return getDisintegrateDebuffEvents(event).length;
 }
 
 /** Returns the apply/refresh debuff events that were caused by a Disintegrate cast */
 export function getDisintegrateDebuffEvents(
   event: CastEvent,
 ): (ApplyDebuffEvent | RefreshDebuffEvent)[] {
-  return GetRelatedEvents(event, DISINTEGRATE_CAST_DEBUFF_LINK);
+  return [
+    ...GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, DISINTEGRATE_DEBUFF),
+    ...GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, MASS_DISINTEGRATE_DEBUFF),
+  ];
 }
 
 /** Returns the damage events linked to the Disintegrate debuff events
