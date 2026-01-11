@@ -3,12 +3,9 @@ import TALENTS from 'common/TALENTS/evoker';
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
 import { Options } from 'parser/core/Module';
 import {
-  ApplyBuffEvent,
-  ApplyBuffStackEvent,
   ApplyDebuffEvent,
   CastEvent,
   DamageEvent,
-  EmpowerEndEvent,
   EventType,
   GetRelatedEvent,
   GetRelatedEvents,
@@ -32,11 +29,11 @@ export const DISINTEGRATE_REMOVE_APPLY = 'DisintegrateRemoveApply';
 export const PYRE_CAST = 'PyreCast';
 export const PYRE_DRAGONRAGE = 'PyreDragonrage';
 export const PYRE_VOLATILITY = 'PyreVolatility';
-export const DISINTEGRATE_CAST_DEBUFF_LINK = 'DisintegrateCastDebuffLink';
-export const DISINTEGRATE_DEBUFF_TICK_LINK = 'DisintegrateDebuffTickLink';
-export const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
-export const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
-export const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
+const DISINTEGRATE_CAST_DEBUFF_LINK = 'DisintegrateCastDebuffLink';
+const DISINTEGRATE_TICK = 'DisintegrateTick';
+const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
+const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
+const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
 export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
 export const ENGULF_DAMAGE = 'EngulfDamage';
 export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
@@ -170,17 +167,7 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
-    maximumLinks: (C) => (C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT) ? 3 : 1),
-  },
-  {
-    linkRelation: DISINTEGRATE_DEBUFF_TICK_LINK,
-    reverseLinkRelation: DISINTEGRATE_DEBUFF_TICK_LINK,
-    linkingEventId: SPELLS.DISINTEGRATE.id,
-    linkingEventType: EventType.Damage,
-    referencedEventId: SPELLS.DISINTEGRATE.id,
-    referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
-    backwardBufferMs: DISINTEGRATE_TICK_BUFFER,
-    maximumLinks: 1,
+    maximumLinks: (c) => (c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT) ? 3 : 1),
   },
   {
     linkRelation: MASS_DISINTEGRATE_CONSUME,
@@ -192,7 +179,18 @@ const EVENT_LINKS: EventLink[] = [
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CAST_BUFFER_MS,
-    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    isActive: (c) => c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    maximumLinks: 1,
+  },
+  {
+    linkRelation: DISINTEGRATE_TICK,
+    reverseLinkRelation: DISINTEGRATE_TICK,
+    linkingEventId: SPELLS.DISINTEGRATE.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: SPELLS.DISINTEGRATE.id,
+    referencedEventType: EventType.Cast,
+    anyTarget: false,
+    backwardBufferMs: DISINTEGRATE_TICK_BUFFER,
     maximumLinks: 1,
   },
   {
@@ -203,11 +201,14 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventId: SPELLS.DISINTEGRATE.id,
     referencedEventType: EventType.Cast,
     anyTarget: true,
-    backwardBufferMs: 4_000,
-    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    backwardBufferMs: DISINTEGRATE_TICK_BUFFER,
+    isActive: (c) => c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
     maximumLinks: 1,
     additionalCondition(linkingEvent, referencedEvent) {
-      return encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent);
+      return (
+        !HasRelatedEvent(linkingEvent, DISINTEGRATE_TICK) &&
+        encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent)
+      );
     },
   },
   {
@@ -219,7 +220,7 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
-    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    isActive: (c) => c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
     maximumLinks: 10,
     additionalCondition(linkingEvent, referencedEvent) {
       return encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent);
@@ -352,15 +353,12 @@ export function getDisintegrateDebuffEvents(
  *
  * TODO: This should be able to conditionally get chained ticks as well, since some modifiers
  * carry over to the next cast
- *
- * FIXME: Improve this once Disintegrate gets reworked event linking!
  */
 export function getDisintegrateDamageEvents(event: CastEvent): DamageEvent[] {
-  const debuffEvents = getDisintegrateDebuffEvents(event);
-  const damageEvents = debuffEvents.map((debuffEvent) =>
-    GetRelatedEvents<DamageEvent>(debuffEvent, DISINTEGRATE_DEBUFF_TICK_LINK),
-  );
-  return damageEvents.flat().sort((a, b) => a.timestamp - b.timestamp);
+  return [
+    ...GetRelatedEvents<DamageEvent>(event, DISINTEGRATE_TICK),
+    ...GetRelatedEvents<DamageEvent>(event, MASS_DISINTEGRATE_TICK),
+  ];
 }
 
 export function isFromMassDisintegrate(event: CastEvent) {
