@@ -103,6 +103,9 @@ const EVENT_LINKS: EventLink[] = [
    * doing this over a normalizer for simplicity sake.
    * issue seen here: @ 06:36.392
    * https://www.warcraftlogs.com/reports/6RgwY1MV3CcJv792/#fight=25&type=damage-done&pins=0%24Separate%24%23244F4B%24casts%240%240.0.0.Any%24175324455.0.0.Evoker%24true%240.0.0.Any%24false%24356995%5E0%24Separate%24%23909049%24auras-gained%241%240.0.0.Any%24175324455.0.0.Evoker%24true%240.0.0.Any%24false%24356995&view=events&source=20&start=6166628&end=6169628
+   *
+   * This also works as a "is this from a chain" check, used for the Disintegrate module
+   * FIXME: This should be removed once a better way to link chained cast events together is implemented
    */
   {
     linkRelation: DISINTEGRATE_REMOVE_APPLY,
