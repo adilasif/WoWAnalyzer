@@ -170,10 +170,6 @@ class UnleashLife extends Analyzer {
       this._onHealUL,
     );
     this.addEventListener(
-      Events.heal.by(SELECTED_PLAYER).spell(SPELLS.HEALING_SURGE),
-      this._onHealingSurge,
-    );
-    this.addEventListener(
       Events.heal.by(SELECTED_PLAYER).spell(TALENTS.RIPTIDE_TALENT),
       this._onRiptide,
     );
@@ -186,12 +182,8 @@ class UnleashLife extends Analyzer {
       this._onRemoveUL,
     );
 
-    this.goodSpells.push(TALENTS.HEALING_RAIN_TALENT.id);
-    this.okSpells.push(TALENTS.CHAIN_HEAL_TALENT.id);
-
-    if (this.downpourActive) {
-      this.goodSpells.push(SPELLS.DOWNPOUR_ABILITY.id);
-    }
+    this.goodSpells.push(SPELLS.HEALING_WAVE.id);
+    this.okSpells.push(TALENTS.RIPTIDE_TALENT.id);
   }
   //necessary because riptide can be spellqued into the spell that actually consumed UL and event linking will match both
   _wasAlreadyConsumed(event: CastEvent | HealEvent) {
@@ -595,11 +587,9 @@ class UnleashLife extends Analyzer {
         <b>
           <SpellLink spell={TALENTS.UNLEASH_LIFE_TALENT} />
         </b>{' '}
-        is a very efficient heal on a short cooldown, however the true power of this spell comes
-        from the potent buff it provides that can be consumed by a number of different abilities.
-        This spell is best used in preparation for incoming damage to combo with one of your
-        stronger abilities like a buffed <SpellLink spell={TALENTS.CHAIN_HEAL_TALENT} />, or{' '}
-        <SpellLink spell={TALENTS.HEALING_RAIN_TALENT} />
+        is a very efficient and potent heal on a short cooldown that also provides a buff that
+        improves your next <SpellLink spell={TALENTS.CHAIN_HEAL_TALENT} />,{' '}
+        <SpellLink spell={SPELLS.HEALING_WAVE} />, or <SpellLink spell={TALENTS.RIPTIDE_TALENT} />.
       </p>
     );
 
