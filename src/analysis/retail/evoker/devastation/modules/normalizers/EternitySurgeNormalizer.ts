@@ -48,9 +48,9 @@ const ETERNITY_SURGE_IDS = new Set<number>([
 class EternitySurgeNormalizer extends EventsNormalizer {
   constructor(options: Options) {
     super(options);
-    /** NOTE: For now since we only use the links for Scintillation analysis
-     * we will only enable this if we have Scintillation talented */
-    this.active = this.selectedCombatant.hasTalent(TALENTS.SCINTILLATION_TALENT);
+    this.active =
+      this.selectedCombatant.hasTalent(TALENTS.SCINTILLATION_TALENT) ||
+      this.selectedCombatant.hasTalent(TALENTS.EYE_OF_INFINITY_TALENT);
   }
 
   normalize(events: AnyEvent[]) {
