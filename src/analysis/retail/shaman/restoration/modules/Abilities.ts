@@ -68,6 +68,18 @@ class Abilities extends CoreAbilities {
         healSpellIds: [SPELLS.HEALING_STREAM_TOTEM_HEAL.id],
       },
       {
+        spell: [SPELLS.STORMSTREAM_TOTEM.id],
+        category: SPELL_CATEGORY.ROTATIONAL,
+        cooldown: 50,
+        timelineSortIndex: 10,
+        gcd: {
+          base: 1500,
+        },
+        castEfficiency: {
+          suggestion: false,
+        },
+      },
+      {
         spell: TALENTS.ASTRAL_SHIFT_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.ASTRAL_SHIFT_TALENT),
         buffSpellId: TALENTS.ASTRAL_SHIFT_TALENT.id,
