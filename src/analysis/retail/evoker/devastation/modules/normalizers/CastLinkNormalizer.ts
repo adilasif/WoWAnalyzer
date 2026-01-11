@@ -6,6 +6,7 @@ import {
   ApplyDebuffEvent,
   CastEvent,
   DamageEvent,
+  EmpowerEndEvent,
   EventType,
   GetRelatedEvent,
   GetRelatedEvents,
@@ -25,6 +26,7 @@ import {
   LIVING_FLAME_CAST_HIT,
 } from 'analysis/retail/evoker/shared/modules/normalizers/LeapingFlamesNormalizer';
 import { CHAINED_CAST, CHAINED_FROM_CAST } from './DisintegrateChainCastLinks';
+import { ETERNITY_SURGE_FROM_CAST } from './EternitySurgeNormalizer';
 
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
@@ -525,6 +527,10 @@ export function getIridescenceConsumeEvent(
   }
 
   return GetRelatedEvent<CastEvent>(event, IRIDESCENCE_RED_CONSUME);
+}
+
+export function getEternitySurgeDamageEvents(event: EmpowerEndEvent): DamageEvent[] {
+  return GetRelatedEvents<DamageEvent>(event, ETERNITY_SURGE_FROM_CAST);
 }
 
 export default CastLinkNormalizer;
