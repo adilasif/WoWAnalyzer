@@ -82,7 +82,7 @@ class Abilities extends CoreAbilities {
         spell: [TALENTS.TAKEDOWN_TALENT.id],
         enabled: combatant.hasTalent(TALENTS.TAKEDOWN_TALENT),
         category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 90 - (combatant.hasTalent(TALENTS.SAVAGERY_SURVIVAL_TALENT) ? 30 : 0),
+        cooldown: 90 - 15 * combatant.getTalentRank(TALENTS.SAVAGERY_SURVIVAL_TALENT),
         gcd: {
           static: 0,
         },
