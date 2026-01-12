@@ -386,6 +386,11 @@ const spells = {
     name: 'Merciless Blow',
     icon: 'ability_hunter_swiftstrike',
   },
+  BOOMSTICK_DAMAGE: {
+    id: 1261215,
+    name: 'Merciless Blow',
+    icon: 'ability_hunter_swiftstrike',
+  },
   //endregion
 
   //region Shared

@@ -36,6 +36,7 @@ export default function RotationSection({
           have fit a whole extra use of the cooldown.
         </Trans>
         {modules.wildfireBomb.guideSubsection}
+        {modules.boomstick.guideSubsection}
       </SubSection>
     </Section>
   );
