@@ -29,7 +29,16 @@ class Abilities extends CoreAbilities {
       {
         spell: [TALENTS.RAPTOR_STRIKE_TALENT.id, SPELLS.RAPTOR_STRIKE_AOTE.id],
         category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: !combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
+        enabled: combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
+        gcd: {
+          base: 1500,
+        },
+        timelineSortIndex: 1,
+      },
+      {
+        spell: [SPELLS.RAPTOR_SWIPE_DAMAGE.id, SPELLS.RAPTOR_SWIPE_AOTE.id],
+        category: SPELL_CATEGORY.ROTATIONAL,
+        enabled: combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
         gcd: {
           base: 1500,
         },

@@ -310,6 +310,16 @@ const spells = {
     name: 'Boomstick',
     icon: 'inv_musket_04',
   },
+  RAPTOR_SWIPE_DAMAGE: {
+    id: 1262293,
+    name: 'Raptor Swipe',
+    icon: 'inv12_apextalent_hunter_raptorswipe',
+  },
+  RAPTOR_SWIPE_AOTE: {
+    id: 1262343,
+    name: 'Raptor Swipe',
+    icon: 'inv12_apextalent_hunter_raptorswipe',
+  },
   //endregion
 
   //region Shared
