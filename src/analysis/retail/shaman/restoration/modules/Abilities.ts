@@ -72,6 +72,7 @@ class Abilities extends CoreAbilities {
         category: SPELL_CATEGORY.ROTATIONAL,
         cooldown: 50,
         timelineSortIndex: 10,
+        enabled: combatant.hasTalent(TALENTS.STORMSTREAM_TOTEM_1_RESTORATION_TALENT),
         gcd: {
           base: 1500,
         },

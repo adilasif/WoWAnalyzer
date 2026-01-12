@@ -42,6 +42,10 @@ class EarthlivingAttributor extends Analyzer {
       Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.EARTHLIVING_WEAPON_HEAL),
       this.onApplyEarthliving,
     );
+    this.addEventListener(
+      Events.refreshbuff.by(SELECTED_PLAYER).spell(SPELLS.EARTHLIVING_WEAPON_HEAL),
+      this.onApplyEarthliving,
+    );
   }
 
   onApplyEarthliving(event: ApplyBuffEvent | RefreshBuffEvent) {
