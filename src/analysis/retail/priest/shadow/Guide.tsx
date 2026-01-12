@@ -13,7 +13,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
       <Section title="Core">
         <Section title="Insanity">
           <ResourceSubsection.ResourceSubsection modules={modules} events={events} info={info} />{' '}
-          {modules.dotUptimes.guideSubsectionDP}
+          {/*modules.dotUptimes.guideSubsectionDP*/}
         </Section>
         <Section title="DoTs">{modules.dotUptimes.guideSubsection}</Section>
         {modules.shadowform.guideSubsection}
