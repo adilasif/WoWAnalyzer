@@ -23,7 +23,6 @@ import GlobalCooldown from './modules/core/GlobalCooldown';
 import KillCommand from './modules/talents/KillCommand';
 import RaptorStrike from './modules/talents/RaptorStrike';
 import SurvivalFocusUsage from './modules/resources/SurvivalFocusUsage';
-import TipOfTheSpear from './modules/talents/TipOfTheSpear';
 import TipOfTheSpearNormalizer from './normalizers/TipOfTheSpear';
 import WildfireBomb from './modules/talents/WildfireBomb';
 import Lunge from './modules/talents/Lunge';
@@ -73,7 +72,6 @@ class CombatLogParser extends CoreCombatLogParser {
     bloodseeker: Bloodseeker,
     killCommand: KillCommand,
     raptorStrike: RaptorStrike,
-    tipOfTheSpear: TipOfTheSpear,
     wildfireBomb: WildfireBomb,
     lunge: Lunge,
     boomstick: Boomstick,
