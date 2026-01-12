@@ -2,8 +2,6 @@ import MainCombatLogParser from 'parser/core/CombatLogParser';
 
 import Abilities from './modules/Abilities';
 
-import ShatteringStar from './modules/abilities/ShatteringStar';
-import ShatteringStarGuide from './modules/abilities/ShatterStarGuide';
 import Buffs from './modules/Buffs';
 import Guide from './Guide';
 //import AplCheck from './modules/AplCheck/AplCheck';
@@ -13,7 +11,6 @@ import Burnout from './modules/abilities/Burnout';
 import DragonRage from './modules/abilities/DragonRage';
 import CastLinkNormalizer from './modules/normalizers/CastLinkNormalizer';
 import EssenceBurstNormalizer from './modules/normalizers/EssenceBurstNormalizer';
-import Snapfire from './modules/abilities/Snapfire';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import Catalyze from './modules/talents/Catalyze';
 import Scintillation from './modules/talents/Scintillation';
@@ -54,7 +51,6 @@ import {
   DefensiveNormalizer,
   DefensiveCastLinkNormalizer,
   MobilityCastLinkNormalizer,
-  RenewingBlaze,
   ImminentDestruction,
   MeltArmor,
   MassDisintegrate,
@@ -69,7 +65,6 @@ import {
   RefinedEssence,
   CommandSquadron,
 } from 'analysis/retail/evoker/shared';
-import TWW2TierSet from './modules/tier/TWW2TierSet';
 
 class CombatLogParser extends MainCombatLogParser {
   static specModules = {
@@ -96,7 +91,6 @@ class CombatLogParser extends MainCombatLogParser {
     defensiveCastLinkNormalizer: DefensiveCastLinkNormalizer,
     defensiveNormalizer: DefensiveNormalizer,
     mobilityCastLinkNormalizer: MobilityCastLinkNormalizer,
-    renewingBlaze: RenewingBlaze,
     timeSpiral: TimeSpiral,
 
     // Core
@@ -120,7 +114,6 @@ class CombatLogParser extends MainCombatLogParser {
     causality: Causality,
     volatility: Volatility,
     arcaneIntensity: ArcaneIntensity,
-    snapfire: Snapfire,
     heatWave: HeatWave,
     spellweaversDominance: SpellweaversDominance,
     honedAggression: HonedAggression,
@@ -146,15 +139,12 @@ class CombatLogParser extends MainCombatLogParser {
 
     // core abilities
     disintegrate: Disintegrate,
-    shatteringStar: ShatteringStar,
-    shatteringStarGuide: ShatteringStarGuide,
     essenceBurst: EssenceBurst,
     burnout: Burnout,
     dragonRage: DragonRage,
     pyre: Pyre,
 
     // tier
-    tww2TierSet: TWW2TierSet,
   };
 
   static guide = Guide;
