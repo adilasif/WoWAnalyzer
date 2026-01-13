@@ -33,13 +33,10 @@ const {
   LIVING_FLAME_DAMAGE,
   SHATTERING_STAR,
   AZURE_STRIKE,
-  FIRESTORM_DAMAGE,
   UNRAVEL,
   IRIDESCENCE_BLUE,
   IRIDESCENCE_RED,
 } = SPELLS;
-
-const FIRESTORM_DURATION = 12000;
 
 class Iridescence extends Analyzer {
   // Blue spell stuff
@@ -53,14 +50,11 @@ class Iridescence extends Analyzer {
   // Red spell stuff
   iridescencePyreDamage = 0;
   iridescenceLivingFlameDamage = 0;
-  iridescenceFirestormDamage = 0;
 
   lastPyreDamEvent = 0;
-  firestormCastEvent = 0;
 
   trackBlueDamage = false;
   trackRedDamage = false;
-  trackFirestorm = false;
   trackedSpells = [DISINTEGRATE, PYRE, LIVING_FLAME_DAMAGE, SHATTERING_STAR, AZURE_STRIKE, UNRAVEL];
 
   iridescenceSpells = [IRIDESCENCE_BLUE, IRIDESCENCE_RED];
@@ -75,11 +69,6 @@ class Iridescence extends Analyzer {
     this.addEventListener(
       Events.cast.by(SELECTED_PLAYER).spell(DISINTEGRATE),
       this.onDisintegrateCast,
-    );
-
-    this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.FIRESTORM_TALENT),
-      this.onFirestormCast,
     );
 
     this.addEventListener(
@@ -138,11 +127,6 @@ class Iridescence extends Analyzer {
     }
   }
 
-  onFirestormCast(event: CastEvent) {
-    this.firestormCastEvent = event.timestamp;
-    this.trackFirestorm = false;
-  }
-
   removeDebuff() {
     this.ticksToCount = 0;
   }
@@ -191,21 +175,6 @@ class Iridescence extends Analyzer {
         this.trackRedDamage = false;
       }
     }
-    // FIXME:
-    // This is kinda jank, since *technically* two Firestorms can be down at the same time, and this would then combine the values of both
-    // But for now it's fine, since it's extremely rare to run Firestorm along with Iridescence in the first place, not including the unicorn cases of running the talents
-    // That allows multiple Firestorms AND Iridescence at the same time.
-    else if (
-      event.ability.name === FIRESTORM_DAMAGE.name &&
-      (this.trackRedDamage ||
-        (event.timestamp > this.firestormCastEvent + FIRESTORM_DURATION && this.trackFirestorm))
-    ) {
-      this.iridescenceFirestormDamage += calculateEffectiveDamage(event, IRIDESCENCE_MULTIPLIER);
-      if (this.trackRedDamage) {
-        this.trackRedDamage = false;
-        this.trackFirestorm = true;
-      }
-    }
   }
 
   statistic() {
@@ -215,8 +184,7 @@ class Iridescence extends Analyzer {
       this.iridescenceShatteringStarDamage +
       this.iridescenceUnravelDamage +
       this.iridescencePyreDamage +
-      this.iridescenceLivingFlameDamage +
-      this.iridescenceFirestormDamage;
+      this.iridescenceLivingFlameDamage;
 
     return (
       <Statistic
@@ -247,10 +215,6 @@ class Iridescence extends Analyzer {
             </li>
             <li>
               <SpellLink spell={PYRE} /> Damage: {formatNumber(this.iridescencePyreDamage)}
-            </li>
-            <li>
-              <SpellLink spell={FIRESTORM_DAMAGE} /> Damage:{' '}
-              {formatNumber(this.iridescenceFirestormDamage)}
             </li>
           </>
         }
