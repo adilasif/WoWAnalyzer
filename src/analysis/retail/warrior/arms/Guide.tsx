@@ -76,14 +76,14 @@ function RotationSection({ modules, info }: GuideProps<typeof CombatLogParser>) 
         It does not cover the full set of priorites used by Simulationcraft/Raidbots (much like the
         written guides) as the list would be far too long and too complex to follow.
       </p>
-      <p>
+      <div>
         Potential areas of inaccuracy:
         <ul>
           <li>Holding cooldowns for raid events</li>
           <li>Multiple targets</li>
           <li>Movement or periods of downtime</li>
         </ul>
-      </p>
+      </div>
       <p>
         <strong> NOTE:</strong> The priority list below does not include{' '}
         <SpellLink spell={TALENTS.REND_TALENT} icon />
