@@ -70,14 +70,12 @@ class AngerManagement extends Analyzer.withDependencies({
     if (event.ability.guid === SPELLS.RAMPAGE.id) {
       if (this.selectedCombatant.hasBuff(SPELLS.RECKLESSNESS.id)) {
         rageSpent -= this.furyApexRampageCostReduction;
-        // TODO probably better to reduce the cost of the actual event instead of doing this workaround
-        // but I'm kinda dumb
-        // maybe some sort of normalizer
+        // Midnight TODO probably better to reduce the cost of the actual event instead of doing this workaround
       }
       if (this.selectedCombatant.has4PieceByTier(TIERS.MID1)) {
         this.deps.spellUsable.reduceCooldown(SPELLS.ODYNS_FURY.id, 1000);
       }
-      // TODO this probably shouldn't be in the AM section
+      // Midnight TODO this probably shouldn't be in the AM section
     }
     this.totalRageSpent += rageSpent;
     const reduction = (rageSpent / RAGE_NEEDED_FOR_PROC) * CDR_PER_PROC;

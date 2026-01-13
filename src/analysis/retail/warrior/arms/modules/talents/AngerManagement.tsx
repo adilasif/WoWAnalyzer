@@ -23,8 +23,7 @@ class AngerManagement extends Analyzer {
 
   protected spellUsable!: SpellUsable;
 
-  cooldownsAffected = [SPELLS.COLOSSUS_SMASH.id, SPELLS.BLADESTORM.id];
-  // TODO update AM
+  cooldownsAffected = [SPELLS.COLOSSUS_SMASH.id, SPELLS.AVATAR_SHARED.id];
 
   totalRageSpend = 0;
   wastedReduction: Map<number, number> = new Map<number, number>();

@@ -6,7 +6,6 @@ import RageCountDebugger from '../shared/modules/debuggers/RageCountDebugger';
 import GenerateRageEventsNormalizer from '../shared/modules/normalizers/rage/GenerateRageEventsNormalizer';
 import RageAttributeNormalizer from '../shared/modules/normalizers/rage/RageAttributeNormalizer';
 import ResourceChangeNormalizer from '../shared/modules/normalizers/rage/ResourceChangeNormalizer';
-// import ChampionsMight from '../shared/modules/talents/ChampionsMight';
 import ChampionsSpear from '../shared/modules/talents/ChampionsSpear';
 import ImpendingVictory from '../shared/modules/talents/ImpendingVictory';
 import SpellReflection from '../shared/modules/talents/SpellReflection';
@@ -92,7 +91,6 @@ class CombatLogParser extends CoreCombatLogParser {
     impendingVictory: ImpendingVictory,
     hackAndSlash: HackAndSlash,
     executioner: Executioner,
-    // championsMight: ChampionsMight,
 
     // Debuggers
     rageCountDebugger: RageCountDebugger,

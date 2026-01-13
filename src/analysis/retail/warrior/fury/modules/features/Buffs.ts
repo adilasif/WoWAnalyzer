@@ -50,4 +50,3 @@ class Buffs extends CoreAuras {
 }
 
 export default Buffs;
-// TODO check avatar spell ID

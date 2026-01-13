@@ -14,10 +14,9 @@ import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
  * you deal to them by 30% for 10 sec.
  */
 
-const WARBREAKER_BONUS_DAMAGES = 0.3;
+const COLOSSUS_SMASH_BONUS_DAMAGE = 0.3;
 
-// TODO can probably just get removed idk maybe just change it to CS
-class Warbreaker extends Analyzer {
+class ColossusSmash extends Analyzer {
   get dps() {
     return (this.totalDamages / this.owner.fightDuration) * 1000;
   }
@@ -45,7 +44,7 @@ class Warbreaker extends Analyzer {
     }
     const target = this.enemies.getEntity(event);
     if (target !== null && target.hasBuff(SPELLS.COLOSSUS_SMASH_DEBUFF.id, event.timestamp)) {
-      this.totalDamages += calculateEffectiveDamage(event, WARBREAKER_BONUS_DAMAGES);
+      this.totalDamages += calculateEffectiveDamage(event, COLOSSUS_SMASH_BONUS_DAMAGE);
     }
   }
 
@@ -60,11 +59,12 @@ class Warbreaker extends Analyzer {
         value={`${formatThousands(this.dps)} DPS`}
         valueTooltip={
           <>
-            Your Warbreaker contributed {formatThousands(this.totalDamages)} total damage (
+            Your <SpellLink spell={TALENTS.COLOSSUS_SMASH_TALENT} /> contributed{' '}
+            {formatThousands(this.totalDamages)} total damage (
             {formatPercentage(this.owner.getPercentageOfTotalDamageDone(this.totalDamages))} %).
             <br />
-            This accounts for the damage dealt by Warbreaker and the 30% increased damage from
-            Colossus Smash debuff.
+            This accounts for the hit damage dealt by{' '}
+            <SpellLink spell={TALENTS.COLOSSUS_SMASH_TALENT} /> and the 30% increased damage debuff.
           </>
         }
       />
@@ -72,4 +72,4 @@ class Warbreaker extends Analyzer {
   }
 }
 
-export default Warbreaker;
+export default ColossusSmash;

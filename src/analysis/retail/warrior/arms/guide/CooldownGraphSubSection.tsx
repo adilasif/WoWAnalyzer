@@ -16,8 +16,10 @@ interface Cooldown {
 const cooldownsToCheck: Cooldown[] = [
   { talent: TALENTS_WARRIOR.AVATAR_TALENT },
   { talent: TALENTS_WARRIOR.BLADESTORM_TALENT, spell: SPELLS.BLADESTORM },
+  { talent: TALENTS_WARRIOR.COLOSSUS_SMASH_TALENT },
+  { talent: TALENTS_WARRIOR.RAVAGER_TALENT },
+  { talent: TALENTS_WARRIOR.DEMOLISH_TALENT },
 ];
-// TODO add CS, ravager, demolish
 
 const CooldownGraphSubsection = () => {
   const info = useInfo();

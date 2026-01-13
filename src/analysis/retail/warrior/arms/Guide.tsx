@@ -1,14 +1,7 @@
-import { GuideProps, Section, SubSection } from 'interface/guide';
+import { GuideProps, Section } from 'interface/guide';
 import TALENTS from 'common/TALENTS/warrior';
-import { ResourceLink, SpellLink } from 'interface';
+import { SpellLink } from 'interface';
 import PreparationSection from 'interface/guide/components/Preparation/PreparationSection';
-import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
-import { HideExplanationsToggle } from 'interface/guide/components/HideExplanationsToggle';
-import CooldownUsage from 'parser/core/MajorCooldowns/CooldownUsage';
-import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
-import { HideGoodCastsToggle } from 'interface/guide/components/HideGoodCastsToggle';
-import { formatPercentage } from 'common/format';
-import ActiveTimeGraph from 'parser/ui/ActiveTimeGraph';
 import CombatLogParser from './CombatLogParser';
 import FoundationDowntimeSectionV2 from 'interface/guide/foundation/FoundationDowntimeSectionV2';
 import CooldownGraphSubsection from './guide/CooldownGraphSubSection';
@@ -40,7 +33,6 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
       <Section title="Always Be Casting">
         <FoundationDowntimeSectionV2 />
       </Section>
-      {/* <ResourceUsageSection modules={modules} events={events} info={info} /> */}
       <CooldownSection modules={modules} events={events} info={info} />
       <RotationSection modules={modules} events={events} info={info} />
       <PreparationSection />
@@ -52,8 +44,6 @@ function CooldownSection({ modules, info }: GuideProps<typeof CombatLogParser>) 
   return (
     <Section title="Cooldowns">
       <CooldownGraphSubsection />
-      {/* <CooldownUsage analyzer={modules.essenceBreak} title="Essence Break" />
-      <CooldownUsage analyzer={modules.eyeBeam} title="Eye Beam" /> */}
     </Section>
   );
 }

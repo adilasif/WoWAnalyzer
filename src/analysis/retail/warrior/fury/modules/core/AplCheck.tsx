@@ -24,15 +24,16 @@ export const apl = (info: PlayerInfo): Apl => {
     ? MASSACRE_EXECUTE_THRESHOLD
     : DEFAULT_EXECUTE_THRESHOLD;
   const executeUsable = cnd.or(
-    cnd.buffPresent(SPELLS.SUDDEN_DEATH_TALENT_BUFF), // TODO fury also uses this buff now, should probably rename the spell
+    cnd.buffPresent(SPELLS.SUDDEN_DEATH_TALENT_BUFF),
     cnd.inExecute(executeThreshold),
   );
   const executeSpell = info.combatant.hasTalent(TALENTS.MASSACRE_FURY_TALENT)
     ? SPELLS.EXECUTE_FURY_MASSACRE
     : SPELLS.EXECUTE_FURY;
 
-  const rampageRageThreshold = 1150; // threshold below which builders are still better than spending (115 rage)
-  // TODO in the future this will probably be based on talents
+  const rampageRageThreshold = 1150;
+  // threshold below which builders are still better than spending (115 rage)
+  // in the future this will probably be based on talents
 
   return info.combatant.hasTalent(TALENTS.SLAYERS_DOMINANCE_TALENT)
     ? buildSlayerApl(executeThreshold, executeUsable, executeSpell, rampageRageThreshold)
@@ -233,11 +234,11 @@ export const buildThaneApl = (
 
     // 2 stack thunder blast
     {
-      spell: SPELLS.THUNDER_CLAP, // TODO seems like the cast is tied to TC but can still check for the TB buff
-      condition: cnd.buffStacks(SPELLS.THUNDER_BLAST_BUFF, { atLeast: 2 }),
-      //   cnd.and(
-      //     cnd.spellAvailable(SPELLS.THUNDER_BLAST) // maybe need to check TC here instead idk how those get handled
-      //   ),
+      spell: SPELLS.THUNDER_CLAP, // seems like the cast is tied to TC but can still check for the TB buff
+      condition: cnd.and(
+        cnd.buffStacks(SPELLS.THUNDER_BLAST_BUFF, { atLeast: 2 }),
+        cnd.spellAvailable(SPELLS.THUNDER_CLAP),
+      ),
       description: (
         <>
           Cast <SpellLink spell={SPELLS.THUNDER_BLAST} /> with 2 stacks.
@@ -302,11 +303,11 @@ export const buildThaneApl = (
 
     // 1 stack thunder blast
     {
-      spell: SPELLS.THUNDER_CLAP, // TODO seems like the cast is tied to TC but can still check for the TB buff
-      condition: cnd.buffPresent(SPELLS.THUNDER_BLAST_BUFF),
-      //   cnd.and(
-      //     cnd.spellAvailable(SPELLS.THUNDER_BLAST) // maybe need to check TC here instead idk how those get handled
-      //   ),
+      spell: SPELLS.THUNDER_CLAP, // seems like the cast is tied to TC but can still check for the TB buff
+      condition: cnd.and(
+        cnd.buffPresent(SPELLS.THUNDER_BLAST_BUFF),
+        cnd.spellAvailable(SPELLS.THUNDER_CLAP),
+      ),
       description: (
         <>
           Cast <SpellLink spell={SPELLS.THUNDER_BLAST} />.
