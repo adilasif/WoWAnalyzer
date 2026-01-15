@@ -29,7 +29,7 @@ export default class HotStreak extends Analyzer {
   protected spellUsable!: SpellUsable;
 
   hasFirestarter: boolean = this.selectedCombatant.hasTalent(TALENTS.FIRESTARTER_TALENT);
-  hasSearingTouch: boolean = this.selectedCombatant.hasTalent(TALENTS.SCORCH_TALENT);
+  hasScorch: boolean = this.selectedCombatant.hasTalent(TALENTS.SCORCH_TALENT);
   hasPyromaniac: boolean = this.selectedCombatant.hasTalent(TALENTS.PYROMANIAC_TALENT);
 
   hotStreaks: HotStreakProc[] = [];
@@ -52,11 +52,12 @@ export default class HotStreak extends Analyzer {
     const spender: CastEvent | undefined = GetRelatedEvent(event, 'SpellCast');
     const damage: DamageEvent | undefined = GetRelatedEvent(event, 'SpellDamage');
     const precast: CastEvent | undefined = GetRelatedEvent(event, 'PreCast');
+    const targetHealth = damage && this.sharedCode.getTargetHealth(damage);
 
     let buff;
-    if (this.hasSearingTouch && damage && this.sharedCode.getTargetHealth(damage)) {
+    if (this.hasScorch && targetHealth && targetHealth < 0.3) {
       buff = { active: true, buffId: TALENTS.SCORCH_TALENT.id };
-    } else if (this.hasFirestarter && damage && this.sharedCode.getTargetHealth(damage)) {
+    } else if (this.hasFirestarter && targetHealth && targetHealth > 0.9) {
       buff = { active: true, buffId: TALENTS.FIRESTARTER_TALENT.id };
     } else if (
       this.selectedCombatant.hasBuff(TALENTS.COMBUSTION_TALENT.id) ||

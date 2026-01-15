@@ -28,7 +28,7 @@ export default class HeatingUp extends Analyzer {
   protected spellUsable!: SpellUsable;
 
   hasFirestarter: boolean = this.selectedCombatant.hasTalent(TALENTS.FIRESTARTER_TALENT);
-  hasSearingTouch: boolean = this.selectedCombatant.hasTalent(TALENTS.SCORCH_TALENT);
+  hasScorch: boolean = this.selectedCombatant.hasTalent(TALENTS.SCORCH_TALENT);
 
   heatingUpCrits: HeatingUpCrits[] = [];
 
@@ -44,14 +44,15 @@ export default class HeatingUp extends Analyzer {
       const damageTarget = HasTarget(d) && encodeTargetString(d.targetID, d.targetInstance);
       return castTarget === damageTarget;
     });
+    const targetHealth = damageEvent && this.sharedCode.getTargetHealth(damageEvent);
     if (!damageEvent || !HasTarget(damageEvent) || damageEvent.hitType !== HIT_TYPES.CRIT) {
       return;
     }
 
     let buff;
-    if (this.hasSearingTouch && damage && this.sharedCode.getTargetHealth(damageEvent)) {
+    if (this.hasScorch && targetHealth && targetHealth < 0.3) {
       buff = { active: true, buffId: TALENTS.SCORCH_TALENT.id };
-    } else if (this.hasFirestarter && damage && this.sharedCode.getTargetHealth(damageEvent)) {
+    } else if (this.hasFirestarter && targetHealth && targetHealth > 0.9) {
       buff = { active: true, buffId: TALENTS.FIRESTARTER_TALENT.id };
     } else if (
       this.selectedCombatant.hasBuff(TALENTS.COMBUSTION_TALENT.id) ||

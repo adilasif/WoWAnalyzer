@@ -17,14 +17,17 @@ import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import AlwaysBeCasting from 'parser/shared/modules/AlwaysBeCasting';
+import SpellUsable from 'parser/shared/modules/SpellUsable';
 
 export default class CombustionCasts extends Analyzer {
   static dependencies = {
     abilityTracker: AbilityTracker,
     alwaysBeCasting: AlwaysBeCasting,
+    spellUsable: SpellUsable,
   };
   protected abilityTracker!: AbilityTracker;
   protected alwaysBeCasting!: AlwaysBeCasting;
+  protected spellUsable!: SpellUsable;
 
   hasFlameOn: boolean = this.selectedCombatant.hasTalent(TALENTS.FLAME_ON_TALENT);
   hasFlameAccelerant: boolean = this.selectedCombatant.hasTalent(TALENTS.FLAME_ACCELERANT_TALENT);
@@ -46,6 +49,15 @@ export default class CombustionCasts extends Analyzer {
   }
 
   onCombust(event: CastEvent) {
+    if (this.selectedCombatant.getTalentRank(TALENTS.SPONTANEOUS_COMBUSTION_TALENT) === 2) {
+      // If you have two points in Spontaneous Combustion, you gain 2 Charges.
+      this.spellUsable.endCooldown(TALENTS.FIRE_BLAST_TALENT.id);
+      this.spellUsable.endCooldown(TALENTS.FIRE_BLAST_TALENT.id);
+    } else if (this.selectedCombatant.getTalentRank(TALENTS.SPONTANEOUS_COMBUSTION_TALENT) === 1) {
+      // If you have one point in Spontaneous Combustion, you gain 1 charge.
+      this.spellUsable.endCooldown(TALENTS.FIRE_BLAST_TALENT.id);
+    }
+
     const precast: CastEvent | undefined = GetRelatedEvent(event, 'PreCast');
     const removeBuff: RemoveBuffEvent | undefined = GetRelatedEvent(event, 'BuffRemove');
 
