@@ -65,6 +65,7 @@ import {
   TimeSpiral,
   RefinedEssence,
   CommandSquadron,
+  ImminentDestructionCastLinkNormalizer,
 } from 'analysis/retail/evoker/shared';
 
 class CombatLogParser extends MainCombatLogParser {
@@ -80,6 +81,7 @@ class CombatLogParser extends MainCombatLogParser {
     essenceBurstRefreshNormalizer: EssenceBurstRefreshNormalizer,
     essenceBurstCastLinkNormalizer: EssenceBurstCastLinkNormalizer,
     leapingFlamesNormalizer: LeapingFlamesNormalizer,
+    imminentDestructionCastLinkNormalizer: ImminentDestructionCastLinkNormalizer,
     leapingFlames: LeapingFlames,
     spellEssenceCost: SpellEssenceCost,
     essenceTracker: EssenceTracker,
