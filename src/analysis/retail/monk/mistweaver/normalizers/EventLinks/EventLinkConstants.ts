@@ -49,6 +49,20 @@ export const MT_STACK_CHANGE = 'MTStackChange';
 export const MAX_MT_CHANNEL = 25000;
 export const MANA_TEA_YULONS_WHISPER = 'MTYulonsWhisper';
 
+// Damaging Abilities
+export const TIGER_PALM_CAST_LINK = 'TigerPalmCastLink';
+export const BLACKOUT_KICK_CAST_LINK = 'BlackoutKickCastLink';
+export const RSK_CAST_LINK = 'RisingSunKickCastLink';
+export const CJL_CAST_LINK = 'CracklingJadeLightningCastLink';
+export const SCK_CAST_LINK = 'SpinningCraneKickCastLink';
+
+// Ancient Teachings
+export const AT_TIGER_PALM = 'ATTigerPalm';
+export const AT_BLACKOUT_KICK = 'ATBlackoutKick';
+export const AT_RSK = 'ATRisingSunKick';
+export const AT_CJL = 'ATCracklingJadeLightning';
+export const AT_JFS = 'ATJadefireStomp';
+
 // Hero Talents
 export const STRENGTH_OF_THE_BLACK_OX = 'SotBO';
 

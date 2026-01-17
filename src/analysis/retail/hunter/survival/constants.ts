@@ -5,9 +5,9 @@ import TALENTS from 'common/TALENTS/hunter';
 /** Butchery / Carve */
 //Butchery and Carve can hit up to 5 targets for Frenzied Strikes
 export const BUTCHERY_CARVE_MAX_TARGETS_HIT = 5;
-/** Coordinated Assault */
+/** Takedown Buff */
 //Coordinated Assault increases all damage done by 20%
-export const COORDINATED_ASSAULT_DMG_MOD = 0.2;
+export const TAKEDOWN_DMG_MOD = 0.2;
 /** Wildfire Bomb */
 //People aren't robots, give them a bit of leeway in terms of when they cast WFB to avoid capping on charges
 export const WILDFIRE_BOMB_LEEWAY_BUFFER = 500;
@@ -24,7 +24,6 @@ export const SERPENT_STING_SURVIVAL_BASE_DURATION = 12000;
 export const RAPTOR_MONGOOSE_VARIANTS = [
   TALENTS.RAPTOR_STRIKE_TALENT,
   SPELLS.RAPTOR_STRIKE_AOTE,
-  TALENTS.MONGOOSE_BITE_TALENT,
   SPELLS.MONGOOSE_BITE_TALENT_AOTE,
 ];
 /** Aspect of the Eagle */
@@ -57,11 +56,7 @@ export const EXPLOSIVES_EXPERT_CDR = [0, 1, 2];
 
 //region Resources
 export const LIST_OF_FOCUS_SPENDERS_SV = [
-  TALENTS.BUTCHERY_TALENT,
-  TALENTS.KILL_SHOT_SURVIVAL_TALENT,
   TALENTS.WILDFIRE_BOMB_TALENT,
-  TALENTS.FLANKING_STRIKE_TALENT,
-  TALENTS.EXPLOSIVE_SHOT_TALENT,
   ...RAPTOR_MONGOOSE_VARIANTS,
 ];
 //endregion

@@ -1,10 +1,10 @@
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
 import {
-  AbilityEvent,
   ApplyBuffEvent,
   CastEvent,
   EventType,
   GetRelatedEvents,
+  GetRelatedEvent,
   HasRelatedEvent,
   HealEvent,
   RefreshBuffEvent,
@@ -31,6 +31,8 @@ import {
   WHIRLINGEARTH_HEAL,
   WHIRLINGWATER_HEAL,
   LIVELY_TOTEMS_CHAIN_HEAL,
+  SPLITSTREAM,
+  EARTHLIVING,
 } from '../constants';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/shaman';
@@ -281,6 +283,39 @@ const EVENT_LINKS: EventLink[] = [
       return c.hasTalent(talents.LIVELY_TOTEMS_TALENT);
     },
   },
+  // Reactivity: Your Healing Stream Totems now also heals a second ally at 100% effectiveness.
+  {
+    linkRelation: SPLITSTREAM,
+    linkingEventId: [SPELLS.HEALING_STREAM_TOTEM_HEAL.id],
+    linkingEventType: [EventType.Heal],
+    referencedEventId: [SPELLS.HEALING_STREAM_TOTEM_HEAL.id],
+    referencedEventType: [EventType.Heal],
+    backwardBufferMs: 5,
+    forwardBufferMs: 5,
+    anyTarget: true,
+    isActive(c) {
+      return c.hasTalent(talents.SPLITSTREAM_TALENT);
+    },
+  },
+  // Link Earthliving buff to the spell that applied it
+  {
+    linkRelation: EARTHLIVING,
+    linkingEventId: SPELLS.EARTHLIVING_WEAPON_HEAL.id,
+    linkingEventType: [EventType.ApplyBuff, EventType.RefreshBuff],
+    referencedEventId: [
+      SPELLS.HEALING_WAVE.id,
+      TALENTS.CHAIN_HEAL_TALENT.id,
+      TALENTS.RIPTIDE_TALENT.id,
+      SPELLS.HEALING_STREAM_TOTEM_HEAL.id,
+      SPELLS.HEALING_TIDE_TOTEM_HEAL.id,
+      SPELLS.STORMSTREAM_TOTEM_HEAL.id,
+    ],
+    referencedEventType: EventType.Heal,
+    backwardBufferMs: 200,
+    forwardBufferMs: 200,
+    anySource: true,
+    maximumLinks: 1,
+  },
 ];
 
 class CastLinkNormalizer extends EventLinkNormalizer {
@@ -289,7 +324,7 @@ class CastLinkNormalizer extends EventLinkNormalizer {
   }
 }
 
-export function isFromHardcast(event: AbilityEvent<any>): boolean {
+export function isFromHardcast(event: ApplyBuffEvent | RefreshBuffEvent | HealEvent): boolean {
   return HasRelatedEvent(event, HARDCAST);
 }
 
@@ -355,6 +390,14 @@ export function isLivelyTotemsChainHealCast(event: CastEvent) {
 
 export function isLivelyTotemsChainHeal(event: HealEvent) {
   return HasRelatedEvent(event, LIVELY_TOTEMS_CHAIN_HEAL);
+}
+
+export function isSplitstreamHeal(event: HealEvent) {
+  return HasRelatedEvent(event, SPLITSTREAM);
+}
+
+export function earthlivingApplication(event: ApplyBuffEvent | RefreshBuffEvent) {
+  return GetRelatedEvent<HealEvent>(event, EARTHLIVING);
 }
 
 export default CastLinkNormalizer;

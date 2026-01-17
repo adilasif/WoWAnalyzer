@@ -60,7 +60,7 @@ class InsidiousIre extends Analyzer {
           enemy &&
           enemy.hasBuff(SPELLS.SHADOW_WORD_PAIN.id, damage.timestamp) &&
           enemy.hasBuff(SPELLS.VAMPIRIC_TOUCH.id, damage.timestamp) &&
-          enemy.hasBuff(TALENTS.DEVOURING_PLAGUE_TALENT.id, damage.timestamp);
+          enemy.hasBuff(TALENTS.SHADOW_WORD_MADNESS_TALENT.id, damage.timestamp);
         result[wasIred ? 0 : 1].push(damage);
         return result;
       },
@@ -146,8 +146,8 @@ class InsidiousIre extends Analyzer {
           adds damange to <SpellLink spell={SPELLS.MIND_BLAST} /> and{' '}
           <SpellLink spell={TALENTS.VOID_TORRENT_TALENT} /> when{' '}
           <SpellLink spell={SPELLS.SHADOW_WORD_PAIN} />, <SpellLink spell={SPELLS.VAMPIRIC_TOUCH} />
-          , and <SpellLink spell={TALENTS.DEVOURING_PLAGUE_TALENT} /> are all active on the target.{' '}
-          <br />
+          , and <SpellLink spell={TALENTS.SHADOW_WORD_MADNESS_TALENT} /> are all active on the
+          target. <br />
           Be sure to cast these spells while Devouring Plague is on your target to increase their
           damage.
         </p>

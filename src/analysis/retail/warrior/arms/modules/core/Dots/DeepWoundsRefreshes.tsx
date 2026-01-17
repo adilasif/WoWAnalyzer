@@ -55,11 +55,7 @@ class EarlyDotRefresh extends EarlyDotRefreshesCore {
     }
 
     // Refreshes from Colossus Smash/Warbreaker/Bladestorm dont count against you
-    if (
-      dot.castId === SPELLS.BLADESTORM.id ||
-      dot.castId === TALENTS.WARBREAKER_TALENT.id ||
-      dot.castId === SPELLS.COLOSSUS_SMASH.id
-    ) {
+    if (dot.castId === SPELLS.BLADESTORM.id || dot.castId === SPELLS.COLOSSUS_SMASH.id) {
       this.lastCastGoodExtension = true;
     }
 

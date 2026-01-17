@@ -63,9 +63,6 @@ export default class StampedeAnalyzer extends Analyzer {
   private totalStampedeDamage = 0;
   private encounterUniqueTargets = new Set<string>();
   private useEntries: BoxRowEntry[] = [];
-  private damageCooldown = this.selectedCombatant.hasTalent(TALENTS.COORDINATED_ASSAULT_TALENT)
-    ? TALENTS.COORDINATED_ASSAULT_TALENT
-    : TALENTS.BESTIAL_WRATH_TALENT;
 
   constructor(options: Options) {
     super(options);
@@ -275,9 +272,7 @@ export default class StampedeAnalyzer extends Analyzer {
         <strong>
           <SpellLink spell={SPELLS.LEAD_FROM_THE_FRONT} />
         </strong>{' '}
-        windows should contain <strong>2 Stampedes</strong>. You should hold{' '}
-        <SpellLink spell={this.damageCooldown} /> briefly so it aligns inside a Lead from the Front
-        window.
+        windows should contain <strong>2 Stampedes</strong>.
       </p>
     );
 

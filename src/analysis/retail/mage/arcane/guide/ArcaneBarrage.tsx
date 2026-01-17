@@ -1,8 +1,8 @@
-import { ReactNode, type JSX } from 'react';
+import { type JSX } from 'react';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/mage';
 import { SpellLink } from 'interface';
-import { formatPercentage, formatDuration } from 'common/format';
+import { formatPercentage, formatDuration, formatNumber } from 'common/format';
 import GuideSection from 'interface/guide/components/GuideSection';
 import CastDetail, {
   type PerCastData,
@@ -11,6 +11,7 @@ import CastDetail, {
 import Analyzer from 'parser/core/Analyzer';
 import ArcaneBarrage, { ArcaneBarrageData } from '../analyzers/ArcaneBarrage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
+import { ARCANE_SALVO_MAX_STACKS } from '../../shared';
 
 class ArcaneBarrageGuide extends Analyzer {
   static dependencies = {
@@ -21,164 +22,67 @@ class ArcaneBarrageGuide extends Analyzer {
 
   isSunfury: boolean = this.selectedCombatant.hasTalent(TALENTS.MEMORY_OF_ALAR_TALENT);
   isSpellslinger: boolean = this.selectedCombatant.hasTalent(TALENTS.SPLINTERSTORM_TALENT);
+  hasArcaneSalvo: boolean = this.selectedCombatant.hasTalent(TALENTS.ARCANE_SALVO_TALENT);
 
   private readonly MAX_ARCANE_CHARGES = 4;
   private readonly LOW_MANA_THRESHOLD = 0.3;
   private readonly LOW_HEALTH_THRESHOLD = 0.35;
-  private readonly TEMPO_THRESHOLD = 5000;
   private readonly AOE_THRESHOLD = 3;
 
-  /**
-   * Evaluates a single Arcane Barrage cast for CastDetail.
-   * Returns complete cast information including performance and stats.
-   */
-  private evaluateBarrageCast(cast: ArcaneBarrageData): PerCastData {
-    // Calculate conditions (same as CastSummary version)
-    const hasMaxCharges = cast.charges >= this.MAX_ARCANE_CHARGES;
-    const isAOE = cast.targetsHit >= this.AOE_THRESHOLD;
-    const hasLowMana = cast.mana !== undefined && cast.mana <= this.LOW_MANA_THRESHOLD;
-    const hasLowHealth = cast.health !== undefined && cast.health < this.LOW_HEALTH_THRESHOLD;
-    const hasPrecastSurge = cast.precast?.ability.guid === TALENTS.ARCANE_SURGE_TALENT.id;
-    const tempoExpiring =
-      cast.tempoRemaining !== undefined && cast.tempoRemaining < this.TEMPO_THRESHOLD;
-    const hasSunfuryProc = cast.gloriousIncandescence || (cast.arcaneSoul && !cast.clearcasting);
-    const hasSpellslingerProc = cast.arcaneOrbAvail;
-
-    // Determine overall performance (same logic as CastSummary)
-    let performance: QualitativePerformance;
-    let notes: ReactNode;
-
-    // Fail conditions
-    if (!hasMaxCharges) {
-      performance = QualitativePerformance.Fail;
-      notes = `Insufficient Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES}) - should wait for maximum charges`;
-    }
-    // Perfect conditions
-    else if (hasMaxCharges && hasPrecastSurge) {
-      performance = QualitativePerformance.Perfect;
-      notes = (
-        <>
-          Perfect combo - <SpellLink spell={TALENTS.ARCANE_SURGE_TALENT} /> + 4 charges for maximum
-          damage!
-        </>
-      );
-    } else if (this.isSunfury && hasMaxCharges && hasSunfuryProc) {
-      performance = QualitativePerformance.Perfect;
-      notes = (
-        <>
-          Perfect Sunfury proc usage with max charges - converting{' '}
-          {cast.gloriousIncandescence ? (
-            <SpellLink spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />
-          ) : (
-            <SpellLink spell={SPELLS.ARCANE_SOUL_BUFF} />
-          )}{' '}
-          into AoE damage
-        </>
-      );
-    } else if (this.isSpellslinger && hasMaxCharges && hasSpellslingerProc) {
-      performance = QualitativePerformance.Perfect;
-      notes = 'Perfect Spellslinger proc usage with max charges';
-    } else if (isAOE && hasMaxCharges) {
-      performance = QualitativePerformance.Perfect;
-      notes = `Excellent AOE usage - hit ${cast.targetsHit} targets with max charges`;
-    } else if (this.isSpellslinger && isAOE && tempoExpiring) {
-      performance = QualitativePerformance.Perfect;
-      notes = `Perfect AOE + Tempo management - hit ${cast.targetsHit} targets before Tempo expires`;
-    }
-    // Good conditions
-    else if (hasMaxCharges && hasLowMana) {
-      performance = QualitativePerformance.Good;
-      notes = `Good emergency usage - low mana (${formatPercentage(cast.mana!, 1)}) necessitated charge spending`;
-    } else if (this.isSpellslinger && hasMaxCharges && tempoExpiring) {
-      performance = QualitativePerformance.Good;
-      notes = (
-        <>
-          Good timing - avoiding <SpellLink spell={SPELLS.ARCANE_TEMPO_BUFF} /> expiration
-        </>
-      );
-    }
-    // Ok conditions
-    else if (hasMaxCharges && hasLowHealth) {
-      performance = QualitativePerformance.Ok;
-      notes = `Target execute - ${formatPercentage(cast.health!, 1)}% health remaining`;
-    } else if (isAOE) {
-      performance = QualitativePerformance.Ok;
-      notes = `AOE usage - hit ${cast.targetsHit} targets (could optimize with procs/buffs)`;
-    }
-    // Default
-    else {
-      performance = QualitativePerformance.Fail;
-      notes = 'Wasted Arcane Charges - no clear benefit to casting Barrage';
-    }
-
-    // Build stats array for CastDetail
+  private buildCastStats(cast: ArcaneBarrageData): PerCastStat[] {
     const stats: PerCastStat[] = [];
 
-    // Arcane Charges
-    const chargePerformance =
-      cast.charges >= this.MAX_ARCANE_CHARGES
-        ? QualitativePerformance.Perfect
-        : cast.charges >= 3
-          ? QualitativePerformance.Good
-          : QualitativePerformance.Fail;
-
+    //Arcane Charges
     stats.push({
       label: 'Arcane Charges',
       value: `${cast.charges} / ${this.MAX_ARCANE_CHARGES}`,
-      tooltip:
-        cast.charges >= this.MAX_ARCANE_CHARGES
-          ? 'Maximum charges'
-          : `Only ${cast.charges} charges`,
-      performance: chargePerformance,
+      tooltip: `The number of Arcane Charge you had when Arcane Barrage was cast.`,
     });
 
-    // Targets Hit
+    //Targets Hit
     if (cast.targetsHit > 0) {
-      const targetsPerformance =
-        cast.targetsHit >= this.AOE_THRESHOLD
-          ? QualitativePerformance.Good
-          : QualitativePerformance.Ok;
-
       stats.push({
         label: 'Targets Hit',
         value: `${cast.targetsHit}`,
-        tooltip: cast.targetsHit >= this.AOE_THRESHOLD ? 'Good AOE opportunity' : undefined,
-        performance: targetsPerformance,
+        tooltip: `The number of targets hit by the Arcane Barrage cast`,
       });
     }
 
-    // Mana
+    //Mana
     if (cast.mana !== undefined) {
-      const manaPerformance =
-        cast.mana <= this.LOW_MANA_THRESHOLD
-          ? QualitativePerformance.Ok
-          : cast.mana <= 0.5
-            ? QualitativePerformance.Good
-            : undefined;
-
       stats.push({
         label: 'Mana',
         value: formatPercentage(cast.mana, 0),
-        tooltip:
-          cast.mana <= this.LOW_MANA_THRESHOLD ? 'Low mana - emergency cast acceptable' : undefined,
-        performance: manaPerformance,
+        tooltip: `The player's mana before Arcane Barrage was cast.`,
+      });
+    }
+
+    //Arcane Salvo
+    if (this.hasArcaneSalvo && cast.salvoStacks) {
+      stats.push({
+        label: 'Arcane Salvo Stacks',
+        value: formatNumber(cast.salvoStacks),
+        tooltip: `The number of Arcane Salvo stacks the player had before Arcane Barrage was cast.`,
+      });
+    }
+
+    //Precast
+    if (cast.precast) {
+      stats.push({
+        label: 'Precast Spell',
+        value: cast.precast.ability.name,
+        tooltip: `The spell cast immediately before Arcane Barrage.`,
       });
     }
 
     // Active Buffs
     const activeBuffs: JSX.Element[] = [];
-    if (cast.clearcasting) {
+    if (cast.clearcasting)
       activeBuffs.push(<SpellLink key="cc" spell={SPELLS.CLEARCASTING_ARCANE} />);
-    }
-    if (cast.arcaneSoul) {
-      activeBuffs.push(<SpellLink key="as" spell={SPELLS.ARCANE_SOUL_BUFF} />);
-    }
-    if (cast.gloriousIncandescence) {
+    if (cast.gloriousIncandescence)
       activeBuffs.push(<SpellLink key="gi" spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />);
-    }
-    if (cast.burdenOfPower) {
+    if (cast.burdenOfPower)
       activeBuffs.push(<SpellLink key="bp" spell={SPELLS.BURDEN_OF_POWER_BUFF} />);
-    }
 
     if (activeBuffs.length > 0) {
       stats.push({
@@ -194,81 +98,169 @@ class ArcaneBarrageGuide extends Analyzer {
       });
     }
 
-    // Tempo Remaining (Spellslinger)
-    if (this.isSpellslinger && cast.tempoRemaining !== undefined) {
-      const tempoSeconds = cast.tempoRemaining / 1000;
-      const tempoPerformance = tempoSeconds < 5 ? QualitativePerformance.Ok : undefined;
-
-      stats.push({
-        label: 'Tempo Remaining',
-        value: `${tempoSeconds.toFixed(1)}s`,
-        tooltip:
-          tempoSeconds < 5 ? (
-            <>
-              Good timing - avoiding <SpellLink spell={SPELLS.ARCANE_TEMPO_BUFF} /> expiration
-            </>
-          ) : undefined,
-        performance: tempoPerformance,
-      });
-    }
-
-    // Touch CD
-    if (cast.touchCD > 0) {
-      const touchPerformance = cast.touchCD <= 5000 ? QualitativePerformance.Good : undefined;
-
+    // touch of the Magi Cooldown
+    if (cast.touchCD) {
       stats.push({
         label: 'Touch CD',
         value: formatDuration(cast.touchCD),
-        tooltip:
-          cast.touchCD <= 5000 ? (
-            <>
-              <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} /> almost available
-            </>
-          ) : undefined,
-        performance: touchPerformance,
+        tooltip: `Cooldown Remaining on Touch of the Magi`,
       });
     }
 
-    // Return complete PerCastData object
-    return {
-      performance,
-      stats,
-      details: notes,
+    return stats;
+  }
+
+  private evaluateBarrageCast(cast: ArcaneBarrageData): PerCastData {
+    const hasMaxCharges = cast.charges >= this.MAX_ARCANE_CHARGES;
+    const isAOE = cast.targetsHit >= this.AOE_THRESHOLD;
+    const hasLowMana = cast.mana !== undefined && cast.mana <= this.LOW_MANA_THRESHOLD;
+    const hasLowHealth = cast.health !== undefined && cast.health <= this.LOW_HEALTH_THRESHOLD;
+
+    const statData = {
+      stats: this.buildCastStats(cast),
       timestamp: this.owner.formatTimestamp(cast.cast.timestamp),
+    };
+
+    // FAIL CONDITIONS
+    if (!hasMaxCharges) {
+      return {
+        performance: QualitativePerformance.Fail,
+        details: `Insufficient Arcane Charges (${cast.charges}/${this.MAX_ARCANE_CHARGES}) - should wait for maximum charges`,
+        ...statData,
+      };
+    }
+
+    // PERFECT CONDITIONS
+    // 20 Stacks of Arcane Salvo
+    if (this.hasArcaneSalvo && cast.salvoStacks >= ARCANE_SALVO_MAX_STACKS) {
+      return {
+        performance: QualitativePerformance.Perfect,
+        details: (
+          <>
+            Had {ARCANE_SALVO_MAX_STACKS} Stacks of{' '}
+            <SpellLink spell={TALENTS.ARCANE_SALVO_TALENT} />.
+          </>
+        ),
+        ...statData,
+      };
+    }
+
+    // Arcane Orb Available with Clearcasting
+    if (cast.arcaneOrbAvail && cast.clearcasting) {
+      return {
+        performance: QualitativePerformance.Perfect,
+        details: (
+          <>
+            <SpellLink spell={TALENTS.ARCANE_ORB_TALENT} /> was Available with{' '}
+            <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />
+          </>
+        ),
+        ...statData,
+      };
+    }
+
+    //Arcane Orb Available in AOE
+    if (isAOE && cast.arcaneOrbAvail) {
+      return {
+        performance: QualitativePerformance.Perfect,
+        details: (
+          <>
+            <SpellLink spell={SPELLS.ARCANE_BARRAGE} /> used in AOE with{' '}
+            <SpellLink spell={TALENTS.ARCANE_ORB_TALENT} /> Available.
+          </>
+        ),
+        ...statData,
+      };
+    }
+
+    // GOOD CONDITIONS
+    if (isAOE && hasMaxCharges) {
+      return {
+        performance: QualitativePerformance.Perfect,
+        details: `Excellent AOE usage - hit ${cast.targetsHit} targets with max charges`,
+        ...statData,
+      };
+    }
+
+    // Low mana
+    if (hasMaxCharges && hasLowMana) {
+      return {
+        performance: QualitativePerformance.Good,
+        details: `Good emergency usage - low mana (${formatPercentage(cast.mana!, 1)}) necessitated charge spending`,
+        ...statData,
+      };
+    }
+
+    // OK CONDITIONS
+    if (hasMaxCharges && hasLowHealth) {
+      return {
+        performance: QualitativePerformance.Ok,
+        details: `Target execute - ${formatPercentage(cast.health!, 1)}% health remaining`,
+        ...statData,
+      };
+    }
+
+    if (isAOE) {
+      return {
+        performance: QualitativePerformance.Ok,
+        details: `AOE usage - hit ${cast.targetsHit} targets (could optimize with procs/buffs)`,
+        ...statData,
+      };
+    }
+
+    // DEFAULT FAIL
+    return {
+      performance: QualitativePerformance.Fail,
+      details: 'Wasted Arcane Charges - no clear benefit to casting Barrage',
+      ...statData,
     };
   }
 
   get guideSubsection(): JSX.Element {
     const arcaneCharge = <SpellLink spell={SPELLS.ARCANE_CHARGE} />;
     const touchOfTheMagi = <SpellLink spell={TALENTS.TOUCH_OF_THE_MAGI_TALENT} />;
-    const arcaneSoul = <SpellLink spell={SPELLS.ARCANE_SOUL_BUFF} />;
     const arcaneBarrage = <SpellLink spell={SPELLS.ARCANE_BARRAGE} />;
-    const arcaneOrb = <SpellLink spell={SPELLS.ARCANE_ORB} />;
-    const gloriousIncandescence = <SpellLink spell={TALENTS.GLORIOUS_INCANDESCENCE_TALENT} />;
     const clearcasting = <SpellLink spell={SPELLS.CLEARCASTING_ARCANE} />;
+    const arcaneOrb = <SpellLink spell={SPELLS.ARCANE_ORB} />;
+    const arcaneSalvo = <SpellLink spell={TALENTS.ARCANE_SALVO_TALENT} />;
 
     const explanation = (
       <>
         <b>{arcaneBarrage}</b> is your {arcaneCharge} spender, removing the associated increased
-        mana costs and damage. Only cast {arcaneBarrage} under one of the below conditions to
-        maintain the damage increase for as long as possible.
+        mana costs and damage. Only cast {arcaneBarrage} with {this.MAX_ARCANE_CHARGES}{' '}
+        {arcaneCharge}s plus one of the below conditions to maintain the damage increase for as long
+        as possible.
         <ul>
-          <li>{touchOfTheMagi} is almost available or you are out of mana.</li>
-          {this.isSunfury && (
+          {this.hasArcaneSalvo && (
             <>
-              <li>You have {gloriousIncandescence}.</li>
               <li>
-                You have {arcaneSoul} and either or don't have {clearcasting}
+                You have {ARCANE_SALVO_MAX_STACKS} stacks of {arcaneSalvo}
               </li>
             </>
           )}
-          {this.isSpellslinger && <li>You have or {arcaneOrb}.</li>}
+          <li>{touchOfTheMagi} is almost available or you are out of mana.</li>
+          {this.isSpellslinger && (
+            <li>
+              You have {clearcasting} and {arcaneOrb}.
+            </li>
+          )}
+          {this.isSpellslinger && (
+            <li>
+              You have {arcaneOrb} and {arcaneBarrage} will hit at least {this.AOE_THRESHOLD}{' '}
+              targets.
+            </li>
+          )}
         </ul>
       </>
     );
 
     return (
-      <GuideSection spell={SPELLS.ARCANE_BARRAGE} explanation={explanation} title="Arcane Barrage">
+      <GuideSection
+        spell={SPELLS.ARCANE_BARRAGE}
+        explanation={explanation}
+        explanationPercent={30}
+        title="Arcane Barrage"
+      >
         <CastDetail
           title="Arcane Barrage Casts"
           casts={this.arcaneBarrage.barrageData.map((cast) => this.evaluateBarrageCast(cast))}
