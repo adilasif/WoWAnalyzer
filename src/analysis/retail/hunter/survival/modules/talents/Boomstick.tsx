@@ -41,8 +41,6 @@ class Boomstick extends Analyzer {
   private useEntries: BoxRowEntry[] = [];
   private clippedCasts = 0;
 
-  private castTippedStatus = new Map<number, boolean>();
-
   private static readonly BUCKET_WINDOW_MS = 100;
   private static readonly EXPECTED_TICKS = 4;
 
@@ -54,20 +52,10 @@ class Boomstick extends Analyzer {
     }
 
     this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.BOOMSTICK_TALENT),
-      this.onCast,
-    );
-
-    this.addEventListener(
       Events.EndChannel.by(SELECTED_PLAYER).spell(TALENTS.BOOMSTICK_TALENT),
       this.onEndChannel,
     );
   }
-
-  private onCast = (event: CastEvent) => {
-    const tipped = this.selectedCombatant.hasBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id);
-    this.castTippedStatus.set(event.timestamp, tipped);
-  };
 
   private onEndChannel = (event: EndChannelEvent) => {
     const cast = GetRelatedEvent<CastEvent>(event, BOOMSTICK_CAST_END);
@@ -75,31 +63,23 @@ class Boomstick extends Analyzer {
       return;
     }
 
-    // Retrieve whether this cast had Tip of the Spear
-    const tipped = this.castTippedStatus.get(cast.timestamp) ?? false;
+    // Check if Tip of the Spear was active at the time of cast
+    const tipped = this.selectedCombatant.hasBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id, cast.timestamp);
 
     const hits = GetRelatedEvents<DamageEvent>(cast, BOOMSTICK_CAST_HIT).sort(
       (a, b) => a.timestamp - b.timestamp,
     );
 
     // Group damage events into ticks based on timestamp proximity
-    const buckets: DamageEvent[][] = [];
-    hits.forEach((hit) => {
-      if (buckets.length === 0) {
-        buckets.push([hit]);
-        return;
-      }
-      const currentBucket = buckets[buckets.length - 1];
-      const bucketStart = currentBucket[0].timestamp;
-
-      // If this hit is within 100ms of the bucket start, it's part of the same tick
-      if (hit.timestamp - bucketStart <= Boomstick.BUCKET_WINDOW_MS) {
-        currentBucket.push(hit);
+    const buckets = hits.reduce<DamageEvent[][]>((acc, hit) => {
+      const lastBucket = acc[acc.length - 1];
+      if (!lastBucket || hit.timestamp - lastBucket[0].timestamp > Boomstick.BUCKET_WINDOW_MS) {
+        acc.push([hit]);
       } else {
-        // Otherwise, start a new tick bucket
-        buckets.push([hit]);
+        lastBucket.push(hit);
       }
-    });
+      return acc;
+    }, []);
 
     const tickCount = buckets.length;
 
@@ -191,10 +171,6 @@ class Boomstick extends Analyzer {
     this.useEntries.push({ value, tooltip });
   };
 
-  private get averageTargetsHit() {
-    return this.totalTicks > 0 ? this.totalHits / this.totalTicks : 0;
-  }
-
   get guideSubsection(): JSX.Element {
     const explanation = (
       <p>
@@ -232,7 +208,8 @@ class Boomstick extends Analyzer {
             <ItemDamageDone amount={this.totalDamage} />
             {this.totalHits} <small>targets hit</small>
             <br />
-            {this.averageTargetsHit.toFixed(1)} <small>avg targets/tick</small>
+            {(this.totalTicks > 0 ? this.totalHits / this.totalTicks : 0).toFixed(1)}{' '}
+            <small>avg targets/tick</small>
             {this.clippedCasts > 0 && (
               <>
                 <br />
