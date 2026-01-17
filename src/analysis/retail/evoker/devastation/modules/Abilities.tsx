@@ -36,6 +36,15 @@ class Abilities extends CoreAbilities {
         range: BASE_EVOKER_RANGE,
         enabled: combatant.hasTalent(TALENTS.ETERNITY_SURGE_TALENT),
       },
+      {
+        spell: SPELLS.AZURE_SWEEP.id,
+        category: SPELL_CATEGORY.ROTATIONAL,
+        gcd: {
+          base: 1500,
+        },
+        range: BASE_EVOKER_RANGE,
+        enabled: combatant.hasTalent(TALENTS.AZURE_SWEEP_TALENT),
+      },
       //endregion
       //region Cooldowns
       {

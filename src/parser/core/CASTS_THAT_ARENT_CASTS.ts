@@ -54,6 +54,8 @@ const spells: number[] = [
 
   //region Evoker
   SPELLS.VERDANT_EMBRACE_HEAL.id,
+  SPELLS.TWIN_FLAME.id,
+  SPELLS.CHARGED_BLAST.id,
   //endregion
 
   //region Hunter

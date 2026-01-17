@@ -6,6 +6,7 @@ import {
   getDisintegrateDamageEvents,
   getDisintegrateTargetCount,
   isFromMassDisintegrate,
+  isMassDisintegrateTick,
 } from 'analysis/retail/evoker/devastation/modules/normalizers/CastLinkNormalizer';
 import Enemies from 'parser/shared/modules/Enemies';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
@@ -122,20 +123,22 @@ class MassDisintegrate extends Analyzer {
     const targetCount = getDisintegrateTargetCount(event);
     this.targetCount += targetCount;
 
-    const castTarget = this.enemies.getEntity(event);
     const damageEvents = getDisintegrateDamageEvents(event);
 
     damageEvents.forEach((damageEvent) => {
-      const target = this.enemies.getEntity(damageEvent);
-      if (target === castTarget && targetCount < MAX_TARGETS) {
-        this.damageFromAmp += calculateEffectiveDamage(
-          damageEvent,
-          MASS_DISINTEGRATE_MULTIPLIER_PER_MISSING_TARGET * (MAX_TARGETS - targetCount),
-        );
-        return;
-      }
+      const ampedDamage =
+        targetCount < MAX_TARGETS
+          ? calculateEffectiveDamage(
+              damageEvent,
+              MASS_DISINTEGRATE_MULTIPLIER_PER_MISSING_TARGET * (MAX_TARGETS - targetCount),
+            )
+          : 0;
+      this.damageFromAmp += ampedDamage;
 
-      this.damageFromExtraTargets += damageEvent.amount + (damageEvent.absorbed || 0);
+      if (isMassDisintegrateTick(damageEvent)) {
+        this.damageFromExtraTargets +=
+          damageEvent.amount + (damageEvent.absorbed || 0) - ampedDamage;
+      }
     });
   }
 

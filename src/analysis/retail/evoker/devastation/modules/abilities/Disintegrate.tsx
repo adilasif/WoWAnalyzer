@@ -260,7 +260,7 @@ class Disintegrate extends Analyzer {
       return;
     }
 
-    // This is actually a refresh event
+    // This is actually a refresh event or chained cast
     if (HasRelatedEvent(event, DISINTEGRATE_REMOVE_APPLY)) {
       this.onRefreshDebuff(event);
       return;
@@ -297,6 +297,8 @@ class Disintegrate extends Analyzer {
     if (isMassDisintegrateDebuff(event)) {
       return;
     }
+    this.currentMainTarget = encodeEventTargetString(event);
+
     // Clipped before GCD, very bad
     if (
       this.currentRemainingTicks >=
