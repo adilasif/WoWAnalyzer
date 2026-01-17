@@ -44,6 +44,7 @@ export const BLESSING_OF_ANSHE_INCREASE = 2.0;
 export const DIVINE_REVELATIONS_INCREASE = 0.2;
 export const PROTECTION_OF_TYR_INCREASE = 0.1;
 export const RECLAMATION_MAX_INCREASE = 0.5;
+export const RISING_SUNLIGHT_MAX_INCREASE = 0.1;
 export const UNENDING_LIGHT_INCREASE = 0.05; // per stack
 export const GLEAMING_RAYS_INCREASE = 0.05;
 export const BLESSING_OF_SEASONS_DURATION = 30;
@@ -108,6 +109,7 @@ export const enum BEACON_TYPE {
   BEACON_OF_LIGHT,
   BEACON_OF_FAITH,
   BEACON_OF_VIRTUE,
+  BEACON_OF_THE_SAVIOR,
 }
 
 export const BEACON_SPELL_IDS: Record<BEACON_TYPE, readonly number[]> = {
@@ -117,6 +119,7 @@ export const BEACON_SPELL_IDS: Record<BEACON_TYPE, readonly number[]> = {
     TALENTS.BEACON_OF_FAITH_TALENT.id,
   ],
   [BEACON_TYPE.BEACON_OF_VIRTUE]: [TALENTS.BEACON_OF_VIRTUE_TALENT.id],
+  [BEACON_TYPE.BEACON_OF_THE_SAVIOR]: [TALENTS.BEACON_OF_THE_SAVIOR_1_HOLY_TALENT.id],
 } as const;
 
 // Holy Power Constants
