@@ -14,9 +14,9 @@ import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
  * you deal to them by 30% for 10 sec.
  */
 
-const WARBREAKER_BONUS_DAMAGES = 0.3;
+const COLOSSUS_SMASH_BONUS_DAMAGE = 0.3;
 
-class Warbreaker extends Analyzer {
+class ColossusSmash extends Analyzer {
   get dps() {
     return (this.totalDamages / this.owner.fightDuration) * 1000;
   }
@@ -31,7 +31,7 @@ class Warbreaker extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS.WARBREAKER_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.COLOSSUS_SMASH_TALENT);
     this.addEventListener(Events.damage.by(SELECTED_PLAYER), this._onDamage);
   }
 
@@ -39,12 +39,12 @@ class Warbreaker extends Analyzer {
     if (event.targetIsFriendly) {
       return;
     }
-    if (event.ability.guid === TALENTS.WARBREAKER_TALENT.id) {
+    if (event.ability.guid === SPELLS.COLOSSUS_SMASH.id) {
       this.totalDamages += (event.amount || 0) + (event.absorbed || 0);
     }
     const target = this.enemies.getEntity(event);
     if (target !== null && target.hasBuff(SPELLS.COLOSSUS_SMASH_DEBUFF.id, event.timestamp)) {
-      this.totalDamages += calculateEffectiveDamage(event, WARBREAKER_BONUS_DAMAGES);
+      this.totalDamages += calculateEffectiveDamage(event, COLOSSUS_SMASH_BONUS_DAMAGE);
     }
   }
 
@@ -53,17 +53,18 @@ class Warbreaker extends Analyzer {
       <StatisticListBoxItem
         title={
           <>
-            <SpellLink spell={TALENTS.WARBREAKER_TALENT} /> bonus damage
+            <SpellLink spell={TALENTS.COLOSSUS_SMASH_TALENT} /> bonus damage
           </>
         }
         value={`${formatThousands(this.dps)} DPS`}
         valueTooltip={
           <>
-            Your Warbreaker contributed {formatThousands(this.totalDamages)} total damage (
+            Your <SpellLink spell={TALENTS.COLOSSUS_SMASH_TALENT} /> contributed{' '}
+            {formatThousands(this.totalDamages)} total damage (
             {formatPercentage(this.owner.getPercentageOfTotalDamageDone(this.totalDamages))} %).
             <br />
-            This accounts for the damage dealt by Warbreaker and the 30% increased damage from
-            Colossus Smash debuff.
+            This accounts for the hit damage dealt by{' '}
+            <SpellLink spell={TALENTS.COLOSSUS_SMASH_TALENT} /> and the 30% increased damage debuff.
           </>
         }
       />
@@ -71,4 +72,4 @@ class Warbreaker extends Analyzer {
   }
 }
 
-export default Warbreaker;
+export default ColossusSmash;
