@@ -29,7 +29,7 @@ class Abilities extends CoreAbilities {
       {
         spell: [TALENTS.RAPTOR_STRIKE_TALENT.id, SPELLS.RAPTOR_STRIKE_AOTE.id],
         category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: !combatant.hasTalent(TALENTS.MONGOOSE_BITE_TALENT),
+        enabled: !combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
         gcd: {
           base: 1500,
         },
@@ -53,62 +53,9 @@ class Abilities extends CoreAbilities {
           recommendedEfficiency: 0.85,
         },
       },
-      {
-        spell: SPELLS.SERPENT_STING_SURVIVAL.id,
-        enabled: !combatant.hasTalent(TALENTS.VIPERS_VENOM_TALENT),
-        category: SPELL_CATEGORY.ROTATIONAL,
-        gcd: {
-          base: 1500,
-        },
-        timelineSortIndex: 4,
-      },
       //endregion
 
       //region Talents
-      {
-        spell: [TALENTS.MONGOOSE_BITE_TALENT.id, SPELLS.MONGOOSE_BITE_TALENT_AOTE.id],
-        category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: combatant.hasTalent(TALENTS.MONGOOSE_BITE_TALENT),
-        gcd: {
-          base: 1500,
-        },
-        timelineSortIndex: 2,
-      },
-      {
-        spell: [TALENTS.FLANKING_STRIKE_TALENT.id, SPELLS.FLANKING_STRIKE_PLAYER.id],
-        category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: combatant.hasTalent(TALENTS.FLANKING_STRIKE_TALENT),
-        cooldown: 30,
-        gcd: {
-          base: 1500,
-        },
-        castEfficiency: {
-          suggestion: true,
-          recommendedEfficiency: 0.9,
-        },
-      },
-      {
-        spell: TALENTS.EXPLOSIVE_SHOT_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.EXPLOSIVE_SHOT_TALENT),
-        category: SPELL_CATEGORY.ROTATIONAL_AOE,
-        cooldown: 30,
-        gcd: {
-          base: 1500,
-        },
-      },
-      {
-        spell: TALENTS.BUTCHERY_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL_AOE,
-        enabled: combatant.hasTalent(TALENTS.BUTCHERY_TALENT),
-        cooldown: (haste) => hastedCooldown(15, haste),
-        gcd: {
-          base: 1500,
-        },
-        castEfficiency: {
-          suggestion: true,
-          recommendedEfficiency: 0.9,
-        },
-      },
       {
         spell: TALENTS.CAMOUFLAGE_TALENT.id,
         category: SPELL_CATEGORY.UTILITY,
@@ -122,10 +69,10 @@ class Abilities extends CoreAbilities {
 
       //region Cooldowns
       {
-        spell: [TALENTS.COORDINATED_ASSAULT_TALENT.id],
-        enabled: combatant.hasTalent(TALENTS.COORDINATED_ASSAULT_TALENT),
+        spell: [TALENTS.TAKEDOWN_TALENT.id],
+        enabled: combatant.hasTalent(TALENTS.TAKEDOWN_TALENT),
         category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: combatant.hasTalent(TALENTS.SYMBIOTIC_ADRENALINE_TALENT) ? 60 : 120,
+        cooldown: 90 - (combatant.hasTalent(TALENTS.SAVAGERY_SURVIVAL_TALENT) ? 30 : 0),
         gcd: {
           static: 0,
         },
@@ -134,24 +81,6 @@ class Abilities extends CoreAbilities {
           recommendedEfficiency: 0.85,
         },
         timelineSortIndex: 6,
-      },
-      {
-        spell: TALENTS.SPEARHEAD_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.SPEARHEAD_TALENT),
-        category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: combatant.hasTalent(TALENTS.DEADLY_DUO_TALENT) ? 60 : 90,
-        gcd: {
-          base: 1500,
-        },
-      },
-      {
-        spell: TALENTS.FURY_OF_THE_EAGLE_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.FURY_OF_THE_EAGLE_TALENT),
-        category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 90 - (combatant.hasTalent(TALENTS.BORN_TO_BE_WILD_TALENT) ? 30 : 0),
-        gcd: {
-          base: 1500,
-        },
       },
       //endregion
 
