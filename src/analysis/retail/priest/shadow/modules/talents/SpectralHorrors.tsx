@@ -8,9 +8,9 @@ import Enemies from 'parser/shared/modules/Enemies';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
 
-import { PHANTASMAL_PATHOGEN_DAMAGE_PER_RANK } from '../../constants';
+import { SPECTRAL_HORROR_DAMAGE } from '../../constants';
 
-class PhantasmalPathogen extends Analyzer {
+class SpectralHorrors extends Analyzer {
   static dependencies = {
     enemies: Enemies,
   };
@@ -20,13 +20,12 @@ class PhantasmalPathogen extends Analyzer {
   damage = 0;
   hits = 0;
 
-  phantasmalPathogenMultiplier =
-    this.selectedCombatant.getTalentRank(TALENTS.INSIDIOUS_IRE_TALENT) *
-    PHANTASMAL_PATHOGEN_DAMAGE_PER_RANK;
+  spectralHorrorsMultiplier =
+    this.selectedCombatant.getTalentRank(TALENTS.INSIDIOUS_IRE_TALENT) * SPECTRAL_HORROR_DAMAGE;
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS.PHANTASMAL_PATHOGEN_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.SPECTRAL_HORRORS_TALENT);
     this.addEventListener(
       Events.cast.by(SELECTED_PLAYER).spell(SPELLS.SHADOWY_APPARITION_CAST),
       this.onCastSA,
@@ -44,16 +43,16 @@ class PhantasmalPathogen extends Analyzer {
   onApparitionDamage(event: DamageEvent) {
     const target = this.enemies.getEntity(event);
 
-    if (target && target.hasBuff(TALENTS.DEVOURING_PLAGUE_TALENT.id, event.timestamp)) {
+    if (target && target.hasBuff(TALENTS.SHADOW_WORD_MADNESS_TALENT.id, event.timestamp)) {
       this.hits += 1;
-      this.damage += calculateEffectiveDamage(event, this.phantasmalPathogenMultiplier);
+      this.damage += calculateEffectiveDamage(event, this.spectralHorrorsMultiplier);
     }
   }
 
   //this is used in ShadowyApparitions to show all Apparition Talents together
   subStatistic() {
     return (
-      <BoringSpellValueText spell={TALENTS.PHANTASMAL_PATHOGEN_TALENT}>
+      <BoringSpellValueText spell={TALENTS.SPECTRAL_HORRORS_TALENT}>
         <div>
           <ItemDamageDone amount={this.damage} />
         </div>
@@ -65,4 +64,4 @@ class PhantasmalPathogen extends Analyzer {
   }
 }
 
-export default PhantasmalPathogen;
+export default SpectralHorrors;

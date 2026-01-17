@@ -14,7 +14,7 @@ import { BoxRowEntry, PerformanceBoxRow } from 'interface/guide/components/Perfo
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 
-class ShadowCrash extends Analyzer {
+class TentacleSlam extends Analyzer {
   static dependencies = {
     abilityTracker: AbilityTracker,
   };
@@ -30,48 +30,28 @@ class ShadowCrash extends Analyzer {
   recentHits = 0;
   recentSCTimestamp = 0;
 
-  shadowCrash1 = this.selectedCombatant.hasTalent(TALENTS.SHADOW_CRASH_1_SHADOW_TALENT);
-  shadowCrash2 = this.selectedCombatant.hasTalent(TALENTS.SHADOW_CRASH_2_SHADOW_TALENT);
+  tentacleSlam = this.selectedCombatant.hasTalent(TALENTS.TENTACLE_SLAM_TALENT);
 
   constructor(options: Options) {
     super(options);
-    this.active = this.shadowCrash1 || this.shadowCrash2;
+    this.active = this.tentacleSlam;
     this.addEventListener(
-      Events.damage.by(SELECTED_PLAYER).spell(SPELLS.SHADOW_CRASH_TALENT_DAMAGE_ONE),
+      Events.damage.by(SELECTED_PLAYER).spell(SPELLS.TENTACLE_SLAM_TALENT_DAMAGE),
       this.onDamage,
     );
     this.addEventListener(
-      Events.damage.by(SELECTED_PLAYER).spell(SPELLS.SHADOW_CRASH_TALENT_DAMAGE_TWO),
-      this.onDamage,
-    );
-    this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.SHADOW_CRASH_1_SHADOW_TALENT),
+      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.TENTACLE_SLAM_TALENT),
       this.onCast,
     );
     this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.SHADOW_CRASH_2_SHADOW_TALENT),
-      this.onCast,
-    );
-    this.addEventListener(
-      Events.resourcechange.by(SELECTED_PLAYER).spell(TALENTS.SHADOW_CRASH_1_SHADOW_TALENT),
-      this.onEnergize,
-    );
-    this.addEventListener(
-      Events.resourcechange.by(SELECTED_PLAYER).spell(TALENTS.SHADOW_CRASH_2_SHADOW_TALENT),
+      Events.resourcechange.by(SELECTED_PLAYER).spell(TALENTS.TENTACLE_SLAM_TALENT),
       this.onEnergize,
     );
     this.addEventListener(Events.fightend, this.onFightEnd);
   }
 
   get abilityVersion() {
-    if (this.shadowCrash1) {
-      return this.abilityTracker.getAbility(TALENTS.SHADOW_CRASH_1_SHADOW_TALENT.id).casts;
-    }
-    if (this.shadowCrash2) {
-      return this.abilityTracker.getAbility(TALENTS.SHADOW_CRASH_2_SHADOW_TALENT.id).casts;
-    } else {
-      return 1;
-    } //this should never be reached
+    return this.abilityTracker.getAbility(TALENTS.TENTACLE_SLAM_TALENT.id).casts;
   }
 
   get averageTargetsHit() {
@@ -126,7 +106,7 @@ class ShadowCrash extends Analyzer {
         size="flexible"
         tooltip={`Average targets hit: ${this.averageTargetsHit.toFixed(1)}`}
       >
-        <BoringSpellValueText spell={TALENTS.SHADOW_CRASH_1_SHADOW_TALENT}>
+        <BoringSpellValueText spell={TALENTS.TENTACLE_SLAM_TALENT}>
           <>
             <div>
               <ItemDamageDone amount={this.damage} />
@@ -149,22 +129,21 @@ class ShadowCrash extends Analyzer {
     const explanation = (
       <p>
         <b>
-          <SpellLink spell={TALENTS.SHADOW_CRASH_1_SHADOW_TALENT} />
+          <SpellLink spell={TALENTS.TENTACLE_SLAM_TALENT} />
         </b>{' '}
         deals damage and applies <SpellLink spell={SPELLS.VAMPIRIC_TOUCH} /> to targets it hits.
         <br />
-        Use <SpellLink spell={TALENTS.SHADOW_CRASH_1_SHADOW_TALENT} /> to apply your DoTs, and
-        generate insanity. You may want to hold this ability if it will allow you to hit more
-        targets.
+        Use <SpellLink spell={TALENTS.TENTACLE_SLAM_TALENT} /> to apply your DoTs, and generate
+        insanity. You may want to hold this ability if it will allow you to hit more targets.
       </p>
     );
 
     const data = (
       <div>
-        <strong>Shadow Crash Casts</strong>
+        <strong>Tentacle Slam Casts</strong>
         <small>
           {' '}
-          - Shows number of targets hit for each Shadow Crash. Mouseover boxes for details.
+          - Shows number of targets hit for each Tentacle Slam. Mouseover boxes for details.
         </small>
         <PerformanceBoxRow values={this.castEntries} />
       </div>
@@ -174,4 +153,4 @@ class ShadowCrash extends Analyzer {
   }
 }
 
-export default ShadowCrash;
+export default TentacleSlam;

@@ -61,8 +61,6 @@ const ignores = tseslint.config({
     'src/analysis/retail/paladin/shared/**',
     'src/analysis/retail/priest/discipline/**',
     'src/analysis/retail/priest/holy/**',
-    'src/analysis/retail/priest/shadow/**',
-    'src/analysis/retail/priest/shared/**',
     'src/analysis/retail/rogue/assassination/**',
     'src/analysis/retail/rogue/subtlety/**',
     'src/analysis/retail/rogue/outlaw/**',

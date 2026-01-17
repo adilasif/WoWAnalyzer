@@ -31,7 +31,7 @@ class Voidform extends Analyzer {
   constructor(options: Options) {
     super(options);
 
-    this.active = this.selectedCombatant.hasTalent(TALENTS.VOID_ERUPTION_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS.VOIDFORM_TALENT);
 
     this.addEventListener(
       Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.VOIDFORM_BUFF),
@@ -117,14 +117,14 @@ class Voidform extends Analyzer {
     const explanation = (
       <p>
         <b>
-          <SpellLink spell={TALENTS.VOID_ERUPTION_TALENT} />
+          <SpellLink spell={TALENTS.VOIDFORM_TALENT} />
         </b>{' '}
         is a powerful cooldown.
         <br />
         Entering <SpellLink spell={SPELLS.VOIDFORM_BUFF} />, causes you to regain all charges of{' '}
         <SpellLink spell={SPELLS.MIND_BLAST} />. It is not a priority to regain charges in this way.
         <br />
-        Casting <SpellLink spell={TALENTS.DEVOURING_PLAGUE_TALENT} /> during{' '}
+        Casting <SpellLink spell={TALENTS.SHADOW_WORD_MADNESS_TALENT} /> during{' '}
         <SpellLink spell={SPELLS.VOIDFORM_BUFF} /> extends its duration by 2.5 seconds.
         {this.selectedCombatant.hasTalent(TALENTS.SUSTAINED_POTENCY_TALENT) && (
           <>
