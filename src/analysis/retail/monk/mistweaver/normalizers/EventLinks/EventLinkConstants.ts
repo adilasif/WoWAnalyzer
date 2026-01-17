@@ -70,3 +70,7 @@ export const STRENGTH_OF_THE_BLACK_OX = 'SotBO';
 export const CAST_BUFFER_MS = 100;
 export const CHI_WAVE_RSK = 'ChiWaveRSK';
 export const RUSHING_WIND_KICK = 'RWK';
+
+// Spiritfont
+export const SPIRITFONT_PROC = 'SpiritfontProc';
+export const SPIRITFONT_TFT = 'SpiritfontTFT';

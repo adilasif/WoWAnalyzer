@@ -94,6 +94,7 @@ import WayOfTheSerpent from './modules/spells/WayOfTheSerpent';
 import MovementTracker from './modules/features/MovementDuringBuffTracker';
 import WayOfTheCrane from './modules/spells/WayOfTheCrane';
 import AncientTeachingsLinkNormalizer from './normalizers/AncientTeachingsLinkNormalizer';
+import Spiritfont from './modules/spells/Spiritfont';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -191,6 +192,7 @@ class CombatLogParser extends CoreCombatLogParser {
     jadeEmpowerment: JadeEmpowerment,
     wayOfTheSerpent: WayOfTheSerpent,
     wayOfTheCrane: WayOfTheCrane,
+    spiritfont: Spiritfont,
 
     // Hero Talents
     // Conduit

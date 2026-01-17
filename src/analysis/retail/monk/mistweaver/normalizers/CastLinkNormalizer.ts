@@ -48,6 +48,8 @@ import {
   INSURANCE_FROM_REM,
   INSURANCE,
   RUSHING_WIND_KICK,
+  SPIRITFONT_PROC,
+  SPIRITFONT_TFT,
 } from './EventLinks/EventLinkConstants';
 import { RENEWING_MIST_EVENT_LINKS } from './EventLinks/RenewingMistEventLinks';
 import { GUST_OF_MISTS_EVENT_LINKS } from './EventLinks/GustOfMistEventLinks';
@@ -103,6 +105,38 @@ const EVENT_LINKS: EventLink[] = [
     maximumLinks: 5,
     isActive(c) {
       return c.hasTalent(TALENTS_MONK.RUSHING_WIND_KICK_MISTWEAVER_TALENT);
+    },
+  },
+  {
+    linkRelation: SPIRITFONT_PROC,
+    linkingEventId: SPELLS.SPIRITFONT_BUFF.id,
+    linkingEventType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
+    referencedEventId: [
+      TALENTS_MONK.RISING_SUN_KICK_TALENT.id,
+      TALENTS_MONK.RUSHING_WIND_KICK_MISTWEAVER_TALENT.id,
+      SPELLS.VIVIFY.id,
+      TALENTS_MONK.SHEILUNS_GIFT_TALENT.id,
+    ],
+    referencedEventType: EventType.Cast,
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+    isActive(c) {
+      return c.hasTalent(TALENTS_MONK.SPIRITFONT_1_MISTWEAVER_TALENT);
+    },
+  },
+  {
+    linkRelation: SPIRITFONT_TFT,
+    linkingEventId: SPELLS.SPIRITFONT_BUFF.id,
+    linkingEventType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
+    referencedEventId: TALENTS_MONK.THUNDER_FOCUS_TEA_TALENT.id,
+    referencedEventType: EventType.Cast,
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+    isActive(c) {
+      // should be spiritfont_3 but it doesn't work
+      return c.hasTalent(TALENTS_MONK.SPIRITFONT_1_MISTWEAVER_TALENT);
     },
   },
 ];
