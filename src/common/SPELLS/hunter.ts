@@ -320,6 +320,21 @@ const spells = {
     name: 'Raptor Swipe',
     icon: 'inv12_apextalent_hunter_raptorswipe',
   },
+  TAKEDOWN_PET_DAMAGE: {
+    id: 1253862,
+    name: 'Takedown',
+    icon: 'inv12_ability_hunter_takedown',
+  },
+  TAKEDOWN_PLAYER: {
+    id: 1253859,
+    name: 'Takedown',
+    icon: 'inv12_ability_hunter_takedown',
+  },
+  HATCHET_TOSS: {
+    id: 193265,
+    name: 'Hatchet Toss',
+    icon: 'ability_hunter_hatchettoss',
+  },
   //endregion
 
   //region Shared

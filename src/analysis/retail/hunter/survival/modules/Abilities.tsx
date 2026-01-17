@@ -72,6 +72,15 @@ class Abilities extends CoreAbilities {
         cooldown: 45,
         timelineSortIndex: 1,
       },
+      {
+        spell: SPELLS.HATCHET_TOSS.id,
+        category: SPELL_CATEGORY.ROTATIONAL,
+        enabled: combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
+        gcd: {
+          base: 1500,
+        },
+        timelineSortIndex: 1,
+      },
       //endregion
 
       //region Talents
@@ -85,7 +94,6 @@ class Abilities extends CoreAbilities {
         },
       },
       //endregion
-
       //region Cooldowns
       {
         spell: [TALENTS.TAKEDOWN_TALENT.id],
