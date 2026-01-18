@@ -20,12 +20,6 @@ class HotStreakGuide extends Analyzer {
 
   hasFlameOn: boolean = this.selectedCombatant.hasTalent(TALENTS.FLAME_ON_TALENT);
 
-  /**
-   * Evaluates a single Hot Streak proc for CastSummary.
-   * Returns performance and reason for tooltip display.
-   *
-   * Evaluation priority: fail → good → ok
-   */
   private evaluateHotStreakProc(hs: any): CastEvaluation {
     const lowBlastCharges = hs.blastCharges <= LOW_BLAST_CHARGES;
 
