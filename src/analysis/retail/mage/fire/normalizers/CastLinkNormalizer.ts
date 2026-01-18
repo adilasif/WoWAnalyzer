@@ -31,6 +31,7 @@ const CAST_BUFFER_MS = 100;
 const CustomType = {
   PRECAST: 'precast',
   CONSUME: 'consume',
+  LAST_BUFF_REFRESH: 'lastBuffRefresh',
 };
 
 const EVENT_LINKS = createEventLinks(
@@ -56,9 +57,20 @@ const EVENT_LINKS = createEventLinks(
     links: [link(EventType.BeginCast, { maxLinks: 1 }), link(EventType.Damage, { maxLinks: 1 })],
   },
   {
-    spell: TALENTS.FIRE_BLAST_TALENT.id,
+    spell: SPELLS.FIRE_BLAST.id,
     parentType: EventType.Cast,
-    links: [link(EventType.BeginCast, { maxLinks: 1 })],
+    links: [
+      link(EventType.BeginCast, { maxLinks: 1 }),
+      link(EventType.Damage, { maxLinks: 1 }),
+      link(CustomType.LAST_BUFF_REFRESH, {
+        id: SPELLS.FEEL_THE_BURN_BUFF.id,
+        type: [EventType.ApplyBuff, EventType.ApplyBuffStack, EventType.RefreshBuff],
+        anyTarget: true,
+        maxLinks: 1,
+        backwardBuffer: 4000,
+        forwardBuffer: -10,
+      }),
+    ],
   },
   {
     spell: SPELLS.FLAMESTRIKE.id,
@@ -119,7 +131,7 @@ const EVENT_LINKS = createEventLinks(
         forwardBuffer: 150,
         condition: (linkingEvent, referencedEvent) => {
           if ((referencedEvent as CastEvent).ability.guid === TALENTS.PYROBLAST_TALENT.id) {
-            return !isInstantCast(referencedEvent as CastEvent);
+            return isInstantCast(referencedEvent as CastEvent);
           }
           return true;
         },
@@ -128,7 +140,7 @@ const EVENT_LINKS = createEventLinks(
   },
   {
     spell: SPELLS.FEEL_THE_BURN_BUFF.id,
-    parentType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
+    parentType: [EventType.ApplyBuff, EventType.ApplyBuffStack, EventType.RefreshBuff],
     links: [link(EventType.RemoveBuff, { forwardBuffer: 600_000, maxLinks: 1 })],
   },
 );

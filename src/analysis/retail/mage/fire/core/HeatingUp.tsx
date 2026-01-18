@@ -5,7 +5,14 @@ import TALENTS from 'common/TALENTS/mage';
 import HIT_TYPES from 'game/HIT_TYPES';
 import SpellIcon from 'interface/SpellIcon';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import Events, { CastEvent, DamageEvent, GetRelatedEvents, HasTarget } from 'parser/core/Events';
+import Events, {
+  CastEvent,
+  DamageEvent,
+  EventType,
+  GetRelatedEvent,
+  GetRelatedEvents,
+  HasTarget,
+} from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import CooldownHistory from 'parser/shared/modules/CooldownHistory';
@@ -38,7 +45,7 @@ export default class HeatingUp extends Analyzer {
   }
 
   castEvent(event: CastEvent) {
-    const damage: DamageEvent[] = GetRelatedEvents(event, 'SpellDamage') || [];
+    const damage: DamageEvent[] = GetRelatedEvents(event, EventType.Damage) || [];
     const castTarget = HasTarget(event) && encodeTargetString(event.targetID, event.targetInstance);
     const damageEvent = damage.find((d) => {
       const damageTarget = HasTarget(d) && encodeTargetString(d.targetID, d.targetInstance);
@@ -48,10 +55,13 @@ export default class HeatingUp extends Analyzer {
     if (!damageEvent || !HasTarget(damageEvent) || damageEvent.hitType !== HIT_TYPES.CRIT) {
       return;
     }
+    const ftbBuff = this.selectedCombatant.getBuff(SPELLS.FEEL_THE_BURN_BUFF);
+    const ftbLastRefresh = ftbBuff && GetRelatedEvent(event, 'lastBuffRefresh');
+    const ftbDuration = ftbLastRefresh && event.timestamp - ftbLastRefresh.timestamp;
 
     let buff;
     if (this.hasScorch && targetHealth && targetHealth < 0.3) {
-      buff = { active: true, buffId: TALENTS.SCORCH_TALENT.id };
+      buff = { active: true, buffId: SPELLS.SCORCH.id };
     } else if (this.hasFirestarter && targetHealth && targetHealth > 0.9) {
       buff = { active: true, buffId: TALENTS.FIRESTARTER_TALENT.id };
     } else if (
@@ -74,6 +84,7 @@ export default class HeatingUp extends Analyzer {
       hasHeatingUp: this.selectedCombatant.hasBuff(SPELLS.HEATING_UP.id),
       hasHotStreak: this.selectedCombatant.hasBuff(SPELLS.HOT_STREAK.id),
       critBuff: buff,
+      ftbDuration,
       charges: this.spellUsable.chargesAvailable(event.ability.guid),
       timeTillCapped: this.spellUsable.cooldownRemaining(event.ability.guid),
     });
@@ -155,6 +166,7 @@ export interface HeatingUpCrits {
   hasHeatingUp: boolean;
   hasHotStreak: boolean;
   critBuff: { active: boolean; buffId?: number };
+  ftbDuration?: number;
   charges: number;
   timeTillCapped: number;
 }

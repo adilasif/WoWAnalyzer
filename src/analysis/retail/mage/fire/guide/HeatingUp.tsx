@@ -8,8 +8,10 @@ import CastSummary, { type CastEvaluation } from 'interface/guide/components/Cas
 import GuideSection from 'interface/guide/components/GuideSection';
 
 import HeatingUp from '../core/HeatingUp';
+import { formatDurationMillisMinSec } from 'common/format';
 
 const CAPPED_MS_THRESHOLD = 7000;
+const FEEL_THE_BURN_DURATION_THRESHOLD = 1500;
 
 class HeatingUpGuide extends Analyzer {
   static dependencies = {
@@ -33,7 +35,7 @@ class HeatingUpGuide extends Analyzer {
       return {
         timestamp: hu.cast.timestamp,
         performance: QualitativePerformance.Good,
-        reason: 'Good - Fire Blast cast while capped on charges',
+        reason: 'Fire Blast cast while capped on charges',
       };
     }
 
@@ -42,7 +44,7 @@ class HeatingUpGuide extends Analyzer {
       return {
         timestamp: hu.cast.timestamp,
         performance: QualitativePerformance.Good,
-        reason: `Good - ${hu.cast.ability.name} cast with ${buffName}`,
+        reason: `Fire Blast cast with ${buffName}`,
       };
     }
 
@@ -51,6 +53,14 @@ class HeatingUpGuide extends Analyzer {
         timestamp: hu.cast.timestamp,
         performance: QualitativePerformance.Good,
         reason: 'Good - Proper Heating Up generation',
+      };
+    }
+
+    if (hu.ftbDuration <= FEEL_THE_BURN_DURATION_THRESHOLD) {
+      return {
+        timestamp: hu.cast.timestamp,
+        performance: QualitativePerformance.Ok,
+        reason: `${formatDurationMillisMinSec(hu.ftbDuration)}s left on Feel the Burn.`,
       };
     }
 
@@ -67,34 +77,35 @@ class HeatingUpGuide extends Analyzer {
     return {
       timestamp: hu.cast.timestamp,
       performance: QualitativePerformance.Good,
-      reason: 'Heating Up generated',
+      reason: 'Good Fire Blast Usage',
     };
   }
 
   get guideSubsection(): JSX.Element {
-    const fireBlast = <SpellLink spell={SPELLS.FIRE_BLAST} />;
+    const fireblast = <SpellLink spell={SPELLS.FIRE_BLAST} />;
     const combustion = <SpellLink spell={TALENTS.COMBUSTION_TALENT} />;
     const heatingUp = <SpellLink spell={SPELLS.HEATING_UP} />;
     const hotStreak = <SpellLink spell={SPELLS.HOT_STREAK} />;
     const firestarter = <SpellLink spell={TALENTS.FIRESTARTER_TALENT} />;
     const searingTouch = <SpellLink spell={TALENTS.SCORCH_TALENT} />;
-    const flamesFury = <SpellLink spell={SPELLS.FLAMES_FURY_BUFF} />;
+    const feelTheBurn = <SpellLink spell={TALENTS.FEEL_THE_BURN_TALENT} />;
 
     const explanation = (
       <>
-        roperly managing <b>{heatingUp}</b> maximizes your {hotStreak} generation throughout the
+        Properly managing <b>{heatingUp}</b> maximizes your {hotStreak} generation throughout the
         fight.
         <ul>
           <li>
-            Use guaranteed crit abilities like {fireBlast} to convert {heatingUp} to {hotStreak}.
+            Use guaranteed crit abilities like {fireblast} to convert {heatingUp} to {hotStreak}.
           </li>
           <li>
             Unless you are guaranteed to crit ({combustion}, {firestarter}, {searingTouch}), or are
-            capped/about to cap on charges, don't use {fireBlast} without {heatingUp}.
+            capped/about to cap on charges, don't use {fireblast} without {heatingUp}.
           </li>
           <li>
-            Outside of {combustion}, you can use {fireBlast} without {heatingUp} and then convert
-            that into {hotStreak}, especially with {flamesFury} procs.
+            If you are getting close to {combustion} and {feelTheBurn} is about to expire, it can be
+            acceptable to use {fireblast} without {heatingUp} to keep the buff maxed before{' '}
+            {combustion}.
           </li>
         </ul>
       </>
