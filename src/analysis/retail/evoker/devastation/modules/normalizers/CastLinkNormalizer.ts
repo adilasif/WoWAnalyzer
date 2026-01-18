@@ -27,6 +27,7 @@ import {
 } from 'analysis/retail/evoker/shared/modules/normalizers/LeapingFlamesNormalizer';
 import { CHAINED_CAST, CHAINED_FROM_CAST } from './DisintegrateChainCastLinks';
 import { ETERNITY_SURGE_FROM_CAST } from './EternitySurgeNormalizer';
+import { DEEP_BREATH_SPELL_IDS } from 'analysis/retail/evoker/shared';
 
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
@@ -53,6 +54,7 @@ export const PYRE_MAX_TRAVEL_TIME = 1_050;
 const CAST_BUFFER_MS = 100;
 const IRIDESCENCE_RED_BACKWARDS_BUFFER_MS = 500;
 const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
+const DEEP_BREATH_FLIGHT_TIME_MS = 4_000; // 3s + some leeway
 
 const EVENT_LINKS: EventLink[] = [
   {
@@ -265,6 +267,17 @@ const EVENT_LINKS: EventLink[] = [
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     isActive: (c) => c.hasTalent(TALENTS.AZURE_SWEEP_TALENT),
+  },
+  {
+    linkRelation: CAST_LINK,
+    reverseLinkRelation: DAMAGE_LINK,
+    linkingEventId: SPELLS.DEEP_BREATH_DAM.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: DEEP_BREATH_SPELL_IDS,
+    referencedEventType: EventType.Cast,
+    anyTarget: true,
+    backwardBufferMs: DEEP_BREATH_FLIGHT_TIME_MS,
+    maximumLinks: 1,
   },
   // TODO: Figure out what to do with these when Flameshaper gets worked on
   /* {

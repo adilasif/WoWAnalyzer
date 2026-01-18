@@ -82,6 +82,8 @@ export const TITANIC_WRATH_MULTIPLIER = 0.15;
 export const IRIDESCENCE_MULTIPLIER = 0.2;
 export const HEAT_WAVE_MULTIPLIER = 0.15;
 export const LAY_WASTE_MULTIPLIER = 0.2;
+export const STRAFING_RUN_MULTIPLIER = 0.2;
+export const STRAFING_RUN_DURATION = 18_000;
 
 // Talent multipliers
 export const DENSE_ENERGY_ESSENCE_REDUCTION = 1;
