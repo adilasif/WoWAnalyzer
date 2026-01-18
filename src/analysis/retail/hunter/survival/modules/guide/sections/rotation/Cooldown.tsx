@@ -7,6 +7,7 @@ import { GapHighlight } from 'parser/ui/CooldownBar';
 import CombatLogParser from 'analysis/retail/hunter/survival/CombatLogParser';
 import { SpellLink } from 'interface';
 import TALENTS from 'common/TALENTS/hunter';
+import SPELLS from 'common/SPELLS/hunter';
 export default function CooldownSection({ modules, info }: GuideProps<typeof CombatLogParser>) {
   const castEfficiency = useAnalyzer(CastEfficiency);
   if (!info || !castEfficiency) {
@@ -27,7 +28,7 @@ export default function CooldownSection({ modules, info }: GuideProps<typeof Com
         </ul>
       </div>
       <CastEfficiencyBar
-        spell={TALENTS.TAKEDOWN_TALENT}
+        spell={SPELLS.TAKEDOWN_PLAYER}
         gapHighlightMode={GapHighlight.FullCooldown}
         slimLines
         useThresholds

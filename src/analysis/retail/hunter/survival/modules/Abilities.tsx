@@ -96,12 +96,12 @@ class Abilities extends CoreAbilities {
       //endregion
       //region Cooldowns
       {
-        spell: [TALENTS.TAKEDOWN_TALENT.id],
+        spell: SPELLS.TAKEDOWN_PLAYER.id,
         enabled: combatant.hasTalent(TALENTS.TAKEDOWN_TALENT),
         category: SPELL_CATEGORY.COOLDOWNS,
         cooldown: 90 - 15 * combatant.getTalentRank(TALENTS.SAVAGERY_SURVIVAL_TALENT),
         gcd: {
-          static: 0,
+          base: 1500,
         },
         castEfficiency: {
           suggestion: true,
