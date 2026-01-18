@@ -18,14 +18,6 @@ class CombustionGuide extends Analyzer {
 
   protected combustion!: CombustionCasts;
 
-  hasFlameAccelerant: boolean = this.selectedCombatant.hasTalent(TALENTS.FLAME_ACCELERANT_TALENT);
-
-  /**
-   * Evaluates a single Combustion cast for CastSummary.
-   * Returns performance and reason for tooltip display.
-   *
-   * Evaluation priority: fail → perfect → good → ok
-   */
   private evaluateCombustionCast(cb: any): CastEvaluation {
     const combustDuration = cb.remove - cb.cast.timestamp;
     const activeTimePercent = cb.activeTime / combustDuration;
@@ -39,14 +31,7 @@ class CombustionGuide extends Analyzer {
         return false;
       }
       const beginCast = GetRelatedEvent(sc, 'CastBegin');
-      const hasAccelerantBuff = this.selectedCombatant.hasBuff(
-        SPELLS.FLAME_ACCELERANT_BUFF.id,
-        sc.timestamp,
-      );
-      if (
-        this.selectedCombatant.hasBuff(TALENTS.COMBUSTION_TALENT.id, beginCast?.timestamp) &&
-        !hasAccelerantBuff
-      ) {
+      if (this.selectedCombatant.hasBuff(TALENTS.COMBUSTION_TALENT.id, beginCast?.timestamp)) {
         return true;
       }
       return false;
@@ -57,7 +42,7 @@ class CombustionGuide extends Analyzer {
       return {
         timestamp: cb.cast.timestamp,
         performance: QualitativePerformance.Fail,
-        reason: `${fireballCasts.length} Hardcast Fireball(s) during Combustion - significant DPS loss`,
+        reason: `${fireballCasts.length} Hardcast Fireball(s) during Combustion`,
       };
     }
 
@@ -66,14 +51,6 @@ class CombustionGuide extends Analyzer {
         timestamp: cb.cast.timestamp,
         performance: QualitativePerformance.Fail,
         reason: `Low Active Time: ${formatPercentage(activeTimePercent, 1)}% (${formatDurationMillisMinSec(cb.activeTime, 1)} / ${formatDurationMillisMinSec(combustDuration, 1)})`,
-      };
-    }
-
-    if (cb.castDelay > delayThresholds.major) {
-      return {
-        timestamp: cb.cast.timestamp,
-        performance: QualitativePerformance.Fail,
-        reason: `High Cast Delay: ${formatDurationMillisMinSec(cb.castDelay, 2)} - wasted Combustion duration`,
       };
     }
 
@@ -96,6 +73,14 @@ class CombustionGuide extends Analyzer {
     }
 
     // OK CONDITIONS
+    if (cb.castDelay > delayThresholds.major) {
+      return {
+        timestamp: cb.cast.timestamp,
+        performance: QualitativePerformance.Fail,
+        reason: `High Cast Delay: ${formatDurationMillisMinSec(cb.castDelay, 2)} - wasted Combustion duration`,
+      };
+    }
+
     return {
       timestamp: cb.cast.timestamp,
       performance: QualitativePerformance.Ok,
@@ -104,14 +89,13 @@ class CombustionGuide extends Analyzer {
   }
 
   get guideSubsection(): JSX.Element {
-    const fireBlast = <SpellLink spell={SPELLS.FIRE_BLAST} />;
+    const fireblast = <SpellLink spell={SPELLS.FIRE_BLAST} />;
     const combustion = <SpellLink spell={TALENTS.COMBUSTION_TALENT} />;
     const hotStreak = <SpellLink spell={SPELLS.HOT_STREAK} />;
     const scorch = <SpellLink spell={SPELLS.SCORCH} />;
     const fireball = <SpellLink spell={SPELLS.FIREBALL} />;
     const pyroblast = <SpellLink spell={TALENTS.PYROBLAST_TALENT} />;
     const flamestrike = <SpellLink spell={SPELLS.FLAMESTRIKE} />;
-    const flameAccelerant = <SpellLink spell={TALENTS.FLAME_ACCELERANT_TALENT} />;
     const feelTheBurn = <SpellLink spell={TALENTS.FEEL_THE_BURN_TALENT} />;
 
     const explanation = (
@@ -121,24 +105,26 @@ class CombustionGuide extends Analyzer {
         before {combustion} ends.
         <ul>
           <li>
-            Cast {combustion} as close to the end of your hardcast as possible to avoid wasting buff
-            duration (Cast Delay).
+            Hardcast an ability like {fireball} or {pyroblast} and activate {combustion} as close to
+            the end of your hardcast as possible. This will give you maximum uptime of {combustion}{' '}
+            and allow your hardcast to land while {combustion} is active.
           </li>
-          <li>
-            Pool {fireBlast} charges before {combustion} so you have enough to last its duration.
-          </li>
+          {!this.selectedCombatant.hasTalent(TALENTS.SPONTANEOUS_COMBUSTION_TALENT) && (
+            <li>
+              Pool {fireblast} charges before {combustion} so you have enough to last its duration.
+            </li>
+          )}
           <li>
             Spend as many {hotStreak}s as possible during {combustion} and avoid any downtime.
           </li>
           <li>
-            Don't hardcast {fireball} (
-            {this.hasFlameAccelerant ? `without ${flameAccelerant}` : `with > 100% Haste`}),{' '}
-            {pyroblast}, or {flamestrike} during {combustion}. Use {scorch} if running low on
-            charges.
+            Don't hardcast {fireball}, {pyroblast}, or {flamestrike} during {combustion}. Use{' '}
+            {scorch} if you are running low on {fireblast} charges.
           </li>
           {this.selectedCombatant.hasTalent(TALENTS.FEEL_THE_BURN_TALENT) && (
             <li>
-              Get max stacks of {feelTheBurn} and maintain it for {combustion}'s duration.
+              Get max stacks of {feelTheBurn} as quickly as possible and maintain it for{' '}
+              {combustion}'s duration.'
             </li>
           )}
         </ul>
