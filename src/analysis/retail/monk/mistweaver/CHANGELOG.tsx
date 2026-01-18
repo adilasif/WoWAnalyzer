@@ -5,6 +5,7 @@ import { swirl, Vohrr } from 'CONTRIBUTORS';
 import SpellLink from 'interface/SpellLink';
 
 export default [
+  change(date(2026, 1, 18), <>Added <SpellLink spell={TALENTS_MONK.SPIRITFONT_1_MISTWEAVER_TALENT}/> module.</>, swirl),
   change(date(2025, 12, 15), <>Added <SpellLink spell={TALENTS_MONK.WAY_OF_THE_CRANE_TALENT}/> and <SpellLink spell={TALENTS_MONK.WAY_OF_THE_SERPENT_TALENT}/> modules.</>, swirl),
   change(date(2025, 12, 12), <>Updated <SpellLink spell={TALENTS_MONK.TEAR_OF_MORNING_TALENT}/> for Midnight.</>, swirl),
   change(date(2025, 12, 5), <>Added <SpellLink spell={TALENTS_MONK.AMPLIFIED_RUSH_TALENT}/> statistic, removed Unison.</>, Vohrr),
