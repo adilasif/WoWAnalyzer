@@ -5,6 +5,7 @@ import TALENTS from 'common/TALENTS/hunter';
 import { SpellLink } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
+  BeginCastEvent,
   CastEvent,
   DamageEvent,
   EndChannelEvent,
@@ -77,7 +78,7 @@ class Boomstick extends Analyzer.withDependencies({ haste: Haste }) {
 
     const tipped = this.selectedCombatant.hasBuff(SPELLS.TIP_OF_THE_SPEAR_CAST.id, cast.timestamp);
     const tickResults = this.analyzeTicksForCast(cast);
-    const nextAbility = GetRelatedEvent(event, BOOMSTICK_NEXT_CAST);
+    const nextAbility = GetRelatedEvent<CastEvent | BeginCastEvent>(event, BOOMSTICK_NEXT_CAST);
 
     // Aggregate stats
     const ticksHit = tickResults.filter((t) => t.hit).length;
@@ -169,7 +170,7 @@ class Boomstick extends Analyzer.withDependencies({ haste: Haste }) {
     ticksHit: number,
     wasClipped: boolean,
     missedTicks: number[],
-    nextAbility: ReturnType<typeof GetRelatedEvent>,
+    nextAbility: CastEvent | BeginCastEvent | undefined,
   ): { value: QualitativePerformance; header: JSX.Element; clippingInfo: JSX.Element | null } {
     let value: QualitativePerformance;
     let header: JSX.Element;
@@ -286,6 +287,7 @@ class Boomstick extends Analyzer.withDependencies({ haste: Haste }) {
         <BoringSpellValueText spell={TALENTS.BOOMSTICK_TALENT}>
           <>
             <ItemDamageDone amount={this.totalDamage} />
+            <br />
             {this.totalHits} <small>targets hit</small>
             <br />
             {(this.totalTicks > 0 ? this.totalHits / this.totalTicks : 0).toFixed(1)}{' '}
