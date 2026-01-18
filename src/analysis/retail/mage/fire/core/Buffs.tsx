@@ -35,22 +35,11 @@ class Buffs extends CoreAuras {
         timelineHighlight: true,
       },
       {
-        spellId: TALENTS.BLAZING_BARRIER_TALENT.id,
-        triggeredBySpellId: TALENTS.BLAZING_BARRIER_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.BLAZING_BARRIER_TALENT),
-        timelineHighlight: true,
-      },
-      {
         spellId: TALENTS.ICE_BLOCK_TALENT.id,
         triggeredBySpellId: TALENTS.ICE_BLOCK_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.BLAZING_BARRIER_TALENT),
         timelineHighlight: true,
       },
-      // {
-      //   spellId: SPELLS.IMPROVED_SCORCH_BUFF.id,
-      //   enabled: combatant.hasTalent(TALENTS.IMPROVED_SCORCH_TALENT),
-      //   timelineHighlight: true,
-      // },
       {
         spellId: Object.keys(BLOODLUST_BUFFS).map((item) => Number(item)),
         timelineHighlight: true,
