@@ -22,13 +22,14 @@ class FeelTheBurnGuide extends Analyzer {
   get guideSubsection(): JSX.Element {
     const feelTheBurn = <SpellLink spell={TALENTS.FEEL_THE_BURN_TALENT} />;
     const ignite = <SpellLink spell={SPELLS.IGNITE} />;
-    const fireBlast = <SpellLink spell={SPELLS.FIRE_BLAST} />;
+    const combustion = <SpellLink spell={TALENTS.COMBUSTION_TALENT} />;
+    const fireblast = <SpellLink spell={SPELLS.FIRE_BLAST} />;
 
     const explanation = (
       <>
         <b>{feelTheBurn}</b> grants a high amount of mastery which increases your ticking {ignite}{' '}
-        damage. Keeping this buff at max stacks is not difficult as it can be extended via{' '}
-        {fireBlast}.
+        damage. You should use {fireblast} to keep this buff at max stacks as long as possible, and
+        for as much of {combustion} as possible, to maximize your {ignite} damage.
       </>
     );
 
