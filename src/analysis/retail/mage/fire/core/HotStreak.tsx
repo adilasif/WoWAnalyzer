@@ -15,6 +15,7 @@ import Events, {
   ApplyBuffEvent,
   RemoveBuffEvent,
   GetRelatedEvent,
+  EventType,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import { encodeTargetString } from 'parser/shared/modules/Enemies';
@@ -48,10 +49,10 @@ export default class HotStreak extends Analyzer {
   }
 
   onHotStreakApply(event: RemoveBuffEvent) {
-    const buffApply: ApplyBuffEvent | undefined = GetRelatedEvent(event, 'BuffApply');
-    const spender: CastEvent | undefined = GetRelatedEvent(event, 'SpellCast');
-    const damage: DamageEvent | undefined = GetRelatedEvent(event, 'SpellDamage');
-    const precast: CastEvent | undefined = GetRelatedEvent(event, 'PreCast');
+    const buffApply: ApplyBuffEvent | undefined = GetRelatedEvent(event, EventType.ApplyBuff);
+    const spender: CastEvent | undefined = GetRelatedEvent(event, 'consume');
+    const damage: DamageEvent | undefined = GetRelatedEvent(event, EventType.Damage);
+    const precast: CastEvent | undefined = GetRelatedEvent(event, 'precast');
     const targetHealth = damage && this.sharedCode.getTargetHealth(damage);
 
     let buff;
