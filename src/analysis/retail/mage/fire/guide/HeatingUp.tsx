@@ -20,12 +20,6 @@ class HeatingUpGuide extends Analyzer {
 
   hasFlameOn: boolean = this.selectedCombatant.hasTalent(TALENTS.FLAME_ON_TALENT);
 
-  /**
-   * Evaluates a single Heating Up proc generation for CastSummary.
-   * Returns performance and reason for tooltip display.
-   *
-   * Evaluation priority: good → fail
-   */
   private evaluateHeatingUpCrit(hu: any): CastEvaluation {
     const fireBlastCapped =
       hu.cast.ability.guid === SPELLS.FIRE_BLAST.id &&
@@ -88,8 +82,8 @@ class HeatingUpGuide extends Analyzer {
 
     const explanation = (
       <>
-        <b>{heatingUp}</b> is essential for managing your {hotStreak} procs. Properly managing{' '}
-        {heatingUp} maximizes your {hotStreak} generation throughout the fight.
+        roperly managing <b>{heatingUp}</b> maximizes your {hotStreak} generation throughout the
+        fight.
         <ul>
           <li>
             Use guaranteed crit abilities like {fireBlast} to convert {heatingUp} to {hotStreak}.
