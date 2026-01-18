@@ -135,8 +135,7 @@ const EVENT_LINKS: EventLink[] = [
     forwardBufferMs: CAST_BUFFER_MS,
     anyTarget: true,
     isActive(c) {
-      // should be spiritfont_3 but it doesn't work
-      return c.hasTalent(TALENTS_MONK.SPIRITFONT_1_MISTWEAVER_TALENT);
+      return c.hasTalent(TALENTS_MONK.SPIRITFONT_3_MISTWEAVER_TALENT);
     },
   },
 ];

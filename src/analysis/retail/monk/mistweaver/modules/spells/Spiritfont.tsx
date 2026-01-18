@@ -53,13 +53,12 @@ class Spiritfont extends Analyzer {
 
     this.activeRSKTalent = getCurrentRSKTalentDamage(this.selectedCombatant);
 
-    // this doesn't work for some reason
-    // if (this.selectedCombatant.hasTalent(talents.SPIRITFONT_2_MISTWEAVER_TALENT)) {
-    //   this.envRskIncrease = this.selectedCombatant.getTalentRank(talents.SPIRITFONT_2_MISTWEAVER_TALENT) === 1
-    //     ? SPIRITFONT_R1_ENV_RSK_INCREASE
-    //     : SPIRITFONT_R2_ENV_RSK_INCREASE;
-    // }
-    this.envRskIncrease = SPIRITFONT_R2_ENV_RSK_INCREASE;
+    if (this.selectedCombatant.hasTalent(talents.SPIRITFONT_2_MISTWEAVER_TALENT)) {
+      this.envRskIncrease =
+        this.selectedCombatant.getTalentRank(talents.SPIRITFONT_2_MISTWEAVER_TALENT) === 1
+          ? SPIRITFONT_R1_ENV_RSK_INCREASE
+          : SPIRITFONT_R2_ENV_RSK_INCREASE;
+    }
 
     this.addEventListener(
       Events.heal.by(SELECTED_PLAYER).spell(talents.ENVELOPING_MIST_TALENT),
