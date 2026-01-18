@@ -41,7 +41,7 @@ const CooldownGraphSubsection = () => {
     const talentCasts = castEfficiency.getCastEfficiencyForSpell(cooldown.talent)?.casts ?? 0;
     let spellCasts = 0;
     if (cooldown.spell) {
-      castEfficiency.getCastEfficiencyForSpell(cooldown.spell)?.casts ?? 0;
+      spellCasts = castEfficiency.getCastEfficiencyForSpell(cooldown.spell)?.casts ?? 0;
     }
     return Math.max(talentCasts, spellCasts) >= 10;
   });

@@ -4,15 +4,11 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, {
   ApplyBuffEvent,
   ApplyBuffStackEvent,
-  ApplyDebuffEvent,
-  ApplyDebuffStackEvent,
   CastEvent,
   EventType,
   RefreshBuffEvent,
   RemoveBuffEvent,
   RemoveBuffStackEvent,
-  RemoveDebuffEvent,
-  RemoveDebuffStackEvent,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import { currentStacks } from 'parser/shared/modules/helpers/Stacks';
