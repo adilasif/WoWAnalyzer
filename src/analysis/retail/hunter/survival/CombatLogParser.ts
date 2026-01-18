@@ -25,7 +25,6 @@ import RaptorStrike from './modules/talents/RaptorStrike';
 import SurvivalFocusUsage from './modules/resources/SurvivalFocusUsage';
 import TipOfTheSpearNormalizer from './normalizers/TipOfTheSpear';
 import WildfireBomb from './modules/talents/WildfireBomb';
-import Lunge from './modules/talents/Lunge';
 import FocusGraph from './modules/guide/sections/resources/FocusGraph';
 import Guide from './modules/guide/Guide';
 import SurvivalOfTheFittest from '../shared/talents/SurvivalOfTheFittest';
@@ -73,7 +72,6 @@ class CombatLogParser extends CoreCombatLogParser {
     killCommand: KillCommand,
     raptorStrike: RaptorStrike,
     wildfireBomb: WildfireBomb,
-    lunge: Lunge,
     boomstick: Boomstick,
 
     //Shared Talents
