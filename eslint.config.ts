@@ -71,10 +71,7 @@ const ignores = tseslint.config({
     'src/analysis/retail/warlock/demonology/**',
     'src/analysis/retail/warlock/destruction/**',
     'src/analysis/retail/warlock/shared/**',
-    'src/analysis/retail/warrior/arms/**',
-    'src/analysis/retail/warrior/fury/**',
     'src/analysis/retail/warrior/protection/**',
-    'src/analysis/retail/warrior/shared/**',
   ],
 });
 
