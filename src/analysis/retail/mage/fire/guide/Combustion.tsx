@@ -7,7 +7,7 @@ import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import Analyzer from 'parser/core/Analyzer';
 import CastSummary, { type CastEvaluation } from 'interface/guide/components/CastSummary';
 import GuideSection from 'interface/guide/components/GuideSection';
-import { GetRelatedEvent } from 'parser/core/Events';
+import { EventType, GetRelatedEvent } from 'parser/core/Events';
 
 import CombustionCasts from '../core/Combustion';
 
@@ -30,7 +30,7 @@ class CombustionGuide extends Analyzer {
       if (sc.ability.guid !== SPELLS.FIREBALL.id) {
         return false;
       }
-      const beginCast = GetRelatedEvent(sc, 'CastBegin');
+      const beginCast = GetRelatedEvent(sc, EventType.BeginCast);
       if (this.selectedCombatant.hasBuff(TALENTS.COMBUSTION_TALENT.id, beginCast?.timestamp)) {
         return true;
       }

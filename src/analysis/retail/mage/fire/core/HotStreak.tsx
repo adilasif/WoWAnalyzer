@@ -91,7 +91,7 @@ export default class HotStreak extends Analyzer {
     if (!this.selectedCombatant.hasBuff(SPELLS.HOT_STREAK.id) || event.hitType !== HIT_TYPES.CRIT) {
       return;
     }
-    const cast: CastEvent | undefined = GetRelatedEvent(event, 'SpellCast');
+    const cast: CastEvent | undefined = GetRelatedEvent(event, EventType.Cast);
     const hadPyromaniac =
       this.selectedCombatant.hasBuff(TALENTS.PYROMANIAC_TALENT.id) ||
       this.selectedCombatant.hasBuff(TALENTS.PYROMANIAC_TALENT.id, event.timestamp - 250);

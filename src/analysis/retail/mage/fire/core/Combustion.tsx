@@ -10,6 +10,7 @@ import Events, {
   GetRelatedEvent,
   HasRelatedEvent,
   FightEndEvent,
+  EventType,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
@@ -58,12 +59,12 @@ export default class CombustionCasts extends Analyzer {
       this.spellUsable.endCooldown(TALENTS.FIRE_BLAST_TALENT.id);
     }
 
-    const precast: CastEvent | undefined = GetRelatedEvent(event, 'PreCast');
-    const removeBuff: RemoveBuffEvent | undefined = GetRelatedEvent(event, 'BuffRemove');
+    const precast: CastEvent | undefined = GetRelatedEvent(event, 'precast');
+    const removeBuff: RemoveBuffEvent | undefined = GetRelatedEvent(event, EventType.RemoveBuff);
 
     let castDelay = 0;
     if (precast && HasRelatedEvent(precast, 'SpellCast')) {
-      const beginCast: BeginCastEvent | undefined = GetRelatedEvent(precast, 'CastBegin');
+      const beginCast: BeginCastEvent | undefined = GetRelatedEvent(precast, EventType.BeginCast);
       castDelay =
         beginCast && precast.timestamp > event.timestamp && beginCast.timestamp < event.timestamp
           ? precast.timestamp - event.timestamp
@@ -81,7 +82,7 @@ export default class CombustionCasts extends Analyzer {
   }
 
   onCombustEnd(event: RemoveBuffEvent) {
-    const cast: CastEvent | undefined = GetRelatedEvent(event, 'SpellCast');
+    const cast: CastEvent | undefined = GetRelatedEvent(event, EventType.Cast);
     const index = this.combustCasts.findIndex((c) => c.cast.timestamp === cast?.timestamp);
     if (cast && index >= 0) {
       this.combustCasts[index].activeTime = this.alwaysBeCasting.getActiveTimeMillisecondsInWindow(
