@@ -31,6 +31,9 @@ import SurvivalOfTheFittest from '../shared/talents/SurvivalOfTheFittest';
 import ExhilarationTiming from '../shared/guide/defensives/Exhiliration';
 import Boomstick from './modules/talents/Boomstick';
 import BoomstickNormalizer from './normalizers/BoomstickNormalizer';
+import WildfireShells from './modules/talents/WildfireShells';
+import LethalCalibration from './modules/talents/LethalCalibration';
+import WildfireBombNormalizer from './normalizers/WildfireBombNormalizer';
 // import EventLinkNormalizer from '../shared/normalizers/HunterEventLinkNormalizers'; // This has a pack leader normalizer in it useful to Survival so not deleting yet.
 
 class CombatLogParser extends CoreCombatLogParser {
@@ -52,6 +55,8 @@ class CombatLogParser extends CoreCombatLogParser {
     focusCapTracker: FocusCapTracker,
     focus: Focus,
     survivalFocusUsage: SurvivalFocusUsage,
+    wildfireShells: WildfireShells,
+    lethalCalibration: LethalCalibration,
 
     //Guide
     focusGraph: FocusGraph,
@@ -62,6 +67,7 @@ class CombatLogParser extends CoreCombatLogParser {
     channeling: Channeling,
     tipOfTheSpearNormalizer: TipOfTheSpearNormalizer,
     boomstickNormalizer: BoomstickNormalizer,
+    wildfireBombNormalizer: WildfireBombNormalizer,
     // EventLinkNormalizers: EventLinkNormalizer,
 
     //DeathTracker

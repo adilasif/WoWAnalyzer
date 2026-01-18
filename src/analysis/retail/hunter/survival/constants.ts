@@ -36,6 +36,20 @@ export const BLOODSEEKER_ATTACK_SPEED_GAIN = 0.1;
 export const EXPLOSIVES_EXPERT_CDR = [0, 1, 2];
 //endregion
 
+/** Wildfire Shells */
+// CDR per Boomstick tick that hits at least one target
+export const WILDFIRE_SHELLS_CDR_PER_TICK = 2000;
+// Internal cooldown on the CDR
+export const WILDFIRE_SHELLS_TICK_COOLDOWN = 100;
+//endregion
+
+/** Lethal Calibration */
+// CDR per Wildfire Bomb impact hit (initial explosion damage)
+export const LETHAL_CALIBRATION_CDR_PER_HIT = 2000;
+// Maximum targets that can grant CDR per Wildfire Bomb cast
+export const LETHAL_CALIBRATION_MAX_TARGETS = 5;
+//endregion
+
 //region Resources
 export const LIST_OF_FOCUS_SPENDERS_SV = [
   TALENTS.WILDFIRE_BOMB_TALENT,
