@@ -4,6 +4,13 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { ApplyBuffEvent, RemoveBuffEvent } from 'parser/core/Events';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import { BREATH_OF_EONS_SPELLS } from '../../constants';
+import {
+  MAX_SKIP_CDR_BASE,
+  MAX_SKIP_CDR_TB,
+  MAX_SKIP_CDR_TT,
+  MAX_SKIP_CDR_TT_TB,
+} from '../../constants';
+import { TEMORAL_BURST_CDR_MODIFIER_PER_STACK } from 'analysis/retail/evoker/shared/constants';
 
 /**
  * Time Skip is a channeled spell that makes cooldowns recover 1000% faster
@@ -63,11 +70,11 @@ class TimeSkip extends Analyzer {
 
   MAX_CDR = this.selectedCombatant.hasTalent(TALENTS.TEMPORAL_BURST_TALENT)
     ? this.selectedCombatant.hasTalent(TALENTS.TOMORROW_TODAY_TALENT)
-      ? 38550
-      : 25700
+      ? MAX_SKIP_CDR_TT_TB
+      : MAX_SKIP_CDR_TB
     : this.selectedCombatant.hasTalent(TALENTS.TOMORROW_TODAY_TALENT)
-      ? 30000
-      : 20000;
+      ? MAX_SKIP_CDR_TT
+      : MAX_SKIP_CDR_BASE;
 
   constructor(options: Options) {
     super(options);
@@ -109,7 +116,9 @@ class TimeSkip extends Analyzer {
     // Use the average Temporal Burst stacks to calculate CDR multiplier
     if (this.temporalBurstApplyStacks > 0 && this.temporalBurstRemoveStacks > 0) {
       temporalBurstMultiplier +=
-        (this.temporalBurstApplyStacks + this.temporalBurstRemoveStacks) * 0.5 * 0.01;
+        (this.temporalBurstApplyStacks + this.temporalBurstRemoveStacks) *
+        0.5 *
+        TEMORAL_BURST_CDR_MODIFIER_PER_STACK;
     }
     let CDRAmount =
       (this.timeSkipRemoveTimestamp - this.timeSkipApplyTimestamp) *

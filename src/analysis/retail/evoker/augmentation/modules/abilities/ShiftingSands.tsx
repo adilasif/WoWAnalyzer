@@ -85,10 +85,7 @@ class ShiftingSands extends Analyzer {
       ebonMightOn: target.hasBuff(SPELLS.EBON_MIGHT_BUFF_EXTERNAL.id) ?? false,
       prescienceOn: target.hasBuff(SPELLS.PRESCIENCE_BUFF.id) ?? false,
       combatant: target,
-      recentSkip:
-        event.timestamp - this.timeSkipTimestamp < 10000 && this.timeSkipTimestamp > 0
-          ? true
-          : false,
+      recentSkip: event.timestamp - this.timeSkipTimestamp < 10000 && this.timeSkipTimestamp > 0,
     };
 
     this.shiftingSandsApplications.push(shiftingSandsApplication);
