@@ -470,7 +470,7 @@ const spells = {
   },
   BREATH_OF_EONS_DAMAGE: {
     id: 409632,
-    name: 'Temporal Wound',
+    name: 'Breath of Eons',
     icon: 'ability_evoker_breathofeons',
   },
   BREATH_OF_EONS_SCALECOMMANDER: {
