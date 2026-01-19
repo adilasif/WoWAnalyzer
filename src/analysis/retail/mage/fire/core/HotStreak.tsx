@@ -15,6 +15,7 @@ import Events, {
   ApplyBuffEvent,
   RemoveBuffEvent,
   GetRelatedEvent,
+  EventType,
 } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import { encodeTargetString } from 'parser/shared/modules/Enemies';
@@ -29,7 +30,7 @@ export default class HotStreak extends Analyzer {
   protected spellUsable!: SpellUsable;
 
   hasFirestarter: boolean = this.selectedCombatant.hasTalent(TALENTS.FIRESTARTER_TALENT);
-  hasSearingTouch: boolean = this.selectedCombatant.hasTalent(TALENTS.SCORCH_TALENT);
+  hasScorch: boolean = this.selectedCombatant.hasTalent(TALENTS.SCORCH_TALENT);
   hasPyromaniac: boolean = this.selectedCombatant.hasTalent(TALENTS.PYROMANIAC_TALENT);
 
   hotStreaks: HotStreakProc[] = [];
@@ -48,15 +49,16 @@ export default class HotStreak extends Analyzer {
   }
 
   onHotStreakApply(event: RemoveBuffEvent) {
-    const buffApply: ApplyBuffEvent | undefined = GetRelatedEvent(event, 'BuffApply');
-    const spender: CastEvent | undefined = GetRelatedEvent(event, 'SpellCast');
-    const damage: DamageEvent | undefined = GetRelatedEvent(event, 'SpellDamage');
-    const precast: CastEvent | undefined = GetRelatedEvent(event, 'PreCast');
+    const buffApply: ApplyBuffEvent | undefined = GetRelatedEvent(event, EventType.ApplyBuff);
+    const spender: CastEvent | undefined = GetRelatedEvent(event, 'consume');
+    const damage: DamageEvent | undefined = GetRelatedEvent(event, EventType.Damage);
+    const precast: CastEvent | undefined = GetRelatedEvent(event, 'precast');
+    const targetHealth = damage && this.sharedCode.getTargetHealth(damage);
 
     let buff;
-    if (this.hasSearingTouch && damage && this.sharedCode.getTargetHealth(damage)) {
+    if (this.hasScorch && targetHealth && targetHealth < 0.3) {
       buff = { active: true, buffId: TALENTS.SCORCH_TALENT.id };
-    } else if (this.hasFirestarter && damage && this.sharedCode.getTargetHealth(damage)) {
+    } else if (this.hasFirestarter && targetHealth && targetHealth > 0.9) {
       buff = { active: true, buffId: TALENTS.FIRESTARTER_TALENT.id };
     } else if (
       this.selectedCombatant.hasBuff(TALENTS.COMBUSTION_TALENT.id) ||
@@ -89,7 +91,7 @@ export default class HotStreak extends Analyzer {
     if (!this.selectedCombatant.hasBuff(SPELLS.HOT_STREAK.id) || event.hitType !== HIT_TYPES.CRIT) {
       return;
     }
-    const cast: CastEvent | undefined = GetRelatedEvent(event, 'SpellCast');
+    const cast: CastEvent | undefined = GetRelatedEvent(event, EventType.Cast);
     const hadPyromaniac =
       this.selectedCombatant.hasBuff(TALENTS.PYROMANIAC_TALENT.id) ||
       this.selectedCombatant.hasBuff(TALENTS.PYROMANIAC_TALENT.id, event.timestamp - 250);

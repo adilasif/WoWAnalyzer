@@ -3,8 +3,6 @@ import TALENTS from 'common/TALENTS/evoker';
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
 import { Options } from 'parser/core/Module';
 import {
-  ApplyBuffEvent,
-  ApplyBuffStackEvent,
   ApplyDebuffEvent,
   CastEvent,
   DamageEvent,
@@ -15,9 +13,20 @@ import {
   HasRelatedEvent,
   RefreshDebuffEvent,
   RemoveBuffEvent,
+  RemoveBuffStackEvent,
 } from 'parser/core/Events';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
-import { TIERS } from 'game/TIERS';
+import {
+  GetMaxDisintegrateTargetCount,
+  IRIDESCENCE_BLUE_CAST_SPELLS,
+  IRIDESCENCE_RED_CAST_SPELLS,
+} from '../../constants';
+import {
+  LEAPING_FLAMES_HITS,
+  LIVING_FLAME_CAST_HIT,
+} from 'analysis/retail/evoker/shared/modules/normalizers/LeapingFlamesNormalizer';
+import { CHAINED_CAST, CHAINED_FROM_CAST } from './DisintegrateChainCastLinks';
+import { ETERNITY_SURGE_FROM_CAST } from './EternitySurgeNormalizer';
 
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
@@ -27,25 +36,23 @@ export const DISINTEGRATE_REMOVE_APPLY = 'DisintegrateRemoveApply';
 export const PYRE_CAST = 'PyreCast';
 export const PYRE_DRAGONRAGE = 'PyreDragonrage';
 export const PYRE_VOLATILITY = 'PyreVolatility';
-export const DISINTEGRATE_CAST_DEBUFF_LINK = 'DisintegrateCastDebuffLink';
-export const DISINTEGRATE_DEBUFF_TICK_LINK = 'DisintegrateDebuffTickLink';
-export const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
-export const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
-export const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
-export const JACKPOT_CONSUME = 'JackpotConsume';
-export const JACKPOT_APPLY_REMOVE_LINK = 'JackpotApplyRemoveLink';
+const DISINTEGRATE_DEBUFF = 'DisintegrateDebuff';
+const DISINTEGRATE_TICK = 'DisintegrateTick';
+const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
+const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
+const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
 export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
 export const ENGULF_DAMAGE = 'EngulfDamage';
 export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
+
+const CAST_LINK = 'CastLink';
+const DAMAGE_LINK = 'DamageLink';
 
 export const PYRE_MIN_TRAVEL_TIME = 950;
 export const PYRE_MAX_TRAVEL_TIME = 1_050;
 const CAST_BUFFER_MS = 100;
 const IRIDESCENCE_RED_BACKWARDS_BUFFER_MS = 500;
 const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
-const JACK_APPLY_REMOVE_BUFFER = 30_000; // Realistically it will never be this long, but we hate edgecases
-const ENGULF_TRAVEL_TIME_MS = 500;
-const JACKPOT_CONSUME_FORWARD_BUFFER_MS = 300;
 
 const EVENT_LINKS: EventLink[] = [
   {
@@ -66,9 +73,9 @@ const EVENT_LINKS: EventLink[] = [
   {
     linkRelation: IRIDESCENCE_RED_CONSUME,
     reverseLinkRelation: IRIDESCENCE_RED_CONSUME,
-    linkingEventId: [SPELLS.IRIDESCENCE_RED.id],
+    linkingEventId: SPELLS.IRIDESCENCE_RED.id,
     linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    referencedEventId: [SPELLS.PYRE.id, SPELLS.PYRE_DENSE_TALENT.id, SPELLS.LIVING_FLAME_CAST.id],
+    referencedEventId: IRIDESCENCE_RED_CAST_SPELLS.map((spell) => spell.id),
     referencedEventType: EventType.Cast,
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
@@ -81,18 +88,14 @@ const EVENT_LINKS: EventLink[] = [
   {
     linkRelation: IRIDESCENCE_BLUE_CONSUME,
     reverseLinkRelation: IRIDESCENCE_BLUE_CONSUME,
-    linkingEventId: [SPELLS.IRIDESCENCE_BLUE.id],
+    linkingEventId: SPELLS.IRIDESCENCE_BLUE.id,
     linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    referencedEventId: [
-      SPELLS.DISINTEGRATE.id,
-      SPELLS.UNRAVEL.id,
-      SPELLS.AZURE_STRIKE.id,
-      SPELLS.SHATTERING_STAR.id,
-    ],
+    referencedEventId: IRIDESCENCE_BLUE_CAST_SPELLS.map((spell) => spell.id),
     referencedEventType: EventType.Cast,
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CAST_BUFFER_MS,
+    maximumLinks: 1,
     isActive(c) {
       return c.hasTalent(TALENTS.IRIDESCENCE_TALENT);
     },
@@ -103,6 +106,9 @@ const EVENT_LINKS: EventLink[] = [
    * doing this over a normalizer for simplicity sake.
    * issue seen here: @ 06:36.392
    * https://www.warcraftlogs.com/reports/6RgwY1MV3CcJv792/#fight=25&type=damage-done&pins=0%24Separate%24%23244F4B%24casts%240%240.0.0.Any%24175324455.0.0.Evoker%24true%240.0.0.Any%24false%24356995%5E0%24Separate%24%23909049%24auras-gained%241%240.0.0.Any%24175324455.0.0.Evoker%24true%240.0.0.Any%24false%24356995&view=events&source=20&start=6166628&end=6169628
+   *
+   * This also works as a "is this from a chain" check, used for the Disintegrate module
+   * FIXME: This should be removed once a better way to link chained cast events together is implemented
    */
   {
     linkRelation: DISINTEGRATE_REMOVE_APPLY,
@@ -163,24 +169,13 @@ const EVENT_LINKS: EventLink[] = [
     },
   },
   {
-    linkRelation: DISINTEGRATE_CAST_DEBUFF_LINK,
-    reverseLinkRelation: DISINTEGRATE_CAST_DEBUFF_LINK,
+    linkRelation: DISINTEGRATE_DEBUFF,
+    reverseLinkRelation: DISINTEGRATE_DEBUFF,
     linkingEventId: SPELLS.DISINTEGRATE.id,
     linkingEventType: EventType.Cast,
     referencedEventId: SPELLS.DISINTEGRATE.id,
     referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
-    anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
-    maximumLinks: (C) => (C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT) ? 3 : 1),
-  },
-  {
-    linkRelation: DISINTEGRATE_DEBUFF_TICK_LINK,
-    reverseLinkRelation: DISINTEGRATE_DEBUFF_TICK_LINK,
-    linkingEventId: SPELLS.DISINTEGRATE.id,
-    linkingEventType: EventType.Damage,
-    referencedEventId: SPELLS.DISINTEGRATE.id,
-    referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
-    backwardBufferMs: DISINTEGRATE_TICK_BUFFER,
     maximumLinks: 1,
   },
   {
@@ -193,7 +188,18 @@ const EVENT_LINKS: EventLink[] = [
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CAST_BUFFER_MS,
-    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    isActive: (c) => c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    maximumLinks: 1,
+  },
+  {
+    linkRelation: DISINTEGRATE_TICK,
+    reverseLinkRelation: DISINTEGRATE_TICK,
+    linkingEventId: SPELLS.DISINTEGRATE.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: SPELLS.DISINTEGRATE.id,
+    referencedEventType: EventType.Cast,
+    anyTarget: false,
+    backwardBufferMs: DISINTEGRATE_TICK_BUFFER,
     maximumLinks: 1,
   },
   {
@@ -204,11 +210,14 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventId: SPELLS.DISINTEGRATE.id,
     referencedEventType: EventType.Cast,
     anyTarget: true,
-    backwardBufferMs: 4_000,
-    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    backwardBufferMs: DISINTEGRATE_TICK_BUFFER,
+    isActive: (c) => c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
     maximumLinks: 1,
     additionalCondition(linkingEvent, referencedEvent) {
-      return encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent);
+      return (
+        !HasRelatedEvent(linkingEvent, DISINTEGRATE_TICK) &&
+        encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent)
+      );
     },
   },
   {
@@ -220,40 +229,11 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
-    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
-    maximumLinks: 10,
+    isActive: (c) => c.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    maximumLinks: (c) => GetMaxDisintegrateTargetCount(c) - 1,
     additionalCondition(linkingEvent, referencedEvent) {
       return encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent);
     },
-  },
-  {
-    linkRelation: JACKPOT_CONSUME,
-    reverseLinkRelation: JACKPOT_CONSUME,
-    linkingEventId: [
-      SPELLS.FIRE_BREATH.id,
-      SPELLS.FIRE_BREATH_FONT.id,
-      SPELLS.ETERNITY_SURGE.id,
-      SPELLS.ETERNITY_SURGE_FONT.id,
-    ],
-    linkingEventType: EventType.EmpowerEnd,
-    referencedEventId: SPELLS.JACKPOT_BUFF.id,
-    referencedEventType: EventType.RemoveBuff,
-    anyTarget: true,
-    backwardBufferMs: CAST_BUFFER_MS,
-    forwardBufferMs: JACKPOT_CONSUME_FORWARD_BUFFER_MS,
-    isActive: (C) => C.has4PieceByTier(TIERS.TWW2),
-    maximumLinks: 1,
-  },
-  {
-    linkRelation: JACKPOT_APPLY_REMOVE_LINK,
-    reverseLinkRelation: JACKPOT_APPLY_REMOVE_LINK,
-    linkingEventId: SPELLS.JACKPOT_BUFF.id,
-    linkingEventType: EventType.RemoveBuff,
-    referencedEventId: SPELLS.JACKPOT_BUFF.id,
-    referencedEventType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
-    maximumLinks: 1,
-    backwardBufferMs: JACK_APPLY_REMOVE_BUFFER,
-    isActive: (C) => C.has4PieceByTier(TIERS.TWW2),
   },
   {
     linkRelation: FIRE_BREATH_DEBUFF,
@@ -264,6 +244,27 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
     forwardBufferMs: CAST_BUFFER_MS,
     anyTarget: true,
+  },
+  {
+    linkRelation: DAMAGE_LINK,
+    reverseLinkRelation: CAST_LINK,
+    linkingEventId: SPELLS.AZURE_STRIKE.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.AZURE_STRIKE.id,
+    referencedEventType: EventType.Damage,
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+  },
+  {
+    linkRelation: DAMAGE_LINK,
+    reverseLinkRelation: CAST_LINK,
+    linkingEventId: SPELLS.AZURE_SWEEP.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.AZURE_SWEEP.id,
+    referencedEventType: EventType.Damage,
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+    isActive: (c) => c.hasTalent(TALENTS.AZURE_SWEEP_TALENT),
   },
   // TODO: Figure out what to do with these when Flameshaper gets worked on
   /* {
@@ -324,11 +325,10 @@ export function isPyreFromCast(event: DamageEvent) {
 }
 
 export function getPyreEvents(event: CastEvent): DamageEvent[] {
-  if (event.ability.guid === TALENTS.PYRE_TALENT.id) {
-    return GetRelatedEvents<DamageEvent>(event, PYRE_CAST);
+  if (event.ability.guid === TALENTS.DRAGONRAGE_TALENT.id) {
+    return GetRelatedEvents<DamageEvent>(event, PYRE_DRAGONRAGE);
   }
-
-  return GetRelatedEvents<DamageEvent>(event, PYRE_DRAGONRAGE);
+  return GetRelatedEvents<DamageEvent>(event, PYRE_CAST);
 }
 
 function pyreHitIsUnique(castEvent: CastEvent, damageEvent: DamageEvent, maxHitsAllowed = 1) {
@@ -348,23 +348,114 @@ function pyreHitIsUnique(castEvent: CastEvent, damageEvent: DamageEvent, maxHits
 
 /** Returns the number of targets that was hit by a Disintegrate cast */
 export function getDisintegrateTargetCount(event: CastEvent) {
-  return GetRelatedEvents(event, DISINTEGRATE_CAST_DEBUFF_LINK).length;
+  return getDisintegrateDebuffEvents(event).length;
+}
+
+/** Returns the number of extra targets that was hit by a Mass Disintegrate cast */
+export function getMassDisintegrateTargetCount(event: CastEvent) {
+  return GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, MASS_DISINTEGRATE_DEBUFF)
+    .length;
 }
 
 /** Returns the apply/refresh debuff events that were caused by a Disintegrate cast */
 export function getDisintegrateDebuffEvents(
   event: CastEvent,
 ): (ApplyDebuffEvent | RefreshDebuffEvent)[] {
-  return GetRelatedEvents(event, DISINTEGRATE_CAST_DEBUFF_LINK);
+  return [
+    ...GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, DISINTEGRATE_DEBUFF),
+    ...GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, MASS_DISINTEGRATE_DEBUFF),
+  ];
 }
 
-/** Returns the damage events linked to the Disintegrate debuff events */
-export function getDisintegrateDamageEvents(event: CastEvent): DamageEvent[] {
-  const debuffEvents = getDisintegrateDebuffEvents(event);
-  const damageEvents = debuffEvents.map((debuffEvent) =>
-    GetRelatedEvents<DamageEvent>(debuffEvent, DISINTEGRATE_DEBUFF_TICK_LINK),
-  );
-  return damageEvents.flat().sort((a, b) => a.timestamp - b.timestamp);
+/**
+ * Returns the damage events associated with a Disintegrate cast.
+ *
+ * When `discriminateChainedTicks` is enabled, the returned events are adjusted to account for Disintegrate chaining:
+ *  - Damage ticks that were carried over *into* this cast are removed
+ *  - Damage ticks that are carried over *from* this cast are added
+ *
+ * This is intended to be used as an easy path for correctly evaluating modifiers that persist
+ * across chained Disintegrate ticks (e.g. Iridescence), but may be expensive
+ * depending on call frequency and usage.
+ *
+ * NOTE: This assumes that the first tick in a chained Disintegrate is the chained tick.
+ *
+ * @param discriminateChainedTicks If true, will remove ticks that were chained into this cast and add ticks that were chained from this cast
+ */
+export function getDisintegrateDamageEvents(
+  event: CastEvent,
+  discriminateChainedTicks = false,
+): DamageEvent[] {
+  const disintegrateTicks = GetRelatedEvents<DamageEvent>(event, DISINTEGRATE_TICK);
+  let massDisintegrateTicks = GetRelatedEvents<DamageEvent>(event, MASS_DISINTEGRATE_TICK);
+
+  if (!discriminateChainedTicks) {
+    return [...disintegrateTicks, ...massDisintegrateTicks];
+  }
+
+  const chainedFromCast = getChainedFromCast(event);
+  if (chainedFromCast) {
+    disintegrateTicks.shift();
+
+    // You can only chain into a Mass Disintegrate from another Mass Disintegrate
+    if (massDisintegrateTicks.length > 0) {
+      const amountOfChainedTicks = Math.min(
+        getMassDisintegrateTargetCount(event),
+        getMassDisintegrateTargetCount(chainedFromCast),
+      );
+
+      if (amountOfChainedTicks > 0) {
+        const seenTargets = new Set<string>();
+
+        massDisintegrateTicks = massDisintegrateTicks.filter((tick) => {
+          if (seenTargets.size >= amountOfChainedTicks) return true;
+
+          const target = encodeEventTargetString(tick);
+          if (seenTargets.has(target)) return true;
+
+          seenTargets.add(target);
+          return false;
+        });
+      }
+    }
+  }
+
+  const chainedCast = getChainedCast(event);
+  if (chainedCast) {
+    const chainedCastTicks = GetRelatedEvents<DamageEvent>(chainedCast, DISINTEGRATE_TICK);
+    if (chainedCastTicks.length > 0) {
+      disintegrateTicks.push(chainedCastTicks[0]);
+    }
+
+    // Chaining into a normal Disintegrate won't carry over Mass ticks
+    // So this case will only be a Mass Disintegrate chained into another Mass Disintegrate
+    const chainedCastMassDisintegrateTicks = GetRelatedEvents<DamageEvent>(
+      chainedCast,
+      MASS_DISINTEGRATE_TICK,
+    );
+    if (chainedCastMassDisintegrateTicks.length > 0) {
+      const amountOfChainedTicks = Math.min(
+        getMassDisintegrateTargetCount(event),
+        getMassDisintegrateTargetCount(chainedCast),
+      );
+
+      if (amountOfChainedTicks > 0) {
+        const seenTargets = new Set<string>();
+
+        for (const tick of chainedCastMassDisintegrateTicks) {
+          const target = encodeEventTargetString(tick);
+          if (seenTargets.has(target)) continue;
+
+          seenTargets.add(target);
+          massDisintegrateTicks.push(tick);
+
+          if (seenTargets.size >= amountOfChainedTicks) break;
+        }
+      }
+    }
+  }
+
+  return [...disintegrateTicks, ...massDisintegrateTicks];
 }
 
 export function isFromMassDisintegrate(event: CastEvent) {
@@ -379,34 +470,67 @@ export function isMassDisintegrateDebuff(event: ApplyDebuffEvent | RefreshDebuff
   return HasRelatedEvent(event, MASS_DISINTEGRATE_DEBUFF);
 }
 
-/** Returns the number of stacks consumed by a Jackpot! remove event or empower end event
- * will return 0 if the event didn't consume Jackpot! */
-export function getConsumedJackpotStacks(event: EmpowerEndEvent | RemoveBuffEvent) {
-  if (event.type === EventType.EmpowerEnd) {
-    const maybeConsumeEvent = GetRelatedEvent<RemoveBuffEvent>(event, JACKPOT_CONSUME);
+export function isChainedCast(event: CastEvent) {
+  return HasRelatedEvent(event, CHAINED_FROM_CAST);
+}
 
-    if (maybeConsumeEvent) {
-      event = maybeConsumeEvent;
-    }
+export function hasChainedCast(event: CastEvent) {
+  return HasRelatedEvent(event, CHAINED_CAST);
+}
+
+export function getChainedCast(event: CastEvent) {
+  return GetRelatedEvent<CastEvent>(event, CHAINED_CAST);
+}
+
+export function getChainedFromCast(event: CastEvent) {
+  return GetRelatedEvent<CastEvent>(event, CHAINED_FROM_CAST);
+}
+
+/** Get ALL related damage events from a cast event
+ *
+ * Still WIP so make sure to check if it works for your specific use case
+ *
+ * The main use case currently for this is Iridescence
+ */
+export function getDamageEventsFromCast(event: CastEvent): DamageEvent[] {
+  switch (event.ability.guid) {
+    case SPELLS.LIVING_FLAME_CAST.id:
+      return [
+        // TODO: DoT
+        ...GetRelatedEvents<DamageEvent>(event, LIVING_FLAME_CAST_HIT),
+        ...GetRelatedEvents<DamageEvent>(event, LEAPING_FLAMES_HITS),
+      ];
+    case SPELLS.PYRE.id:
+    case SPELLS.PYRE_DENSE_TALENT.id:
+    case TALENTS.DRAGONRAGE_TALENT.id:
+      return getPyreEvents(event);
+    case SPELLS.DISINTEGRATE.id:
+      return getDisintegrateDamageEvents(event, true);
   }
 
-  if (event.ability.guid === SPELLS.JACKPOT_BUFF.id && event.type === EventType.RemoveBuff) {
-    const applyEvent = GetRelatedEvent<ApplyBuffEvent | ApplyBuffStackEvent>(
-      event,
-      JACKPOT_APPLY_REMOVE_LINK,
-    );
+  return GetRelatedEvents<DamageEvent>(event, DAMAGE_LINK);
+}
 
-    switch (applyEvent?.type) {
-      case EventType.ApplyBuff:
-        return 1;
-      case EventType.ApplyBuffStack:
-        return applyEvent.stack ?? 2;
-      default:
-        return 0;
-    }
+/** Get the cast event that triggered the damage event
+ *
+ * Still WIP so make sure to check if it works for your specific use case
+ */
+export function getCastEventFromDamage(event: DamageEvent): CastEvent | undefined {
+  return GetRelatedEvent<CastEvent>(event, CAST_LINK);
+}
+
+export function getIridescenceConsumeEvent(
+  event: RemoveBuffEvent | RemoveBuffStackEvent,
+): CastEvent | undefined {
+  if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
+    return GetRelatedEvent<CastEvent>(event, IRIDESCENCE_BLUE_CONSUME);
   }
 
-  return 0;
+  return GetRelatedEvent<CastEvent>(event, IRIDESCENCE_RED_CONSUME);
+}
+
+export function getEternitySurgeDamageEvents(event: EmpowerEndEvent): DamageEvent[] {
+  return GetRelatedEvents<DamageEvent>(event, ETERNITY_SURGE_FROM_CAST);
 }
 
 export default CastLinkNormalizer;

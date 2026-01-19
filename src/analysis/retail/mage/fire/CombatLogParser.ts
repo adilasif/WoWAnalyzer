@@ -25,7 +25,6 @@ import FeveredIncantation from './talents/FeveredIncantation';
 import Hyperthermia from './talents/Hyperthermia';
 import FeelTheBurn from './talents/FeelTheBurn';
 import FromTheAshes from './talents/FromTheAshes';
-import Kindling from './talents/Kindling';
 import MeteorCombustion from './talents/MeteorCombustion';
 import SearingTouch from './talents/SearingTouch';
 import Meteor from './talents/Meteor';
@@ -76,7 +75,6 @@ class CombatLogParser extends CoreCombatLogParser {
     combustion: Combustion,
 
     //Talents - Fire
-    kindling: Kindling,
     meteorCombustion: MeteorCombustion,
     searingTouch: SearingTouch,
     fromTheAshes: FromTheAshes,

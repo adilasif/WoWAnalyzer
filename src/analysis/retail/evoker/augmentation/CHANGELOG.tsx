@@ -6,6 +6,7 @@ import SPELLS from 'common/SPELLS';
 
 export default [  
   change(date(2026, 1, 19), <>Updated for Midnight.</>, KYZ),
+  change(date(2026, 1, 17), <>Update <SpellLink spell={TALENTS.IMMINENT_DESTRUCTION_AUGMENTATION_TALENT}/> module for Midnight.</>, Vollmer),
   change(date(2025, 9, 20), <>Update filter for <SpellLink spell={TALENTS.BREATH_OF_EONS_TALENT}/> to remove a Dimensius mechanic.</>, KYZ),
   change(date(2025, 8, 29), <>Update <SpellLink spell={TALENTS.EBON_MIGHT_TALENT}/> module to be more lenient with pandemic duration.</>, KYZ),
   change(date(2025, 8, 22), "Update example report for 11.2.0", Vollmer),

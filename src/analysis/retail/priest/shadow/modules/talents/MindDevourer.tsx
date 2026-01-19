@@ -106,9 +106,9 @@ class MindDevourer extends Analyzer {
         </b>{' '}
         is gained randomly from <SpellLink spell={SPELLS.MIND_BLAST} /> casts.
         <br />
-        Before the buff expires, cast <SpellLink spell={TALENTS.DEVOURING_PLAGUE_TALENT} />. While
-        you have this active, be careful using <SpellLink spell={SPELLS.MIND_BLAST} />, as it may
-        overwrite it.
+        Before the buff expires, cast <SpellLink spell={TALENTS.SHADOW_WORD_MADNESS_TALENT} />.
+        While you have this active, be careful using <SpellLink spell={SPELLS.MIND_BLAST} />, as it
+        may overwrite it.
       </p>
     );
 

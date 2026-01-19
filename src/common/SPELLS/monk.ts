@@ -288,12 +288,12 @@ const spells = {
     name: 'Expel Harm',
     icon: 'ability_monk_expelharm',
   },
-  AJ_HEAL: {
+  WOTC_HEAL: {
     id: 389325,
     name: 'Awakened Jadefire',
     icon: 'inv_leather_raidmonkt2_d_01_helm',
   },
-  AJ_CRIT_HEAL: {
+  WOTC_CRIT_HEAL: {
     id: 389328,
     name: 'Awakened Jadefire',
     icon: 'inv_leather_raidmonkt2_d_01_helm',
@@ -764,16 +764,31 @@ const spells = {
     ...talents.PRESS_THE_ADVANTAGE_TALENT,
     id: 418360,
   },
-  WEAPONS_OF_ORDER_DEBUFF: {
-    // ...talents.WEAPONS_OF_ORDER_TALENT,
-    id: 387179,
-    name: 'Weapons of Order',
-    icon: '',
-  },
   WWTO_STOMP_DAMAGE: {
     id: 1242373,
     name: 'Stomp',
     icon: 'ability_warstomp.jpg',
+  },
+  VITAL_FLAME_HEAL: {
+    id: 1263408,
+    name: 'Vital Flame',
+    icon: 'achievement_faction_shadopan.jpg',
+  },
+  DRAGONFIRE_BREW_DAMAGE: {
+    id: 387621,
+    name: 'Dragonfire Brew',
+    icon: 'spell_fire_burnout.jpg',
+  },
+  EXPLODING_KEG_DEBUFF_DAMAGE: {
+    id: 388867,
+    name: 'Exploding Keg',
+    icon: 'inv12_ability_monk_explodingkeg.jpg',
+  },
+  // Midnight S1 Tier Set
+  EXTRA_KICK_DAMAGE: {
+    id: 1272464,
+    name: 'Extra Kick',
+    icon: 'inv_flaming_splinter',
   },
 
   // Windwalker Spells
@@ -1019,6 +1034,12 @@ const spells = {
   FLURRY_STRIKES_DAMAGE_2: {
     ...talents.FLURRY_STRIKES_TALENT,
     id: 450617,
+  },
+  // TODO: verify if this is the new damage ability in all cases
+  FLURRY_STRIKES_DAMAGE_MIDNIGHT: {
+    id: 451250,
+    name: 'Flurry Strikes',
+    icon: 'inv-ability-shadopanmonk-flurrystrikes',
   },
 } satisfies Record<string, Spell>;
 

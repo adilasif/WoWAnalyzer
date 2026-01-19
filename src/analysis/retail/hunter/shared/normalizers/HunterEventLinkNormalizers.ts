@@ -9,28 +9,15 @@ export const SV_MB_CLEAVE = 'mb_cleave';
 export const LFTF_TO_STAMPEDE_DAMAGE = 'lftf_to_stampede_damage';
 export const LFTF_TO_STAMPEDE_BUFF_APPLY = 'lftf_to_stampede_buff_apply';
 export const LFTF_TO_STAMPEDE_BUFF_REFRESH = 'lftf_to_stampede_buff_refresh';
-const explosiveBuffer = 5500;
 const stampedeDamageBuffer = 20_000;
 const stampedeBuffer = 12_000;
 const links: EventLink[] = [
-  {
-    linkRelation: EXS_CAST_TO_DAMAGE,
-    linkingEventType: EventType.Cast,
-    linkingEventId: TALENTS.EXPLOSIVE_SHOT_TALENT.id,
-    referencedEventType: EventType.Damage,
-    referencedEventId: SPELLS.EXPLOSIVE_SHOT_DAMAGE.id,
-    anyTarget: true,
-    anySource: false,
-    forwardBufferMs: explosiveBuffer,
-    backwardBufferMs: 150,
-    maximumLinks: 50,
-  },
   {
     linkRelation: SV_MB_CLEAVE,
     linkingEventType: EventType.RemoveBuff,
     linkingEventId: SPELLS.HOGSTRIDER_BUFF.id,
     referencedEventType: EventType.Damage,
-    referencedEventId: TALENTS.MONGOOSE_BITE_TALENT.id,
+    referencedEventId: TALENTS.RAPTOR_STRIKE_TALENT.id,
     anyTarget: true,
     anySource: false,
     forwardBufferMs: 100,
