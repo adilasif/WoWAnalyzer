@@ -9,9 +9,13 @@ $side-rail-width: 320px;
 
   &:empty,
   &.show_background {
-    background-image: url('../../public/img/ad-fallback.jpg');
+    background-image: url('../../public/img/ad-fallback-top.jpg');
     background-origin: content-box;
     background-repeat: no-repeat;
+
+    .ad_label {
+      display: none;
+    }
   }
 
   #leaderboard_atf > *,
@@ -23,7 +27,7 @@ $side-rail-width: 320px;
 }
 
 .top {
-  min-height: 250;
+  min-height: 250px;
   margin-left: auto;
   margin-right: auto;
   width: 970px;
@@ -42,6 +46,12 @@ $side-rail-width: 320px;
   position: sticky;
   align-self: start;
   top: 1rem;
+
+  &:empty,
+  &.show_background {
+    background-image: url('../../public/img/ad-fallback-side.jpg');
+    background-position: center;
+  }
 }
 
 .ad_label {
