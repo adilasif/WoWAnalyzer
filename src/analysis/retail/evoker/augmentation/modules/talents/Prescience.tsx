@@ -95,12 +95,12 @@ class Prescience extends MajorCooldown<PrescienceCooldownCast> {
           .
           <br />
           {this.selectedCombatant.hasTalent(TALENTS.CLAIRVOYANT_TALENT) && (
-            <div>
+            <>
               With <SpellLink spell={TALENTS.CLAIRVOYANT_TALENT} /> talented,{' '}
               <SpellLink spell={TALENTS.MOTES_OF_POSSIBILITY_TALENT} /> have a chance to apply{' '}
               <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> to players who consume them. These
               uses are not included in this cast breakdown.
-            </div>
+            </>
           )}
         </p>
       </>
