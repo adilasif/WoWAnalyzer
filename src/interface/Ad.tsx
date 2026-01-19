@@ -41,6 +41,7 @@ const Ad = ({ style, location }: Props) => {
       return () => activeUnits.delete(location);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     return () => {};
   }, [location]);
 
