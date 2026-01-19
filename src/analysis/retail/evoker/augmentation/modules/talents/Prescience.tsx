@@ -84,38 +84,27 @@ class Prescience extends MajorCooldown<PrescienceCooldownCast> {
   }
 
   description(): ReactNode {
-    if (this.selectedCombatant.hasTalent(TALENTS.CLAIRVOYANT_TALENT)) {
-      return (
-        <>
-          <p>
-            <strong>
-              <SpellLink spell={TALENTS.PRESCIENCE_TALENT} />
-            </strong>{' '}
-            is an ability that enhances the performance of DPS players by granting them Critical
-            Strike chance and the damage multiplier <SpellLink spell={TALENTS.FATE_MIRROR_TALENT} />
-            .
-            <br />
-            With <SpellLink spell={TALENTS.CLAIRVOYANT_TALENT} /> talented,{' '}
-            <SpellLink spell={TALENTS.MOTES_OF_POSSIBILITY_TALENT} /> have a chance to apply{' '}
-            <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> to players who consume them. These uses
-            are not included in this cast breakdown.
-          </p>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <p>
-            <strong>
-              <SpellLink spell={TALENTS.PRESCIENCE_TALENT} />
-            </strong>{' '}
-            is an ability that enhances the performance of DPS players by granting them Critical
-            Strike chance and the damage multiplier <SpellLink spell={TALENTS.FATE_MIRROR_TALENT} />
-            .
-          </p>
-        </>
-      );
-    }
+    return (
+      <>
+        <p>
+          <strong>
+            <SpellLink spell={TALENTS.PRESCIENCE_TALENT} />
+          </strong>{' '}
+          is an ability that enhances the performance of DPS players by granting them Critical
+          Strike chance and the damage multiplier <SpellLink spell={TALENTS.FATE_MIRROR_TALENT} />
+          .
+          <br />
+          {this.selectedCombatant.hasTalent(TALENTS.CLAIRVOYANT_TALENT) && (
+            <div>
+              With <SpellLink spell={TALENTS.CLAIRVOYANT_TALENT} /> talented,{' '}
+              <SpellLink spell={TALENTS.MOTES_OF_POSSIBILITY_TALENT} /> have a chance to apply{' '}
+              <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> to players who consume them. These
+              uses are not included in this cast breakdown.
+            </div>
+          )}
+        </p>
+      </>
+    );
   }
 
   explainPerformance(cast: PrescienceCooldownCast): SpellUse {
