@@ -274,6 +274,17 @@ export const buildThaneApl = (
       ),
     },
 
+    // Exe conditions
+    {
+      spell: executeSpell,
+      condition: cnd.and(executeUsable, cnd.hasTalent(TALENTS.DEEP_WOUNDS_TALENT)),
+      description: (
+        <>
+          Cast <SpellLink spell={executeSpell} /> if specced into its respective talents.
+        </>
+      ),
+    },
+
     // BT below rage threshold
     {
       spell: SPELLS.BLOODTHIRST,
@@ -282,21 +293,6 @@ export const buildThaneApl = (
       description: (
         <>
           Cast <SpellLink spell={SPELLS.BLOODTHIRST} />.
-        </>
-      ),
-    },
-
-    // Exe conditions
-    {
-      spell: executeSpell,
-      condition: cnd.and(
-        executeUsable,
-        cnd.hasTalent(TALENTS.EXECUTIONERS_WRATH_TALENT),
-        cnd.hasTalent(TALENTS.DEEP_WOUNDS_TALENT),
-      ),
-      description: (
-        <>
-          Cast <SpellLink spell={executeSpell} /> if specced into its respective talents.
         </>
       ),
     },
