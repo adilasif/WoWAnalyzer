@@ -18,7 +18,7 @@ interface Props {
 
 const units = {
   [Location.Top]: { selectorId: 'top-banner-atf', type: 'leaderboard_atf' },
-  [Location.SideRail]: { selectorId: 'vertical-banner-atf', type: 'sky_atf' },
+  [Location.SideRail]: { selectorId: 'vertical-banner-atf', type: 'med_rect_atf' },
 };
 
 interface Unit {
