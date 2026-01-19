@@ -753,6 +753,7 @@ const spells = {
     id: 431698,
     name: 'Temporal Burst',
     icon: 'ability_evoker_essenceburst5',
+  },
   AZURE_SWEEP: {
     id: 1265872,
     name: 'Azure Sweep',
