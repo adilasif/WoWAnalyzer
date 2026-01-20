@@ -124,11 +124,24 @@ function keyByName(spells: gamedata.RetailSpell[]): Record<string, gamedata.Reta
         remainder.push(spell);
       }
 
+      // finally, deconflict by index if necessary
       if (remainder.length === 1) {
         output[baseSpellName(remainder[0])] = remainder[0];
       } else {
-        for (let i = 0; i < remainder.length; i++) {
-          output[`${name}_${i + 1}`] = remainder[i];
+        let indexDeconflict = remainder;
+
+        // if there is exactly one baseline spell + one or more temporary spells, give the baseline an un-suffixed name and the others indexed names
+        const baseline = remainder.find((spell) => spell.type === 'baseline');
+        if (
+          baseline &&
+          remainder.every((spell) => spell.type === 'temporary' || spell.id === baseline?.id)
+        ) {
+          output[baseSpellName(baseline)] = baseline;
+          indexDeconflict = remainder.filter((spell) => spell.id !== baseline.id);
+        }
+
+        for (let i = 0; i < indexDeconflict.length; i++) {
+          output[`${name}_${i + 1}`] = indexDeconflict[i];
         }
       }
     }

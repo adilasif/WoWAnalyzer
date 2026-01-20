@@ -207,25 +207,7 @@ const SPELLS = {
     },
     icon: 'ability_demonhunter_spectralsight.jpg',
   },
-  SPECTRAL_SIGHT_1: {
-    id: 202688,
-    grantedBy: 1251417,
-    type: 'temporary',
-    iconID: 1247266,
-    passive: false,
-    name: 'Spectral Sight',
-    icon: 'ability_demonhunter_spectralsight.jpg',
-  },
-  SPECTRAL_SIGHT_2: {
-    id: 215725,
-    grantedBy: 1251417,
-    type: 'temporary',
-    iconID: 1247266,
-    passive: false,
-    name: 'Spectral Sight',
-    icon: 'ability_demonhunter_spectralsight.jpg',
-  },
-  SPECTRAL_SIGHT_3: {
+  SPECTRAL_SIGHT: {
     id: 1251417,
     type: 'baseline',
     overrides: 188501,
@@ -249,7 +231,25 @@ const SPELLS = {
     },
     icon: 'ability_demonhunter_spectralsight.jpg',
   },
-  SPECTRAL_SIGHT_4: {
+  SPECTRAL_SIGHT_1: {
+    id: 202688,
+    grantedBy: 1251417,
+    type: 'temporary',
+    iconID: 1247266,
+    passive: false,
+    name: 'Spectral Sight',
+    icon: 'ability_demonhunter_spectralsight.jpg',
+  },
+  SPECTRAL_SIGHT_2: {
+    id: 215725,
+    grantedBy: 1251417,
+    type: 'temporary',
+    iconID: 1247266,
+    passive: false,
+    name: 'Spectral Sight',
+    icon: 'ability_demonhunter_spectralsight.jpg',
+  },
+  SPECTRAL_SIGHT_3: {
     id: 1251707,
     grantedBy: 1251417,
     type: 'temporary',

@@ -21,6 +21,16 @@ const SPELLS = {
     },
     icon: 'spell_shadow_evileye.jpg',
   },
+  CORRUPTION_CORRUPTION: {
+    id: 146739,
+    grantedBy: 172,
+    type: 'temporary',
+    iconID: 136118,
+    passive: false,
+    hidden: 'always',
+    name: 'Corruption',
+    icon: 'spell_shadow_abominationexplosion.jpg',
+  },
   CORRUPTION_1: {
     id: 172,
     type: 'baseline',
@@ -72,6 +82,32 @@ const SPELLS = {
     },
     castTime: {
       duration: 1700,
+    },
+    icon: 'spell_shadow_shadowbolt.jpg',
+  },
+  SHADOW_BOLT_1: {
+    id: 114328,
+    grantedBy: 112092,
+    type: 'temporary',
+    iconID: 136197,
+    passive: false,
+    name: 'Shadow Bolt',
+    gcd: {
+      duration: 1500,
+      hasted: true,
+    },
+    icon: 'spell_shadow_shadowbolt.jpg',
+  },
+  SHADOW_BOLT_2: {
+    id: 114329,
+    grantedBy: 112092,
+    type: 'temporary',
+    iconID: 136197,
+    passive: false,
+    name: 'Shadow Bolt',
+    gcd: {
+      duration: 1500,
+      hasted: true,
     },
     icon: 'spell_shadow_shadowbolt.jpg',
   },
@@ -392,6 +428,34 @@ const SPELLS = {
     },
     icon: 'warlock_-healthstone.jpg',
   },
+  SOULSTONE_SOULSTONE: {
+    id: 6203,
+    grantedBy: 20707,
+    type: 'temporary',
+    iconID: 136210,
+    passive: false,
+    name: 'Soulstone',
+    icon: 'spell_shadow_soulgem.jpg',
+  },
+  SOULSTONE: {
+    id: 20707,
+    type: 'baseline',
+    iconID: 136210,
+    passive: false,
+    name: 'Soulstone',
+    gcd: {
+      duration: 1500,
+      hasted: true,
+    },
+    cooldown: {
+      duration: 600000,
+      hasted: false,
+    },
+    castTime: {
+      duration: 3000,
+    },
+    icon: 'spell_shadow_soulgem.jpg',
+  },
   TWILIGHT_WARD: {
     id: 6229,
     type: 'baseline',
@@ -442,6 +506,15 @@ const SPELLS = {
     },
     icon: 'ability_warlock_mortalcoil.jpg',
   },
+  SUMMON_DOOMGUARD_SUMMON_DOOMGUARD: {
+    id: 60478,
+    grantedBy: 18540,
+    type: 'temporary',
+    iconID: 615103,
+    passive: false,
+    name: 'Summon Doomguard',
+    icon: 'warlock_summon_doomguard.jpg',
+  },
   SUMMON_DOOMGUARD: {
     id: 18540,
     type: 'baseline',
@@ -457,25 +530,6 @@ const SPELLS = {
       hasted: false,
     },
     icon: 'warlock_summon_doomguard.jpg',
-  },
-  SOULSTONE: {
-    id: 20707,
-    type: 'baseline',
-    iconID: 136210,
-    passive: false,
-    name: 'Soulstone',
-    gcd: {
-      duration: 1500,
-      hasted: true,
-    },
-    cooldown: {
-      duration: 600000,
-      hasted: false,
-    },
-    castTime: {
-      duration: 3000,
-    },
-    icon: 'spell_shadow_soulgem.jpg',
   },
   DREADSTEED_THE_CODEX_OF_XERRATH_HIDDEN: {
     id: 148972,
@@ -1402,7 +1456,7 @@ const SPELLS = {
     name: 'Grimoire of Supremacy',
     icon: 'warlock_grimoireofcommand.jpg',
   },
-  GRIMOIRE_OF_SERVICE_HIDDEN: {
+  GRIMOIRE_OF_SERVICE_TALENT: {
     id: 108501,
     type: 'mists-talent',
     row: 4,
@@ -1597,6 +1651,20 @@ const SPELLS = {
       hasted: true,
     },
     icon: 'ability_deathwing_sealarmorbreachtga.jpg',
+  },
+  DEMONIC_GATEWAY_DEMONIC_GATEWAY: {
+    id: 113890,
+    grantedBy: 111771,
+    type: 'temporary',
+    iconID: 607513,
+    castableWhileCasting: true,
+    passive: false,
+    name: 'Demonic Gateway',
+    cooldown: {
+      duration: 10000,
+      hasted: false,
+    },
+    icon: 'spell_warlock_demonicportal_purple.jpg',
   },
   DEMONIC_GATEWAY: {
     id: 111771,
@@ -1796,6 +1864,14 @@ const SPELLS = {
     },
     icon: 'spell_warlock_summonwrathguard.jpg',
   },
+  UNKNOWN: {
+    id: 112891,
+    grantedBy: 5484,
+    type: 'temporary',
+    passive: false,
+    name: 'Unknown',
+    icon: 'inv_axe_02.jpg',
+  },
   SUMMON_ABYSSAL_GRIMOIRE_OF_SUPREMACY_TALENT: {
     id: 112921,
     grantedBy: 108499,
@@ -1832,7 +1908,16 @@ const SPELLS = {
     },
     icon: 'ability_boss_lordanthricystgreen.jpg',
   },
-  SUMMON_TERRORGUARD: {
+  SUMMON_TERRORGUARD_SUMMON_TERRORGUARD: {
+    id: 112926,
+    grantedBy: 112927,
+    type: 'temporary',
+    iconID: 615098,
+    passive: false,
+    name: 'Summon Terrorguard',
+    icon: 'spell_warlock_summonterrorguard.jpg',
+  },
+  SUMMON_TERRORGUARD_GRIMOIRE_OF_SUPREMACY_TALENT: {
     id: 112927,
     grantedBy: 108499,
     type: 'temporary',
@@ -1902,6 +1987,17 @@ const SPELLS = {
     passive: true,
     name: 'Wild Imps',
     icon: 'ability_warlock_impoweredimp.jpg',
+  },
+  DISRUPTED_NETHER: {
+    id: 114736,
+    grantedBy: 104316,
+    type: 'temporary',
+    iconID: 236300,
+    castableWhileCasting: true,
+    passive: false,
+    hidden: 'always',
+    name: 'Disrupted Nether',
+    icon: 'ability_warlock_improvedsoulleech.jpg',
   },
   SEED_OF_CORRUPTION_1: {
     id: 114790,
@@ -2117,15 +2213,6 @@ const SPELLS = {
     hidden: 'unless-learned',
     name: "Kil'jaeden's Cunning",
     icon: 'achievement_boss_kiljaedan.jpg',
-  },
-  CORRUPTION_HIDDEN: {
-    id: 146739,
-    type: 'baseline',
-    iconID: 136118,
-    passive: false,
-    hidden: 'always',
-    name: 'Corruption',
-    icon: 'spell_shadow_abominationexplosion.jpg',
   },
   GLYPH_OF_HAVOC: {
     type: 'glyph',

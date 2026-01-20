@@ -6,7 +6,7 @@ export const Abilities = genAbilities({
   rotational: [spells.CORRUPTION_1, spells.HAND_OF_GULDAN, spells.SHADOW_BOLT, spells.SOUL_FIRE],
   cooldowns: [
     spells.DARK_SOUL_KNOWLEDGE,
-    spells.GRIMOIRE_OF_SERVICE_HIDDEN,
+    spells.GRIMOIRE_OF_SERVICE_TALENT,
     spells.IMP_SWARM,
     spells.SUMMON_DOOMGUARD,
   ],

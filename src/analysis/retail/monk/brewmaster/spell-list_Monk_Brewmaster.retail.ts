@@ -544,6 +544,15 @@ const SPELLS = {
     name: 'Crackling Jade Lightning',
     icon: 'ability_parry.jpg',
   },
+  CHI_TORPEDO: {
+    id: 119085,
+    grantedBy: 115008,
+    type: 'temporary',
+    iconID: 574577,
+    passive: false,
+    name: 'Chi Torpedo',
+    icon: 'ability_monk_standingkick.jpg',
+  },
   LEG_SWEEP: {
     id: 119381,
     type: 'baseline',
@@ -688,6 +697,16 @@ const SPELLS = {
     },
     icon: 'achievement_brewery_2.jpg',
   },
+  FISTS_OF_FURY_VISUAL_TARGET: {
+    id: 123154,
+    grantedBy: 117418,
+    type: 'temporary',
+    iconID: 132298,
+    passive: false,
+    hidden: 'always',
+    name: 'Fists of Fury Visual Target',
+    icon: 'ability_rogue_kidneyshot.jpg',
+  },
   FLYING_SERPENT_KICK_HIDDEN: {
     id: 123586,
     type: 'baseline',
@@ -778,6 +797,7 @@ const SPELLS = {
     id: 293866,
     grantedBy: 126892,
     type: 'temporary',
+    overrides: 126892,
     iconID: 775462,
     passive: false,
     name: 'Zen Pilgrimage',
@@ -1781,7 +1801,7 @@ const SPELLS = {
     name: 'Press the Advantage',
     icon: 'inv__fistofthewhitetiger.jpg',
   },
-  TRANSCENDENCE: {
+  TRANSCENDENCE_1: {
     id: 434763,
     type: 'learned',
     overrides: 101643,
@@ -1797,6 +1817,33 @@ const SPELLS = {
       duration: 10000,
       hasted: false,
     },
+    icon: 'monk_ability_transcendence.jpg',
+  },
+  TRANSCENDENCE_2: {
+    id: 434767,
+    grantedBy: 434763,
+    type: 'temporary',
+    iconID: 627608,
+    passive: false,
+    name: 'Transcendence',
+    gcd: {
+      duration: 1000,
+      hasted: true,
+    },
+    cooldown: {
+      duration: 15000,
+      hasted: false,
+    },
+    icon: 'monk_ability_transcendence.jpg',
+  },
+  TRANSCENDENCE_3: {
+    id: 434782,
+    grantedBy: 434763,
+    type: 'temporary',
+    iconID: 627608,
+    passive: true,
+    hidden: 'always',
+    name: 'Transcendence',
     icon: 'monk_ability_transcendence.jpg',
   },
   TRANSCENDENCE_LINKED_SPIRITS_TALENT: {
