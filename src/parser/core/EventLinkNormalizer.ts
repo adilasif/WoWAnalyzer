@@ -244,8 +244,8 @@ abstract class EventLinkNormalizer extends EventsNormalizer {
 }
 
 interface EventLinkHelperInner<Types extends EventType> {
-  first: (event: AnyEvent) => Types | undefined;
-  get: (event: AnyEvent) => Types[];
+  first: (event: AnyEvent) => AnyEvent<Types> | undefined;
+  get: (event: AnyEvent) => AnyEvent<Types>[];
 }
 
 type EventTypeUnion<Ts extends EventType | EventType[]> = Ts extends EventType

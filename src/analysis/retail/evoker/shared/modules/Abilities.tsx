@@ -127,7 +127,9 @@ class Abilities extends CoreAbilities {
       {
         spell: TALENTS.TIP_THE_SCALES_TALENT.id,
         category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 120 * interwovenThreadsMultiplier,
+        cooldown: combatant.hasTalent(TALENTS.CHRONOBOON_TALENT)
+          ? 90 * interwovenThreadsMultiplier
+          : 120 * interwovenThreadsMultiplier,
         enabled: combatant.hasTalent(TALENTS.TIP_THE_SCALES_TALENT),
       },
       //endregion
