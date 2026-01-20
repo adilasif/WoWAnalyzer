@@ -5,11 +5,13 @@ import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent'
 import { Buffs } from 'analysis/retail/demonhunter/devourer/modules/Buffs';
 import { GlobalCooldown } from 'analysis/retail/demonhunter/devourer/modules/core/GlobalCooldown';
 import { AlwaysBeCasting } from 'analysis/retail/demonhunter/devourer/modules/features/AlwaysBeCasting';
-import { Abilities } from 'analysis/retail/demonhunter/devourer/modules/Abilities';
 import { CooldownThroughputTracker } from 'analysis/retail/demonhunter/devourer/modules/features/CooldownThroughputTracker';
 import { FuryTracker } from 'analysis/retail/demonhunter/devourer/modules/resourcetracker/FuryTracker';
 import { FuryDetails } from 'analysis/retail/demonhunter/devourer/modules/resourcetracker/FuryDetails';
 import { FuryGraph } from 'analysis/retail/demonhunter/devourer/modules/resourcetracker/FuryGraph';
+import FoundationGuide from 'interface/guide/foundation/FoundationGuide';
+import { Abilities } from './gen';
+import CollapsingStar from './modules/talents/CollapsingStar';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -25,6 +27,7 @@ class CombatLogParser extends CoreCombatLogParser {
     cooldownThroughputTracker: CooldownThroughputTracker,
 
     // Talents
+    collapsingStar: CollapsingStar,
 
     // Hero
 
@@ -36,6 +39,8 @@ class CombatLogParser extends CoreCombatLogParser {
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,
   };
+
+  static guide = FoundationGuide;
 }
 
 export default CombatLogParser;
