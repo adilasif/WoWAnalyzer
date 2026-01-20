@@ -34,7 +34,6 @@ import SigilOfSpite from './modules/talents/SigilOfSpite';
 import EssenceBreak from './modules/talents/EssenceBreak';
 import GlaiveTempest from './modules/talents/GlaiveTempest';
 import Exergy from './modules/talents/Exergy';
-import Netherwalk from './modules/talents/Netherwalk';
 import TrailofRuin from './modules/talents/TrailofRuin';
 import TacticalRetreat from './modules/talents/TacticalRetreat';
 import Initiative from './modules/talents/Initiative';
@@ -97,7 +96,6 @@ class CombatLogParser extends CoreCombatLogParser {
     blindFury: BlindFury,
     trailofRuin: TrailofRuin,
     exergy: Exergy,
-    netherwalk: Netherwalk,
     masterOfTheGlaive: MasterOfTheGlaive,
     essenceBreak: EssenceBreak,
     cycleOfHatred: CycleOfHatred,

@@ -14,7 +14,7 @@ import { KILL_SHOT_EXECUTE_RANGE } from '../constants';
 class KillShot extends ExecuteHelper {
   static executeSources = SELECTED_PLAYER;
   static lowerThreshold = KILL_SHOT_EXECUTE_RANGE;
-  static singleExecuteEnablers: Spell[] = [TALENTS.HUNTERS_PREY_TALENT, SPELLS.DEATHBLOW_BUFF];
+  static singleExecuteEnablers: Spell[] = [SPELLS.DEATHBLOW_BUFF];
   static modifiesDamage = false;
 
   static dependencies = {
