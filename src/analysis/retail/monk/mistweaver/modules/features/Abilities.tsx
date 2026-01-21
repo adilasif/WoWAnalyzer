@@ -101,9 +101,9 @@ class Abilities extends CoreAbilities {
         timelineSortIndex: 20,
       },
       {
-        spell: TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT.id,
+        spell: TALENTS_MONK.CELESTIAL_CONDUIT_MISTWEAVER_TALENT.id,
         category: SPELL_CATEGORY.COOLDOWNS,
-        enabled: combatant.hasTalent(TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT),
+        enabled: combatant.hasTalent(TALENTS_MONK.CELESTIAL_CONDUIT_MISTWEAVER_TALENT),
         cooldown: 90,
         gcd: {
           base: 1500,

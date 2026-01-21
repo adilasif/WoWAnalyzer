@@ -50,7 +50,6 @@ import YulonsWhisper from './modules/spells/YulonsWhisper';
 import HotApplicationNormalizer from './normalizers/HotApplicationNormalizer';
 import HotRemovalNormalizer from './normalizers/HotRemovalNormalizer';
 import CastLinkNormalizer from './normalizers/CastLinkNormalizer';
-import Unison from './modules/spells/Unison';
 import RapidDiffusion from './modules/spells/RapidDiffusion';
 import DancingMists from './modules/spells/DancingMists';
 import MistyPeaksHealingBreakdown from './modules/features/MistyPeaksHealingBreakdown';
@@ -172,7 +171,6 @@ class CombatLogParser extends CoreCombatLogParser {
     soothingMist: SoothingMist,
     thunderFocusTea: ThunderFocusTea,
     yulonsWhisper: YulonsWhisper,
-    //unison: Unison,
     rapidDiffusion: RapidDiffusion,
     dancingMists: DancingMists,
     teachingsOfTheMonestary: TeachingsOfTheMonestary,
