@@ -10,7 +10,11 @@ const defaultCombatantInfoEvent = {
   auras: [] as Buff[],
 } as CombatantInfoEvent;
 
-const defaultPlayerDetails = {} as PlayerDetails;
+const defaultPlayerDetails = {
+  name: 'Test',
+  className: 'Mage',
+  specName: 'Frost',
+} as PlayerDetails;
 
 class TestCombatant extends FullCombatant {
   readonly #id = 1;

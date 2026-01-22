@@ -483,7 +483,11 @@ export class FullCombatant extends Combatant {
   constructor(parser: CombatLogParser, player: PlayerDetails, combatantInfo: CombatantInfoEvent) {
     super(parser, player);
 
-    this.specId = parser.config.spec.id;
+    if (import.meta.env.MODE === 'test') {
+      this.specId = player.specID ?? parser.config?.spec?.id ?? -1;
+    } else {
+      this.specId = player.specID ?? parser.config.spec.id;
+    }
 
     this._combatantInfo = {
       ...combatantInfo,

@@ -4,7 +4,7 @@ import Config from 'parser/Config';
 import Report from 'parser/core/Report';
 import { PlayerDetails } from 'parser/core/Player';
 import Fight from 'parser/core/Fight';
-import { AnyEvent, CombatantInfoEvent } from 'parser/core/Events';
+import { AnyEvent, Buff, CombatantInfoEvent, Item } from 'parser/core/Events';
 import { FullCombatant } from 'parser/core/Combatant';
 import TestCombatant from 'parser/core/tests/TestCombatant';
 import {
@@ -15,7 +15,10 @@ import {
   DEFAULT_REPORT,
 } from 'parser/core/tests/constants';
 
-const defaultCombatantInfo = {} as CombatantInfoEvent;
+const defaultCombatantInfo = {
+  gear: [] as Item[],
+  auras: [] as Buff[],
+} as CombatantInfoEvent;
 
 class TestCombatLogParser extends CombatLogParser {
   static defaultModules = {};
@@ -50,7 +53,7 @@ class TestCombatLogParser extends CombatLogParser {
       selectedFight,
       playerCombatantInfo,
       DEFAULT_CHARACTER_PROFILE,
-      [],
+      [selectedPlayer],
     );
   }
 
