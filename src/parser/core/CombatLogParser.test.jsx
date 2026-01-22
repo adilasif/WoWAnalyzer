@@ -24,16 +24,16 @@ const fakePlayer = {
 };
 const fakeFight = {};
 const fakeCombatants = {
-    sourceID: 1,
-    specID: 62,
-    auras: [],
-    talents: [],
-    artifact: [],
-    gear: [],
-    player: {
-      type: 'Warlock',
-    },
-  };
+  sourceID: 1,
+  specID: 62,
+  auras: [],
+  talents: [],
+  artifact: [],
+  gear: [],
+  player: {
+    type: 'Warlock',
+  },
+};
 
 // This uses `_modules` on the CombatLogParser. I know I shouldn't test private properties! But using the modules property directly throws a deprecation warning for now, and this is probably only temporary. So this is only a temp fix. (lol who am I kidding)
 
