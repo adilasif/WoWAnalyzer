@@ -7,7 +7,7 @@ import ROLES from 'game/ROLES';
 import { ItemLink } from 'interface';
 import ActivityIndicator from 'interface/ActivityIndicator';
 import Icon from 'interface/Icon';
-import Combatant from 'parser/core/Combatant';
+import { FullCombatant } from 'parser/core/Combatant';
 import { PureComponent, ReactNode } from 'react';
 import Config from 'parser/Config';
 import { WCLRanking, WCLRankingGear, WCLRankingsResponse } from 'common/WCL_TYPES';
@@ -28,7 +28,7 @@ interface Props {
   currentBoss: number;
   difficulty: number;
   duration: number;
-  combatant: Combatant;
+  combatant: FullCombatant;
 }
 
 // TODO: Figure out new talents
@@ -128,7 +128,7 @@ class EncounterStats extends PureComponent<Props, State> {
         let trinkets: WCLRankingGearWithAmount[] = [];
         const similiarKillTimes: KillTime[] = []; // These are the reports within the defined variance of the analyzed log
         const closestKillTimes: KillTime[] = []; // These are the reports closest to the analyzed log regardless of it being within variance or not
-        const combatantName = this.props.combatant._combatantInfo.name;
+        const combatantName = this.props.combatant.name;
 
         stats.rankings.forEach((rank) => {
           rank.gear.forEach((item, itemSlot) => {

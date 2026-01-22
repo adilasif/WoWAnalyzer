@@ -243,7 +243,9 @@ const PlayerLoader = ({ children }: Props) => {
         })}
       />
 
-      <PlayerProvider player={player}>{children}</PlayerProvider>
+      <PlayerProvider player={player} allPlayers={data.players}>
+        {children}
+      </PlayerProvider>
     </>
   );
 };

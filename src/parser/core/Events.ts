@@ -1137,7 +1137,6 @@ export interface CombatantInfoEvent extends Event<EventType.CombatantInfo> {
    * Shadowlands: Anima Powers
    */
   tertiaryCustomPowerSet?: any[]; // will be copied into field with better name / type depending on expansion
-  error?: any; //TODO: Verify, is this a bool? string?
 }
 
 const Events = {

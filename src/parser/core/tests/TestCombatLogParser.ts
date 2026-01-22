@@ -5,7 +5,7 @@ import Report from 'parser/core/Report';
 import { PlayerDetails } from 'parser/core/Player';
 import Fight from 'parser/core/Fight';
 import { AnyEvent, CombatantInfoEvent } from 'parser/core/Events';
-import Combatant from 'parser/core/Combatant';
+import { FullCombatant } from 'parser/core/Combatant';
 import TestCombatant from 'parser/core/tests/TestCombatant';
 import {
   DEFAULT_CHARACTER_PROFILE,
@@ -14,6 +14,8 @@ import {
   DEFAULT_PLAYER_INFO,
   DEFAULT_REPORT,
 } from 'parser/core/tests/constants';
+
+const defaultCombatantInfo = {} as CombatantInfoEvent;
 
 class TestCombatLogParser extends CombatLogParser {
   static defaultModules = {};
@@ -29,12 +31,9 @@ class TestCombatLogParser extends CombatLogParser {
   set currentTimestamp(value) {
     this._timestamp = value;
   }
-  _combatant: Combatant = new TestCombatant(this);
+  _combatant: FullCombatant = new TestCombatant(this);
   get selectedCombatant() {
     return this._combatant;
-  }
-  set selectedCombatant(value) {
-    this._combatant = value;
   }
 
   constructor(
@@ -42,15 +41,16 @@ class TestCombatLogParser extends CombatLogParser {
     report: Report = DEFAULT_REPORT,
     selectedPlayer: PlayerDetails = DEFAULT_PLAYER_INFO,
     selectedFight: Fight = DEFAULT_FIGHT,
-    combatantInfoEvents: CombatantInfoEvent[] = [],
+    playerCombatantInfo: CombatantInfoEvent = defaultCombatantInfo,
   ) {
     super(
       config,
       report,
       selectedPlayer,
       selectedFight,
-      combatantInfoEvents,
+      playerCombatantInfo,
       DEFAULT_CHARACTER_PROFILE,
+      [],
     );
   }
 
