@@ -1,5 +1,4 @@
 import SPELLS from 'common/SPELLS';
-import TALENTS from 'common/TALENTS/warrior';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent } from 'parser/core/Events';
 import Abilities from 'parser/core/modules/Abilities';

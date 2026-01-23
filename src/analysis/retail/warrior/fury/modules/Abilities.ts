@@ -83,7 +83,16 @@ class Abilities extends CoreAbilities {
         spell: SPELLS.THUNDER_CLAP.id,
         enabled: combatant.hasTalent(TALENTS.THUNDER_CLAP_TALENT),
         category: SPELL_CATEGORY.OTHERS,
-        cooldown: 6,
+        cooldown: (haste: number) => 6 / (1 + haste),
+        gcd: {
+          base: 1500,
+        },
+      },
+      {
+        spell: SPELLS.THUNDER_BLAST.id,
+        enabled: combatant.hasTalent(TALENTS.THUNDER_BLAST_TALENT),
+        category: SPELL_CATEGORY.OTHERS,
+        cooldown: (haste: number) => 6 / (1 + haste),
         gcd: {
           base: 1500,
         },
