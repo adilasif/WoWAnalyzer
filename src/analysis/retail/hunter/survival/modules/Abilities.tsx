@@ -15,7 +15,7 @@ class Abilities extends CoreAbilities {
         spell: TALENTS.KILL_COMMAND_SURVIVAL_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.KILL_COMMAND_SURVIVAL_TALENT),
         category: SPELL_CATEGORY.ROTATIONAL,
-        charges: combatant.hasTalent(TALENTS.ALPHA_PREDATOR_TALENT) ? 2 : 1,
+        charges: 2,
         cooldown: (haste) => hastedCooldown(6, haste),
         gcd: {
           base: 1500,
