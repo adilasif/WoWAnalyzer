@@ -25,6 +25,7 @@ import AverageTimeBetweenRSKs from '../spells/AverageTimeBetweenRSKs';
 import WayOfTheSerpent from '../spells/WayOfTheSerpent';
 import WayOfTheCrane from '../spells/WayOfTheCrane';
 import PeacefulMending from '../spells/PeacefulMending';
+import Spiritfont from '../spells/Spiritfont';
 
 class TalentHealingStatistic extends Analyzer {
   static dependencies = {
@@ -50,6 +51,7 @@ class TalentHealingStatistic extends Analyzer {
     wayOfTheSerpent: WayOfTheSerpent,
     wayOfTheCrane: WayOfTheCrane,
     peacefulMending: PeacefulMending,
+    spiritfont: Spiritfont,
   };
 
   protected risingMist!: RisingMist;
@@ -75,6 +77,7 @@ class TalentHealingStatistic extends Analyzer {
   protected wayOfTheSerpent!: WayOfTheSerpent;
   protected wayOfTheCrane!: WayOfTheCrane;
   protected peacefulMending!: PeacefulMending;
+  protected spiritfont!: Spiritfont;
 
   buildTalentList() {
     const talentList = [];
@@ -140,6 +143,9 @@ class TalentHealingStatistic extends Analyzer {
     }
     if (this.selectedCombatant.hasTalent(TALENTS_MONK.PEACEFUL_MENDING_TALENT)) {
       talentList.push(this.peacefulMending.subStatistic());
+    }
+    if (this.selectedCombatant.hasTalent(TALENTS_MONK.SPIRITFONT_1_MISTWEAVER_TALENT)) {
+      talentList.push(this.spiritfont.subStatistic());
     }
 
     const sortedTalentList = talentList.sort(

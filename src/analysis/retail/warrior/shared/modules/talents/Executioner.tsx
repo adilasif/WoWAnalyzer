@@ -4,7 +4,6 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import { addInefficientCastReason } from 'parser/core/EventMetaLib';
 import Events, { CastEvent } from 'parser/core/Events';
 import SPECS from 'game/SPECS';
-import { ThresholdStyle } from 'parser/core/ParseResults';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 
 class Executioner extends Analyzer.withDependencies({

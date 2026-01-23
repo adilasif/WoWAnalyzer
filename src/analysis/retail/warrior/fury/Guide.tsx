@@ -13,21 +13,23 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
     <>
       <Section title="Preface & Disclaimers">
         <>
-          When reviewing this information, keep in mind that WoWAnalyzer is limited to the
-          information that is present in your combat log. As a result, we have no way of knowing if
-          you were intentionally doing something suboptimal because the fight or strat required it
-          (such as forced downtime or holding cooldowns for a burn phase). Because of this, we
-          recommend comparing your analysis against a top 100 log for the same boss.
-          <br />
-          <br />
-          For additional assistance in improving your gameplay, or to have someone look more in
-          depth at your combat logs, please visit the{' '}
-          <a href="https://discord.gg/skyhold">Skyhold</a> discord.
-          <br />
-          <br />
-          If you notice any issues or errors in this analysis or if there is additional analysis you
-          would like added, please ping <code>@Bigbowwl</code> in the{' '}
-          <a href="https://discord.gg/skyhold">Skyhold</a> discord (please don't DM me).
+          <p>
+            When reviewing this information, keep in mind that WoWAnalyzer is limited to the
+            information that is present in your combat log. As a result, we have no way of knowing
+            if you were intentionally doing something suboptimal because the fight or strat required
+            it (such as forced downtime or holding cooldowns for a burn phase). Because of this, we
+            recommend comparing your analysis against a top 100 log for the same boss.
+          </p>
+          <p>
+            For additional assistance in improving your gameplay, or to have someone look more in
+            depth at your combat logs, please visit the{' '}
+            <a href="https://discord.gg/skyhold">Skyhold</a> discord.
+          </p>
+          <p>
+            If you notice any issues or errors in this analysis or if there is additional analysis
+            you would like added, please ping <code>@Bigbowwl</code> in the{' '}
+            <a href="https://discord.gg/skyhold">Skyhold</a> discord (please don't DM me).
+          </p>
         </>
       </Section>
       <Section title="Always Be Casting">
@@ -79,7 +81,7 @@ function RotationSection({ modules, info }: GuideProps<typeof CombatLogParser>) 
       <div>
         Potential areas of inaccuracy:
         <ul>
-          <li>Holding cooldowns for raid events</li>
+          <li>Holding abilities for upcoming add spawns or damage amps</li>
           <li>Multiple targets</li>
           <li>Movement or periods of downtime</li>
         </ul>
