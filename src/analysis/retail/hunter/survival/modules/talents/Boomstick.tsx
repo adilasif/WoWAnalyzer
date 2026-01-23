@@ -54,7 +54,7 @@ class Boomstick extends Analyzer.withDependencies({ haste: Haste }) {
 
   private static readonly BUCKET_WINDOW_MS = 100;
   private static readonly EXPECTED_TICKS = 4;
-  private static readonly BASE_TICK_INTERVAL_MS = 1000;
+  private static readonly BASE_TICK_INTERVAL_MS = 800;
   private static readonly TICK_MATCH_TOLERANCE_MS = 200;
 
   constructor(options: Options) {
@@ -143,15 +143,23 @@ class Boomstick extends Analyzer.withDependencies({ haste: Haste }) {
     const hasteAtCast = this.deps.haste.current;
     const tickInterval = Boomstick.BASE_TICK_INTERVAL_MS / (1 + hasteAtCast);
 
+    console.log(
+      `Haste: ${hasteAtCast}, tickInterval: ${tickInterval}, buckets:`,
+      buckets.map((b) => b[0].timestamp),
+    );
+
     // Match each expected tick slot to actual damage buckets
     return [0, 1, 2, 3].map((tickIndex) => {
       const tickNumber = tickIndex + 1;
       const expectedTime = cast.timestamp + tickInterval * tickIndex;
 
-      const matchingBucket = buckets.find(
-        (bucket) =>
-          Math.abs(bucket[0].timestamp - expectedTime) < Boomstick.TICK_MATCH_TOLERANCE_MS,
-      );
+      const matchingBucket = buckets.find((bucket) => {
+        const diff = Math.abs(bucket[0].timestamp - expectedTime);
+        console.log(
+          `Tick ${tickNumber}: expected ${expectedTime}, bucket ${bucket[0].timestamp}, diff ${diff}`,
+        );
+        return diff < Boomstick.TICK_MATCH_TOLERANCE_MS;
+      });
 
       if (matchingBucket) {
         const damage = matchingBucket.reduce(
