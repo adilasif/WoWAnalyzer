@@ -4,7 +4,6 @@ import TALENTS from 'common/TALENTS/hunter';
 import CoreAbilities from 'parser/core/modules/Abilities';
 import { SpellbookAbility } from 'parser/core/modules/Ability';
 import SPELL_CATEGORY from 'parser/core/SPELL_CATEGORY';
-import { EXPLOSIVES_EXPERT_CDR } from 'analysis/retail/hunter/survival/constants';
 
 class Abilities extends CoreAbilities {
   spellbook(): SpellbookAbility[] {
@@ -50,10 +49,7 @@ class Abilities extends CoreAbilities {
         category: SPELL_CATEGORY.ROTATIONAL,
         charges: combatant.hasTalent(TALENTS.GUERRILLA_TACTICS_TALENT) ? 2 : 1,
         cooldown: (haste) =>
-          hastedCooldown(
-            18 - EXPLOSIVES_EXPERT_CDR[combatant.getTalentRank(TALENTS.EXPLOSIVES_EXPERT_TALENT)],
-            haste,
-          ),
+          hastedCooldown(18 - (combatant.hasTalent(TALENTS.LUNGE_TALENT) ? 1 : 0), haste),
         gcd: {
           base: 1500,
         },
