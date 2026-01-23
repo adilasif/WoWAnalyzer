@@ -528,6 +528,26 @@ const spells = {
     name: "Jade Serpent's Blessing",
     icon: 'inv_celestialserpentmount_jade',
   },
+  SPIRITFONT_HOT: {
+    id: 1260617,
+    name: 'Spiritfont',
+    icon: 'inv12_apextalent_monk_spiritfont',
+  },
+  SPIRITFONT_ACTIVE_BUFF: {
+    id: 1260670,
+    name: 'Spiritfont',
+    icon: 'inv12_apextalent_monk_spiritfont',
+  },
+  SPIRITFONT_CHI_COCOON: {
+    id: 1260681,
+    name: 'Chi Cocoon',
+    icon: 'ability_monk_chiexplosion',
+  },
+  SPIRITFONT_BUFF: {
+    id: 1260565,
+    name: 'Spiritfont',
+    icon: 'inv12_apextalent_monk_spiritfont',
+  },
   // Brewmaster
   ELEVATED_STAGGER_BUFF: {
     id: 1260619,
