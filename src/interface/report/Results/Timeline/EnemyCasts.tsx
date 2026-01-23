@@ -401,7 +401,6 @@ export const EnemyCastsTimeline = ({
     parser.report.code,
     parser.fight.start_time,
     parser.fight.end_time,
-    parser.combatantInfoEvents,
     parser.report.enemies,
     parser.report.enemyPets,
     parser.players,
