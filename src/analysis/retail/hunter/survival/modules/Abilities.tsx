@@ -53,6 +53,16 @@ class Abilities extends CoreAbilities {
           recommendedEfficiency: 0.85,
         },
       },
+      {
+        spell: TALENTS.BOOMSTICK_TALENT.id,
+        category: SPELL_CATEGORY.ROTATIONAL,
+        enabled: combatant.hasTalent(TALENTS.BOOMSTICK_TALENT),
+        gcd: {
+          base: 1500,
+        },
+        cooldown: 45,
+        timelineSortIndex: 1,
+      },
       //endregion
 
       //region Talents

@@ -1,5 +1,6 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
+import Channeling from 'parser/shared/normalizers/Channeling';
 import {
   BindingShot,
   DeathTracker,
@@ -30,6 +31,8 @@ import FocusGraph from './modules/guide/sections/resources/FocusGraph';
 import Guide from './modules/guide/Guide';
 import SurvivalOfTheFittest from '../shared/talents/SurvivalOfTheFittest';
 import ExhilarationTiming from '../shared/guide/defensives/Exhiliration';
+import Boomstick from './modules/talents/Boomstick';
+import BoomstickNormalizer from './normalizers/BoomstickNormalizer';
 // import EventLinkNormalizer from '../shared/normalizers/HunterEventLinkNormalizers'; // This has a pack leader normalizer in it useful to Survival so not deleting yet.
 
 class CombatLogParser extends CoreCombatLogParser {
@@ -57,7 +60,10 @@ class CombatLogParser extends CoreCombatLogParser {
     exhilarationTiming: ExhilarationTiming,
 
     //Normalizers
+    // Channeling must come before BoomstickNormalizer to ensure EndChannel events exist
+    channeling: Channeling,
     tipOfTheSpearNormalizer: TipOfTheSpearNormalizer,
+    boomstickNormalizer: BoomstickNormalizer,
     // EventLinkNormalizers: EventLinkNormalizer,
 
     //DeathTracker
@@ -70,6 +76,7 @@ class CombatLogParser extends CoreCombatLogParser {
     tipOfTheSpear: TipOfTheSpear,
     wildfireBomb: WildfireBomb,
     lunge: Lunge,
+    boomstick: Boomstick,
 
     //Shared Talents
 
