@@ -109,8 +109,6 @@ class RayOfFrost extends Analyzer {
   get guideSubsection(): JSX.Element {
     const rayOfFrost = <SpellLink spell={TALENTS.RAY_OF_FROST_TALENT} />;
 
-    const wintersChill = <SpellLink spell={SPELLS.WINTERS_CHILL} />;
-
     const cometStorm = <SpellLink spell={TALENTS.COMET_STORM_TALENT} />;
     const glacialAssault = <SpellLink spell={TALENTS.GLACIAL_ASSAULT_TALENT} />;
 
@@ -134,9 +132,6 @@ class RayOfFrost extends Analyzer {
               Use it after {cometStorm} (to benefit from {glacialAssault})
             </li>
           )}
-          <li>
-            Use it in 2nd {wintersChill}'s stack <small>(to optimize {wintersChill})</small>
-          </li>
         </ol>
         <p>
           To meet <b>all the conditions</b>, your {rayOfFrost} rotation should look like this:
