@@ -33,6 +33,12 @@ const ZONES: Zone[] = [
       toes.bosses.ShaOfFear,
     ],
   },
+  {
+    id: 1046,
+    name: 'Throne of Thunder',
+    frozen: false,
+    encounters: [],
+  },
 ];
 
 export default ZONES;
