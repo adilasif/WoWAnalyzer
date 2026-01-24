@@ -70,6 +70,10 @@ export const IRIDESCENCE_BLUE_CAST_SPELLS = [
   SPELLS.AZURE_SWEEP,
 ];
 
+export const AZURE_SWEEP_MAX_STACKS = 2;
+export const AZURE_SWEEP_BASE_STACKS = 1;
+export const AZURE_SWEEP_MID1_2PC_EXTRA_STACKS = 1;
+
 // Talent damage multipliers
 export const SPELLWEAVERS_DOMINANCE_CRIT_MULTIPLIER = 0.3;
 export const SHATTERING_STAR_AMP_MULTIPLIER = 0.2;

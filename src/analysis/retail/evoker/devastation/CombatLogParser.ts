@@ -34,6 +34,7 @@ import DisintegrateChainCastLinks from './modules/normalizers/DisintegrateChainC
 import StrafingRun from './modules/talents/StrafingRun';
 import SpellUsable from './modules/features/SpellUsable';
 import StrafingRunNormalizer from './modules/normalizers/StrafingRun';
+import AzureSweep from './modules/talents/AzureSweep';
 
 // Shared
 import {
@@ -131,6 +132,7 @@ class CombatLogParser extends MainCombatLogParser {
     iridescence: Iridescence,
     scorchingEmbers: ScorchingEmbers,
     strafingRun: StrafingRun,
+    azureSweep: AzureSweep,
 
     // hero talents
     expandedLungs: ExpandedLungs,

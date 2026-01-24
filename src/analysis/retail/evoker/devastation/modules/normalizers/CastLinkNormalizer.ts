@@ -3,6 +3,8 @@ import TALENTS from 'common/TALENTS/evoker';
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
 import { Options } from 'parser/core/Module';
 import {
+  ApplyBuffEvent,
+  ApplyBuffStackEvent,
   ApplyDebuffEvent,
   CastEvent,
   DamageEvent,
@@ -45,6 +47,8 @@ const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
 export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
 export const ENGULF_DAMAGE = 'EngulfDamage';
 export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
+const AZURE_SWEEP_CONSUME = 'AzureSweepConsume';
+const AZURE_SWEEP_GENERATE = 'AzureSweepGenerate';
 
 const CAST_LINK = 'CastLink';
 const DAMAGE_LINK = 'DamageLink';
@@ -278,6 +282,30 @@ const EVENT_LINKS: EventLink[] = [
     anyTarget: true,
     backwardBufferMs: DEEP_BREATH_FLIGHT_TIME_MS,
     maximumLinks: 1,
+  },
+  {
+    linkRelation: AZURE_SWEEP_CONSUME,
+    linkingEventId: SPELLS.AZURE_SWEEP_BUFF.id,
+    linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
+    referencedEventId: SPELLS.AZURE_SWEEP.id,
+    referencedEventType: EventType.Cast,
+    anyTarget: true,
+    backwardBufferMs: CAST_BUFFER_MS,
+    maximumLinks: 1,
+    isActive: (c) => c.hasTalent(TALENTS.AZURE_SWEEP_TALENT),
+  },
+  {
+    linkRelation: AZURE_SWEEP_GENERATE,
+    reverseLinkRelation: AZURE_SWEEP_GENERATE,
+    linkingEventId: [SPELLS.ETERNITY_SURGE.id, SPELLS.ETERNITY_SURGE_FONT.id],
+    linkingEventType: EventType.EmpowerEnd,
+    referencedEventId: SPELLS.AZURE_SWEEP_BUFF.id,
+    referencedEventType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+    backwardBufferMs: CAST_BUFFER_MS,
+    maximumLinks: 1,
+    isActive: (c) => c.hasTalent(TALENTS.AZURE_SWEEP_TALENT),
   },
   // TODO: Figure out what to do with these when Flameshaper gets worked on
   /* {
@@ -544,6 +572,18 @@ export function getIridescenceConsumeEvent(
 
 export function getEternitySurgeDamageEvents(event: EmpowerEndEvent): DamageEvent[] {
   return GetRelatedEvents<DamageEvent>(event, ETERNITY_SURGE_FROM_CAST);
+}
+
+export function getAzureSweepBuffEvent(
+  event: EmpowerEndEvent,
+): ApplyBuffEvent | ApplyBuffStackEvent | undefined {
+  return GetRelatedEvent<ApplyBuffEvent | ApplyBuffStackEvent>(event, AZURE_SWEEP_GENERATE);
+}
+
+export function getAzureSweepConsumeEvent(
+  event: RemoveBuffEvent | RemoveBuffStackEvent,
+): CastEvent | undefined {
+  return GetRelatedEvent<CastEvent>(event, AZURE_SWEEP_CONSUME);
 }
 
 export default CastLinkNormalizer;
