@@ -70,7 +70,7 @@ import MissingCastsNormalizer from '../shared/normalizers/MissingCasts';
 import PhaseChangesNormalizer from '../shared/normalizers/PhaseChanges';
 import PrePullCooldownsNormalizer from '../shared/normalizers/PrePullCooldowns';
 import Analyzer from './Analyzer';
-import Combatant from './Combatant';
+import { FullCombatant } from './Combatant';
 import EventFilter from './EventFilter';
 import EventsNormalizer from './EventsNormalizer';
 import { EventListener } from './EventSubscriber';
@@ -84,7 +84,7 @@ import EventEmitter from './modules/EventEmitter';
 import SpellInfo from './modules/SpellInfo';
 import ParseResults from './ParseResults';
 import { PetInfo } from './Pet';
-import { PlayerInfo } from './Player';
+import { PlayerDetails, PlayerInfo } from './Player';
 import Report from './Report';
 import { SpellUsageContextProvider } from 'parser/core/SpellUsage/core';
 import SignetOfThePriory from 'parser/retail/modules/items/thewarwithin/trinkets/SignetOfThePriory';
@@ -238,10 +238,10 @@ class CombatLogParser {
 
   // Player info from WCL - required
   player: PlayerInfo;
+  readonly playerCombatantInfo: CombatantInfoEvent | undefined;
   playerPets: PetInfo[];
   fight: Fight;
   boss: Boss | null;
-  combatantInfoEvents: CombatantInfoEvent[];
 
   //Disabled Modules
   disabledModules!: Record<ModuleError, ModuleErrorDetails[]>;
@@ -276,29 +276,41 @@ class CombatLogParser {
   }
   finished = false;
 
+  /**
+   * Should probably use .playerDetails
+   */
   get players(): PlayerInfo[] {
     return this.report.friendlies;
   }
-  get selectedCombatant(): Combatant {
+  readonly playerDetails: PlayerDetails[];
+  get selectedCombatant(): FullCombatant {
     return this.getModule(Combatants).selected;
   }
 
   constructor(
     config: Config,
     report: Report,
-    selectedPlayer: PlayerInfo,
+    selectedPlayer: PlayerDetails,
     selectedFight: Fight,
-    combatantInfoEvents: CombatantInfoEvent[],
+    playerCombatantInfo: CombatantInfoEvent | undefined,
     characterProfile: CharacterProfile,
+    playerDetails: PlayerDetails[],
   ) {
     this.config = config;
     this.report = report;
-    this.player = selectedPlayer;
+
+    this.playerCombatantInfo = playerCombatantInfo;
+    this.playerDetails = playerDetails;
+
+    const playerInfo = report.friendlies.find((player) => player.id === selectedPlayer.id);
+    if (!playerInfo) {
+      throw new Error(`could not locate character with id ${selectedPlayer.id}`);
+    }
+    this.player = playerInfo;
+
     this.playerPets = report.friendlyPets.filter((pet) => pet.petOwner === selectedPlayer.id);
     this.fight = selectedFight;
-    this.combatantInfoEvents = combatantInfoEvents;
-    // combatantinfo events aren't included in the regular events, but they're still used to analysis. We should have them show in the history to make it complete.
-    combatantInfoEvents.forEach((event) => this.eventHistory.push(event));
+
     this.characterProfile = characterProfile;
     this._timestamp = selectedFight.start_time;
     this.boss = findByBossId(selectedFight.boss);

@@ -104,10 +104,7 @@ class SoothingMist extends Analyzer {
     this.castsInSoom -= duration / this.assumedGCD;
     if (
       this.castsInSoom < 0 &&
-      !(
-        this.selectedCombatant.hasTalent(TALENTS_MONK.UNISON_TALENT) &&
-        this.selectedCombatant.hasTalent(TALENTS_MONK.SUMMON_JADE_SERPENT_STATUE_TALENT)
-      )
+      !this.selectedCombatant.hasTalent(TALENTS_MONK.SUMMON_JADE_SERPENT_STATUE_TALENT)
     ) {
       this.badSooms += 1;
     }

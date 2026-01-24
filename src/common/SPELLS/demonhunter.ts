@@ -175,6 +175,16 @@ const spells = {
     name: 'Demon Soul',
     icon: 'spell_shadow_soulleech_3',
   },
+  DEMON_SOUL_BUFF_FEL_SCARRED_VDH: {
+    id: 1238675,
+    name: 'Demon Soul',
+    icon: 'ability_warlock_improvedsoulleech',
+  },
+  DEMON_SOUL_BUFF_FEL_SCARRED_HDH: {
+    id: 1238676,
+    name: 'Demon Soul',
+    icon: 'ability_warlock_improvedsoulleech',
+  },
   //endregion
 
   //region Vengeance
@@ -206,6 +216,7 @@ const spells = {
     name: 'Soul Fragment',
     icon: 'spell_shadow_soulgem',
   },
+  SOUL_FRAGMENT_2: { id: 1223412, name: 'Soul Fragment', icon: 'spell_shadow_soulgem.jpg' },
   SOUL_FRAGMENT_KILLING_BLOW: {
     id: 204062,
     name: 'Soul Fragment (from killing blow)',
@@ -584,6 +595,14 @@ const spells = {
     id: 198030,
     name: 'Eye Beam',
     icon: 'ability_demonhunter_eyebeam',
+  },
+  //endregion
+
+  //region Devourer
+  COLLAPSING_STAR: {
+    id: 1221150,
+    name: 'Collapsing Star',
+    icon: 'inv_12_dh_void_ability_collapsingstar.jpg',
   },
   //endregion
 

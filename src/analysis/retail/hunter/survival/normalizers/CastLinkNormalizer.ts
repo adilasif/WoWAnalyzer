@@ -2,7 +2,6 @@ import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/hunter';
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
 import {
-  AbilityEvent,
   AnyEvent,
   ApplyDebuffEvent,
   CastEvent,
@@ -10,7 +9,6 @@ import {
   EventType,
   GetRelatedEvent,
   GetRelatedEvents,
-  HasAbility,
   HasRelatedEvent,
   RefreshDebuffEvent,
 } from 'parser/core/Events';
@@ -53,10 +51,6 @@ export function getHardcast(
 
 export function getHitCount(aoeCastEvent: CastEvent): number {
   return GetRelatedEvents(aoeCastEvent, HIT_TARGET).length;
-}
-
-export function getHits(castEvent: CastEvent): AbilityEvent<any>[] {
-  return GetRelatedEvents(castEvent, HIT_TARGET, HasAbility);
 }
 
 export function getDamageHits(castEvent: CastEvent): DamageEvent[] {

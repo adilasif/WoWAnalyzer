@@ -1,12 +1,6 @@
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
-import talents, { TALENTS_MONK } from 'common/TALENTS/monk';
-import {
-  DamageEvent,
-  EventType,
-  GetRelatedEvents,
-  HasRelatedEvent,
-  HealEvent,
-} from 'parser/core/Events';
+import talents from 'common/TALENTS/monk';
+import { DamageEvent, EventType, GetRelatedEvents, HealEvent } from 'parser/core/Events';
 import { CAST_BUFFER_MS } from 'analysis/retail/monk/mistweaver/normalizers/EventLinks/EventLinkConstants';
 import SPELLS from 'common/SPELLS';
 import { Options } from 'parser/core/Module';
@@ -26,13 +20,19 @@ const CELESTIAL_CONDUIT_LINKS: EventLink[] = [
     reverseLinkRelation: CELESTIAL_CONDUIT_CAST,
     linkingEventId: [SPELLS.CELESTIAL_CONDUIT_HEAL.id, SPELLS.CELESTIAL_CONDUIT_DAMAGE.id],
     linkingEventType: [EventType.Heal, EventType.Damage],
-    referencedEventId: [talents.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT.id],
+    referencedEventId: [
+      talents.CELESTIAL_CONDUIT_MISTWEAVER_TALENT.id,
+      talents.CELESTIAL_CONDUIT_WINDWALKER_TALENT.id,
+    ],
     referencedEventType: EventType.Cast,
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CELESTIAL_CONDUIT_MAX_DURATION,
     isActive(c) {
-      return c.hasTalent(talents.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT);
+      return (
+        c.hasTalent(talents.CELESTIAL_CONDUIT_MISTWEAVER_TALENT) ||
+        c.hasTalent(talents.CELESTIAL_CONDUIT_WINDWALKER_TALENT)
+      );
     },
   },
   //grouping damage and heal events on tick
@@ -47,7 +47,10 @@ const CELESTIAL_CONDUIT_LINKS: EventLink[] = [
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CAST_BUFFER_MS,
     isActive(c) {
-      return c.hasTalent(talents.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT);
+      return (
+        c.hasTalent(talents.CELESTIAL_CONDUIT_MISTWEAVER_TALENT) ||
+        c.hasTalent(talents.CELESTIAL_CONDUIT_WINDWALKER_TALENT)
+      );
     },
     additionalCondition(linkingEvent, referencedEvent) {
       return (
@@ -68,7 +71,8 @@ const UNITY_WITHIN_EVENT_LINKS: EventLink[] = [
     linkingEventType: EventType.Heal,
     referencedEventId: [
       SPELLS.UNITY_WITHIN_CAST.id,
-      TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT.id,
+      talents.CELESTIAL_CONDUIT_MISTWEAVER_TALENT.id,
+      talents.CELESTIAL_CONDUIT_WINDWALKER_TALENT.id,
     ],
     referencedEventType: [EventType.Cast, EventType.EndChannel],
     anyTarget: true,

@@ -475,7 +475,7 @@ const spells = {
   },
   BREATH_OF_EONS_DAMAGE: {
     id: 409632,
-    name: 'Temporal Wound',
+    name: 'Breath of Eons',
     icon: 'ability_evoker_breathofeons',
   },
   BREATH_OF_EONS_SCALECOMMANDER: {
@@ -602,21 +602,6 @@ const spells = {
     id: 431583,
     name: 'Chronoflame',
     icon: 'inv_ability_chronowardenevoker_chronoflame',
-  },
-  THREAD_OF_FATE_BUFF: {
-    id: 431716,
-    name: 'Thread of Fate',
-    icon: 'ability_evoker_sandsoftime',
-  },
-  THREAD_OF_FATE_HEALING: {
-    id: 432896,
-    name: 'Thread of Fate',
-    icon: 'ability_evoker_sandsoftime',
-  },
-  THREAD_OF_FATE_DAMAGE: {
-    id: 432895,
-    name: 'Thread of Fate',
-    icon: 'ability_evoker_sandsoftime',
   },
   PRIMACY_BUFF: {
     id: 431654,
@@ -752,7 +737,7 @@ const spells = {
   DUPLICATE_SELF_BUFF: {
     id: 1259171,
     name: 'Duplicate',
-    icon: 'ability_evoker_masterylifebinder_bronze',
+    icon: 'inv12_apextalent_evoker_duplicate',
   },
   DUPLICATE_ERUPTION: {
     id: 1259172,
@@ -763,6 +748,11 @@ const spells = {
     id: 431164,
     name: 'Fire Breath (Duplicate)',
     icon: 'ability_evoker_firebreath',
+  },
+  TEMPORAL_BURST_BUFF: {
+    id: 431698,
+    name: 'Temporal Burst',
+    icon: 'ability_evoker_essenceburst5',
   },
   AZURE_SWEEP: {
     id: 1265872,

@@ -4,7 +4,6 @@ export { default as CancelledCasts } from './CancelledCasts';
 export { default as Channeling } from 'parser/shared/normalizers/Channeling';
 export { default as Deathblow } from './talents/Deathblow';
 export { default as DeathTracker } from './DeathTracker';
-export { default as ExplosiveShot } from './talents/ExplosiveShot';
 export { default as FocusCapTracker } from './FocusCapTracker';
 export { default as FocusDetails } from './FocusDetails';
 export { default as FocusTracker } from './FocusTracker';

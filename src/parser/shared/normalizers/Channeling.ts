@@ -2,6 +2,7 @@ import SPELLS from 'common/SPELLS';
 import CLASSIC_SPELLS from 'common/SPELLS/classic';
 import {
   TALENTS_EVOKER,
+  TALENTS_HUNTER,
   TALENTS_MAGE,
   TALENTS_MONK,
   TALENTS_ROGUE,
@@ -105,6 +106,7 @@ class Channeling extends EventsNormalizer {
     // Shaman
     // Hunter
     buffChannelSpec(SPELLS.RAPID_FIRE.id),
+    buffChannelSpec(TALENTS_HUNTER.BOOMSTICK_TALENT.id),
     // Paladin
     // Warrior
     buffChannelSpec(SPELLS.BLADESTORM.id),
