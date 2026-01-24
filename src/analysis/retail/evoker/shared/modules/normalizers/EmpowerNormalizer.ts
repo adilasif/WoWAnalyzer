@@ -13,7 +13,8 @@ import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer'
 import { EMPOWERS } from '../../constants';
 
 const TIP_THE_SCALES_CONSUME = 'TipTheScalesConsume';
-export const EMPOWERED_CAST = 'EmpoweredCast';
+const EMPOWER_CAST = 'EmpoweredCast';
+const EMPOWER_END = 'EmpowerEnd';
 
 const EMPOWERED_CAST_BUFFER = 6000;
 const TIP_THE_SCALES_CONSUME_BUFFER = 25;
@@ -35,8 +36,8 @@ const EVENT_LINKS: EventLink[] = [
     },
   },
   {
-    linkRelation: EMPOWERED_CAST,
-    reverseLinkRelation: EMPOWERED_CAST,
+    linkRelation: EMPOWER_CAST,
+    reverseLinkRelation: EMPOWER_END,
     linkingEventId: EMPOWERS,
     linkingEventType: EventType.EmpowerEnd,
     referencedEventId: EMPOWERS,
@@ -97,8 +98,8 @@ class EmpowerNormalizer extends EventLinkNormalizer {
         __fabricated: true,
       };
 
-      AddRelatedEvent(event, EMPOWERED_CAST, fabricatedEvent);
-      AddRelatedEvent(fabricatedEvent, EMPOWERED_CAST, event);
+      AddRelatedEvent(event, EMPOWER_END, fabricatedEvent);
+      AddRelatedEvent(fabricatedEvent, EMPOWER_CAST, event);
 
       fixedEvents.push(event);
       fixedEvents.push(fabricatedEvent);
@@ -116,12 +117,12 @@ export function isFromTipTheScales(event: CastEvent): boolean {
  *
  * Returns true if the Empower was instant cast with Tip the Scales or if it has an associated empowerEnd event  */
 export function empowerFinishedCasting(event: CastEvent): boolean {
-  return HasRelatedEvent(event, EMPOWERED_CAST) || isFromTipTheScales(event);
+  return HasRelatedEvent(event, EMPOWER_END) || isFromTipTheScales(event);
 }
 
 /** Get the associated empowerEnd event for an Empower cast */
 export function getEmpowerEndEvent(event: CastEvent): EmpowerEndEvent | undefined {
-  return GetRelatedEvent(event, EMPOWERED_CAST, (e) => e.type === EventType.EmpowerEnd);
+  return GetRelatedEvent(event, EMPOWER_END, (e) => e.type === EventType.EmpowerEnd);
 }
 
 export default EmpowerNormalizer;
