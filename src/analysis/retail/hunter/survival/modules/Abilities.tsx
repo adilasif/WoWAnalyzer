@@ -4,7 +4,6 @@ import TALENTS from 'common/TALENTS/hunter';
 import CoreAbilities from 'parser/core/modules/Abilities';
 import { SpellbookAbility } from 'parser/core/modules/Ability';
 import SPELL_CATEGORY from 'parser/core/SPELL_CATEGORY';
-import { EXPLOSIVES_EXPERT_CDR } from 'analysis/retail/hunter/survival/constants';
 
 class Abilities extends CoreAbilities {
   spellbook(): SpellbookAbility[] {
@@ -15,8 +14,8 @@ class Abilities extends CoreAbilities {
         spell: TALENTS.KILL_COMMAND_SURVIVAL_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.KILL_COMMAND_SURVIVAL_TALENT),
         category: SPELL_CATEGORY.ROTATIONAL,
-        charges: combatant.hasTalent(TALENTS.ALPHA_PREDATOR_TALENT) ? 2 : 1,
-        cooldown: (haste) => hastedCooldown(6, haste),
+        charges: 2,
+        cooldown: (haste) => hastedCooldown(5, haste),
         gcd: {
           base: 1500,
         },
@@ -29,7 +28,16 @@ class Abilities extends CoreAbilities {
       {
         spell: [TALENTS.RAPTOR_STRIKE_TALENT.id, SPELLS.RAPTOR_STRIKE_AOTE.id],
         category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: !combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
+        enabled: combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
+        gcd: {
+          base: 1500,
+        },
+        timelineSortIndex: 1,
+      },
+      {
+        spell: [SPELLS.RAPTOR_SWIPE_DAMAGE.id, SPELLS.RAPTOR_SWIPE_AOTE.id],
+        category: SPELL_CATEGORY.ROTATIONAL,
+        enabled: combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
         gcd: {
           base: 1500,
         },
@@ -41,10 +49,7 @@ class Abilities extends CoreAbilities {
         category: SPELL_CATEGORY.ROTATIONAL,
         charges: combatant.hasTalent(TALENTS.GUERRILLA_TACTICS_TALENT) ? 2 : 1,
         cooldown: (haste) =>
-          hastedCooldown(
-            18 - EXPLOSIVES_EXPERT_CDR[combatant.getTalentRank(TALENTS.EXPLOSIVES_EXPERT_TALENT)],
-            haste,
-          ),
+          hastedCooldown(18 - (combatant.hasTalent(TALENTS.LUNGE_TALENT) ? 1 : 0), haste),
         gcd: {
           base: 1500,
         },
@@ -63,6 +68,15 @@ class Abilities extends CoreAbilities {
         cooldown: 45,
         timelineSortIndex: 1,
       },
+      {
+        spell: SPELLS.HATCHET_TOSS.id,
+        category: SPELL_CATEGORY.ROTATIONAL,
+        enabled: combatant.hasTalent(TALENTS.RAPTOR_STRIKE_TALENT),
+        gcd: {
+          base: 1500,
+        },
+        timelineSortIndex: 1,
+      },
       //endregion
 
       //region Talents
@@ -76,15 +90,14 @@ class Abilities extends CoreAbilities {
         },
       },
       //endregion
-
       //region Cooldowns
       {
-        spell: [TALENTS.TAKEDOWN_TALENT.id],
+        spell: SPELLS.TAKEDOWN_PLAYER.id,
         enabled: combatant.hasTalent(TALENTS.TAKEDOWN_TALENT),
         category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 90 - (combatant.hasTalent(TALENTS.SAVAGERY_SURVIVAL_TALENT) ? 30 : 0),
+        cooldown: 90 - 15 * combatant.getTalentRank(TALENTS.SAVAGERY_SURVIVAL_TALENT),
         gcd: {
-          static: 0,
+          base: 1500,
         },
         castEfficiency: {
           suggestion: true,
