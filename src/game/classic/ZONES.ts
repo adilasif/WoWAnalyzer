@@ -1,5 +1,6 @@
 import { Zone } from 'game/ZONES';
 import { msv, hof, toes } from 'game/raids/mop_msv_hof_toes';
+import tot from 'game/raids/throne_of_thunder';
 
 const ZONES: Zone[] = [
   {
@@ -37,7 +38,7 @@ const ZONES: Zone[] = [
     id: 1046,
     name: 'Throne of Thunder',
     frozen: false,
-    encounters: [],
+    encounters: Object.values(tot.bosses),
   },
 ];
 

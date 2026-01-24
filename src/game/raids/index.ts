@@ -8,6 +8,7 @@ import {
   hof as HeartOfFear,
   toes as TerraceOfEndlessSpring,
 } from './mop_msv_hof_toes';
+import ThroneOfThunder from './throne_of_thunder';
 
 interface EncounterConfig {
   vantusRuneBuffId?: number;
@@ -73,6 +74,7 @@ const raids = {
   // Midnight
   VSDRMQD,
   // Mists of Pandaria (Classic)
+  ThroneOfThunder,
   MogushanVaults,
   HeartOfFear,
   TerraceOfEndlessSpring,
