@@ -42,7 +42,7 @@ interface Props {
   /**
    * Events that have not been filtered to the time range.
    */
-  allEvents?: AnyEvent[];
+  allEvents?: AnyEvent[] | null;
   dependenciesLoading?: boolean;
 }
 
