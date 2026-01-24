@@ -1,7 +1,9 @@
 import type { Boss } from '../index';
 
-export default {
+const boss: Boss = {
   id: 51559,
   name: 'Iron Qon',
   fight: {},
-} satisfies Boss;
+};
+
+export default boss;
