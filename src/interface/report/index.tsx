@@ -153,6 +153,7 @@ const ResultsLoader = () => {
     parserClass,
     characterProfile,
     events: filteredEvents,
+    allEvents: events,
     dependenciesLoading: isLoadingParser || isLoadingCharacterProfile || isFilteringEvents,
   });
   const parsingState = isParsingEvents ? EVENT_PARSING_STATE.PARSING : EVENT_PARSING_STATE.DONE;

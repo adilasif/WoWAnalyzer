@@ -39,6 +39,10 @@ interface Props {
   parserClass?: new (...args: ConstructorParameters<typeof CombatLogParser>) => CombatLogParser;
   characterProfile: CharacterProfile | null;
   events?: AnyEvent[];
+  /**
+   * Events that have not been filtered to the time range.
+   */
+  allEvents?: AnyEvent[];
   dependenciesLoading?: boolean;
 }
 
@@ -52,6 +56,7 @@ const useEventParser = ({
   parserClass,
   characterProfile,
   events,
+  allEvents,
   dependenciesLoading,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -60,10 +65,10 @@ const useEventParser = ({
 
   const playerCombatantInfo = useMemo(
     () =>
-      events?.find(
+      allEvents?.find(
         (event) => event.type === EventType.CombatantInfo && event.sourceID === player.id,
       ) as CombatantInfoEvent | undefined,
-    [events, player.id],
+    [allEvents, player.id],
   );
 
   const parser = useMemo(() => {
