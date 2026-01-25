@@ -338,6 +338,11 @@ const spells = {
   //endregion
 
   //region Shared
+  SENTINELS_MARK_DEBUFF: {
+    id: 1253601,
+    name: "Sentinel's Mark",
+    icon: 'ability_ardenweald_hunter',
+  },
   MOONLIGHT_CHAKRAM_DAMAGE: {
     id: 1266081,
     name: 'Moonlight Chakram',
