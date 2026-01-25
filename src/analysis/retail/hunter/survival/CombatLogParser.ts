@@ -35,6 +35,7 @@ import WildfireShells from './modules/talents/WildfireShells';
 import LethalCalibration from './modules/talents/LethalCalibration';
 import WildfireBombNormalizer from './normalizers/WildfireBombNormalizer';
 import TipOfTheSpear from './modules/talents/TipOfTheSpear';
+import AplCheck from './modules/apl/AplCheck';
 // import EventLinkNormalizer from '../shared/normalizers/HunterEventLinkNormalizers'; // This has a pack leader normalizer in it useful to Survival so not deleting yet.
 
 class CombatLogParser extends CoreCombatLogParser {
@@ -93,6 +94,9 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Survival's throughput benefit isn't as big as for other classes
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: 0.5 }] as const,
+
+    // APL section.
+    apl: AplCheck,
   };
 }
 
