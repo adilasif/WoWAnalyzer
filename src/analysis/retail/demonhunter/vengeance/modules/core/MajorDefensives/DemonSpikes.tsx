@@ -13,6 +13,7 @@ import {
 import MajorDefensiveStatistic from 'interface/MajorDefensiveStatistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import { TALENTS_DEMON_HUNTER } from 'common/TALENTS';
+import { CALCIFIED_SPIKES_DR } from '../../../constants';
 
 const BASE_DURATION = 12000;
 
@@ -79,7 +80,7 @@ export default class DemonSpikes extends MajorDefensiveBuff {
       mitigatedAmount += getArmorMitigationForEvent(event, this.owner.fight)?.amount ?? 0;
     }
     if (this.hasCalcifiedSpikes) {
-      mitigatedAmount += event.amount * 0.05;
+      mitigatedAmount += event.amount * CALCIFIED_SPIKES_DR;
     }
     if (mitigatedAmount > 0) {
       this.recordMitigation({
