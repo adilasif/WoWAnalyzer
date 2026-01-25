@@ -49,12 +49,15 @@ export const ENGULF_DAMAGE = 'EngulfDamage';
 export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
 const AZURE_SWEEP_CONSUME = 'AzureSweepConsume';
 const AZURE_SWEEP_GENERATE = 'AzureSweepGenerate';
+const SHATTERING_STAR_DAMAGE = 'ShatteringStarDamage';
+const ETERNITY_SURGE_SHATTER_STAR_LINK = 'EternitySurgeShatterStarLink';
 
 const CAST_LINK = 'CastLink';
 const DAMAGE_LINK = 'DamageLink';
 
 export const PYRE_MIN_TRAVEL_TIME = 950;
 export const PYRE_MAX_TRAVEL_TIME = 1_050;
+const SHATTERING_STAR_TRAVEL_TIME = 2_000;
 const CAST_BUFFER_MS = 100;
 const IRIDESCENCE_RED_BACKWARDS_BUFFER_MS = 500;
 const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
@@ -306,6 +309,17 @@ const EVENT_LINKS: EventLink[] = [
     backwardBufferMs: CAST_BUFFER_MS,
     maximumLinks: 1,
     isActive: (c) => c.hasTalent(TALENTS.AZURE_SWEEP_TALENT),
+  },
+  {
+    linkRelation: SHATTERING_STAR_DAMAGE,
+    reverseLinkRelation: ETERNITY_SURGE_SHATTER_STAR_LINK,
+    linkingEventId: SPELLS.ETERNITY_SURGE_DAM.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: SPELLS.SHATTERING_STAR_DAMAGE.id,
+    referencedEventType: EventType.Damage,
+    forwardBufferMs: SHATTERING_STAR_TRAVEL_TIME,
+    maximumLinks: 1,
+    isActive: (c) => c.hasTalent(TALENTS.SHATTERING_STARS_TALENT),
   },
   // TODO: Figure out what to do with these when Flameshaper gets worked on
   /* {
@@ -584,6 +598,21 @@ export function getAzureSweepConsumeEvent(
   event: RemoveBuffEvent | RemoveBuffStackEvent,
 ): CastEvent | undefined {
   return GetRelatedEvent<CastEvent>(event, AZURE_SWEEP_CONSUME);
+}
+
+export function getEternitySurgeEventForShatteringStarDamage(
+  event: DamageEvent,
+): EmpowerEndEvent | undefined {
+  const eternitySurgeDamageEvent = GetRelatedEvent<DamageEvent>(
+    event,
+    ETERNITY_SURGE_SHATTER_STAR_LINK,
+  );
+
+  if (!eternitySurgeDamageEvent) {
+    return undefined;
+  }
+
+  return GetRelatedEvent<EmpowerEndEvent>(eternitySurgeDamageEvent, ETERNITY_SURGE_FROM_CAST);
 }
 
 export default CastLinkNormalizer;

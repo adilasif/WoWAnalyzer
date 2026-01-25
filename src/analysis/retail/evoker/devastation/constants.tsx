@@ -88,6 +88,8 @@ export const HEAT_WAVE_MULTIPLIER = 0.15;
 export const LAY_WASTE_MULTIPLIER = 0.2;
 export const STRAFING_RUN_MULTIPLIER = 0.2;
 export const STRAFING_RUN_DURATION = 18_000;
+export const SHATTERING_STARS_MULTIPLIER_PER_RANK = 0.5;
+export const STAR_SALVO_MULTIPLIER = 0.35;
 
 // Talent multipliers
 export const DENSE_ENERGY_ESSENCE_REDUCTION = 1;

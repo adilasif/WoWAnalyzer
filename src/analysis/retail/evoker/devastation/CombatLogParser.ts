@@ -35,6 +35,7 @@ import StrafingRun from './modules/talents/StrafingRun';
 import SpellUsable from './modules/features/SpellUsable';
 import StrafingRunNormalizer from './modules/normalizers/StrafingRun';
 import AzureSweep from './modules/talents/AzureSweep';
+import ShatteringStars from './modules/talents/ShatteringStars';
 
 // Shared
 import {
@@ -133,6 +134,7 @@ class CombatLogParser extends MainCombatLogParser {
     scorchingEmbers: ScorchingEmbers,
     strafingRun: StrafingRun,
     azureSweep: AzureSweep,
+    shatteringStars: ShatteringStars,
 
     // hero talents
     expandedLungs: ExpandedLungs,

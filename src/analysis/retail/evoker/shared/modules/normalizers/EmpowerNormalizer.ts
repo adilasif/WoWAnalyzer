@@ -125,4 +125,8 @@ export function getEmpowerEndEvent(event: CastEvent): EmpowerEndEvent | undefine
   return GetRelatedEvent(event, EMPOWER_END, (e) => e.type === EventType.EmpowerEnd);
 }
 
+export function getEmpowerCastEvent(event: EmpowerEndEvent): CastEvent | undefined {
+  return GetRelatedEvent(event, EMPOWER_CAST, (e) => e.type === EventType.Cast);
+}
+
 export default EmpowerNormalizer;
