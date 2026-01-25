@@ -12,6 +12,7 @@ import {
 } from 'interface/guide/components/MajorDefensives/MajorDefensiveAnalyzer';
 import MajorDefensiveStatistic from 'interface/MajorDefensiveStatistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
+import { TALENTS_DEMON_HUNTER } from 'common/TALENTS';
 
 const BASE_DURATION = 12000;
 
@@ -23,6 +24,9 @@ export default class DemonSpikes extends MajorDefensiveBuff {
 
   private spikesDurationPerCast = BASE_DURATION;
   private maximumUptime = 0;
+  private hasCalcifiedSpikes = this.selectedCombatant.hasTalent(
+    TALENTS_DEMON_HUNTER.CALCIFIED_SPIKES_TALENT,
+  );
 
   constructor(options: Options & { statTracker: StatTracker }) {
     super(SPELLS.DEMON_SPIKES, buff(SPELLS.DEMON_SPIKES_BUFF), options);
@@ -66,17 +70,23 @@ export default class DemonSpikes extends MajorDefensiveBuff {
   }
 
   private recordDamage(event: DamageEvent) {
-    if (
-      !this.defensiveActive(event) ||
-      event.sourceIsFriendly ||
-      event.ability.type !== MAGIC_SCHOOLS.ids.PHYSICAL
-    ) {
+    if (!this.defensiveActive(event) || event.sourceIsFriendly) {
       return;
     }
-    this.recordMitigation({
-      event,
-      mitigatedAmount: getArmorMitigationForEvent(event, this.owner.fight)?.amount ?? 0,
-    });
+    let mitigatedAmount = 0;
+
+    if (event.ability.type === MAGIC_SCHOOLS.ids.PHYSICAL) {
+      mitigatedAmount += getArmorMitigationForEvent(event, this.owner.fight)?.amount ?? 0;
+    }
+    if (this.hasCalcifiedSpikes) {
+      mitigatedAmount += event.amount * 0.05;
+    }
+    if (mitigatedAmount > 0) {
+      this.recordMitigation({
+        event,
+        mitigatedAmount,
+      });
+    }
   }
 
   private onDemonSpikesCast() {
