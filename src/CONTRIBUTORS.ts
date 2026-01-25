@@ -2541,6 +2541,7 @@ export const SaltyRain: Contributor = {
       link: 'https://worldofwarcraft.blizzard.com/en-gb/character/eu/draenor/liarli',
     },
   ],
+  avatar: avatar('SaltyRain_avatar.jpg'),
 };
 
 export const SebShady: Contributor = {
