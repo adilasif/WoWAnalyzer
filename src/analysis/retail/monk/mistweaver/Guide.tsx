@@ -46,7 +46,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
           : modules.invokeYulon.guideCastBreakdown}
         {info.combatant.hasTalent(TALENTS_MONK.JADE_BOND_TALENT) &&
           modules.revival.guideCastBreakdown}
-        {info.combatant.hasTalent(TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT) &&
+        {info.combatant.hasTalent(TALENTS_MONK.CELESTIAL_CONDUIT_MISTWEAVER_TALENT) &&
           modules.celestialConduit.guideCastBreakdown}
         <HotGraphSubsection modules={modules} events={events} info={info} />
       </Section>

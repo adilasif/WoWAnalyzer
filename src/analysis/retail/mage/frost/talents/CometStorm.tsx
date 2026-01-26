@@ -120,7 +120,6 @@ class CometStorm extends Analyzer {
 
   get guideSubsection(): JSX.Element {
     const cometStorm = <SpellLink spell={TALENTS.COMET_STORM_TALENT} />;
-    const wintersChill = <SpellLink spell={SPELLS.WINTERS_CHILL} />;
     const rayOfFrost = <SpellLink spell={TALENTS.RAY_OF_FROST_TALENT} />;
 
     const explanation = (
@@ -134,11 +133,6 @@ class CometStorm extends Analyzer {
           <li>
             <b>Single Target</b>
           </li>
-          <p>Most of the time on 2 stacks of {wintersChill}, to shatter all 7 comets. </p>
-          <SpellSeq spells={[TALENTS.FLURRY_TALENT, TALENTS.COMET_STORM_TALENT]} />
-          <p>
-            On 1 stack of {wintersChill}, before a long cast ({rayOfFrost})
-          </p>
           <SpellSeq
             spells={[TALENTS.FLURRY_TALENT, SPELLS.ICE_LANCE_DAMAGE, TALENTS.COMET_STORM_TALENT]}
           />

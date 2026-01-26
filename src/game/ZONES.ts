@@ -17,6 +17,13 @@ export interface Zone {
 
 const ZONES: Zone[] = [
   {
+    id: 49, // TODO (@emallson): the release zone is 47
+    name: 'Mythic+ Season 1',
+    frozen: false,
+    useBetaTooltips: true,
+    encounters: Object.values(MythicPlusSeasonOne.bosses),
+  },
+  {
     id: 48, // TODO (@emallson): the release zone is 46
     name: 'Voidspire / Dreamrift / MQD',
     frozen: false,
@@ -24,11 +31,18 @@ const ZONES: Zone[] = [
     encounters: Object.values(VSDRMQD.bosses),
   },
   {
-    id: 49, // TODO (@emallson): the release zone is 47
-    name: 'Mythic+ Season 1',
+    id: 45,
+    name: 'Mythic+ Season 3',
     frozen: false,
-    useBetaTooltips: true,
-    encounters: Object.values(MythicPlusSeasonOne.bosses),
+    encounters: [],
+    partition: 2, // pre-patch
+  },
+  {
+    id: 44,
+    name: 'Manaforge Omega',
+    frozen: false,
+    encounters: [],
+    partition: 3, // pre-patch
   },
 ];
 

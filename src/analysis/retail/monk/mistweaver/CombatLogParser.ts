@@ -50,7 +50,6 @@ import YulonsWhisper from './modules/spells/YulonsWhisper';
 import HotApplicationNormalizer from './normalizers/HotApplicationNormalizer';
 import HotRemovalNormalizer from './normalizers/HotRemovalNormalizer';
 import CastLinkNormalizer from './normalizers/CastLinkNormalizer';
-import Unison from './modules/spells/Unison';
 import RapidDiffusion from './modules/spells/RapidDiffusion';
 import DancingMists from './modules/spells/DancingMists';
 import MistyPeaksHealingBreakdown from './modules/features/MistyPeaksHealingBreakdown';
@@ -94,6 +93,8 @@ import WayOfTheSerpent from './modules/spells/WayOfTheSerpent';
 import MovementTracker from './modules/features/MovementDuringBuffTracker';
 import WayOfTheCrane from './modules/spells/WayOfTheCrane';
 import AncientTeachingsLinkNormalizer from './normalizers/AncientTeachingsLinkNormalizer';
+import PeacefulMending from './modules/spells/PeacefulMending';
+import Spiritfont from './modules/spells/Spiritfont';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -172,7 +173,6 @@ class CombatLogParser extends CoreCombatLogParser {
     soothingMist: SoothingMist,
     thunderFocusTea: ThunderFocusTea,
     yulonsWhisper: YulonsWhisper,
-    //unison: Unison,
     rapidDiffusion: RapidDiffusion,
     dancingMists: DancingMists,
     teachingsOfTheMonestary: TeachingsOfTheMonestary,
@@ -191,6 +191,8 @@ class CombatLogParser extends CoreCombatLogParser {
     jadeEmpowerment: JadeEmpowerment,
     wayOfTheSerpent: WayOfTheSerpent,
     wayOfTheCrane: WayOfTheCrane,
+    peacefulMending: PeacefulMending,
+    spiritfont: Spiritfont,
 
     // Hero Talents
     // Conduit

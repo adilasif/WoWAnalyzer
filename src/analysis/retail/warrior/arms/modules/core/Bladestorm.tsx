@@ -1,5 +1,4 @@
 import SPELLS from 'common/SPELLS';
-import TALENTS from 'common/TALENTS/warrior';
 import Analyzer, { SELECTED_PLAYER, Options } from 'parser/core/Analyzer';
 import Events, { CastEvent } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';

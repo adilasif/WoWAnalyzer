@@ -4,11 +4,15 @@ import { TALENTS_MONK } from 'common/TALENTS';
 import { swirl, Vohrr } from 'CONTRIBUTORS';
 import SpellLink from 'interface/SpellLink';
 
+// prettier-ignore
 export default [
+  change(date(2026, 1, 22), <>Added <SpellLink spell={TALENTS_MONK.PEACEFUL_MENDING_TALENT}/> module.</>, swirl),
+  change(date(2025, 1, 22), <>Updated <SpellLink spell={TALENTS_MONK.SAVE_THEM_ALL_TALENT}/> for Midnight.</>, swirl),
+  change(date(2026, 1, 18), <>Added <SpellLink spell={TALENTS_MONK.SPIRITFONT_1_MISTWEAVER_TALENT}/> module.</>, swirl),
   change(date(2025, 12, 15), <>Added <SpellLink spell={TALENTS_MONK.WAY_OF_THE_CRANE_TALENT}/> and <SpellLink spell={TALENTS_MONK.WAY_OF_THE_SERPENT_TALENT}/> modules.</>, swirl),
   change(date(2025, 12, 12), <>Updated <SpellLink spell={TALENTS_MONK.TEAR_OF_MORNING_TALENT}/> for Midnight.</>, swirl),
   change(date(2025, 12, 5), <>Added <SpellLink spell={TALENTS_MONK.AMPLIFIED_RUSH_TALENT}/> statistic, removed Unison.</>, Vohrr),
-  change(date(2025, 12, 2), <>Updated <SpellLink spell={TALENTS_MONK.RESTORE_BALANCE_TALENT}/> for Midnight and re-enabled <SpellLink spell={TALENTS_MONK.CELESTIAL_CONDUIT_1_WINDWALKER_TALENT}/> for Mistweaver.</>, Vohrr),
+  change(date(2025, 12, 2), <>Updated <SpellLink spell={TALENTS_MONK.RESTORE_BALANCE_TALENT}/> for Midnight and re-enabled <SpellLink spell={TALENTS_MONK.CELESTIAL_CONDUIT_MISTWEAVER_TALENT}/> for Mistweaver.</>, Vohrr),
   change(date(2025, 11, 25), <>Added Season 1 Tier Set analysis for Mistweaver</>, Vohrr),
   change(date(2025, 11, 23), <>Minor bug fixes and typos. Added <SpellLink spell={TALENTS_MONK.MISTY_COALESCENCE_TALENT}/> module.</>, Vohrr),
   change(date(2025, 11, 23), <>Updated <SpellLink spell={TALENTS_MONK.YULONS_WHISPER_TALENT}/>, <SpellLink spell={TALENTS_MONK.MANA_TEA_TALENT}/> bug fixes,  <SpellLink spell={TALENTS_MONK.JADE_EMPOWERMENT_TALENT}/>, and <SpellLink spell={SPELLS.ANCIENT_TEACHINGS}/> for Midnight.</>, Vohrr),

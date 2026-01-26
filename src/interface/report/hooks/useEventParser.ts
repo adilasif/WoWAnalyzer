@@ -34,10 +34,15 @@ interface Props {
   fight?: Fight;
   config: Config;
   player: PlayerDetails;
+  allPlayers: PlayerDetails[];
   applyTimeFilter: (start: number, end: number) => null;
   parserClass?: new (...args: ConstructorParameters<typeof CombatLogParser>) => CombatLogParser;
   characterProfile: CharacterProfile | null;
   events?: AnyEvent[];
+  /**
+   * Events that have not been filtered to the time range.
+   */
+  allEvents?: AnyEvent[] | null;
   dependenciesLoading?: boolean;
 }
 
@@ -46,19 +51,24 @@ const useEventParser = ({
   fight,
   config,
   player,
+  allPlayers,
   applyTimeFilter,
   parserClass,
   characterProfile,
   events,
+  allEvents,
   dependenciesLoading,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const eventIndexRef = useRef(0);
 
-  const combatantInfoEvents = useMemo(
-    () => events?.filter((event) => event.type === EventType.CombatantInfo) as CombatantInfoEvent[],
-    [events],
+  const playerCombatantInfo = useMemo(
+    () =>
+      allEvents?.find(
+        (event) => event.type === EventType.CombatantInfo && event.sourceID === player.id,
+      ) as CombatantInfoEvent | undefined,
+    [allEvents, player.id],
   );
 
   const parser = useMemo(() => {
@@ -70,7 +80,7 @@ const useEventParser = ({
     // isLoadingParser => parserClass == null
     // isLoadingCharacterProfile => characterProfile == null
     // isFilteringEvents => events == null
-    if (dependenciesLoading || !combatantInfoEvents) {
+    if (dependenciesLoading) {
       return null;
     }
     //set current build to undefined if default build or non-existing build selected
@@ -79,8 +89,9 @@ const useEventParser = ({
       report,
       player,
       fight!,
-      combatantInfoEvents,
+      playerCombatantInfo,
       characterProfile!,
+      allPlayers,
     );
     parser.applyTimeFilter = applyTimeFilter;
 
@@ -94,7 +105,8 @@ const useEventParser = ({
     report,
     player,
     config,
-    combatantInfoEvents,
+    playerCombatantInfo,
+    allPlayers,
   ]);
 
   const normalizedEvents = useMemo(() => {
@@ -105,7 +117,7 @@ const useEventParser = ({
     }
     // The events we fetched will be all events related to the selected player. This includes the `combatantinfo` for the selected player. However we have already parsed this event when we loaded the combatants in the `initializeAnalyzers` of the CombatLogParser. Loading the selected player again could lead to bugs since it would reinitialize and overwrite the existing entity (the selected player) in the Combatants module.
     const result = parser
-      .normalize(events.filter((event) => event.type !== EventType.CombatantInfo))
+      .normalize(events)
       //sort now normalized events to avoid new fabricated events like "prepull" casts etc being in incorrect order with casts "kept" from before the filter
       .sort((a, b) => a.timestamp - b.timestamp);
     benchEnd('normalizing events');

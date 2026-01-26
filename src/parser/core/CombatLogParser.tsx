@@ -70,7 +70,7 @@ import MissingCastsNormalizer from '../shared/normalizers/MissingCasts';
 import PhaseChangesNormalizer from '../shared/normalizers/PhaseChanges';
 import PrePullCooldownsNormalizer from '../shared/normalizers/PrePullCooldowns';
 import Analyzer from './Analyzer';
-import Combatant from './Combatant';
+import { FullCombatant } from './Combatant';
 import EventFilter from './EventFilter';
 import EventsNormalizer from './EventsNormalizer';
 import { EventListener } from './EventSubscriber';
@@ -238,10 +238,10 @@ class CombatLogParser {
 
   // Player info from WCL - required
   player: PlayerInfo;
+  readonly playerCombatantInfo: CombatantInfoEvent | undefined;
   playerPets: PetInfo[];
   fight: Fight;
   boss: Boss | null;
-  combatantInfoEvents: CombatantInfoEvent[] = [];
 
   //Disabled Modules
   disabledModules!: Record<ModuleError, ModuleErrorDetails[]>;
@@ -276,10 +276,14 @@ class CombatLogParser {
   }
   finished = false;
 
+  /**
+   * Should probably use .playerDetails
+   */
   get players(): PlayerInfo[] {
     return this.report.friendlies;
   }
-  get selectedCombatant(): Combatant {
+  readonly playerDetails: PlayerDetails[];
+  get selectedCombatant(): FullCombatant {
     return this.getModule(Combatants).selected;
   }
 
@@ -288,11 +292,15 @@ class CombatLogParser {
     report: Report,
     selectedPlayer: PlayerDetails,
     selectedFight: Fight,
-    combatantInfoEvents: CombatantInfoEvent[],
+    playerCombatantInfo: CombatantInfoEvent | undefined,
     characterProfile: CharacterProfile,
+    playerDetails: PlayerDetails[],
   ) {
     this.config = config;
     this.report = report;
+
+    this.playerCombatantInfo = playerCombatantInfo;
+    this.playerDetails = playerDetails;
 
     const playerInfo = report.friendlies.find((player) => player.id === selectedPlayer.id);
     if (!playerInfo) {
@@ -302,7 +310,6 @@ class CombatLogParser {
 
     this.playerPets = report.friendlyPets.filter((pet) => pet.petOwner === selectedPlayer.id);
     this.fight = selectedFight;
-    this.combatantInfoEvents = combatantInfoEvents;
 
     this.characterProfile = characterProfile;
     this._timestamp = selectedFight.start_time;

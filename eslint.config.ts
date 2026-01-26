@@ -37,7 +37,6 @@ const ignores = tseslint.config({
     'src/analysis/retail/deathknight/frost/**',
     'src/analysis/retail/deathknight/unholy/**',
     'src/analysis/retail/druid/balance/**',
-    'src/analysis/retail/druid/guardian/**',
     'src/analysis/retail/druid/feral/**',
     'src/analysis/retail/druid/restoration/**',
     'src/analysis/retail/druid/shared/**',
@@ -71,10 +70,7 @@ const ignores = tseslint.config({
     'src/analysis/retail/warlock/demonology/**',
     'src/analysis/retail/warlock/destruction/**',
     'src/analysis/retail/warlock/shared/**',
-    'src/analysis/retail/warrior/arms/**',
-    'src/analysis/retail/warrior/fury/**',
     'src/analysis/retail/warrior/protection/**',
-    'src/analysis/retail/warrior/shared/**',
   ],
 });
 

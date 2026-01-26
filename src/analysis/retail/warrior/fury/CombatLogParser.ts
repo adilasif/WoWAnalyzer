@@ -39,6 +39,8 @@ import SuddenDeathBuffNormalizer from '../shared/modules/normalizers/SuddenDeath
 import Guide from './Guide';
 import AplCheck from './modules/core/AplCheck';
 import Executioner from '../shared/modules/talents/Executioner';
+import AvatarOfTheStorm from './modules/talents/AvatarOfTheStorm';
+import BurstOfPower from './modules/talents/BurstOfPower';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -91,6 +93,8 @@ class CombatLogParser extends CoreCombatLogParser {
     impendingVictory: ImpendingVictory,
     hackAndSlash: HackAndSlash,
     executioner: Executioner,
+    avatarOfTheStorm: AvatarOfTheStorm,
+    burstOfPower: BurstOfPower,
 
     // Debuggers
     rageCountDebugger: RageCountDebugger,

@@ -36,10 +36,10 @@ export const EB_FROM_AZURE_STRIKE = 'ebFromAzureStrike';
 export const EB_FROM_PRESCIENCE = 'ebFromPrescience';
 export const EB_FROM_LF_CAST = 'ebFromLFCast';
 export const EB_FROM_LF_HEAL = 'ebFromLFHeal'; // Specifically used for Leaping Flames analysis
-export const EB_FROM_AUG_UNDERMINE_4PC = 'ebFromAugUndermine4pc';
-export const EB_FROM_AUG_UNDERMINE_4PC_EONS = 'ebFromAugUndermine4pcEons';
+const EB_FROM_ENERGY_CYCLES = 'ebFromEnergyCycles';
 const ESSENCE_BURST_BUFFER = 40; // Sometimes the EB comes a bit early/late
 const EB_LF_CAST_BUFFER = 1_000;
+const ENERGY_CYCLES_BUFFER = 6_000;
 
 export const EB_FROM_DIVERTED_POWER = 'ebFromDivertedPower';
 const EB_DIVERTED_POWER_BUFFER = 100; // These for some reason have longer delays
@@ -64,30 +64,46 @@ export const ESSENCE_BURST_CONSUME = 'EssenceBurstConsume';
  */
 const EVENT_LINKS: EventLink[] = [
   {
-    linkRelation: EB_FROM_AUG_UNDERMINE_4PC,
-    reverseLinkRelation: EB_FROM_AUG_UNDERMINE_4PC,
-    linkingEventId: [TALENTS.UPHEAVAL_TALENT.id, SPELLS.UPHEAVAL_FONT.id],
-    linkingEventType: EventType.EmpowerEnd,
+    // unlike emerald trance, energy cycles gives EB on buff application
+    linkRelation: EB_FROM_ENERGY_CYCLES,
+    reverseLinkRelation: EB_FROM_ENERGY_CYCLES,
+    linkingEventId: SPELLS.TEMPORAL_BURST_BUFF.id,
+    linkingEventType: EventType.ApplyBuff,
     referencedEventId: EB_BUFF_IDS,
     referencedEventType: EB_GENERATION_EVENT_TYPES,
     anyTarget: true,
     forwardBufferMs: ESSENCE_BURST_BUFFER,
     backwardBufferMs: ESSENCE_BURST_BUFFER,
     maximumLinks: 1,
-    isActive: (c) => c.has4PieceByTier(TIERS.TWW2),
+    isActive: (c) => c.hasTalent(TALENTS.ENERGY_CYCLES_TALENT),
   },
   {
-    linkRelation: EB_FROM_AUG_UNDERMINE_4PC_EONS,
-    reverseLinkRelation: EB_FROM_AUG_UNDERMINE_4PC_EONS,
-    linkingEventId: [TALENTS.BREATH_OF_EONS_TALENT.id, SPELLS.BREATH_OF_EONS_SCALECOMMANDER.id],
-    linkingEventType: EventType.Cast,
+    linkRelation: EB_FROM_ENERGY_CYCLES,
+    reverseLinkRelation: EB_FROM_ENERGY_CYCLES,
+    linkingEventId: SPELLS.TEMPORAL_BURST_BUFF.id,
+    linkingEventType: EventType.ApplyBuff,
     referencedEventId: EB_BUFF_IDS,
     referencedEventType: EB_GENERATION_EVENT_TYPES,
     anyTarget: true,
-    forwardBufferMs: ESSENCE_BURST_BUFFER,
-    backwardBufferMs: ESSENCE_BURST_BUFFER,
-    maximumLinks: 1,
-    isActive: (c) => c.has4PieceByTier(TIERS.TWW2),
+    forwardBufferMs: ENERGY_CYCLES_BUFFER * 5 + ESSENCE_BURST_BUFFER,
+    maximumLinks: 5,
+    isActive: (c) => c.hasTalent(TALENTS.ENERGY_CYCLES_TALENT),
+    additionalCondition(linkingEvent, referencedEvent) {
+      // reused from Emerald Trance
+      // applies one EB each 6_000 ms for the duration of the buff (30_000ms)
+      // so check if the timestamp difference is divisible by 6_000 allowing the remainder to be withing the ESSENCE_BURST_BUFFER range
+      const timeDiff = Math.abs(
+        (linkingEvent.timestamp - referencedEvent.timestamp) % ENERGY_CYCLES_BUFFER,
+      );
+      if (
+        timeDiff > ESSENCE_BURST_BUFFER &&
+        ENERGY_CYCLES_BUFFER - timeDiff > ESSENCE_BURST_BUFFER // it can probably come early
+      ) {
+        return false;
+      }
+
+      return hasNoGenerationLink(referencedEvent as AnyBuffEvent);
+    },
   },
   {
     linkRelation: EB_FROM_PRESCIENCE,

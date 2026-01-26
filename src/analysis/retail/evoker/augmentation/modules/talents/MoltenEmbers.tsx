@@ -12,10 +12,7 @@ import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import TalentSpellText from 'parser/ui/TalentSpellText';
-import {
-  MOLTEN_EMBERS_MULTIPLIER,
-  MOLTEN_EMBERS_MULTIPLIER_NO_BLAST_FURNACE,
-} from '../../constants';
+import { MOLTEN_EMBERS_MULTIPLIER } from '../../constants';
 import { BLACK_DAMAGE_SPELLS } from 'analysis/retail/evoker/shared/constants';
 import Enemies from 'parser/shared/modules/Enemies';
 import { Talent } from 'common/TALENTS/types';
@@ -67,8 +64,6 @@ class MoltenEmbers extends Analyzer {
   hasReverberations = false;
   perfectFireBreathRank = 1;
 
-  moltenEmbersAmplifiers = MOLTEN_EMBERS_MULTIPLIER_NO_BLAST_FURNACE;
-
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS.MOLTEN_EMBERS_TALENT);
@@ -93,10 +88,6 @@ class MoltenEmbers extends Analyzer {
       this.moltenEmbersDamageSources[spell.id] = { amount: 0, spell };
     }
     this.hasReverberations = this.selectedCombatant.hasTalent(TALENTS.REVERBERATIONS_TALENT);
-
-    if (this.selectedCombatant.hasTalent(TALENTS.BLAST_FURNACE_TALENT)) {
-      this.moltenEmbersAmplifiers = MOLTEN_EMBERS_MULTIPLIER;
-    }
   }
 
   onDamage(event: DamageEvent) {
@@ -111,10 +102,7 @@ class MoltenEmbers extends Analyzer {
       return;
     }
 
-    const effAmount = calculateEffectiveDamage(
-      event,
-      this.moltenEmbersAmplifiers[this.previousFireBreathRank - 1],
-    );
+    const effAmount = calculateEffectiveDamage(event, MOLTEN_EMBERS_MULTIPLIER);
 
     this.moltenEmbersDamageSources[event.ability.guid].amount += effAmount;
     this.totalMoltenEmbersDamage += effAmount;
@@ -135,10 +123,7 @@ class MoltenEmbers extends Analyzer {
       const reverbEvents = GetRelatedEvents<DamageEvent>(event, UPHEAVAL_REVERBERATION_DAM_LINK);
 
       reverbEvents.forEach((reverbEvent) => {
-        const effAmount = calculateEffectiveDamage(
-          reverbEvent,
-          this.moltenEmbersAmplifiers[this.previousFireBreathRank - 1],
-        );
+        const effAmount = calculateEffectiveDamage(reverbEvent, MOLTEN_EMBERS_MULTIPLIER);
 
         this.moltenEmbersDamageSources[SPELLS.UPHEAVAL_DAM.id].amount += effAmount;
         this.totalMoltenEmbersDamage += effAmount;
