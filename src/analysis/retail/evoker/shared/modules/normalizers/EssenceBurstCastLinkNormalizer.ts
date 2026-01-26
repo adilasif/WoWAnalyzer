@@ -262,6 +262,7 @@ export const EBSource = {
   LivingFlameHeal: EB_FROM_LF_HEAL,
   DivertedPower: EB_FROM_DIVERTED_POWER,
   EssenceWell: EB_FROM_ESSENCE_WELL,
+  EnergyCycles: EB_FROM_ENERGY_CYCLES,
 } as const;
 export type EBSourceType = (typeof EBSource)[keyof typeof EBSource];
 
