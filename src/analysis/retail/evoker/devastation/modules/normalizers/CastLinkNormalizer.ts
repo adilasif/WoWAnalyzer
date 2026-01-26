@@ -45,8 +45,6 @@ const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
 const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
 const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
 export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
-export const ENGULF_DAMAGE = 'EngulfDamage';
-export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
 const AZURE_SWEEP_CONSUME = 'AzureSweepConsume';
 const AZURE_SWEEP_GENERATE = 'AzureSweepGenerate';
 const SHATTERING_STAR_DAMAGE = 'ShatteringStarDamage';
@@ -321,35 +319,6 @@ const EVENT_LINKS: EventLink[] = [
     maximumLinks: 1,
     isActive: (c) => c.hasTalent(TALENTS.SHATTERING_STARS_TALENT),
   },
-  // TODO: Figure out what to do with these when Flameshaper gets worked on
-  /* {
-    linkRelation: ENGULF_DAMAGE,
-    reverseLinkRelation: ENGULF_DAMAGE,
-    linkingEventId: TALENTS.ENGULF_TALENT.id,
-    linkingEventType: EventType.Cast,
-    referencedEventId: SPELLS.ENGULF_DAMAGE.id,
-    referencedEventType: EventType.Damage,
-    anyTarget: true,
-    forwardBufferMs: ENGULF_TRAVEL_TIME_MS,
-    maximumLinks: 1,
-    isActive(c) {
-      return c.hasTalent(TALENTS.ENGULF_TALENT);
-    },
-  },
-  {
-    linkRelation: ENGULF_CONSUME_FLAME,
-    reverseLinkRelation: ENGULF_CONSUME_FLAME,
-    linkingEventId: SPELLS.CONSUME_FLAME_DAMAGE.id,
-    linkingEventType: EventType.Damage,
-    referencedEventId: TALENTS.ENGULF_TALENT.id,
-    referencedEventType: EventType.Cast,
-    anyTarget: true,
-    maximumLinks: 1,
-    backwardBufferMs: ENGULF_TRAVEL_TIME_MS,
-    isActive(c) {
-      return c.hasTalent(TALENTS.CONSUME_FLAME_TALENT);
-    },
-  }, */
 ];
 
 class CastLinkNormalizer extends EventLinkNormalizer {
