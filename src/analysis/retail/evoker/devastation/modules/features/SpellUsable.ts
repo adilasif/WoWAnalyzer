@@ -42,7 +42,7 @@ class SpellUsable extends SharedSpellUsable.withDependencies({
     const cooldownRemaining = super.cooldownRemaining(spellId);
 
     super.endCooldown(spellId);
-    super.beginCooldown(event, spellId);
+    super.beginCooldown(primaryDBEvent, spellId);
 
     const diff = Math.abs(cooldownRemaining - super.fullCooldownDuration(spellId));
     super.reduceCooldown(event.ability.guid, diff);
