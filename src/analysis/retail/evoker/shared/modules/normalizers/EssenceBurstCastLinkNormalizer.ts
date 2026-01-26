@@ -229,7 +229,8 @@ const EVENT_LINKS: EventLink[] = [
     ],
     linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
     referencedEventId: [
-      TALENTS.PYRE_TALENT.id,
+      SPELLS.PYRE.id,
+      SPELLS.PYRE_DENSE_TALENT.id,
       SPELLS.DISINTEGRATE.id,
       TALENTS.ERUPTION_TALENT.id,
       TALENTS.ECHO_TALENT.id,
