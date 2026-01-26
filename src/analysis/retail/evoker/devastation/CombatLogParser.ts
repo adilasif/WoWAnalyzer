@@ -71,6 +71,7 @@ import {
   RefinedEssence,
   CommandSquadron,
   ImminentDestructionCastLinkNormalizer,
+  EssenceWell,
 } from 'analysis/retail/evoker/shared';
 
 class CombatLogParser extends MainCombatLogParser {
@@ -94,6 +95,7 @@ class CombatLogParser extends MainCombatLogParser {
     sourceOfMagic: SourceOfMagic,
     potentMana: PotentMana,
     imminentDestruction: ImminentDestruction,
+    essenceWell: EssenceWell,
 
     obsidianScales: ObsidianScales,
     defensiveCastLinkNormalizer: DefensiveCastLinkNormalizer,
