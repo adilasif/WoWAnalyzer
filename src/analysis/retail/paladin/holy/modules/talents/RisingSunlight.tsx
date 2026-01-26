@@ -1,6 +1,6 @@
 import TALENTS from 'common/TALENTS/paladin';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import Events, { DamageEvent, EventType, HealEvent } from 'parser/core/Events';
+import Events, { DamageEvent, HealEvent } from 'parser/core/Events';
 import ItemHealingDone from 'parser/ui/ItemHealingDone';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
@@ -38,7 +38,7 @@ class RisingSunlight extends Analyzer {
     this.active = this.selectedCombatant.hasTalent(TALENTS.RISING_SUNLIGHT_TALENT);
 
     this.addEventListener(Events.heal, this.trackHealthFromHeal);
-    this.addEventListener(Events.damage.to(SELECTED_PLAYER), this.trackHealthFromDamage);
+    this.addEventListener(Events.damage, this.trackHealthFromDamage);
     this.addEventListener(Events.heal.by(SELECTED_PLAYER), this.onHeal);
   }
 
@@ -100,9 +100,11 @@ class RisingSunlight extends Analyzer {
     this.healCount += 1;
   }
 
-  statistic() {
-    const averageIncrease = this.healCount > 0 ? this.totalHealingIncreaseSum / this.healCount : 0;
+  averageHealingIncrease(): number {
+    return this.healCount > 0 ? this.totalHealingIncreaseSum / this.healCount : 0;
+  }
 
+  statistic() {
     return (
       <Statistic
         size="flexible"
@@ -112,7 +114,7 @@ class RisingSunlight extends Analyzer {
           <>
             Effective Healing: {formatNumber(this.healing)} <br />
             Overhealing: {formatNumber(this.overheal)} <br />
-            Average Healing Increase: {formatPercentage(averageIncrease)}%
+            Average Healing Increase: {formatPercentage(this.averageHealingIncrease())}%
           </>
         }
       >
