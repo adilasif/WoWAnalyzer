@@ -118,6 +118,9 @@ const EVENT_LINKS: EventLink[] = [
     backwardBufferMs: ESSENCE_BURST_BUFFER,
     maximumLinks: 1,
     isActive: (c) => c.hasTalent(TALENTS.ANACHRONISM_TALENT),
+    additionalCondition(_linkingEvent, referencedEvent) {
+      return hasNoGenerationLink(referencedEvent as AnyBuffEvent);
+    },
   },
   {
     linkRelation: EB_FROM_AZURE_STRIKE,
