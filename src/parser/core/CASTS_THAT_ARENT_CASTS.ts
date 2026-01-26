@@ -62,8 +62,8 @@ const spells: number[] = [
   SPELLS.BARBED_SHOT_PET_BUFF.id, //The buff applied to BM Hunter pet when casting Barbed Shot
   SPELLS.DIRE_BEAST_SUMMON.id, //Additional cast event associated with summoning a Dire Beast
   SPELLS.DIRE_BEAST_GLYPHED.id, //Additional cast event associated with summoning a Dire Beast with Glyph of Dire Stable
-  SPELLS.COORDINATED_ASSAULT_FAKE_CAST.id, // The real cast is the Coordinated Assault Talent.
   SPELLS.DIRE_BEAST_SUMMON.id, // Turned into a passive proc
+  SPELLS.URSINE_FURY_BEASTS.id, // Pack Leader - Ursine Fury Spawns 2 beasts. Spams out console about duplicate IDs
   //endregion
 
   //region Mage
