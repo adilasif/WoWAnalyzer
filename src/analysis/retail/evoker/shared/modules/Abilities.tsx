@@ -71,6 +71,7 @@ class Abilities extends CoreAbilities {
           },
         }),
         range: BASE_EVOKER_RANGE,
+        charges: combatant.hasTalent(TALENTS.LEGACY_OF_THE_LIFEBINDER_TALENT) ? 2 : 1,
       },
       {
         spell: SPELLS.LIVING_FLAME_CAST.id,
