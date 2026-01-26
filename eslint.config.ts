@@ -169,7 +169,7 @@ const typescript = tseslint.config({
   },
   rules: {
     '@eslint-react/dom/no-missing-button-type': 'error',
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-unused-expressions': [
       'error',
       { allowShortCircuit: true, allowTernary: true },
