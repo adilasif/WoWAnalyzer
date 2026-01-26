@@ -31,6 +31,12 @@ import ScorchingEmbers from './modules/talents/ScorchingEmbers';
 import AlwaysBeCasting from 'parser/shared/modules/AlwaysBeCasting';
 import CancelledCasts from 'parser/shared/modules/CancelledCasts';
 import DisintegrateChainCastLinks from './modules/normalizers/DisintegrateChainCastLinks';
+import StrafingRun from './modules/talents/StrafingRun';
+import SpellUsable from './modules/features/SpellUsable';
+import StrafingRunNormalizer from './modules/normalizers/StrafingRun';
+import AzureSweep from './modules/talents/AzureSweep';
+import ShatteringStars from './modules/talents/ShatteringStars';
+import StarSalvo from './modules/talents/StarSalvo';
 
 // Shared
 import {
@@ -41,7 +47,6 @@ import {
   LeapingFlamesNormalizer,
   LeapingFlames,
   EmpowerNormalizer,
-  SpellUsable,
   GlobalCooldown,
   SpellEssenceCost,
   EssenceTracker,
@@ -105,6 +110,7 @@ class CombatLogParser extends MainCombatLogParser {
     essenceBurstNormalizer: EssenceBurstNormalizer,
     eternitySurgeNormalizer: EternitySurgeNormalizer,
     disintegrateChainCastLinks: DisintegrateChainCastLinks,
+    strafingRunNormalizer: StrafingRunNormalizer,
 
     // features
     //apls: AplCheck,
@@ -127,6 +133,10 @@ class CombatLogParser extends MainCombatLogParser {
     layWaste: LayWaste,
     iridescence: Iridescence,
     scorchingEmbers: ScorchingEmbers,
+    strafingRun: StrafingRun,
+    azureSweep: AzureSweep,
+    shatteringStars: ShatteringStars,
+    starSalvo: StarSalvo,
 
     // hero talents
     expandedLungs: ExpandedLungs,
