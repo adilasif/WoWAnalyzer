@@ -36,7 +36,7 @@ class ShatteringStars extends Analyzer {
 
   protected onDamage(event: DamageEvent) {
     const empowerEndEvent = getEternitySurgeEventForShatteringStarDamage(event);
-    let baseAmount = event.amount + (event.absorbed || 0);
+    const baseAmount = event.amount + (event.absorbed || 0);
 
     // No Empower End event means that this is triggered by Scintillation
     if (!empowerEndEvent) {
