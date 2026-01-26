@@ -72,6 +72,8 @@ import {
   CommandSquadron,
   ImminentDestructionCastLinkNormalizer,
   EssenceWell,
+  TwinFlame,
+  FireTorrent,
 } from 'analysis/retail/evoker/shared';
 
 class CombatLogParser extends MainCombatLogParser {
@@ -96,6 +98,8 @@ class CombatLogParser extends MainCombatLogParser {
     potentMana: PotentMana,
     imminentDestruction: ImminentDestruction,
     essenceWell: EssenceWell,
+    twinFlame: TwinFlame,
+    fireTorrent: FireTorrent,
 
     obsidianScales: ObsidianScales,
     defensiveCastLinkNormalizer: DefensiveCastLinkNormalizer,

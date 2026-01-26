@@ -60,6 +60,7 @@ const CAST_BUFFER_MS = 100;
 const IRIDESCENCE_RED_BACKWARDS_BUFFER_MS = 500;
 const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
 const DEEP_BREATH_FLIGHT_TIME_MS = 4_000; // 3s + some leeway
+const TWIN_FLAME_TRAVEL_TIME_MS = 1_000;
 
 const EVENT_LINKS: EventLink[] = [
   {
@@ -318,6 +319,17 @@ const EVENT_LINKS: EventLink[] = [
     forwardBufferMs: SHATTERING_STAR_TRAVEL_TIME,
     maximumLinks: 1,
     isActive: (c) => c.hasTalent(TALENTS.SHATTERING_STARS_TALENT),
+  },
+  {
+    linkRelation: CAST_LINK,
+    reverseLinkRelation: DAMAGE_LINK,
+    linkingEventId: SPELLS.TWIN_FLAME.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: SPELLS.TWIN_FLAME.id,
+    referencedEventType: EventType.Cast,
+    anyTarget: true,
+    backwardBufferMs: TWIN_FLAME_TRAVEL_TIME_MS,
+    maximumLinks: 1,
   },
 ];
 
