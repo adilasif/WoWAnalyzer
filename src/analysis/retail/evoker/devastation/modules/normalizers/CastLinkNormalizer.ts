@@ -45,8 +45,6 @@ const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
 const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
 const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
 export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
-export const ENGULF_DAMAGE = 'EngulfDamage';
-export const ENGULF_CONSUME_FLAME = 'EngulfConsumeFlame';
 const AZURE_SWEEP_CONSUME = 'AzureSweepConsume';
 const AZURE_SWEEP_GENERATE = 'AzureSweepGenerate';
 const SHATTERING_STAR_DAMAGE = 'ShatteringStarDamage';
@@ -62,6 +60,7 @@ const CAST_BUFFER_MS = 100;
 const IRIDESCENCE_RED_BACKWARDS_BUFFER_MS = 500;
 const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
 const DEEP_BREATH_FLIGHT_TIME_MS = 4_000; // 3s + some leeway
+const TWIN_FLAME_TRAVEL_TIME_MS = 1_000;
 
 const EVENT_LINKS: EventLink[] = [
   {
@@ -321,35 +320,17 @@ const EVENT_LINKS: EventLink[] = [
     maximumLinks: 1,
     isActive: (c) => c.hasTalent(TALENTS.SHATTERING_STARS_TALENT),
   },
-  // TODO: Figure out what to do with these when Flameshaper gets worked on
-  /* {
-    linkRelation: ENGULF_DAMAGE,
-    reverseLinkRelation: ENGULF_DAMAGE,
-    linkingEventId: TALENTS.ENGULF_TALENT.id,
-    linkingEventType: EventType.Cast,
-    referencedEventId: SPELLS.ENGULF_DAMAGE.id,
-    referencedEventType: EventType.Damage,
-    anyTarget: true,
-    forwardBufferMs: ENGULF_TRAVEL_TIME_MS,
-    maximumLinks: 1,
-    isActive(c) {
-      return c.hasTalent(TALENTS.ENGULF_TALENT);
-    },
-  },
   {
-    linkRelation: ENGULF_CONSUME_FLAME,
-    reverseLinkRelation: ENGULF_CONSUME_FLAME,
-    linkingEventId: SPELLS.CONSUME_FLAME_DAMAGE.id,
+    linkRelation: CAST_LINK,
+    reverseLinkRelation: DAMAGE_LINK,
+    linkingEventId: SPELLS.TWIN_FLAME.id,
     linkingEventType: EventType.Damage,
-    referencedEventId: TALENTS.ENGULF_TALENT.id,
+    referencedEventId: SPELLS.TWIN_FLAME.id,
     referencedEventType: EventType.Cast,
     anyTarget: true,
+    backwardBufferMs: TWIN_FLAME_TRAVEL_TIME_MS,
     maximumLinks: 1,
-    backwardBufferMs: ENGULF_TRAVEL_TIME_MS,
-    isActive(c) {
-      return c.hasTalent(TALENTS.CONSUME_FLAME_TALENT);
-    },
-  }, */
+  },
 ];
 
 class CastLinkNormalizer extends EventLinkNormalizer {
