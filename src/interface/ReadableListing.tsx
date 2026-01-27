@@ -13,7 +13,7 @@ const Separator = ({ idx, groupType, size }: SeparatorProps) => {
   if (idx === size - 1) {
     return <> {groupType} </>;
   }
-  return <>, {groupType}</>;
+  return <>, </>;
 };
 
 interface Props {
