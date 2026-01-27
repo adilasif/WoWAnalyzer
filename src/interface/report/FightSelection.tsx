@@ -1,4 +1,4 @@
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import getFightName from 'common/getFightName';
 import makeAnalyzerUrl from 'interface/makeAnalyzerUrl';
 import OldExpansionWarning from 'interface/report/OldExpansionWarning';
@@ -18,6 +18,9 @@ import { isPresent } from 'common/typeGuards';
 import { useWaDispatch } from 'interface/utils/useWaDispatch';
 import { clearFight, setFight } from 'interface/reducers/navigation';
 import Report from 'parser/core/Report';
+import { useLingui } from '@lingui/react';
+import { isEligibleFight } from 'common/isEligibleFight';
+import ReportNoEligibleFightsWarning from 'interface/report/ReportNoEligibleFightsWarning';
 
 const getFightFromReport = (report: Report, fightId: number) => {
   if (!report.fights) {
@@ -34,6 +37,7 @@ const FightSelectionList = () => {
   const [killsOnly, setKillsOnly] = useState(false);
   const { report, refreshReport } = useReport();
   const reportDuration = report.end - report.start;
+  const { i18n } = useLingui();
   usePageView('FightSelectionList');
 
   return (
@@ -42,7 +46,7 @@ const FightSelectionList = () => {
         <div className="flex-main" style={{ position: 'relative' }}>
           <div className="back-button">
             <Tooltip
-              content={t({
+              content={i18n._({
                 id: 'interface.report.fightSelection.tooltip.backToHome',
                 message: `Back to home`,
               })}
@@ -114,7 +118,9 @@ const FightSelection = ({ children }: Props) => {
   const fightIdAsNumber = getFightIdFromParam(fightId);
   const { report } = useReport();
   const dispatch = useWaDispatch();
+  const { i18n } = useLingui();
 
+  const eligibleFights = report.fights.filter(isEligibleFight);
   const fight = isPresent(fightIdAsNumber) ? getFightFromReport(report, fightIdAsNumber) : null;
 
   useEffect(() => {
@@ -132,6 +138,10 @@ const FightSelection = ({ children }: Props) => {
     window.scrollTo(0, 0);
   }, []);
 
+  if (eligibleFights.length === 0) {
+    return <ReportNoEligibleFightsWarning />;
+  }
+
   if (!fight) {
     return <FightSelectionList />;
   }
@@ -141,9 +151,13 @@ const FightSelection = ({ children }: Props) => {
       <DocumentTitle
         title={
           fight
-            ? t({
+            ? i18n._({
                 id: 'interface.report.fightSelection.documentTitle',
-                message: `${getFightName(report, fight)} in ${report.title}`,
+                message: '{name} in {title}',
+                values: {
+                  name: getFightName(report, fight),
+                  title: report.title,
+                },
               })
             : report.title
         }
