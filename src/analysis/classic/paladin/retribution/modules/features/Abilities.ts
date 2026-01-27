@@ -41,6 +41,12 @@ class Abilities extends CoreAbilities {
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: { base: 1500 },
       },
+      // Rotational AOE
+      {
+        spell: [SPELLS.CONSECRATION.id],
+        category: SPELL_CATEGORY.ROTATIONAL_AOE,
+        gcd: { base: 1500 },
+      },
       // Cooldowns
       {
         spell: [SPELLS.AVENGING_WRATH.id],
