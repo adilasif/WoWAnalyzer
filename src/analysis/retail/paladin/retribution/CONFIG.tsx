@@ -2,14 +2,14 @@ import GameBranch from 'game/GameBranch';
 import SPECS from 'game/SPECS';
 import Config, { SupportLevel } from 'parser/Config';
 
-// import CHANGELOG from './CHANGELOG';
+import CHANGELOG from './CHANGELOG';
 import { Texleretour } from 'CONTRIBUTORS';
 
 const config: Config = {
   contributors: [Texleretour],
   branch: GameBranch.Retail,
-  patchCompatibility: '11.2',
-  supportLevel: SupportLevel.MaintainedPartial,
+  patchCompatibility: '12.0.0',
+  supportLevel: SupportLevel.Foundation,
   description: (
     <>
       We hope you get some use out this analyzer we have been working on.
@@ -43,11 +43,11 @@ const config: Config = {
     '/report/Tk1qFQXApP2jZvVD/9-Heroic+Cauldron+of+Carnage+-+Kill+(2:43)/Chepged/standard/overview',
 
   spec: SPECS.RETRIBUTION_PALADIN,
-  changelog: [], // CHANGELOG,
-  // parser: () =>
-  //   import('./CombatLogParser' /* webpackChunkName: "RetributionPaladin" */).then(
-  //     (exports) => exports.default,
-  //   ),
+  changelog: CHANGELOG,
+  parser: () =>
+    import('./CombatLogParser' /* webpackChunkName: "RetributionPaladin" */).then(
+      (exports) => exports.default,
+    ),
   path: import.meta.url,
 };
 
