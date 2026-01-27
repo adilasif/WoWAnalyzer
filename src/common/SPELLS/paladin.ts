@@ -499,16 +499,6 @@ const spells = {
     name: 'Crusading Strikes',
     icon: 'inv_sword_08',
   },
-  VANGUARDS_MOMENTUM: {
-    id: 403081,
-    name: "Vanguard's Momentum",
-    icon: 'ability_paladin_speedoflight',
-  },
-  DIVINE_AUXILIARY: {
-    id: 408386,
-    name: 'Divine Auxiliary',
-    icon: 'spell_holy_righteousfury',
-  },
   RUSH_OF_LIGHT: {
     id: 407065,
     name: 'Rush of Light',

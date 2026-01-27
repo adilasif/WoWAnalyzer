@@ -40,7 +40,7 @@ const config: Config = {
     </>
   ),
   exampleReport:
-    '/report/Tk1qFQXApP2jZvVD/9-Heroic+Cauldron+of+Carnage+-+Kill+(2:43)/Chepged/standard/overview',
+    '/report/9VPGaQY84MzWfZAx/10-Mythic+Fractillus+-+Kill+(1:17)/9-Âjax/standard/overview',
 
   spec: SPECS.RETRIBUTION_PALADIN,
   changelog: CHANGELOG,
