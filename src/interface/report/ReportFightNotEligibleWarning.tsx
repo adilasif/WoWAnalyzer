@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import AlertWarning from 'interface/AlertWarning';
 
-const ReportNoEligibleFightsWarning = () => {
+const ReportFightNotEligibleWarning = () => {
   return (
     <div className="container">
       <AlertWarning>
@@ -19,4 +19,4 @@ const ReportNoEligibleFightsWarning = () => {
   );
 };
 
-export default ReportNoEligibleFightsWarning;
+export default ReportFightNotEligibleWarning;

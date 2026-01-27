@@ -21,6 +21,7 @@ import Report from 'parser/core/Report';
 import { useLingui } from '@lingui/react';
 import { isEligibleFight } from 'common/isEligibleFight';
 import ReportNoEligibleFightsWarning from 'interface/report/ReportNoEligibleFightsWarning';
+import ReportFightNotEligibleWarning from 'interface/report/ReportFightNotEligibleWarning';
 
 const getFightFromReport = (report: Report, fightId: number) => {
   if (!report.fights) {
@@ -138,12 +139,15 @@ const FightSelection = ({ children }: Props) => {
     window.scrollTo(0, 0);
   }, []);
 
-  if (eligibleFights.length === 0) {
-    return <ReportNoEligibleFightsWarning />;
+  if (!fight) {
+    if (eligibleFights.length === 0) {
+      return <ReportNoEligibleFightsWarning />;
+    }
+    return <FightSelectionList />;
   }
 
-  if (!fight) {
-    return <FightSelectionList />;
+  if (!isEligibleFight(fight)) {
+    return <ReportFightNotEligibleWarning />;
   }
 
   return (
