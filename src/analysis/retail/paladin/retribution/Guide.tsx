@@ -122,7 +122,7 @@ function CoreSection({ modules, info }: GuideProps<typeof CombatLogParser>) {
 const cooldowns: Cooldown[] = [
   {
     spell: TALENTS.AVENGING_WRATH_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.AVENGING_WRATH_TALENT),
+    isActive: (c) => !c.hasTalent(TALENTS.RADIANT_GLORY_TALENT),
   },
   {
     spell: TALENTS.WAKE_OF_ASHES_TALENT,

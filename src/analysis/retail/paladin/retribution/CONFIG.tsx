@@ -9,7 +9,7 @@ const config: Config = {
   contributors: [Texleretour],
   branch: GameBranch.Retail,
   patchCompatibility: '12.0.0',
-  supportLevel: SupportLevel.Foundation,
+  supportLevel: SupportLevel.MaintainedPartial,
   description: (
     <>
       We hope you get some use out this analyzer we have been working on.
