@@ -364,6 +364,11 @@ const spells = {
   },
 
   // Retribution Paladin:
+  SHIELD_OF_VENGEANCE_ABSORB: {
+    id: 184662,
+    name: 'Shield of Vengeance',
+    icon: 'Ability_paladin_shieldofthetemplar',
+  },
   AVENGING_WRATH_BUFF: {
     id: 454351,
     name: 'Avenging Wrath',
@@ -374,8 +379,13 @@ const spells = {
     name: 'Instrument of Retribution',
     icon: 'spell_holy_crusade',
   },
-  EXECUTION_SENTENCE_DAMAGE: {
+  EXECUTION_SENTENCE_FALL_DAMAGE: {
     id: 387113,
+    name: 'Execution Sentence',
+    icon: 'spell_paladin_executionsentence',
+  },
+  EXECUTION_SENTENCE_APPLY_DAMAGE: {
+    id: 1260251,
     name: 'Execution Sentence',
     icon: 'spell_paladin_executionsentence',
   },
