@@ -47,10 +47,6 @@ class ShieldOfVengeance extends Analyzer {
   }
 
   get pctAbsorbUsed() {
-    console.log(
-      this.healingDone.byAbility(SPELLS.SHIELD_OF_VENGEANCE_ABSORB.id).effective,
-      this.totalPossibleAbsorb,
-    );
     return (
       this.healingDone.byAbility(SPELLS.SHIELD_OF_VENGEANCE_ABSORB.id).effective /
       this.totalPossibleAbsorb
