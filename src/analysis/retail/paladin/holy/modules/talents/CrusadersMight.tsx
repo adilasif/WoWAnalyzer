@@ -103,16 +103,23 @@ class CrusadersMight extends Analyzer {
         category={STATISTIC_CATEGORY.TALENTS}
         tooltip={
           <>
-            Wasted <b>{formatDuration(this.wastedReductionMs)}</b> of CDR{' '}
-            <small>({Math.floor(this.castsLost)} casts)</small> from:{' '}
             <ul>
               <li>
-                <SpellLink spell={TALENTS.HOLY_SHOCK_TALENT} />: {this.wastedHolyShockCDRCount}{' '}
-                casts
+                Wasted <b>{formatDuration(this.wastedReductionMs)}</b> of CDR
               </li>
               <li>
-                <SpellLink spell={SPELLS.CRUSADER_STRIKE} />: {this.wastedCrusaderStrikeCDRCount}{' '}
-                casts
+                {Math.floor(this.castsLost)} additional casts lost from:{' '}
+                <ul>
+                  <li>
+                    <SpellLink spell={TALENTS.HOLY_SHOCK_TALENT} />: {this.wastedHolyShockCDRCount}{' '}
+                    casts with <SpellLink spell={SPELLS.JUDGMENT_CAST_HOLY} /> available
+                  </li>
+                  <li>
+                    <SpellLink spell={SPELLS.CRUSADER_STRIKE} />:{' '}
+                    {this.wastedCrusaderStrikeCDRCount} casts with{' '}
+                    <SpellLink spell={SPELLS.JUDGMENT_CAST_HOLY} /> available
+                  </li>
+                </ul>
               </li>
             </ul>
           </>
