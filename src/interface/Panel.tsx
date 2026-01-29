@@ -32,6 +32,8 @@ const Heading = ({
   backButton,
   as = 'h1',
 }: HeadingProps) => {
+  if (title == null) return null;
+
   const isStringTitle = typeof title === 'string';
   const anchorId = isStringTitle ? makeAnchorId(title) : undefined;
 
@@ -106,7 +108,7 @@ const Panel = ({
   bodyStyle,
 }: PanelProps) => (
   <div className={clsx('panel', className)} style={style}>
-    {title !== null && (
+    {title !== null && title !== undefined && (
       <Heading
         title={title}
         titleTransId={titleTransId}
