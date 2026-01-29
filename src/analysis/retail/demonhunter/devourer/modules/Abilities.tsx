@@ -1,0 +1,96 @@
+import SharedAbilities from 'analysis/retail/demonhunter/shared/modules/Abilities';
+import { SpellbookAbility } from 'parser/core/modules/Ability';
+import { TALENTS_DEMON_HUNTER } from 'common/TALENTS';
+import SPELL_CATEGORY from 'parser/core/SPELL_CATEGORY';
+import SPELLS from 'common/SPELLS/demonhunter';
+
+class Abilities extends SharedAbilities {
+  spellbook(): SpellbookAbility[] {
+    const combatant = this.selectedCombatant;
+    return [
+      // Rotational Spells
+      {
+        spell: [SPELLS.CONSUME.id, SPELLS.DEVOUR.id],
+        category: SPELL_CATEGORY.ROTATIONAL,
+        gcd: {
+          base: 1500,
+        },
+      },
+      {
+        spell: [TALENTS_DEMON_HUNTER.HUNGERING_SLASH_TALENT.id, SPELLS.REAPERS_TOLL.id],
+        enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.HUNGERING_SLASH_TALENT),
+        category: SPELL_CATEGORY.ROTATIONAL,
+        gcd: {
+          base: 1500,
+        },
+      },
+      {
+        spell: [SPELLS.REAP.id, SPELLS.CULL.id],
+        category: SPELL_CATEGORY.ROTATIONAL,
+        cooldown: 8,
+        gcd: {
+          base: 1500,
+        },
+      },
+      {
+        spell: TALENTS_DEMON_HUNTER.VOID_RAY_TALENT.id,
+        enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.VOID_RAY_TALENT),
+        category: SPELL_CATEGORY.ROTATIONAL,
+        gcd: {
+          base: 1500,
+        },
+      },
+      // Movement
+      {
+        spell: TALENTS_DEMON_HUNTER.VENGEFUL_RETREAT_TALENT.id, // Becomes a rotational ability with the Hungering Slash talent
+        category: combatant.hasTalent(TALENTS_DEMON_HUNTER.HUNGERING_SLASH_TALENT)
+          ? SPELL_CATEGORY.ROTATIONAL
+          : SPELL_CATEGORY.UTILITY,
+        cooldown: 25,
+        gcd: null,
+      },
+      {
+        spell: SPELLS.SHIFT.id,
+        category: SPELL_CATEGORY.UTILITY,
+        cooldown: 20,
+        charges: combatant.hasTalent(TALENTS_DEMON_HUNTER.BLAZING_PATH_TALENT) ? 2 : 1,
+        gcd: {
+          base: 1500,
+        },
+      },
+      // CC, interrupts and utility
+      // DPS Cooldowns
+      {
+        spell: [TALENTS_DEMON_HUNTER.VOIDBLADE_TALENT.id, SPELLS.PIERCE_THE_VEIL.id],
+        enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.VOIDBLADE_TALENT),
+        category: SPELL_CATEGORY.ROTATIONAL,
+        cooldown: 30,
+        gcd: {
+          base: 1500,
+        },
+      },
+      // Big DPS Cooldowns
+      {
+        spell: [TALENTS_DEMON_HUNTER.THE_HUNT_DEVOURER_TALENT.id, SPELLS.PREDATORS_WAKE.id],
+        enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.THE_HUNT_DEVOURER_TALENT),
+        category: SPELL_CATEGORY.COOLDOWNS,
+        cooldown: 90,
+        gcd: {
+          base: 1500,
+        },
+      },
+      // Defensives
+      {
+        spell: SPELLS.BLUR.id,
+        category: SPELL_CATEGORY.DEFENSIVE,
+        cooldown: 60,
+        charges: combatant.hasTalent(TALENTS_DEMON_HUNTER.DEMONIC_RESILIENCE_TALENT) ? 2 : 1,
+        gcd: null,
+      },
+
+      ...super.spellbook(),
+    ];
+  }
+}
+
+export default Abilities;

@@ -9,9 +9,9 @@ import { CooldownThroughputTracker } from 'analysis/retail/demonhunter/devourer/
 import { FuryTracker } from 'analysis/retail/demonhunter/devourer/modules/resourcetracker/FuryTracker';
 import { FuryDetails } from 'analysis/retail/demonhunter/devourer/modules/resourcetracker/FuryDetails';
 import { FuryGraph } from 'analysis/retail/demonhunter/devourer/modules/resourcetracker/FuryGraph';
-import FoundationGuide from 'interface/guide/foundation/FoundationGuide';
-import { Abilities } from './gen';
+import Abilities from './modules/Abilities';
 import CollapsingStar from './modules/talents/CollapsingStar';
+import Guide from './Guide';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -40,7 +40,7 @@ class CombatLogParser extends CoreCombatLogParser {
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,
   };
 
-  static guide = FoundationGuide;
+  static guide = Guide;
 }
 
 export default CombatLogParser;

@@ -602,7 +602,32 @@ const spells = {
   COLLAPSING_STAR: {
     id: 1221150,
     name: 'Collapsing Star',
-    icon: 'inv_12_dh_void_ability_collapsingstar.jpg',
+    icon: 'inv_12_dh_void_ability_collapsingstar',
+  },
+  CONSUME: {
+    id: 473662,
+    name: 'Consume',
+    icon: 'inv_12_dh_void_ability_consume',
+  },
+  DEVOUR: {
+    id: 1217610,
+    name: 'Devour',
+    icon: 'inv_12_dh_void_ability_feast',
+  },
+  REAP: {
+    id: 1226019,
+    name: 'Reap',
+    icon: 'inv_12_dh_void_ability_reap',
+  },
+  CULL: {
+    id: 1245453,
+    name: 'Cull',
+    icon: 'inv_12_dh_void_ability_empoweredreap',
+  },
+  SHIFT: {
+    id: 1234796,
+    name: 'Shift',
+    icon: 'inv_12_dh_void_ability_shift',
   },
   //endregion
 
@@ -699,6 +724,21 @@ const spells = {
     id: 453239,
     name: 'Student of Suffering',
     icon: 'achievement_dungeon_theatreofpain_kultharok',
+  },
+  PREDATORS_WAKE: {
+    id: 1259431,
+    name: "Predator's Wake",
+    icon: 'ability_ardenweald_demonhunter',
+  },
+  PIERCE_THE_VEIL: {
+    id: 1245483,
+    name: 'Pierce the Veil',
+    icon: 'ability_demonhunter_soulcleave4',
+  },
+  REAPERS_TOLL: {
+    id: 1245470,
+    name: "Reaper's Toll",
+    icon: 'inv_glaive_1h_artifactazgalor_d_05dual',
   },
   //endregion
 } satisfies Record<string, Spell>;
