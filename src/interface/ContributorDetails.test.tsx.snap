@@ -15,7 +15,7 @@ exports[`ContributorDetails > matches snapshot 1`] = `
           class="col-md-5"
         >
           <div
-            class="panel "
+            class="panel"
           >
             <div
               class="panel-heading"
@@ -76,7 +76,7 @@ exports[`ContributorDetails > matches snapshot 1`] = `
           class="col-md-7"
         >
           <div
-            class="panel "
+            class="panel"
           >
             <div
               class="panel-heading"
@@ -93,7 +93,7 @@ exports[`ContributorDetails > matches snapshot 1`] = `
               </h1>
             </div>
             <div
-              class="panel-body "
+              class="panel-body"
             >
               <ul
                 class="list"

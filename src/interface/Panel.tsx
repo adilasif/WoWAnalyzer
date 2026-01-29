@@ -1,4 +1,5 @@
 import { Trans } from '@lingui/react/macro';
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { CSSProperties } from 'react';
 
@@ -104,7 +105,7 @@ const Panel = ({
   backButton,
   bodyStyle,
 }: PanelProps) => (
-  <div className={`panel ${className}`} style={style}>
+  <div className={clsx('panel', className)} style={style}>
     {title !== null && (
       <Heading
         title={title}
@@ -116,7 +117,7 @@ const Panel = ({
         backButton={backButton}
       />
     )}
-    <div className={`panel-body ${pad ? 'pad' : ''}`} style={bodyStyle}>
+    <div className={clsx('panel-body', { pad })} style={bodyStyle}>
       {children}
     </div>
   </div>
