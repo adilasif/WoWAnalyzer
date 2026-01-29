@@ -1,4 +1,5 @@
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
+import { t } from '@lingui/core/macro';
 import DocumentTitle from 'interface/DocumentTitle';
 import Panel from 'interface/Panel';
 import { Link } from 'react-router-dom';
@@ -11,7 +12,9 @@ export function Component() {
       <DocumentTitle title="Help wanted" />
 
       <Panel
-        title={<Trans id="interface.helpWantedPage.helpWantedTitle">Help wanted</Trans>}
+        title="Help wanted"
+        titleTransId="interface.helpWantedPage.helpWantedTitle"
+        addAnchor={false}
         bodyStyle={{
           textAlign: 'justify',
           padding: 0,

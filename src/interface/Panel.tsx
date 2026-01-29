@@ -1,46 +1,77 @@
+import { Trans } from '@lingui/react/macro';
 import type { ReactNode } from 'react';
 import { CSSProperties } from 'react';
 
+type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
 interface HeadingProps {
   title?: ReactNode;
+  titleTransId?: string;
+  addAnchor?: boolean;
   explanation?: ReactNode;
   actions?: ReactNode;
   backButton?: ReactNode;
+  as?: HeadingTag;
 }
-const Heading = ({ title, explanation, actions, backButton }: HeadingProps) => {
-  if (!title) {
-    return null;
-  }
 
-  let content = (
+const makeAnchorId = (s: string) =>
+  s
+    .trim()
+    .toLowerCase()
+    .replace(/['"]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const Heading = ({
+  title,
+  titleTransId,
+  addAnchor = true,
+  explanation,
+  actions,
+  backButton,
+  as = 'h1',
+}: HeadingProps) => {
+  const isStringTitle = typeof title === 'string';
+  const anchorId = isStringTitle ? makeAnchorId(title) : undefined;
+
+  const translatedTitle =
+    titleTransId && isStringTitle ? <Trans id={titleTransId}>{title}</Trans> : title;
+
+  const renderedTitle =
+    isStringTitle && addAnchor ? (
+      <a href={`#${anchorId}`} id={anchorId}>
+        {translatedTitle}
+      </a>
+    ) : (
+      translatedTitle
+    );
+
+  const Tag = as;
+
+  const headingBlock = (
     <>
-      <h1 style={{ position: 'relative' }}>
+      <Tag style={{ position: 'relative' }}>
         {backButton && <div className="back-button">{backButton}</div>}
-
-        {typeof title === 'string' ? (
-          <a href={`#${title}`} id={title}>
-            {title}
-          </a>
-        ) : (
-          title
-        )}
-      </h1>
+        {renderedTitle}
+      </Tag>
       {explanation && <small>{explanation}</small>}
     </>
   );
 
-  if (actions) {
-    content = (
-      <div className="flex wrapable">
-        <div className="flex-main">{content}</div>
-        <div className="flex-sub action-buttons" style={{ margin: '10px 0' }}>
-          {actions}
+  return (
+    <div className="panel-heading">
+      {actions ? (
+        <div className="flex wrapable">
+          <div className="flex-main">{headingBlock}</div>
+          <div className="flex-sub action-buttons" style={{ margin: '10px 0' }}>
+            {actions}
+          </div>
         </div>
-      </div>
-    );
-  }
-
-  return <div className="panel-heading">{content}</div>;
+      ) : (
+        headingBlock
+      )}
+    </div>
+  );
 };
 
 interface PanelProps {
@@ -51,6 +82,9 @@ interface PanelProps {
   pad?: boolean;
   // Heading
   title?: ReactNode;
+  titleTransId?: string;
+  titleTag?: HeadingTag;
+  addAnchor?: boolean;
   explanation?: ReactNode;
   actions?: ReactNode;
   backButton?: ReactNode;
@@ -62,13 +96,26 @@ const Panel = ({
   style,
   pad = true,
   title,
+  titleTransId,
+  titleTag,
+  addAnchor,
   explanation,
   actions,
   backButton,
   bodyStyle,
 }: PanelProps) => (
   <div className={`panel ${className}`} style={style}>
-    <Heading title={title} explanation={explanation} actions={actions} backButton={backButton} />
+    {title !== null && (
+      <Heading
+        title={title}
+        titleTransId={titleTransId}
+        as={titleTag}
+        addAnchor={addAnchor}
+        explanation={explanation}
+        actions={actions}
+        backButton={backButton}
+      />
+    )}
     <div className={`panel-body ${pad ? 'pad' : ''}`} style={bodyStyle}>
       {children}
     </div>
