@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/react/macro';
+import { Trans } from '@lingui/react';
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { CSSProperties } from 'react';
@@ -38,7 +38,7 @@ const Heading = ({
   const anchorId = isStringTitle ? makeAnchorId(title) : undefined;
 
   const translatedTitle =
-    titleTransId && isStringTitle ? <Trans id={titleTransId}>{title}</Trans> : title;
+    titleTransId && isStringTitle ? <Trans id={titleTransId} message={title} /> : title;
 
   const renderedTitle =
     isStringTitle && addAnchor ? (
