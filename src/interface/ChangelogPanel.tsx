@@ -1,4 +1,4 @@
-import { t } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
 import { useLingui } from '@lingui/react';
 import CORE_CHANGELOG from 'CHANGELOG';
 import AVAILABLE_CONFIGS from 'parser';
@@ -15,14 +15,17 @@ const ChangelogPanel = () => {
   const limit = expanded ? undefined : 10;
 
   return (
-    <Panel title="Changelog" titleTransId="interface.changelogPanel.heading" titleTag="h2">
+    <Panel
+      title={<Trans id="interface.changelogPanel.heading">Changelog</Trans>}
+      anchor="changelog"
+    >
       <select
         className="form-control"
         value={changelogType}
         onChange={(e) => setChangelogType(Number(e.target.value))}
       >
         <option value={0}>
-          {t({ id: 'interface.changelogPanel.option.core', message: 'Core' })}
+          {i18n.t({ id: 'interface.changelogPanel.option.core', message: 'Core' })}
         </option>
         {AVAILABLE_CONFIGS.map((config) => (
           <option value={config.spec.id} key={config.spec.id}>

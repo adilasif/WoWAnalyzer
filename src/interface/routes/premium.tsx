@@ -1,5 +1,5 @@
-import { t } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
+import { useLingui } from '@lingui/react';
 import DocumentTitle from 'interface/DocumentTitle';
 import GitHubButton from 'interface/GitHubButton';
 import DiscordIcon from 'interface/icons/DiscordTiny';
@@ -20,6 +20,7 @@ import Panel from 'interface/Panel';
 export function Component() {
   usePageView('Premium');
   const user = useWaSelector((state) => getUser(state));
+  const { i18n } = useLingui();
 
   return (
     <>
@@ -29,11 +30,7 @@ export function Component() {
           <LoginPanel />
         </div>
         <div className="col-md-8 col-sm-7">
-          <Panel
-            title="WoWAnalyzer premium"
-            titleTransId="interface.premiumPage.premium"
-            addAnchor={false}
-          >
+          <Panel title={<Trans id="interface.premiumPage.premium">WoWAnalyzer Premium</Trans>}>
             <PremiumIcon
               style={{ fontSize: '6em', float: 'right', color: '#fab700', marginTop: 0 }}
             />
@@ -68,7 +65,7 @@ export function Component() {
                   Improve the analysis of a spec or build a new feature to get 1 month of Premium
                   free
                   <TooltipElement
-                    content={t({
+                    content={i18n.t({
                       id: 'interface.premiumPage.githubTooltip',
                       message: `Only commits that are merged to the main branch are eligible. Your work will have to pass a pull request review before it can be merged.`,
                     })}
@@ -169,43 +166,43 @@ export function Component() {
             </div>
           </Panel>
           {user && (
-            <Panel title="You" titleTransId="interface.premiumPage.you" titleTag="h2">
+            <Panel title={<Trans id="interface.premiumPage.you">You</Trans>}>
               <Trans id="interface.premiumPage.status">
                 Hello {user.name}. Your Premium is currently{' '}
                 {user.premium ? (
                   <span className="text-success">
-                    {t({
+                    {i18n.t({
                       id: 'interface.premiumPage.status.active',
                       message: `Active`,
                     })}
                   </span>
                 ) : (
                   <span className="text-danger">
-                    {t({
+                    {i18n.t({
                       id: 'interface.premiumPage.status.inactive',
                       message: `Inactive`,
                     })}
                   </span>
                 )}{' '}
                 {user.patreon && user.patreon.premium
-                  ? ` ${t({
+                  ? ` ${i18n.t({
                       id: 'interface.premiumPage.status.patreon',
                       message: `because of your Patreonage`,
                     })}`
                   : null}{' '}
                 {user.github && user.github.premium && user.github.expires
-                  ? ` ${t({
+                  ? ` ${i18n.t({
                       id: 'interface.premiumPage.status.gitHub',
                       message: `because of a recent GitHub contribution (active until ${new Date(user.github.expires).toLocaleDateString(import.meta.env.LOCALE)})`,
                     })}`
                   : null}
                 .{' '}
                 {user.premium
-                  ? t({
+                  ? i18n.t({
                       id: 'interface.premiumPage.status.userHasPremium',
                       message: `Awesome!`,
                     })
-                  : t({
+                  : i18n.t({
                       id: 'interface.premiumPage.status.getPremium',
                       message: `You can get Premium by becoming a Patron on Patreon or by making a contribution to application on GitHub. Try logging in again if you wish to refresh your status.`,
                     })}

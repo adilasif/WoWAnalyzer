@@ -1,62 +1,35 @@
-import { Trans } from '@lingui/react';
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { CSSProperties } from 'react';
 
-type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-
 interface HeadingProps {
   title?: ReactNode;
-  titleTransId?: string;
-  addAnchor?: boolean;
+  subheading?: boolean;
+  anchor?: string;
   explanation?: ReactNode;
   actions?: ReactNode;
   backButton?: ReactNode;
-  as?: HeadingTag;
 }
 
-const makeAnchorId = (s: string) =>
-  s
-    .trim()
-    .toLowerCase()
-    .replace(/['"]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-const Heading = ({
-  title,
-  titleTransId,
-  addAnchor = true,
-  explanation,
-  actions,
-  backButton,
-  as = 'h1',
-}: HeadingProps) => {
+const Heading = ({ title, anchor, explanation, actions, backButton, subheading }: HeadingProps) => {
   if (title == null) return null;
 
-  const isStringTitle = typeof title === 'string';
-  const anchorId = isStringTitle ? makeAnchorId(title) : undefined;
+  const renderedTitle = anchor ? (
+    <a href={`#${anchor}`} id={anchor}>
+      {title}
+    </a>
+  ) : (
+    title
+  );
 
-  const translatedTitle =
-    titleTransId && isStringTitle ? <Trans id={titleTransId} message={title} /> : title;
-
-  const renderedTitle =
-    isStringTitle && addAnchor ? (
-      <a href={`#${anchorId}`} id={anchorId}>
-        {translatedTitle}
-      </a>
-    ) : (
-      translatedTitle
-    );
-
-  const Tag = as;
+  const HeadingTag = subheading ? 'h2' : 'h1';
 
   const headingBlock = (
     <>
-      <Tag style={{ position: 'relative' }}>
+      <HeadingTag style={{ position: 'relative' }}>
         {backButton && <div className="back-button">{backButton}</div>}
         {renderedTitle}
-      </Tag>
+      </HeadingTag>
       {explanation && <small>{explanation}</small>}
     </>
   );
@@ -85,9 +58,8 @@ interface PanelProps {
   pad?: boolean;
   // Heading
   title?: ReactNode;
-  titleTransId?: string;
-  titleTag?: HeadingTag;
-  addAnchor?: boolean;
+  subheading?: boolean;
+  anchor?: string;
   explanation?: ReactNode;
   actions?: ReactNode;
   backButton?: ReactNode;
@@ -99,9 +71,8 @@ const Panel = ({
   style,
   pad = true,
   title,
-  titleTransId,
-  titleTag,
-  addAnchor,
+  subheading,
+  anchor,
   explanation,
   actions,
   backButton,
@@ -111,9 +82,8 @@ const Panel = ({
     {title !== null && title !== undefined && (
       <Heading
         title={title}
-        titleTransId={titleTransId}
-        as={titleTag}
-        addAnchor={addAnchor}
+        subheading={subheading}
+        anchor={anchor}
         explanation={explanation}
         actions={actions}
         backButton={backButton}

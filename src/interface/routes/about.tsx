@@ -17,7 +17,7 @@ export function Component() {
     <>
       <DocumentTitle title="About WoWAnalyzer" />
 
-      <Panel title="About WoWAnalyzer" titleTransId="interface.aboutPage.title" addAnchor={false}>
+      <Panel title={<Trans id="interface.aboutPage.title">About WoWAnalyzer</Trans>}>
         <img
           src={MasteryRadiusImage}
           alt="Mastery radius"
@@ -68,9 +68,12 @@ export function Component() {
       <br />
 
       <Panel
-        title="The WoWAnalyzer Discord bot"
-        titleTransId="interface.aboutPage.introducingWOWABotHeading"
-        titleTag="h2"
+        title={
+          <Trans id="interface.aboutPage.introducingWOWABotHeading">
+            The WoWAnalyzer Discord bot
+          </Trans>
+        }
+        anchor="wowanalyzer-discord-bot"
       >
         <div className="flex wrapable">
           <div className="flex-main" style={{ padding: '20px 15px', minWidth: 300 }}>

@@ -23,12 +23,7 @@ exports[`ContributorDetails > matches snapshot 1`] = `
               <h1
                 style="position: relative;"
               >
-                <a
-                  href="#dummy"
-                  id="dummy"
-                >
-                  Dummy
-                </a>
+                Dummy
               </h1>
             </div>
             <div
@@ -84,12 +79,7 @@ exports[`ContributorDetails > matches snapshot 1`] = `
               <h1
                 style="position: relative;"
               >
-                <a
-                  href="#contributions-this-expansion"
-                  id="contributions-this-expansion"
-                >
-                  Contributions this expansion
-                </a>
+                Contributions this expansion
               </h1>
             </div>
             <div
