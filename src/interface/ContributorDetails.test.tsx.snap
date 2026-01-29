@@ -24,8 +24,8 @@ exports[`ContributorDetails > matches snapshot 1`] = `
                 style="position: relative;"
               >
                 <a
-                  href="#Dummy"
-                  id="Dummy"
+                  href="#dummy"
+                  id="dummy"
                 >
                   Dummy
                 </a>
@@ -85,8 +85,8 @@ exports[`ContributorDetails > matches snapshot 1`] = `
                 style="position: relative;"
               >
                 <a
-                  href="#Contributions this expansion"
-                  id="Contributions this expansion"
+                  href="#contributions-this-expansion"
+                  id="contributions-this-expansion"
                 >
                   Contributions this expansion
                 </a>
