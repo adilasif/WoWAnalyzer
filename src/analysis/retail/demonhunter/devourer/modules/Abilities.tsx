@@ -69,12 +69,20 @@ class Abilities extends SharedAbilities {
           base: 1500,
         },
       },
-      // Big DPS Cooldowns
       {
         spell: [TALENTS_DEMON_HUNTER.THE_HUNT_DEVOURER_TALENT.id, SPELLS.PREDATORS_WAKE.id],
         enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.THE_HUNT_DEVOURER_TALENT),
         category: SPELL_CATEGORY.COOLDOWNS,
         cooldown: 90,
+        gcd: {
+          base: 1500,
+        },
+      },
+      // Big DPS Cooldowns
+      {
+        spell: 1217605,
+        enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.VOID_METAMORPHOSIS_TALENT),
+        category: SPELL_CATEGORY.COOLDOWNS,
         gcd: {
           base: 1500,
         },

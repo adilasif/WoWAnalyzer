@@ -629,6 +629,16 @@ const spells = {
     name: 'Shift',
     icon: 'inv_12_dh_void_ability_shift',
   },
+  VOID_METAMORPHOSIS_BUFF: {
+    id: 1217607,
+    name: 'Void Metamorphosis',
+    icon: 'inv_112_ability_demonhunter_metamorphasisvoid',
+  },
+  VOID_METAMORPHOSIS_CAST: {
+    id: 1217605,
+    name: 'Void Metamorphosis',
+    icon: 'inv_112_ability_demonhunter_metamorphasisvoid',
+  },
   //endregion
 
   //region Aldrachi Reaver

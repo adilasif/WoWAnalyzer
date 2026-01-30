@@ -12,6 +12,7 @@ import { FuryGraph } from 'analysis/retail/demonhunter/devourer/modules/resource
 import Abilities from './modules/Abilities';
 import CollapsingStar from './modules/talents/CollapsingStar';
 import Guide from './Guide';
+import VoidMetamorphosisNormalizer from './normalizers/VoidMetamorphosisNormalizer';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -35,6 +36,9 @@ class CombatLogParser extends CoreCombatLogParser {
     furyTracker: FuryTracker,
     furyDetails: FuryDetails,
     furyGraph: FuryGraph,
+
+    // Normalizers
+    voidMetamorphosisNormalizer: VoidMetamorphosisNormalizer,
 
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,
