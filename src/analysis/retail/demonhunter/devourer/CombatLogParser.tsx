@@ -13,7 +13,6 @@ import Abilities from './modules/Abilities';
 import CollapsingStar from './modules/talents/CollapsingStar';
 import Guide from './Guide';
 import VoidMetamorphosisNormalizer from './normalizers/VoidMetamorphosisNormalizer';
-import DevourDuplicateCastsNormalizer from './normalizers/DevourDuplicateCastsNormalizer';
 import ViolentTransformation from './modules/talents/ViolentTransformation';
 
 class CombatLogParser extends CoreCombatLogParser {
@@ -42,7 +41,6 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Normalizers
     voidMetamorphosisNormalizer: VoidMetamorphosisNormalizer,
-    devourDuplicateCastsNormalizer: DevourDuplicateCastsNormalizer,
 
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,

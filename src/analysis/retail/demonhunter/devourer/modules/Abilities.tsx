@@ -54,9 +54,7 @@ class Abilities extends SharedAbilities {
         category: SPELL_CATEGORY.UTILITY,
         cooldown: 20,
         charges: combatant.hasTalent(TALENTS_DEMON_HUNTER.BLAZING_PATH_TALENT) ? 2 : 1,
-        gcd: {
-          base: 1500,
-        },
+        gcd: null,
       },
       // CC, interrupts and utility
       // DPS Cooldowns

@@ -646,6 +646,16 @@ const spells = {
     name: 'Hungering Slash',
     icon: 'inv_12_dh_void_ability_reapersslice',
   },
+  FAKE_VOIDBLADE_CAST: {
+    id: 1245414,
+    name: 'Voidblade',
+    icon: 'inv_12_voiddh_ability_voidblade',
+  },
+  FAKE_THEHUNT_CAST: {
+    id: 1246169,
+    name: 'The Hunt',
+    icon: 'inv_12_voiddh_ability_thehunt',
+  },
   //endregion
 
   //region Aldrachi Reaver
