@@ -16,9 +16,11 @@ export default class ExecutionSentence extends Analyzer {
     this.active = this.selectedCombatant.hasTalent(TALENTS_PALADIN.EXECUTION_SENTENCE_TALENT);
 
     this.addEventListener(
-Events.damage.by(SELECTED_PLAYER).spell([SPELLS.EXECUTION_SENTENCE_FALL_DAMAGE, SPELLS.EXECUTION_SENTENCE_APPLY_DAMAGE]),
-this.executionSentenceDamage,
-);
+      Events.damage
+        .by(SELECTED_PLAYER)
+        .spell([SPELLS.EXECUTION_SENTENCE_FALL_DAMAGE, SPELLS.EXECUTION_SENTENCE_APPLY_DAMAGE]),
+      this.executionSentenceDamage,
+    );
   }
 
   executionSentenceDamage(event: DamageEvent) {
