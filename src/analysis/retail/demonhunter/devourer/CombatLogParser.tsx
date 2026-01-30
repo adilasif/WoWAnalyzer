@@ -14,6 +14,7 @@ import CollapsingStar from './modules/talents/CollapsingStar';
 import Guide from './Guide';
 import VoidMetamorphosisNormalizer from './normalizers/VoidMetamorphosisNormalizer';
 import ViolentTransformation from './modules/talents/ViolentTransformation';
+import MomentOfCraving from './modules/talents/MomentOfCraving';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -30,6 +31,7 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Talents
     collapsingStar: CollapsingStar,
+    momentOfCraving: MomentOfCraving,
 
     // Hero
     violentTransformation: ViolentTransformation,

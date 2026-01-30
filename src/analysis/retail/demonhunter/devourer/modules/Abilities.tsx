@@ -3,6 +3,7 @@ import { SpellbookAbility } from 'parser/core/modules/Ability';
 import { TALENTS_DEMON_HUNTER } from 'common/TALENTS';
 import SPELL_CATEGORY from 'parser/core/SPELL_CATEGORY';
 import SPELLS from 'common/SPELLS/demonhunter';
+import { ERRATIC_FELHEART_SCALING } from '../../shared';
 
 class Abilities extends SharedAbilities {
   spellbook(): SpellbookAbility[] {
@@ -27,7 +28,9 @@ class Abilities extends SharedAbilities {
       {
         spell: [SPELLS.REAP.id, SPELLS.CULL.id],
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 8,
+        cooldown: combatant.hasTalent(TALENTS_DEMON_HUNTER.UMBRAL_BLADE_TALENT)
+          ? (haste) => 8 / (1 + haste)
+          : 8,
         gcd: {
           base: 1500,
         },
@@ -42,7 +45,7 @@ class Abilities extends SharedAbilities {
       },
       // Movement
       {
-        spell: TALENTS_DEMON_HUNTER.VENGEFUL_RETREAT_TALENT.id, // Becomes a rotational ability with the Hungering Slash talent
+        spell: TALENTS_DEMON_HUNTER.VENGEFUL_RETREAT_TALENT.id, // Becomes a rotational ability with Hungering Slash talent
         category: combatant.hasTalent(TALENTS_DEMON_HUNTER.HUNGERING_SLASH_TALENT)
           ? SPELL_CATEGORY.ROTATIONAL
           : SPELL_CATEGORY.UTILITY,
@@ -52,7 +55,11 @@ class Abilities extends SharedAbilities {
       {
         spell: SPELLS.SHIFT.id,
         category: SPELL_CATEGORY.UTILITY,
-        cooldown: 20,
+        cooldown:
+          20 -
+          ERRATIC_FELHEART_SCALING[
+            combatant.getTalentRank(TALENTS_DEMON_HUNTER.ERRATIC_FELHEART_TALENT)
+          ],
         charges: combatant.hasTalent(TALENTS_DEMON_HUNTER.BLAZING_PATH_TALENT) ? 2 : 1,
         gcd: null,
       },
@@ -61,7 +68,7 @@ class Abilities extends SharedAbilities {
       {
         spell: [TALENTS_DEMON_HUNTER.VOIDBLADE_TALENT.id, SPELLS.PIERCE_THE_VEIL.id],
         enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.VOIDBLADE_TALENT),
-        category: SPELL_CATEGORY.ROTATIONAL,
+        category: SPELL_CATEGORY.COOLDOWNS,
         cooldown: 30,
         gcd: {
           base: 500,

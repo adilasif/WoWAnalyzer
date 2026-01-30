@@ -656,6 +656,11 @@ const spells = {
     name: 'The Hunt',
     icon: 'inv_12_voiddh_ability_thehunt',
   },
+  MOMENT_OF_CRAVING_BUFF: {
+    id: 1238495,
+    name: 'Moment of Craving',
+    icon: 'inv_ability_soulharvesterwarlock_demonicsoul',
+  },
   //endregion
 
   //region Aldrachi Reaver
