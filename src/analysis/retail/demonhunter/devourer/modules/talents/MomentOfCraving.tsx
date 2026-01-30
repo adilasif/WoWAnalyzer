@@ -4,13 +4,7 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events from 'parser/core/Events';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 
-class MomentOfCraving extends Analyzer {
-  static dependencies = {
-    spellUsable: SpellUsable,
-  };
-
-  protected spellUsable!: SpellUsable;
-
+class MomentOfCraving extends Analyzer.withDependencies({ spellUsable: SpellUsable }) {
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS_DEMON_HUNTER.MOMENT_OF_CRAVING_TALENT);
@@ -26,8 +20,8 @@ class MomentOfCraving extends Analyzer {
   }
 
   onApplyRefreshBuff() {
-    if (this.spellUsable.isOnCooldown(SPELLS.REAP.id)) {
-      this.spellUsable.endCooldown(SPELLS.REAP.id);
+    if (this.deps.spellUsable.isOnCooldown(SPELLS.REAP.id)) {
+      this.deps.spellUsable.endCooldown(SPELLS.REAP.id);
     }
   }
 }

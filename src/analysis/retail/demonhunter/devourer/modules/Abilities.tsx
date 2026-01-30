@@ -31,6 +31,7 @@ class Abilities extends SharedAbilities {
         cooldown: combatant.hasTalent(TALENTS_DEMON_HUNTER.UMBRAL_BLADE_TALENT)
           ? (haste) => 8 / (1 + haste)
           : 8,
+        charges: combatant.hasTalent(TALENTS_DEMON_HUNTER.SECOND_HELPING_TALENT) ? 2 : 1,
         gcd: {
           base: 1500,
         },
@@ -71,7 +72,7 @@ class Abilities extends SharedAbilities {
         category: SPELL_CATEGORY.COOLDOWNS,
         cooldown: 30,
         gcd: {
-          base: 500,
+          static: 500,
         },
       },
       {

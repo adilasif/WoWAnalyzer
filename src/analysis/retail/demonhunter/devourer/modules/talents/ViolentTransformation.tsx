@@ -5,13 +5,7 @@ import Events from 'parser/core/Events';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import { VIOLENT_TRANSFORMATION_AFFECTED_SPELLS } from '../../constants';
 
-class ViolentTransformation extends Analyzer {
-  static dependencies = {
-    spellUsable: SpellUsable,
-  };
-
-  protected spellUsable!: SpellUsable;
-
+class ViolentTransformation extends Analyzer.withDependencies({ spellUsable: SpellUsable }) {
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(
@@ -26,8 +20,8 @@ class ViolentTransformation extends Analyzer {
 
   onApplyBuff() {
     for (const affectedSpell of VIOLENT_TRANSFORMATION_AFFECTED_SPELLS) {
-      if (this.spellUsable.isOnCooldown(affectedSpell.id)) {
-        this.spellUsable.endCooldown(affectedSpell.id);
+      if (this.deps.spellUsable.isOnCooldown(affectedSpell.id)) {
+        this.deps.spellUsable.endCooldown(affectedSpell.id);
       }
     }
   }
