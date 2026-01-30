@@ -609,6 +609,7 @@ const spells = {
     name: 'Consume',
     icon: 'inv_12_dh_void_ability_consume',
   },
+  // Void Metamorphosis' improved Consume
   DEVOUR: {
     id: 1217610,
     name: 'Devour',
@@ -619,6 +620,7 @@ const spells = {
     name: 'Reap',
     icon: 'inv_12_dh_void_ability_reap',
   },
+  // Void Metamorphosis' improved Reap
   CULL: {
     id: 1245453,
     name: 'Cull',
@@ -638,6 +640,11 @@ const spells = {
     id: 1217605,
     name: 'Void Metamorphosis',
     icon: 'inv_112_ability_demonhunter_metamorphasisvoid',
+  },
+  HUNGERING_SLASH_CAST: {
+    id: 1239123,
+    name: 'Hungering Slash',
+    icon: 'inv_12_dh_void_ability_reapersslice',
   },
   //endregion
 

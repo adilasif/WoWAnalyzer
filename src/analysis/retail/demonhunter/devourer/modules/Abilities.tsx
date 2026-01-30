@@ -17,7 +17,7 @@ class Abilities extends SharedAbilities {
         },
       },
       {
-        spell: [TALENTS_DEMON_HUNTER.HUNGERING_SLASH_TALENT.id, SPELLS.REAPERS_TOLL.id],
+        spell: [SPELLS.HUNGERING_SLASH_CAST.id, SPELLS.REAPERS_TOLL.id],
         enabled: combatant.hasTalent(TALENTS_DEMON_HUNTER.HUNGERING_SLASH_TALENT),
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: {
@@ -66,7 +66,7 @@ class Abilities extends SharedAbilities {
         category: SPELL_CATEGORY.ROTATIONAL,
         cooldown: 30,
         gcd: {
-          base: 1500,
+          base: 500,
         },
       },
       {
