@@ -362,6 +362,16 @@ const spells = {
     name: 'Shield of the Righteous',
     icon: 'ability_paladin_shieldofvengeance',
   },
+  BEACON_OF_THE_SAVIOR_BUFF: {
+    id: 1244893,
+    name: 'Beacon of the Savior',
+    icon: 'inv12_apextalent_paladin_beaconofthesavior',
+  },
+  BEACON_OF_THE_SAVIOR_ABSORB: {
+    id: 1245369,
+    name: 'Beacon of the Savior',
+    icon: 'inv12_apextalent_paladin_beaconofthesavior',
+  },
 
   // Retribution Paladin:
   SHIELD_OF_VENGEANCE_ABSORB: {
