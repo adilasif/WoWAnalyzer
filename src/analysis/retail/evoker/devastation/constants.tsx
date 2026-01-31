@@ -70,6 +70,10 @@ export const IRIDESCENCE_BLUE_CAST_SPELLS = [
   SPELLS.AZURE_SWEEP,
 ];
 
+export const AZURE_SWEEP_MAX_STACKS = 2;
+export const AZURE_SWEEP_BASE_STACKS = 1;
+export const AZURE_SWEEP_MID1_2PC_EXTRA_STACKS = 1;
+
 // Talent damage multipliers
 export const SPELLWEAVERS_DOMINANCE_CRIT_MULTIPLIER = 0.3;
 export const SHATTERING_STAR_AMP_MULTIPLIER = 0.2;
@@ -82,6 +86,10 @@ export const TITANIC_WRATH_MULTIPLIER = 0.15;
 export const IRIDESCENCE_MULTIPLIER = 0.2;
 export const HEAT_WAVE_MULTIPLIER = 0.15;
 export const LAY_WASTE_MULTIPLIER = 0.2;
+export const STRAFING_RUN_MULTIPLIER = 0.2;
+export const STRAFING_RUN_DURATION = 18_000;
+export const SHATTERING_STARS_MULTIPLIER_PER_RANK = 0.5;
+export const STAR_SALVO_MULTIPLIER = 0.35;
 
 // Talent multipliers
 export const DENSE_ENERGY_ESSENCE_REDUCTION = 1;
