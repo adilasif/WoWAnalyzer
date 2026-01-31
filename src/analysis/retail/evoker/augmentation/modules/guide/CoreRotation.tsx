@@ -12,6 +12,7 @@ import CooldownUsage from 'parser/core/MajorCooldowns/CooldownUsage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import PerformancePercentage from 'analysis/retail/evoker/devastation/modules/guide/PerformancePercentage';
+import { isMythicPlus } from 'common/isMythicPlus';
 
 export function CoreRotationSection({ modules, events, info }: GuideProps<typeof CombatLogParser>) {
   return (
@@ -37,9 +38,10 @@ export function CoreRotationSection({ modules, events, info }: GuideProps<typeof
       <EssenceGraphSection modules={modules} events={events} info={info} />
 
       <SubSection title="Buff Graph">
-        This graph shows how many Ebon Mights and Presciences you had active over the course of the
-        encounter, with rule lines showing when you used Breath of Eon. Use this to ensure that you
-        are properly upkeeping your buffs.
+        This graph shows your uptime of <SpellLink spell={TALENTS_EVOKER.EBON_MIGHT_TALENT} /> and{' '}
+        <SpellLink spell={TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT} />, as well as how many{' '}
+        <SpellLink spell={TALENTS_EVOKER.PRESCIENCE_TALENT} /> buffs you had active over the course
+        of the encounter. Use this to ensure that you are properly upkeeping your buffs.
         {modules.buffTrackerGraph.plot}
       </SubSection>
 
