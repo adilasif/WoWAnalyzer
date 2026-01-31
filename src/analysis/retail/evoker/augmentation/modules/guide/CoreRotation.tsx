@@ -12,7 +12,6 @@ import CooldownUsage from 'parser/core/MajorCooldowns/CooldownUsage';
 import { QualitativePerformance } from 'parser/ui/QualitativePerformance';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import PerformancePercentage from 'analysis/retail/evoker/devastation/modules/guide/PerformancePercentage';
-import { isMythicPlus } from 'common/isMythicPlus';
 
 export function CoreRotationSection({ modules, events, info }: GuideProps<typeof CombatLogParser>) {
   return (

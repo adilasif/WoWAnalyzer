@@ -202,7 +202,7 @@ class SandsOfTime extends Analyzer {
                 <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> and{' '}
                 <SpellLink spell={TALENTS.DUPLICATE_1_AUGMENTATION_TALENT} />.
               </>
-            )}{' '}
+            )}
           </>
         }
         abovePerformanceDetails={<div style={{ marginBottom: 10 }}></div>}
