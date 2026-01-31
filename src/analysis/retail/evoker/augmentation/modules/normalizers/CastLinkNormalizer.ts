@@ -28,6 +28,7 @@ import { BREATH_OF_EONS_SPELL_IDS } from '../../constants';
  * https://www.warcraftlogs.com/reports/1JqKrX2vLxb6Zyp9/#fight=8&source=3&pins=2%24Off%24%23244F4B%24expression%24type%20%3D%20%22empowerend%22%20or%20type%3D%22removebuff%22&view=events&start=1402475&end=1408776
  */
 const FAILED_EXTENSION_LINK = 'failedExtensionLink';
+const FAILED_EXTENSION_LINK_DUPLICATE = 'failedExtensionLinkDuplicate';
 
 export const PRESCIENCE_BUFF_CAST_LINK = 'prescienceBuffCastLink';
 export const PRESCIENCE_APPLY_REMOVE_LINK = 'prescienceApplyRemoveLink';
@@ -252,6 +253,33 @@ const EVENT_LINKS: EventLink[] = [
     forwardBufferMs: 850,
   },
   {
+    linkRelation: FAILED_EXTENSION_LINK_DUPLICATE,
+    reverseLinkRelation: FAILED_EXTENSION_LINK,
+    linkingEventId: [
+      SPELLS.FIRE_BREATH.id,
+      SPELLS.FIRE_BREATH_FONT.id,
+      SPELLS.UPHEAVAL.id,
+      SPELLS.UPHEAVAL_FONT.id,
+    ],
+    linkingEventType: EventType.EmpowerEnd,
+    referencedEventId: SPELLS.DUPLICATE_SELF_BUFF.id,
+    referencedEventType: EventType.RemoveBuff,
+    anyTarget: true,
+    forwardBufferMs: 850,
+    isActive: (c) => c.hasTalent(TALENTS.DUPLICATE_2_AUGMENTATION_TALENT),
+  },
+  {
+    linkRelation: FAILED_EXTENSION_LINK_DUPLICATE,
+    reverseLinkRelation: FAILED_EXTENSION_LINK_DUPLICATE,
+    linkingEventId: TALENTS.ERUPTION_TALENT.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.DUPLICATE_SELF_BUFF.id,
+    referencedEventType: EventType.RemoveBuff,
+    anyTarget: true,
+    forwardBufferMs: 850,
+    isActive: (c) => c.hasTalent(TALENTS.DUPLICATE_2_AUGMENTATION_TALENT),
+  },
+  {
     linkRelation: ERUPTION_CHITIN_LINK,
     reverseLinkRelation: ERUPTION_CHITIN_LINK,
     linkingEventId: TALENTS.ERUPTION_TALENT.id,
@@ -473,6 +501,10 @@ export function ebonIsFromBreath(event: ApplyBuffEvent | CastEvent) {
 
 export function failedEbonMightExtension(event: CastEvent | EmpowerEndEvent) {
   return HasRelatedEvent(event, FAILED_EXTENSION_LINK);
+}
+
+export function failedDuplicateExtension(event: CastEvent | EmpowerEndEvent) {
+  return HasRelatedEvent(event, FAILED_EXTENSION_LINK_DUPLICATE);
 }
 
 function upheavalHitIsUnique(castEvent: EmpowerEndEvent, damageEvent: DamageEvent) {
