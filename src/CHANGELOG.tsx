@@ -30,6 +30,7 @@ import SpellLink from 'interface/SpellLink';
 
 // prettier-ignore
 export default [
+  change(date(2026, 1, 29), 'RU: improve localization on key pages (news/about/specs/premium/help-wanted) and make Panel headings fully translatable', SaltyRain),
   change(date(2026, 1, 27), 'Add support for Midnight gems and enchants.', Arlie),
   change(date(2026, 1, 27), 'Add error state for ineligible fights.', Topple),
   change(date(2026, 1, 25), 'RU: localized /specs page (classes/specs) and updated related UI labels', SaltyRain),
