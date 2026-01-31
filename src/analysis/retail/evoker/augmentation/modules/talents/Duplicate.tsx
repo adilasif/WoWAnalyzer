@@ -38,14 +38,12 @@ class Duplicate extends Analyzer {
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT);
-    // Filtering to SELECTED_PLAYER_PET breaks this. Eruption and Fire Breath use separate IDs,
-    // so no filtering needed, but Upheaval uses the same ID as the player so must be distinguished.
     this.addEventListener(
-      Events.damage.spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH]),
+      Events.damage
+        .by(SELECTED_PLAYER_PET)
+        .spell([SPELLS.DUPLICATE_ERUPTION, SPELLS.DUPLICATE_FIRE_BREATH, SPELLS.UPHEAVAL_DAM]),
       this.onPetDamage,
     );
-
-    this.addEventListener(Events.damage.spell([SPELLS.UPHEAVAL_DAM]), this.onPetUpheavalDamage);
 
     if (this.duplicateBuffsEbonMight) {
       this.addEventListener(
@@ -70,11 +68,6 @@ class Duplicate extends Analyzer {
   }
 
   onPetDamage(event: DamageEvent) {
-    this.petDamage += event.amount;
-  }
-
-  onPetUpheavalDamage(event: DamageEvent) {
-    if (event.sourceID === this.selectedCombatant.id) return;
     this.petDamage += event.amount;
   }
 
