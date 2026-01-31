@@ -26,7 +26,7 @@ import { UPHEAVAL_REVERBERATION_DAM_LINK } from '../normalizers/CastLinkNormaliz
  */
 class Duplicate extends Analyzer {
   canExtendDuplicate = this.selectedCombatant.hasTalent(
-    TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT,
+    TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT,
   );
   duplicateBuffsEbonMight = this.selectedCombatant.hasTalent(
     TALENTS_EVOKER.DUPLICATE_3_AUGMENTATION_TALENT,
@@ -37,7 +37,7 @@ class Duplicate extends Analyzer {
 
   constructor(options: Options) {
     super(options);
-    this.active = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT);
+    this.active = this.selectedCombatant.hasTalent(TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT);
     // Filtering to SELECTED_PLAYER_PET breaks this. Eruption and Fire Breath use separate IDs,
     // so no filtering needed, but Upheaval uses the same ID as the player so must be distinguished.
     this.addEventListener(
@@ -115,7 +115,7 @@ class Duplicate extends Analyzer {
       {
         color: 'rgb(255, 255, 0)',
         label: 'Future Self damage',
-        spellId: TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT.id,
+        spellId: TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT.id,
         valueTooltip: formatNumber(this.petDamage),
         value: this.petDamage,
       },
@@ -141,7 +141,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage + this.personalDamage + this.externalDamage} />
               <br />
@@ -161,7 +161,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage} />
               <br />
@@ -177,7 +177,7 @@ class Duplicate extends Analyzer {
           size="flexible"
           category={STATISTIC_CATEGORY.TALENTS}
         >
-          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_2_AUGMENTATION_TALENT}>
+          <TalentSpellText talent={TALENTS_EVOKER.DUPLICATE_1_AUGMENTATION_TALENT}>
             <div>
               <ItemDamageDone amount={this.petDamage} />
             </div>
