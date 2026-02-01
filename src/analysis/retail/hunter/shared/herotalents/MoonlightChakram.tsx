@@ -57,11 +57,11 @@ export default class MoonlightChakram extends Analyzer {
   }
 
   private onTriggerCast(event: CastEvent) {
-    const triggerName = event.ability.guid === SPELLS.TRUESHOT.id ? 'Trueshot' : 'Takedown';
     // Chakram is a 15s duration availability after using cooldown.
     const chakramCast = GetRelatedEvents(event, TRIGGER_TO_CHAKRAM_CAST)[0] as
       | CastEvent
       | undefined;
+    const chakramTarget = this.owner.getTargetName(event) || 'unknown';
 
     if (!chakramCast) {
       this.missedCasts += 1;
@@ -72,8 +72,8 @@ export default class MoonlightChakram extends Analyzer {
             <h5 style={{ color: BadColor }}>
               FAIL: No <SpellLink spell={SPELLS.MOONLIGHT_CHAKRAM_CAST} /> cast
             </h5>
-            @ <strong>{this.owner.formatTimestamp(event.timestamp)}</strong> after{' '}
-            <strong>{triggerName}</strong>
+            Target: <strong>{chakramTarget}</strong>
+            <br />@ <strong>{this.owner.formatTimestamp(event.timestamp)}</strong>
           </>
         ),
       });
@@ -81,8 +81,10 @@ export default class MoonlightChakram extends Analyzer {
     }
 
     this.chakramCasts += 1;
+    const targetName = this.owner.getTargetName(chakramCast) || chakramTarget;
 
-    //Currently hits 16 times, but will only hit for 7 at level 90 with the extra hero talents.
+    //Currently hits 16 times, but will only hit for 7 at level 90 with the extra hero talents
+    // So analysis is a little weird. The important bit is did they even cast the ability or did they forget
     const damageEvents =
       (GetRelatedEvents(chakramCast, CHAKRAM_CAST_TO_DAMAGE) as DamageEvent[]) || [];
     const damage = damageEvents.reduce((sum, dmg) => sum + dmg.amount + (dmg.absorbed || 0), 0);
@@ -147,6 +149,8 @@ export default class MoonlightChakram extends Analyzer {
             Damage: <strong>{damage.toLocaleString()}</strong> ({hits} {hits === 1 ? 'hit' : 'hits'}
             )
             <br />
+            Target: <strong>{targetName}</strong>
+            <br />
             {this.hasStalkAndStrike && this.isSurvival && wastedCDR > 0 && (
               <>
                 {wastedCDR > STALK_AND_STRIKE_WASTE_THRESHOLD ? 'BAD: ' : ''}Wasted{' '}
@@ -161,8 +165,7 @@ export default class MoonlightChakram extends Analyzer {
               </>
             )}
           </div>
-          @ <strong>{this.owner.formatTimestamp(event.timestamp)}</strong> after{' '}
-          <strong>{triggerName}</strong>
+          @ <strong>{this.owner.formatTimestamp(event.timestamp)}</strong>
         </>
       ),
     });
