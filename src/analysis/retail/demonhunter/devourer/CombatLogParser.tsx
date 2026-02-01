@@ -1,7 +1,6 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import Channeling from 'parser/shared/normalizers/Channeling';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
-
 import { Buffs } from 'analysis/retail/demonhunter/devourer/modules/Buffs';
 import { GlobalCooldown } from 'analysis/retail/demonhunter/devourer/modules/core/GlobalCooldown';
 import { AlwaysBeCasting } from 'analysis/retail/demonhunter/devourer/modules/features/AlwaysBeCasting';
