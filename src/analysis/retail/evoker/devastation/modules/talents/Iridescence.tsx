@@ -29,6 +29,7 @@ import {
 } from '../normalizers/CastLinkNormalizer';
 import TalentSpellText from 'parser/ui/TalentSpellText';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
+import { BadColor, GoodColor, OkColor } from 'interface/guide';
 
 type DamageSources = Record<number, { amount: number; spell: Ability }>;
 
@@ -112,11 +113,14 @@ class Iridescence extends Analyzer {
   private onEmpowerEnd(event: EmpowerEndEvent) {
     const consumedIridescence = isFromIridescenceConsume(event);
 
+    let failedToFindTargetAmount = 0;
     const debuffEvents = getFireBreathDebuffEvents(event);
+
     debuffEvents.forEach((debuffEvent) => {
       const target = encodeEventTargetString(debuffEvent);
 
       if (!target) {
+        failedToFindTargetAmount += 1;
         return;
       }
 
@@ -126,21 +130,77 @@ class Iridescence extends Analyzer {
         this.fireBreathTargets.delete(target);
       }
     });
+
+    const details = (
+      <div>
+        <dl>
+          <dt>Active debuff targets</dt>
+          <dd>{[...this.fireBreathTargets].join(', ')}</dd>
+        </dl>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            {debuffEvents.map((e, idx) => {
+              const target = encodeEventTargetString(e);
+              return (
+                <tr key={`${e.timestamp}-${e.type}-${target}-${idx}`}>
+                  <td style={{ minWidth: 100 }}>{e.type}</td>
+                  <td style={{ textAlign: 'right' }}>{target}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+
+    if (failedToFindTargetAmount > 0) {
+      this.addDebugAnnotation(event, {
+        color: BadColor,
+        summary: `Failed to find targets for ${failedToFindTargetAmount} debuff events`,
+        details,
+      });
+    } else if (!consumedIridescence) {
+      this.addDebugAnnotation(event, {
+        color: OkColor,
+        summary: 'Iridescence not consumed',
+        details,
+      });
+    } else {
+      this.addDebugAnnotation(event, {
+        color: GoodColor,
+        summary: 'Iridescence consumed',
+        details,
+      });
+    }
   }
 
   private onRemoveDebuff(event: RemoveDebuffEvent) {
     const target = encodeEventTargetString(event);
-    if (target) {
-      if (this.fireBreathTargets.has(target)) {
-        // Debuff is removed before the consume tick
-        const consumeFlameTick = getConsumeFlameTickEvent(event);
-        if (consumeFlameTick) {
-          this.calculateDamage(consumeFlameTick);
-        }
-      }
 
-      this.fireBreathTargets.delete(target);
+    if (!target) {
+      this.addDebugAnnotation(event, {
+        color: BadColor,
+        summary: 'Unable to find target for RemoveDebuffEvent',
+      });
+      return;
     }
+
+    if (this.fireBreathTargets.has(target)) {
+      // Debuff is removed before the consume tick
+      // technically this happens to fb tick too, but it's rare enough to not be worth handling
+      const consumeFlameTick = getConsumeFlameTickEvent(event);
+      if (consumeFlameTick) {
+        this.calculateDamage(consumeFlameTick);
+      }
+    }
+
+    this.fireBreathTargets.delete(target);
   }
 
   private onDamage(event: DamageEvent) {
