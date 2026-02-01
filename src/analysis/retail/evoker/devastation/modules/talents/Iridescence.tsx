@@ -6,6 +6,9 @@ import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
 import Events, {
   Ability,
+  ApplyBuffEvent,
+  ApplyBuffStackEvent,
+  CastEvent,
   DamageEvent,
   EmpowerEndEvent,
   EventType,
@@ -30,19 +33,24 @@ import {
 import TalentSpellText from 'parser/ui/TalentSpellText';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 import { BadColor, GoodColor, OkColor } from 'interface/guide';
+import { InformationIcon } from 'interface/icons';
 
 type DamageSources = Record<number, { amount: number; spell: Ability }>;
 
 // TODO:
 // Living Flame DoT
-// Show wasted buffs, maybe - would need to make sure we count wasted buff *stacks*
 
 /** Casting an empower spell increases the damage of your next 2 spells of the same color by 20% within 10 sec. */
 class Iridescence extends Analyzer {
   damageSources: DamageSources = {};
 
+  currentBlueBuffStacks = 0;
+  currentRedBuffStacks = 0;
+
   wastedBlueBuffs = 0;
   wastedRedBuffs = 0;
+  overcappedRedBuffs = 0;
+  overcappedBlueBuffs = 0;
 
   fireBreathTargets = new Set<string>();
 
@@ -50,12 +58,18 @@ class Iridescence extends Analyzer {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS.IRIDESCENCE_TALENT);
 
-    [Events.removebuff, Events.removebuffstack].forEach((eventType) => {
-      this.addEventListener(
-        eventType.by(SELECTED_PLAYER).spell([SPELLS.IRIDESCENCE_BLUE, SPELLS.IRIDESCENCE_RED]),
-        this.onBuffRemove,
-      );
-    });
+    this.addEventListener(
+      Events.removebuff
+        .by(SELECTED_PLAYER)
+        .spell([SPELLS.IRIDESCENCE_BLUE, SPELLS.IRIDESCENCE_RED]),
+      this.onRemoveBuff,
+    );
+    this.addEventListener(
+      Events.removebuffstack
+        .by(SELECTED_PLAYER)
+        .spell([SPELLS.IRIDESCENCE_BLUE, SPELLS.IRIDESCENCE_RED]),
+      this.onRemoveBuffStack,
+    );
 
     this.addEventListener(
       Events.empowerEnd.by(SELECTED_PLAYER).spell([SPELLS.FIRE_BREATH, SPELLS.FIRE_BREATH_FONT]),
@@ -73,27 +87,63 @@ class Iridescence extends Analyzer {
       Events.removedebuff.by(SELECTED_PLAYER).spell(SPELLS.FIRE_BREATH_DOT),
       this.onRemoveDebuff,
     );
+
+    this.addEventListener(
+      Events.applybuffstack
+        .by(SELECTED_PLAYER)
+        .spell([SPELLS.IRIDESCENCE_BLUE, SPELLS.IRIDESCENCE_RED]),
+      this.onApplyBuffStack,
+    );
+    this.addEventListener(
+      Events.applybuff.by(SELECTED_PLAYER).spell([SPELLS.IRIDESCENCE_BLUE, SPELLS.IRIDESCENCE_RED]),
+      this.onApplyBuff,
+    );
   }
 
-  private onBuffRemove(event: RemoveBuffEvent | RemoveBuffStackEvent) {
+  private onRemoveBuff(event: RemoveBuffEvent | RemoveBuffStackEvent) {
     const castEvent = getIridescenceConsumeEvent(event);
 
-    if (castEvent) {
-      if (castEvent.type === EventType.EmpowerEnd) {
-        // Handle this seperately
-        return;
-      }
-
-      getDamageEventsFromCast(castEvent).forEach((damageEvent) =>
-        this.calculateDamage(damageEvent),
-      );
+    if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
+      this.wastedBlueBuffs += castEvent ? 0 : this.currentBlueBuffStacks;
+      this.currentBlueBuffStacks = 0;
     } else {
-      if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
-        this.wastedBlueBuffs += 1;
-      } else {
-        this.wastedRedBuffs += 1;
-      }
+      this.wastedRedBuffs += castEvent ? 0 : this.currentRedBuffStacks;
+      this.currentRedBuffStacks = 0;
     }
+
+    if (!castEvent) {
+      return;
+    }
+
+    this.calculateDamageFromCastEvent(castEvent);
+  }
+
+  private onRemoveBuffStack(event: RemoveBuffStackEvent) {
+    if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
+      this.currentBlueBuffStacks = event.stack;
+    } else {
+      this.currentRedBuffStacks = event.stack;
+    }
+
+    const castEvent = getIridescenceConsumeEvent(event);
+    if (!castEvent) {
+      this.addDebugAnnotation(event, {
+        color: BadColor,
+        summary: 'Iridescence consumed, but no consume event found',
+      });
+      return;
+    }
+
+    this.calculateDamageFromCastEvent(castEvent);
+  }
+
+  private calculateDamageFromCastEvent(event: CastEvent | EmpowerEndEvent) {
+    if (event.type === EventType.EmpowerEnd) {
+      // Handle this seperately
+      return;
+    }
+
+    getDamageEventsFromCast(event).forEach((damageEvent) => this.calculateDamage(damageEvent));
   }
 
   private calculateDamage(event: DamageEvent) {
@@ -212,6 +262,24 @@ class Iridescence extends Analyzer {
     this.calculateDamage(event);
   }
 
+  private onApplyBuffStack(event: ApplyBuffStackEvent) {
+    if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
+      this.currentBlueBuffStacks = event.stack;
+      this.overcappedBlueBuffs += 1;
+    } else {
+      this.currentRedBuffStacks = event.stack;
+      this.overcappedRedBuffs += 1;
+    }
+  }
+
+  private onApplyBuff(event: ApplyBuffEvent) {
+    if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
+      this.currentBlueBuffStacks = 2;
+    } else {
+      this.currentRedBuffStacks = 2;
+    }
+  }
+
   statistic() {
     const damageItems = Object.values(this.damageSources)
       .sort((a, b) => b.amount - a.amount)
@@ -223,21 +291,56 @@ class Iridescence extends Analyzer {
 
     const totalAmount = damageItems.reduce((total, item) => total + item.value, 0);
 
-    const tooltip = damageItems.map((item) => (
-      <li key={`iridescence-damage-${item.spellId}`}>
-        <SpellLink spell={item.spellId} /> Damage: {item.valueTooltip}
-      </li>
-    ));
-
     return (
       <Statistic
         position={STATISTIC_ORDER.OPTIONAL()}
         size="flexible"
         category={STATISTIC_CATEGORY.TALENTS}
-        tooltip={tooltip}
+        tooltip={
+          <>
+            <li>Total damage: {formatNumber(totalAmount)}</li>
+            {damageItems.map((item) => (
+              <li key={`iridescence-damage-${item.spellId}`}>
+                <SpellLink spell={item.spellId} /> damage: {item.valueTooltip}
+              </li>
+            ))}
+          </>
+        }
       >
         <TalentSpellText talent={TALENTS.IRIDESCENCE_TALENT}>
           <ItemDamageDone amount={totalAmount} />
+          {this.wastedBlueBuffs > 0 && (
+            <div>
+              <InformationIcon /> {this.wastedBlueBuffs}{' '}
+              <small>
+                <SpellLink spell={SPELLS.IRIDESCENCE_BLUE} /> wasted
+              </small>
+            </div>
+          )}
+          {this.wastedRedBuffs > 0 && (
+            <div>
+              <InformationIcon /> {this.wastedRedBuffs}{' '}
+              <small>
+                <SpellLink spell={SPELLS.IRIDESCENCE_RED} /> wasted
+              </small>
+            </div>
+          )}
+          {this.overcappedRedBuffs > 0 && (
+            <div>
+              <InformationIcon /> {this.overcappedRedBuffs}{' '}
+              <small>
+                <SpellLink spell={SPELLS.IRIDESCENCE_RED} /> overcapped
+              </small>
+            </div>
+          )}
+          {this.overcappedBlueBuffs > 0 && (
+            <div>
+              <InformationIcon /> {this.overcappedBlueBuffs}{' '}
+              <small>
+                <SpellLink spell={SPELLS.IRIDESCENCE_BLUE} /> overcapped
+              </small>
+            </div>
+          )}
         </TalentSpellText>
       </Statistic>
     );
