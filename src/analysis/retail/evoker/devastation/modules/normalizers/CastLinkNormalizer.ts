@@ -16,6 +16,7 @@ import {
   RefreshDebuffEvent,
   RemoveBuffEvent,
   RemoveBuffStackEvent,
+  RemoveDebuffEvent,
 } from 'parser/core/Events';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 import {
@@ -49,6 +50,10 @@ const AZURE_SWEEP_CONSUME = 'AzureSweepConsume';
 const AZURE_SWEEP_GENERATE = 'AzureSweepGenerate';
 const SHATTERING_STAR_DAMAGE = 'ShatteringStarDamage';
 const ETERNITY_SURGE_SHATTER_STAR_LINK = 'EternitySurgeShatterStarLink';
+
+const CONSUME_FLAME_TICK = 'ConsumeFlameTick';
+const FIRE_BREATH_REMOVE_DEBUFF = 'FireBreathRemoveDebuff';
+const FIRE_BREATH_REMOVE_CONSUME_FLAME_BUFFER_MS = 250;
 
 const CAST_LINK = 'CastLink';
 const DAMAGE_LINK = 'DamageLink';
@@ -341,6 +346,16 @@ const EVENT_LINKS: EventLink[] = [
     backwardBufferMs: TWIN_FLAME_TRAVEL_TIME_MS,
     maximumLinks: 1,
   },
+  {
+    linkRelation: CONSUME_FLAME_TICK,
+    reverseLinkRelation: FIRE_BREATH_REMOVE_DEBUFF,
+    linkingEventId: SPELLS.FIRE_BREATH_DOT.id,
+    linkingEventType: EventType.RemoveDebuff,
+    referencedEventId: SPELLS.CONSUME_FLAME_DAMAGE.id,
+    referencedEventType: EventType.Damage,
+    forwardBufferMs: FIRE_BREATH_REMOVE_CONSUME_FLAME_BUFFER_MS,
+    maximumLinks: 1,
+  },
 ];
 
 class CastLinkNormalizer extends EventLinkNormalizer {
@@ -617,6 +632,10 @@ export function getFireBreathDebuffEvents(
   event: EmpowerEndEvent,
 ): (ApplyDebuffEvent | RefreshDebuffEvent)[] {
   return GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, FIRE_BREATH_DEBUFF);
+}
+
+export function getConsumeFlameTickEvent(event: RemoveDebuffEvent) {
+  return GetRelatedEvent<DamageEvent>(event, CONSUME_FLAME_TICK);
 }
 
 export default CastLinkNormalizer;

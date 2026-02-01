@@ -21,6 +21,7 @@ import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import { IRIDESCENCE_MULTIPLIER } from 'analysis/retail/evoker/devastation/constants';
 import { SpellLink } from 'interface';
 import {
+  getConsumeFlameTickEvent,
   getDamageEventsFromCast,
   getFireBreathDebuffEvents,
   getIridescenceConsumeEvent,
@@ -130,6 +131,14 @@ class Iridescence extends Analyzer {
   private onRemoveDebuff(event: RemoveDebuffEvent) {
     const target = encodeEventTargetString(event);
     if (target) {
+      if (this.fireBreathTargets.has(target)) {
+        // Debuff is removed before the consume tick
+        const consumeFlameTick = getConsumeFlameTickEvent(event);
+        if (consumeFlameTick) {
+          this.calculateDamage(consumeFlameTick);
+        }
+      }
+
       this.fireBreathTargets.delete(target);
     }
   }
