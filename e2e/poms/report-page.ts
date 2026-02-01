@@ -129,7 +129,7 @@ export class ReportPage {
       await this.continueAnywayLink.click();
     }
 
-    if (handlePartial && (await this.partialSupportHeading.isVisible())) {
+    if ((await this.partialSupportHeading.isVisible()) && handlePartial) {
       await this.continueAnywayLink.click();
     }
 
