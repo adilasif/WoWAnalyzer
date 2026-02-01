@@ -4,7 +4,15 @@ import { formatNumber } from 'common/format';
 
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import ItemDamageDone from 'parser/ui/ItemDamageDone';
-import Events, { RemoveBuffEvent, Ability, RemoveBuffStackEvent } from 'parser/core/Events';
+import Events, {
+  Ability,
+  DamageEvent,
+  EmpowerEndEvent,
+  EventType,
+  RemoveBuffEvent,
+  RemoveBuffStackEvent,
+  RemoveDebuffEvent,
+} from 'parser/core/Events';
 import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
 
 import Statistic from 'parser/ui/Statistic';
@@ -14,9 +22,12 @@ import { IRIDESCENCE_MULTIPLIER } from 'analysis/retail/evoker/devastation/const
 import { SpellLink } from 'interface';
 import {
   getDamageEventsFromCast,
+  getFireBreathDebuffEvents,
   getIridescenceConsumeEvent,
+  isFromIridescenceConsume,
 } from '../normalizers/CastLinkNormalizer';
 import TalentSpellText from 'parser/ui/TalentSpellText';
+import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
 
 type DamageSources = Record<number, { amount: number; spell: Ability }>;
 
@@ -31,6 +42,8 @@ class Iridescence extends Analyzer {
   wastedBlueBuffs = 0;
   wastedRedBuffs = 0;
 
+  fireBreathTargets = new Set<string>();
+
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS.IRIDESCENCE_TALENT);
@@ -41,25 +54,37 @@ class Iridescence extends Analyzer {
         this.onBuffRemove,
       );
     });
+
+    this.addEventListener(
+      Events.empowerEnd.by(SELECTED_PLAYER).spell([SPELLS.FIRE_BREATH, SPELLS.FIRE_BREATH_FONT]),
+      this.onEmpowerEnd,
+    );
+
+    this.addEventListener(
+      Events.damage
+        .by(SELECTED_PLAYER)
+        .spell([SPELLS.FIRE_BREATH_DOT, SPELLS.CONSUME_FLAME_DAMAGE]),
+      this.onDamage,
+    );
+
+    this.addEventListener(
+      Events.removedebuff.by(SELECTED_PLAYER).spell(SPELLS.FIRE_BREATH_DOT),
+      this.onRemoveDebuff,
+    );
   }
 
-  onBuffRemove(event: RemoveBuffEvent | RemoveBuffStackEvent) {
+  private onBuffRemove(event: RemoveBuffEvent | RemoveBuffStackEvent) {
     const castEvent = getIridescenceConsumeEvent(event);
 
     if (castEvent) {
-      getDamageEventsFromCast(castEvent).forEach((damageEvent) => {
-        if (!this.damageSources[damageEvent.ability.guid]) {
-          this.damageSources[damageEvent.ability.guid] = {
-            amount: 0,
-            spell: damageEvent.ability,
-          };
-        }
+      if (castEvent.type === EventType.EmpowerEnd) {
+        // Handle this seperately
+        return;
+      }
 
-        this.damageSources[damageEvent.ability.guid].amount += calculateEffectiveDamage(
-          damageEvent,
-          IRIDESCENCE_MULTIPLIER,
-        );
-      });
+      getDamageEventsFromCast(castEvent).forEach((damageEvent) =>
+        this.calculateDamage(damageEvent),
+      );
     } else {
       if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
         this.wastedBlueBuffs += 1;
@@ -67,6 +92,55 @@ class Iridescence extends Analyzer {
         this.wastedRedBuffs += 1;
       }
     }
+  }
+
+  private calculateDamage(event: DamageEvent) {
+    if (!this.damageSources[event.ability.guid]) {
+      this.damageSources[event.ability.guid] = {
+        amount: 0,
+        spell: event.ability,
+      };
+    }
+
+    this.damageSources[event.ability.guid].amount += calculateEffectiveDamage(
+      event,
+      IRIDESCENCE_MULTIPLIER,
+    );
+  }
+
+  private onEmpowerEnd(event: EmpowerEndEvent) {
+    const consumedIridescence = isFromIridescenceConsume(event);
+
+    const debuffEvents = getFireBreathDebuffEvents(event);
+    debuffEvents.forEach((debuffEvent) => {
+      const target = encodeEventTargetString(debuffEvent);
+
+      if (!target) {
+        return;
+      }
+
+      if (consumedIridescence) {
+        this.fireBreathTargets.add(target);
+      } else {
+        this.fireBreathTargets.delete(target);
+      }
+    });
+  }
+
+  private onRemoveDebuff(event: RemoveDebuffEvent) {
+    const target = encodeEventTargetString(event);
+    if (target) {
+      this.fireBreathTargets.delete(target);
+    }
+  }
+
+  private onDamage(event: DamageEvent) {
+    const target = encodeEventTargetString(event);
+    if (!target || !this.fireBreathTargets.has(target)) {
+      return;
+    }
+
+    this.calculateDamage(event);
   }
 
   statistic() {

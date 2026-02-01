@@ -44,7 +44,7 @@ const DISINTEGRATE_TICK = 'DisintegrateTick';
 const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
 const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
 const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
-export const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
+const FIRE_BREATH_DEBUFF = 'FireBreathDebuff';
 const AZURE_SWEEP_CONSUME = 'AzureSweepConsume';
 const AZURE_SWEEP_GENERATE = 'AzureSweepGenerate';
 const SHATTERING_STAR_DAMAGE = 'ShatteringStarDamage';
@@ -575,6 +575,13 @@ export function getIridescenceConsumeEvent(
   return GetRelatedEvent<CastEvent | EmpowerEndEvent>(event, IRIDESCENCE_RED_CONSUME);
 }
 
+export function isFromIridescenceConsume(event: CastEvent | EmpowerEndEvent) {
+  return (
+    HasRelatedEvent(event, IRIDESCENCE_RED_CONSUME) ||
+    HasRelatedEvent(event, IRIDESCENCE_BLUE_CONSUME)
+  );
+}
+
 export function getEternitySurgeDamageEvents(event: EmpowerEndEvent): DamageEvent[] {
   return GetRelatedEvents<DamageEvent>(event, ETERNITY_SURGE_FROM_CAST);
 }
@@ -604,6 +611,12 @@ export function getEternitySurgeEventForShatteringStarDamage(
   }
 
   return GetRelatedEvent<EmpowerEndEvent>(eternitySurgeDamageEvent, ETERNITY_SURGE_FROM_CAST);
+}
+
+export function getFireBreathDebuffEvents(
+  event: EmpowerEndEvent,
+): (ApplyDebuffEvent | RefreshDebuffEvent)[] {
+  return GetRelatedEvents<ApplyDebuffEvent | RefreshDebuffEvent>(event, FIRE_BREATH_DEBUFF);
 }
 
 export default CastLinkNormalizer;
