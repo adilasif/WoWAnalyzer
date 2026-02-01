@@ -25,8 +25,8 @@ import {
   IRIDESCENCE_RED_CAST_SPELLS,
 } from '../../constants';
 import {
-  LEAPING_FLAMES_HITS,
-  LIVING_FLAME_CAST_HIT,
+  getLeapingEvents,
+  getLivingFlameCastHit,
 } from 'analysis/retail/evoker/shared/modules/normalizers/LeapingFlamesNormalizer';
 import { CHAINED_CAST, CHAINED_FROM_CAST } from './DisintegrateChainCastLinks';
 import { ETERNITY_SURGE_FROM_CAST } from './EternitySurgeNormalizer';
@@ -560,9 +560,9 @@ export function getDamageEventsFromCast(event: CastEvent): DamageEvent[] {
     case SPELLS.LIVING_FLAME_CAST.id:
       return [
         // TODO: DoT
-        ...GetRelatedEvents<DamageEvent>(event, LIVING_FLAME_CAST_HIT),
-        ...GetRelatedEvents<DamageEvent>(event, LEAPING_FLAMES_HITS),
-      ];
+        getLivingFlameCastHit(event, EventType.Damage),
+        ...getLeapingEvents(event, EventType.Damage),
+      ].filter((x) => x !== undefined);
     case SPELLS.PYRE.id:
     case SPELLS.PYRE_DENSE_TALENT.id:
     case TALENTS.DRAGONRAGE_TALENT.id:
