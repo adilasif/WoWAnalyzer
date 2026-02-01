@@ -355,6 +355,7 @@ const EVENT_LINKS: EventLink[] = [
     referencedEventType: EventType.Damage,
     forwardBufferMs: FIRE_BREATH_REMOVE_CONSUME_FLAME_BUFFER_MS,
     maximumLinks: 1,
+    isActive: (c) => c.hasTalent(TALENTS.CONSUME_FLAME_TALENT),
   },
 ];
 
