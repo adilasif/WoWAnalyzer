@@ -31,9 +31,10 @@ export default class MoonlightChakram extends Analyzer {
   protected spellUsable!: SpellUsable;
 
   private totalDamage = 0;
-  private totalHits = 0;
   private chakramCasts = 0;
   private missedCasts = 0;
+  private totalWildfireBombCdr = 0;
+  private totalWildfireBombCdrWasted = 0;
   private useEntries: BoxRowEntry[] = [];
   private isSurvival = false;
   private hasStalkAndStrike = false;
@@ -91,7 +92,6 @@ export default class MoonlightChakram extends Analyzer {
     const hits = damageEvents.length;
 
     this.totalDamage += damage;
-    this.totalHits += hits;
 
     let performance = QualitativePerformance.Good;
     let wastedCDR = 0;
@@ -115,6 +115,8 @@ export default class MoonlightChakram extends Analyzer {
             performance = QualitativePerformance.Fail;
           }
         }
+        this.totalWildfireBombCdrWasted += wastedCDR;
+        this.totalWildfireBombCdr += STALK_AND_STRIKE_CDR - wastedCDR;
       } else {
         wastedLockAndLoad = this.selectedCombatant.hasBuff(
           SPELLS.LOCK_AND_LOAD_BUFF.id,
@@ -212,8 +214,6 @@ export default class MoonlightChakram extends Analyzer {
   }
 
   statistic() {
-    const avgHits = this.chakramCasts > 0 ? this.totalHits / this.chakramCasts : 0;
-
     return (
       <Statistic
         position={STATISTIC_ORDER.OPTIONAL(13)}
@@ -222,9 +222,20 @@ export default class MoonlightChakram extends Analyzer {
       >
         <BoringSpellValueText spell={TALENTS.MOONLIGHT_CHAKRAM_TALENT}>
           <ItemDamageDone amount={this.totalDamage} />
-          <div>
-            {avgHits.toFixed(1)} <small>average targets hit</small>
-          </div>
+          {this.hasStalkAndStrike && this.isSurvival && this.chakramCasts > 0 && (
+            <>
+              <div>
+                {(this.totalWildfireBombCdr / 1000).toFixed(1)}s{' '}
+                <small>Wildfire Bomb CDR gained</small>
+              </div>
+              {this.totalWildfireBombCdrWasted > 0 && (
+                <div>
+                  {(this.totalWildfireBombCdrWasted / 1000).toFixed(1)}s{' '}
+                  <small>Wildfire Bomb CDR wasted</small>
+                </div>
+              )}
+            </>
+          )}
           {this.missedCasts > 0 && (
             <div style={{ color: BadColor }}>
               {this.missedCasts} <small>missed {this.missedCasts === 1 ? 'cast' : 'casts'}</small>
