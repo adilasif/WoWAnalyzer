@@ -173,27 +173,31 @@ export default class MoonlightChakram extends Analyzer {
 
   get guideSubsection(): JSX.Element {
     const explanation = (
-      <p>
-        <strong>
-          <SpellLink spell={TALENTS.MOONLIGHT_CHAKRAM_TALENT} />
-        </strong>{' '}
-        should be cast within 15 seconds of becoming available.
-        {this.hasStalkAndStrike && this.isSurvival && (
-          <>
-            {' '}
-            With <SpellLink spell={TALENTS.STALK_AND_STRIKE_TALENT} />, ensure you don't waste{' '}
-            <SpellLink spell={TALENTS.WILDFIRE_BOMB_TALENT} /> cooldown reduction.
-          </>
-        )}
-        {this.hasStalkAndStrike && !this.isSurvival && (
-          <>
-            {' '}
-            With <SpellLink spell={TALENTS.STALK_AND_STRIKE_TALENT} />, avoid casting when you
-            already have <SpellLink spell={SPELLS.LOCK_AND_LOAD_BUFF} /> active to prevent wasting
-            the buff.
-          </>
-        )}
-      </p>
+      <div>
+        <p>
+          <strong>
+            <SpellLink spell={TALENTS.MOONLIGHT_CHAKRAM_TALENT} />
+          </strong>{' '}
+          should be cast within 15 seconds of becoming available.
+        </p>
+        <p>
+          {this.hasStalkAndStrike && this.isSurvival && (
+            <>
+              {' '}
+              With <SpellLink spell={TALENTS.STALK_AND_STRIKE_TALENT} />, ensure you don't waste{' '}
+              <SpellLink spell={TALENTS.WILDFIRE_BOMB_TALENT} /> cooldown reduction.
+            </>
+          )}
+          {this.hasStalkAndStrike && !this.isSurvival && (
+            <>
+              {' '}
+              With <SpellLink spell={TALENTS.STALK_AND_STRIKE_TALENT} />, avoid casting when you
+              already have <SpellLink spell={SPELLS.LOCK_AND_LOAD_BUFF} /> active to prevent wasting
+              the buff.
+            </>
+          )}
+        </p>
+      </div>
     );
 
     const data = (
