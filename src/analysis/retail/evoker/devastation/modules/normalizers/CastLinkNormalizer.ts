@@ -345,6 +345,7 @@ const EVENT_LINKS: EventLink[] = [
     anyTarget: true,
     backwardBufferMs: TWIN_FLAME_TRAVEL_TIME_MS,
     maximumLinks: 1,
+    isActive: (c) => c.hasTalent(TALENTS.TWIN_FLAME_TALENT),
   },
   {
     linkRelation: CONSUME_FLAME_TICK,
