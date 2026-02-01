@@ -33,8 +33,8 @@ import { DEEP_BREATH_SPELL_IDS } from 'analysis/retail/evoker/shared';
 
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
-export const IRIDESCENCE_RED_CONSUME = 'IridescentRedConsumption';
-export const IRIDESCENCE_BLUE_CONSUME = 'IridescentBlueConsumption';
+const IRIDESCENCE_RED_CONSUME = 'IridescentRedConsumption';
+const IRIDESCENCE_BLUE_CONSUME = 'IridescentBlueConsumption';
 export const DISINTEGRATE_REMOVE_APPLY = 'DisintegrateRemoveApply';
 export const PYRE_CAST = 'PyreCast';
 export const PYRE_DRAGONRAGE = 'PyreDragonrage';
@@ -84,13 +84,23 @@ const EVENT_LINKS: EventLink[] = [
     linkingEventId: SPELLS.IRIDESCENCE_RED.id,
     linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
     referencedEventId: IRIDESCENCE_RED_CAST_SPELLS.map((spell) => spell.id),
-    referencedEventType: EventType.Cast,
+    referencedEventType: [EventType.Cast, EventType.EmpowerEnd],
     anyTarget: true,
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: IRIDESCENCE_RED_BACKWARDS_BUFFER_MS,
     maximumLinks: 1,
     isActive(c) {
       return c.hasTalent(TALENTS.IRIDESCENCE_TALENT);
+    },
+    additionalCondition(_linkingEvent, referencedEvent) {
+      // We don't want to link to empower cast event
+      // easier to deal with it in this castlink rather than making another one
+      return (
+        referencedEvent.type === EventType.EmpowerEnd ||
+        ![SPELLS.FIRE_BREATH.id, SPELLS.FIRE_BREATH_FONT.id].includes(
+          (referencedEvent as CastEvent).ability.guid,
+        )
+      );
     },
   },
   {
@@ -557,12 +567,12 @@ export function getCastEventFromDamage(event: DamageEvent): CastEvent | undefine
 
 export function getIridescenceConsumeEvent(
   event: RemoveBuffEvent | RemoveBuffStackEvent,
-): CastEvent | undefined {
+): CastEvent | EmpowerEndEvent | undefined {
   if (event.ability.guid === SPELLS.IRIDESCENCE_BLUE.id) {
     return GetRelatedEvent<CastEvent>(event, IRIDESCENCE_BLUE_CONSUME);
   }
 
-  return GetRelatedEvent<CastEvent>(event, IRIDESCENCE_RED_CONSUME);
+  return GetRelatedEvent<CastEvent | EmpowerEndEvent>(event, IRIDESCENCE_RED_CONSUME);
 }
 
 export function getEternitySurgeDamageEvents(event: EmpowerEndEvent): DamageEvent[] {
