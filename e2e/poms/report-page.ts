@@ -129,15 +129,13 @@ export class ReportPage {
       await this.continueAnywayLink.click();
     }
 
+    if (handlePartial && (await this.partialSupportHeading.isVisible())) {
+      await this.continueAnywayLink.click();
+    }
+
     if ((await this.loadingLink.isVisible()) && waitForLoadingToFinish) {
       await this.expectBossDifficultyAndNameHeaderToBeVisible();
       await this.loadingLink.waitFor({ state: 'detached' });
-
-      if (handlePartial) {
-        if (await this.partialSupportHeading.isVisible()) {
-          await this.continueAnywayLink.click();
-        }
-      }
     }
   }
 
